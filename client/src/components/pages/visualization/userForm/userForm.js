@@ -10,17 +10,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { resetVisualizationApi } from '../../../../services/store/rootApi';
-import {
-  useVisualizationUserUploadMutation,
-  useSubmitQueueMutation,
-  useSubmitVisualizationMutation,
-  useUserMatrixMutation,
-} from './apiSlice';
+import { useUploadMutation, useSubmitMutation } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -42,12 +37,10 @@ export default function UserForm() {
   const { inputFilename, bedFilename, id, ...userForm } = store.userForm;
   const { submitted } = store.main;
 
-  const [handleUpload, { isLoading: isUploading }] =
-    useVisualizationUserUploadMutation();
-  const [handleSubmitQueue, { isLoading: isQueueing }] =
-    useSubmitQueueMutation();
-  const [profilerExtraction, { isLoading }] = useSubmitVisualizationMutation();
-  const [fetchMatrix, { isLoading: loadingMatrix }] = useUserMatrixMutation();
+  const [handleUpload, { isLoading: isUploading }] = useUploadMutation();
+  // const [handleSubmitQueue, { isLoading: isQueueing }] =
+  //   useSubmitQueueMutation();
+  const [profilerExtraction, { isLoading }] = useSubmitMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
@@ -196,32 +189,35 @@ export default function UserForm() {
         };
       }
 
-      if (useQueue) {
-        try {
-          await handleSubmitQueue({ args, state: { ...store } });
+      // if (useQueue) {
+      //   try {
+      //     await handleSubmitQueue({ args, state: { ...store } });
 
-          mergeSuccess(
-            `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
-          );
-        } catch (err) {
-          mergeError('Failed to submit to queue. Please Try Again.');
-        }
-      } else {
-        try {
-          mergeMain({ loading: { active: true } });
-          const response = await profilerExtraction(args).unwrap();
-          const matrixData = await fetchMatrix({ userId: id }).unwrap();
-          mergeMain({ ...response, matrixData });
-        } catch (error) {
-          mergeMain({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
-          mergeError(error.data.scriptOutput);
-        } finally {
-          mergeMain({ loading: { active: false } });
-        }
+      //     mergeSuccess(
+      //       `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
+      //     );
+      //   } catch (err) {
+      //     mergeError('Failed to submit to queue. Please Try Again.');
+      //   }
+      // } else {
+      try {
+        mergeMain({ loading: { active: true } });
+        const response = await profilerExtraction({
+          args,
+          email: data.email,
+        }).unwrap();
+        mergeMain({ ...response });
+      } catch (error) {
+        mergeMain({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError(error.data.scriptOutput);
+      } finally {
+        mergeMain({ loading: { active: false } });
       }
+      // }
     } catch (error) {
+      console.error(error);
       mergeError('An error occured while uploading files. Please try again.');
     }
   }
@@ -267,7 +263,7 @@ export default function UserForm() {
           <Col lg="6" className="p-0 d-flex">
             <Button
               className={`p-0 ml-auto font-14`}
-              disabled={submitted || isUploading || isQueueing || isLoading}
+              disabled={submitted || isUploading || isLoading}
               variant="link"
               type="button"
               onClick={() => loadExample()}
@@ -287,9 +283,7 @@ export default function UserForm() {
                   <Form.File
                     {...field}
                     value={''} // set dummy value for file input
-                    disabled={
-                      submitted || isUploading || isQueueing || isLoading
-                    }
+                    disabled={submitted || isUploading || isLoading}
                     id="inputFile"
                     title={inputFile.name || 'Upload Data File...'}
                     label={
@@ -314,7 +308,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
-                  disabled={submitted || isUploading || isQueueing || isLoading}
+                  disabled={submitted || isUploading || isLoading}
                   onClick={removeFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="lg" />
@@ -484,7 +478,6 @@ export default function UserForm() {
               disabled={
                 submitted ||
                 isUploading ||
-                isQueueing ||
                 isLoading ||
                 mutationSplit ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -510,7 +503,6 @@ export default function UserForm() {
                       mutationSplit ||
                       ['catalog_csv', 'catalog_tsv'].includes(inputFormat) ||
                       isUploading ||
-                      isQueueing ||
                       isLoading
                     }
                     id="uploadDataFile"
@@ -539,7 +531,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
-                  disabled={submitted || isUploading || isQueueing || isLoading}
+                  disabled={submitted || isUploading || isLoading}
                   onClick={removeBedFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="lg" />
@@ -743,7 +735,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Button
-            disabled={isUploading || isQueueing || isLoading}
+            disabled={isUploading || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -753,7 +745,7 @@ export default function UserForm() {
         </Col>
         <Col>
           <Button
-            disabled={submitted || isUploading || isQueueing || isLoading}
+            disabled={submitted || isUploading || isLoading}
             className="w-100"
             variant="primary"
             type="submit"

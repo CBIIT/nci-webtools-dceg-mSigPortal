@@ -1,41 +1,49 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import { useCosineWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { defaultMatrix2 } from '../../../../services/utils';
+import { defaultMatrix2, defaultProfile2 } from '../../../../services/utils';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { useMatrixListQuery } from '../userForm/apiSlice';
 
-export default function CsWithin() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        cosineSimilarity: { ...store.cosineSimilarity, withinForm: state },
-      })
-    );
-
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, id } = store.main;
-  const { withinForm } = store.cosineSimilarity;
-
+export default function CsWithin({ state }) {
   const [params, setParams] = useState('');
-
+  const { study, cancer, strategy, source, id } = state;
+  
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
   const { data, error, isFetching } = useCosineWithinQuery(params, {
     skip: !params,
   });
 
-  function getMatrixOptions(profile) {
-    return matrixData && profile
+  const { control, handleSubmit, watch, setValue } = useForm({
+    defaultValues: { profile: '', matrix: '' },
+  });
+  const { profile, matrix } = watch();
+
+  const profileOptions = options
+    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
+        label: e,
+        value: e,
+      }))
+    : [];
+  const matrixOptions = (profile) =>
+    options && profile
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.profile == profile.value)
               .map((e) => e.matrix)
           ),
@@ -46,30 +54,14 @@ export default function CsWithin() {
             value: e,
           }))
       : [];
-  }
-
-  const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
-  });
-
-  const { profile, matrix } = watch();
-
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
-        label: e,
-        value: e,
-      }))
-    : [];
-
-  const matrixOptions = getMatrixOptions(profile);
 
   // set inital parameters
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+    if (!profile && profileOptions.length)
+      handleProfile(defaultProfile2(profileOptions));
   }, [profileOptions]);
 
   function onSubmit(data) {
-    mergeForm(data);
     const params =
       source == 'user'
         ? {
@@ -98,11 +90,10 @@ export default function CsWithin() {
   }
 
   function handleProfile(e) {
-    const matrixOptions = getMatrixOptions(e);
-
+    const matrices = matrixOptions(e);
     setValue('profile', e);
-    if (matrixOptions.length) {
-      setValue('matrix', defaultMatrix2(e, matrixOptions));
+    if (matrices.length) {
+      setValue('matrix', defaultMatrix2(e, matrices));
     }
   }
 
@@ -146,10 +137,10 @@ export default function CsWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={!matrixOptions.length}
+              disabled={!matrixOptions(profile).length}
               name="matrix"
               label="Matrix Size"
-              options={matrixOptions}
+              options={matrixOptions(profile)}
               control={control}
             />
           </Col>

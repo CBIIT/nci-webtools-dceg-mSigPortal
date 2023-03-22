@@ -8,7 +8,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     upload: builder.mutation({
       query: (body) => ({
-        url: `upload/${crypto.randomUUID()}`,
+        url: `upload/extraction/${crypto.randomUUID()}`,
         method: 'POST',
         body,
       }),

@@ -160,7 +160,7 @@ cosineSimilarityWithin <- function(args, config) {
   plotPath <- paste0(config$savePath, "cos_sim_within.svg")
   txtPath <- paste0(config$savePath, "cos_sim_within.txt")
 
-  data_input <- read_delim(paste0(config$savePath, "../../", args$matrixFile), delim = "\t")
+  data_input <- read_delim(args$matrixFile, delim = "\t")
   data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
   # Heatmap of cosine similarity within samples  and put on the web---------------------------
   tryCatch(
@@ -231,7 +231,7 @@ cosineSimilarityRefSig <- function(args, config) {
     select(Signature_name, MutationType, Contribution) %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-  data_input <- read_delim(paste0(config$savePath, "../../", args$matrixFile), delim = "\t")
+  data_input <- read_delim(args$matrixFile, delim = "\t")
   data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   # Heatmap of cosine similarity to reference set signature and put on the web---------------------------
@@ -304,7 +304,7 @@ cosineSimilarityPublic <- function(args, config) {
   txtPath <- paste0(config$savePath, "cos_sim_public.txt")
 
   ## input data
-  data_input <- read_delim(paste0(config$savePath, "../../", args$matrixFile), delim = "\t")
+  data_input <- read_delim(args$matrixFile, delim = "\t")
   data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data
@@ -681,7 +681,7 @@ pca <- function(args, config) {
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
-  data_input <- read_delim(paste0(config$savePath, "../../", args$matrixFile), delim = "\t")
+  data_input <- read_delim(args$matrixFile, delim = "\t")
   data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   # PCA plot ----------------------------------------------------------------
@@ -891,7 +891,7 @@ pcaWithPublic <- function(args, config) {
   pca3Data <- paste0(config$savePath, "pca3_data_with_public.txt")
 
 
-  data_input1 <- read_delim(paste0(config$savePath, "../../", args$matrixFile), delim = "\t")
+  data_input1 <- read_delim(args$matrixFile, delim = "\t")
   data_input1 <- data_input1 %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data

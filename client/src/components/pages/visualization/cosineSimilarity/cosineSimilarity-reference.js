@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import {
   useCosineReferenceQuery,
   useCosineSignatureSetsQuery,
@@ -12,67 +10,57 @@ import {
 import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import { defaultProfile2, defaultMatrix } from '../../../../services/utils';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { useMatrixListQuery } from '../userForm/apiSlice';
 
-export default function CsReference() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        cosineSimilarity: { ...store.cosineSimilarity, referenceForm: state },
-      })
-    );
-
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, id } = store.main;
-  const { referenceForm } = store.cosineSimilarity;
-
-  // main form
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    resetField,
-    formState: { errors: formErrors },
-  } = useForm({
-    defaultValues: referenceForm,
-  });
-  const { profile, signatureSet } = watch();
-
-  const [calculationQuery, setCalculationQuery] = useState('');
+export default function CsReference({ state }) {
+  const [params, setParams] = useState('');
   const [signatureSetQuery, setSignatureSetQuery] = useState('');
+  const { study, cancer, strategy, source, id } = state;
 
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
+  // plot
+  const { data, error, isFetching } = useCosineReferenceQuery(params, {
+    skip: !params,
+  });
   // get signature sets
   const { data: signatureSetOptions, isFetching: fetchingSigSets } =
     useCosineSignatureSetsQuery(signatureSetQuery, {
       skip: !signatureSetQuery,
     });
 
-  //   calculate plot
-  const { data, error, isFetching } = useCosineReferenceQuery(
-    calculationQuery,
-    { skip: !calculationQuery }
-  );
+  // main form
+  const { control, handleSubmit, watch, setValue } = useForm({
+    defaultValues: { profile: '', signatureSet: '' },
+  });
+  const { profile, signatureSet } = watch();
 
   // declare form Options
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+  const profileOptions = options
+    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
-  // set inital profile
+  // set initial profile
   useEffect(() => {
     if (!profile && profileOptions.length)
-      setValue('profile', profileOptions[0]);
+      setValue('profile', defaultProfile2(profileOptions));
   }, [profileOptions]);
   // set intital signature set
-  // useEffect(() => {
-  //   if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
-  // }, [signatureSetOptions]);
+  useEffect(() => {
+    if (signatureSetOptions) setValue('signatureSet', signatureSetOptions[0]);
+  }, [signatureSetOptions]);
 
   // get signature sets when profile is selected
   useEffect(() => {
@@ -85,9 +73,7 @@ export default function CsReference() {
   }, [profile]);
 
   function onSubmit(data) {
-    mergeForm(data);
-
-    const { profile, sample, signatureSet, compare } = data;
+    const { profile, signatureSet } = data;
     const params =
       source == 'user'
         ? {
@@ -114,7 +100,7 @@ export default function CsReference() {
             },
             id,
           };
-    setCalculationQuery(params);
+    setParams(params);
   }
 
   return (

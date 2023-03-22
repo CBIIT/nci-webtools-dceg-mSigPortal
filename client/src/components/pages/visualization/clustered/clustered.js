@@ -1,12 +1,14 @@
-import { useSelector } from 'react-redux';
 import Description from '../../../controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 import ClusteredPlot from './clustered-plot';
 import ClusteredForm from './clustered-form';
+import { useState } from 'react';
 
-export default function ClusteredIdentification() {
-  const store = useSelector((state) => state.visualization);
-  const { cluster, id, inputFormat } = store.userForm;
+export default function ClusteredIdentification({ state }) {
+  const { id, params } = state;
+  const [form, setForm] = useState({ sample: '' });
+  const inputFormat = params.Input_Format;
+  const cluster = params.Cluster === 'True';
 
   return (
     <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
@@ -34,21 +36,23 @@ export default function ClusteredIdentification() {
         }
       />
       <hr />
-      {cluster && id && inputFormat.value == 'vcf' && (
+      {cluster && id && inputFormat == 'vcf' && (
         <>
-          <ClusteredForm />
+          <ClusteredForm state={state} form={form} setForm={setForm} />
           <hr />
-          <ClusteredPlot />
+          <ClusteredPlot state={state} form={form} />
         </>
       )}
-      {inputFormat.value == 'vcf' && !cluster && (
+      {inputFormat == 'vcf' && !cluster && (
         <div className="p-3">
           Calculation must be performed with the "Clustered Mutational Analysis"
           option enabled in the inital submission.
         </div>
       )}
-      {inputFormat.value != 'vcf' && (
-        <div className="p-3">Analysis is only available for VCF file input.</div>
+      {inputFormat != 'vcf' && (
+        <div className="p-3">
+          Analysis is only available for VCF file input.
+        </div>
       )}
     </div>
   );

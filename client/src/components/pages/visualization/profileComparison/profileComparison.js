@@ -1,18 +1,12 @@
+import { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 import PcWithin from './profileComparison-within';
 import PcReference from './profileComparison-reference';
 import PcPublic from './profileComparison-public';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 
-export default function MutationalProfiles(props) {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-
-  const { source } = store.main;
-  const { display } = store.profileComparison;
+export default function MutationalProfiles({ state }) {
+  const [display, setDisplay] = useState('within');
+  const { source } = state;
 
   return (
     <div>
@@ -27,7 +21,7 @@ export default function MutationalProfiles(props) {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => mergeState({ display: tab })}
+        onSelect={(tab) => setDisplay(tab)}
       >
         <Nav variant="tabs">
           <Nav.Item>
@@ -53,14 +47,14 @@ export default function MutationalProfiles(props) {
           style={{ overflowX: 'auto' }}
         >
           <Tab.Pane key="within" eventKey="within" className="border-0">
-            <PcWithin />
+            <PcWithin state={state} />
           </Tab.Pane>
           <Tab.Pane key="reference" eventKey="reference" className="border-0">
-            <PcReference />
+            <PcReference state={state} />
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              <PcPublic />
+              <PcPublic state={state} />
             </Tab.Pane>
           )}
         </Tab.Content>

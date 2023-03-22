@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { getPatternData } from '../../query.js';
 import { wrapper } from '../visualization/userVisualization.js';
-import path from 'path';
 
 const env = process.env;
 
@@ -25,11 +24,7 @@ async function queryPattern(req, res, next) {
         args: {
           pattern: query.pattern,
           proportion: proportion,
-          matrixFile: path.join(
-            env.INPUT_FOLDER,
-            query.userId,
-            query.matrixFile
-          ),
+          matrixFile: query.matrixFile,
         },
       };
       const { output, ...logs } = await wrapper('wrapper', params);

@@ -1,35 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Button, Form, Row, Col } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-
 import Plotly from '../../../controls/plotly/plot/plot';
-import { actions } from '../../../../services/store/visualization';
 import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useMatrixListQuery } from '../userForm/apiSlice';
 
-export default function MutPatternPlot() {
-  const store = useSelector((state) => state.visualization);
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, id, matrixList } = store.main;
-  const { proportion, pattern } = store.mutationalPattern;
-
+export default function MutPatternPlot({ state }) {
   const [scatterParams, setScatterParams] = useState('');
+  const [barParams, setBarParams] = useState('');
 
-  const dispatch = useDispatch();
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalPattern: state }));
+  const { study, cancer, strategy, source, id } = state;
+
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
 
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      proportion: proportion || 0.8,
-      pattern: pattern || 'NCG>NTG',
+      proportion: 0.8,
+      pattern: 'NCG>NTG',
     },
   });
+  const { proportion, pattern } = watch();
 
   const {
     data: scatterData,
@@ -39,7 +35,6 @@ export default function MutPatternPlot() {
     skip: !scatterParams,
   });
 
-  const [barParams, setBarParams] = useState('');
   const {
     data: patternData,
     error: patternError,
@@ -48,8 +43,9 @@ export default function MutPatternPlot() {
     skip: !barParams,
   });
 
-  // get data on form change
-  useEffect(() => {
+  async function onSubmit(data) {
+    const { pattern, proportion } = data;
+
     if (pattern) {
       setScatterParams({
         profile: 'SBS',
@@ -63,21 +59,19 @@ export default function MutPatternPlot() {
         ...(source == 'user' && { userId: id }),
       });
     }
-  }, [study, proportion, pattern]);
 
-  useEffect(() => {
     if (source == 'public') {
       if (study && proportion) {
         setBarParams({
           study: study.value,
-          proportion: proportion,
+          proportion: parseFloat(proportion),
         });
       }
     } else {
       if (proportion && pattern) {
         setBarParams({
           pattern,
-          proportion,
+          proportion: parseFloat(proportion),
           matrixFile: matrixList.filter(
             (e) => e.profile == 'SBS' && e.matrix == '96'
           )[0].Path,
@@ -85,11 +79,6 @@ export default function MutPatternPlot() {
         });
       }
     }
-  }, [proportion, pattern]);
-
-  async function onSubmit(data) {
-    const { pattern, proportion } = data;
-    mergeState({ pattern, proportion: parseFloat(proportion) });
   }
 
   return (

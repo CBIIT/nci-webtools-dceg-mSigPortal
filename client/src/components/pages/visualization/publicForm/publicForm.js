@@ -1,6 +1,6 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
@@ -70,7 +70,7 @@ export default function PublicForm() {
     try {
       const cancers = cancerOptions(data.study);
       mergeMain({ submitted: true, loading: { active: true } });
-      mergeState({...data, cancers });
+      mergeState({ ...data, cancers });
       const params = {
         study: data.study.value,
         cancer: data.cancer.value,
@@ -81,9 +81,9 @@ export default function PublicForm() {
       // for await (const data of paginateQuery(fetchMatrix, params)) {
       //   matrixData = [...matrixData, ...data];
       // }
-      const matrixData = await fetchMatrix(params).unwrap();
+      // const matrixData = await fetchMatrix(params).unwrap();
 
-      mergeMain({ matrixData, id: crypto.randomUUID() });
+      mergeMain({ displayTab: 'profilerSummary', submitted: true });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({

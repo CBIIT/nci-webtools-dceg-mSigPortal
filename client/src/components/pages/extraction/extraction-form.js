@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
-import SelectForm from '../../controls/select/selectForm';
+import SelectForm from '../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as extractionActions } from '../../../services/store/extraction';
