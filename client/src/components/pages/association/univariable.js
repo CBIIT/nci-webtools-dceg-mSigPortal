@@ -244,9 +244,12 @@ export default function Univariable() {
           error,
           uncaughtError,
         } = output;
-        signatureOptions.sort((a, b) =>
-          a.localeCompare(b, undefined, { numeric: true })
-        );
+        if (signatureOptions) {
+          signatureOptions.sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true })
+          );
+        }
+
         if (error || uncaughtError) {
           mergeState({
             error:
