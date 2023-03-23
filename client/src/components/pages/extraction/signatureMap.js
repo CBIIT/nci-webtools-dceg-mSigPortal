@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Row, Col } from 'react-bootstrap';
+import Select from '../../controls/select/selectForm';
+import { useForm } from 'react-hook-form';
 import {
   useSignatureMapTableQuery,
   useSignatureMapPlotsQuery,
@@ -27,9 +30,26 @@ export default function SignatureMap({ state }) {
     },
     { skip: !denovoSigString || !decompSigString }
   );
-  const { plots } = data || {};
 
-  // select inital table row
+  const { denovoPlots, refSigPlots } = data || {};
+  const refSigOptions = Object.keys(refSigPlots || {})
+    .sort((a, b) => {
+      const regex = /\((\w+\.\w+)%\)/;
+      const aValue = +a.match(regex)[1];
+      const bValue = +b.match(regex)[1];
+      return bValue - aValue;
+    })
+    .map((e) => ({
+      label: e,
+      value: e,
+    }));
+
+  const { control, watch, setValue } = useForm({
+    defaultValues: { referenceSignature: '' },
+  });
+  const { referenceSignature } = watch();
+
+  // select initial table row
   useEffect(() => {
     if (table) {
       const row = table.data[0];
@@ -37,7 +57,13 @@ export default function SignatureMap({ state }) {
       setDecomposed(row['Global NMF Signatures']);
     }
   }, [table]);
+  // select initial reference signature
+  useEffect(() => {
+    if (refSigOptions.length && !referenceSignature)
+      setValue('referenceSignature', refSigOptions[0]);
+  }, [refSigOptions]);
 
+  // table options
   const options = {
     initialState: { selectedRowIds: { 0: true } },
     stateReducer: (newState, action) => {
@@ -65,12 +91,33 @@ export default function SignatureMap({ state }) {
           bordered
         />
       )}
-      {plots &&
-        plots.map((e, i) => (
+      {denovoPlots &&
+        denovoPlots.map((e, i) => (
           <div key={i} className="border rounded mb-3">
             <Plotly {...e} data={e.traces} />
           </div>
         ))}
+      <div className="border rounded p-3">
+        <Row>
+          <Col lg="auto">
+            <Select
+              name="referenceSignature"
+              label="Reference Signature"
+              disabled={!refSigOptions.length}
+              options={refSigOptions}
+              control={control}
+            />
+          </Col>
+        </Row>
+      </div>
+      {referenceSignature?.value && refSigPlots && (
+        <div className="border rounded mt-3">
+          <Plotly
+            data={refSigPlots[referenceSignature.value].traces}
+            layout={refSigPlots[referenceSignature.value].layout}
+          />
+        </div>
+      )}
     </div>
   );
 }

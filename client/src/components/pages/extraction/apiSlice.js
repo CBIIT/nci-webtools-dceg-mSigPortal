@@ -130,7 +130,10 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               )
           );
 
-          const denovo = allSignatures[denovoSignature];
+          const denovo = allSignatures[denovoSignature].map((e) => ({
+            ...e,
+            signatureName: `${denovoSignature} (Original)`,
+          }));
 
           const decomposed = decomposedSignatureNames.map((e) =>
             allSignatures[e].reduce(
@@ -147,28 +150,45 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             )
           );
 
-          const plots = [
-            { title: 'Denovo Signature', data: denovo },
-            { title: 'Reconstructed Signature', data: reconstructed },
-            ...decomposed.map((e) => ({
-              title: 'Decomposed Signature',
-              data: e,
-            })),
-          ].map((e) => {
+          const createPlot = (profileMatrix, data, title) => {
             switch (profileMatrix) {
               case 'SBS96':
-                return SBS96(e.data, e.title);
+                return SBS96(data, title);
               case 'DBS78':
-                return DBS78(e.data, e.title);
+                return DBS78(data, title);
               case 'ID83':
-                return ID83(e.data, e.title);
+                return ID83(data, title);
               default:
                 throw new Error(`${profileMatrix} is not supported`);
             }
-          });
+          };
+
+          const denovoPlots = [
+            { title: 'Denovo Signature', data: denovo },
+            { title: 'Reconstructed Signature', data: reconstructed },
+          ].map((e) => createPlot(profileMatrix, e.data, e.title));
+          const refSigPlots = decomposed
+            .map((e) => ({
+              title: 'Reference Signature',
+              data: e,
+            }))
+            .reduce(
+              (obj, e) => ({
+                ...obj,
+                [e.data[0].signatureName]: createPlot(
+                  profileMatrix,
+                  e.data,
+                  e.title
+                ),
+              }),
+              {}
+            );
 
           return {
-            data: { plots },
+            data: {
+              denovoPlots: denovoPlots,
+              refSigPlots: refSigPlots,
+            },
           };
         } catch (error) {
           return { error };
