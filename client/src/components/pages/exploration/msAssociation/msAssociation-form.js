@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '../../../controls/select/selectForm';
@@ -8,46 +8,53 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 const { Group, Check } = Form;
 
 export default function MsAssociationForm({ state, form, mergeForm }) {
-  const [signatureOptionParams, setSignatureOptionParams] = useState('');
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id, id2 } =
+    state;
 
-  const { data, error, isFetching } = useMsAssociationOptionsQuery(
-    signatureOptionParams,
-    {
-      skip: !signatureOptionParams,
-    }
+  const {
+    data: options,
+    error,
+    isFetching,
+  } = useMsAssociationOptionsQuery(
+    study
+      ? {
+          study: study.value,
+          strategy: strategy.value,
+          signatureSetName: signatureSetName.value,
+          ...(!useAllCancer && { cancer: cancer.value }),
+        }
+      : { userId: id },
+    { skip: !study && !id }
   );
+  const {
+    data: options2,
+    error: error2,
+    isFetching: fetchingOptions2,
+  } = useMsAssociationOptionsQuery({ userId: id2 }, { skip: !id2 });
 
   const { both } = form;
-
-  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
   const { control } = useForm({
     defaultValues: form,
   });
 
-  // set inital
+  // set initial samples
   useEffect(() => {
-    if (data) {
+    // public or single user data
+    if (options && !id2) {
       mergeForm({
-        signatureName1: data[0],
-        signatureName2: data[1] || data[0],
+        signatureName1: options[0],
+        signatureName2: options[1] || options[0],
       });
     }
-  }, [data]);
-
-  // get signature name options
-  useEffect(() => {
-    if (study) {
-      setSignatureOptionParams({
-        study: study.value,
-        strategy: strategy.value,
-        signatureSetName: signatureSetName.value,
-        ...(!useAllCancer && { cancer: cancer.value }),
+    if (options && options2) {
+      mergeForm({
+        signatureName1: options[0],
+        signatureName2: options2[0],
       });
-    } else if (id) {
-      setSignatureOptionParams({ userId: id });
     }
-  }, [state]);
+    // extraction two sources
+  }, [options, options2]);
 
   function handleSignatureName1(e) {
     mergeForm({ signatureName1: e });
@@ -66,8 +73,8 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
             name="signatureName1"
             label="Signature Name 1"
             value={form.signatureName1}
-            disabled={!data}
-            options={data}
+            disabled={!options}
+            options={[...(options || []), ...(options2 || [])]}
             onChange={handleSignatureName1}
             control={control}
           />
@@ -77,8 +84,8 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
             name="signatureName2"
             label="Signature Name 2"
             value={form.signatureName2}
-            disabled={!data}
-            options={data}
+            disabled={id2 ? !options2 : !options}
+            options={[...(options || []), ...(options2 || [])]}
             onChange={handleSignatureName2}
             control={control}
           />

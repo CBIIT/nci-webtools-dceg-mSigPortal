@@ -3,19 +3,21 @@ import {
   round,
   calculatePearson,
   calculateSpearman,
-} from '../../utils/utils';
+} from '../../utils/utils.js';
 import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 
-export default function MsAssociation(data, arg) {
-  const [signatureName1, signatureName2] = arg.signatureName.split(';');
-  const checked = arg.both;
-
+export default function MsAssociation(
+  data,
+  signatureName1,
+  signatureName2,
+  both = false
+) {
   let groupBySample;
   let xValues = [];
   let yValues = [];
 
-  if (checked) {
+  if (both) {
     const dataFilter = groupBy(
       data.filter((o) => o['exposure'] > 0),
       'sample'

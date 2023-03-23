@@ -52,11 +52,23 @@ export default function Extraction() {
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   const explorationId = (() => {
     if (isDone) {
-      if (explorationType === 'denovo') return manifest?.denovoId;
-      else if (explorationType === 'decomposed') return manifest?.decomposedId;
-      else return false;
-    } else return false;
+      switch (explorationType) {
+        case 'denovo':
+          return manifest?.denovoId;
+        case 'decomposed':
+          return manifest?.decomposedId;
+        default:
+          return false;
+      }
+    } else {
+      return false;
+    }
   })();
+  const id2 = explorationId
+    ? explorationId === manifest.denovoId
+      ? manifest.decomposedId
+      : manifest.denovoId
+    : false;
 
   const refreshState = useCallback(() => {
     refreshExtraction();
@@ -316,7 +328,7 @@ export default function Extraction() {
                   displayTab === 'msAssociation' ? 'd-block' : 'd-none'
                 }
               >
-                <MsAssociation state={{ id: explorationId }} />
+                <MsAssociation state={{ id: explorationId, id2 }} />
               </div>
               <div
                 className={displayTab === 'msLandscape' ? 'd-block' : 'd-none'}

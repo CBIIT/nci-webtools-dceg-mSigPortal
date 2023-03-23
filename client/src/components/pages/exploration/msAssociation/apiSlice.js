@@ -9,7 +9,7 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
         params: { ...params },
       }),
 
-      transformResponse: (data) => {
+      transformResponse: (data, meta, arg) => {
         return data
           ? [...new Set(data.map((e) => e.signatureName))]
               .sort((a, b) =>
@@ -21,6 +21,7 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
               .map((e) => ({
                 label: e,
                 value: e,
+                id: arg.userId,
               }))
           : [];
       },
@@ -42,15 +43,51 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
             },
       }),
       transformResponse: (data, meta, arg) => {
-        // console.log('api slice association');
-        // console.log(arg);
-        // console.log(data);
+        const { signatureName, both } = arg;
+        const [signatureName1, signatureName2] = signatureName.split(';');
+        return MsAssociation(data, signatureName1, signatureName2, both);
+      },
+    }),
+    msAssociation2Source: builder.query({
+      async queryFn(args, api, extraOptions, fetchWithBQ) {
+        try {
+          const [params1, params2] = args;
+          const [{ data: data1 }, { data: data2 }] = await Promise.all([
+            fetchWithBQ({
+              url: '/signature_activity',
+              params: {
+                userId: params1.userId,
+                signatureName: params1.signatureName,
+              },
+            }),
+            fetchWithBQ({
+              url: '/signature_activity',
+              params: {
+                userId: params2.userId,
+                signatureName: params2.signatureName,
+              },
+            }),
+          ]);
 
-        return MsAssociation(data, arg);
+          const plot = MsAssociation(
+            [...data1, ...data2],
+            params1.signatureName,
+            params2.signatureName,
+            params1.both
+          );
+
+          return { data: plot };
+        } catch (error) {
+          console.log(error);
+          return { error };
+        }
       },
     }),
   }),
 });
 
-export const { useMsAssociationOptionsQuery, useMsAssociationQuery } =
-  msAssociationApiSlice;
+export const {
+  useMsAssociationOptionsQuery,
+  useMsAssociationQuery,
+  useMsAssociation2SourceQuery,
+} = msAssociationApiSlice;
