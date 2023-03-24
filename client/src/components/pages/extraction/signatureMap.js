@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Select from '../../controls/select/selectForm';
+import Select from '../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import {
   useSignatureMapTableQuery,
