@@ -39,6 +39,7 @@ export function MsIndividualComparison(
 
   const searchTerms = ['SBS'];
   const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
+  console.log(containsTerm);
   let signatureColors;
   containsTerm
     ? (signatureColors = colorPallet)
@@ -231,7 +232,7 @@ export function MsIndividualComparison(
     yaxis: 'y12',
   }));
 
-  console.log(sampleTraceOriginal);
+  //console.log(sampleTraceOriginal);
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
       name: group.mutations,
@@ -251,7 +252,7 @@ export function MsIndividualComparison(
       yaxis: 'y11',
     })
   );
-  console.log(sampleTraceDestructed);
+  //console.log(sampleTraceDestructed);
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
     y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),
@@ -460,14 +461,15 @@ export function MsIndividualComparison(
     percents.slice(0, i + 1).reduce((acc, val) => acc + val)
   ); // compute cumulative sum
 
+  // left side percent rectangle shape
   const signaturePercentBox = scaledPercents.map((val, i, arr) => ({
     type: 'rect',
     xref: 'paper',
     yref: 'paper',
     y0: i === 0 ? 0 : arr[i - 1],
     y1: val,
-    x0: -0.105,
-    x1: -0.08,
+    x0: -0.07,
+    x1: -0.085,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     fillcolor: containsTerm
       ? signatureColors[
@@ -479,14 +481,16 @@ export function MsIndividualComparison(
     },
   }));
 
+  console.log(signaturePercentBox);
+  // left side line for percent rectangle shape
   const signaturePercentLine = scaledPercents.map((val, i, arr) => ({
     type: 'line',
     xref: 'paper',
     yref: 'paper',
     y0: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
     y1: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
-    x0: -0.105,
-    x1: -0.125,
+    x0: -0.085,
+    x1: -0.09,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
 
     line: {
@@ -621,15 +625,17 @@ export function MsIndividualComparison(
     align: 'center',
   }));
 
+  // left percent annotation
   const signaturePercentAnnotation = scaledPercents.map((val, i, arr) => ({
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'center',
+    xanchor: 'right',
     yanchor: 'middle',
     val: val,
     val1: arr[i - 1],
     y: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
-    x: longest < 7 ? -0.15 : -0.2,
+    //x: longest < 7 ? -0.09 : -0.1,
+    x: -0.095,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     font: {
       color: containsTerm
