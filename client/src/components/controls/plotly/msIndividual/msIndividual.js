@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
-import { round, arrayContainsTerms } from '../../utils/utils';
-import { colorPallet, colorPallet1 } from '../../utils/colors';
+import { round, arrayContainsTerms } from '../../utils/utils.js';
+import { colorPallet, colorPallet1 } from '../../utils/colors.js';
 
 import {
   groupDataByMutation,

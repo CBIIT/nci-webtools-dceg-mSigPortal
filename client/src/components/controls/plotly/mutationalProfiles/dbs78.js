@@ -1,4 +1,4 @@
-import { dbs78Color } from '../../utils/colors';
+import { dbs78Color } from '../../utils/colors.js';
 import {
   createSampleAnnotation,
   getTotalMutations,

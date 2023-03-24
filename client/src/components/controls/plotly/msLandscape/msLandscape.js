@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
-import { isNumber, mapOrder } from '../../utils/utils';
-import { colorPallet, colorPallet0 } from '../../utils/colors';
+import { isNumber, mapOrder } from '../../utils/utils.js';
+import { colorPallet, colorPallet0 } from '../../utils/colors.js';
 
 export default function MsLandscape(
   cosineData,

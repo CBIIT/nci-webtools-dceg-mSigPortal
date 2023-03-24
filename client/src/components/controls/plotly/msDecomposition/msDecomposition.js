@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { groupByCustom } from '../../utils/utils';
+import { groupByCustom } from '../../utils/utils.js';
 
 export default function MsDecomposition(data, arg) {
   const result = Object.values(data)[0];

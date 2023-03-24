@@ -1,4 +1,4 @@
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '../../utils/colors.js';
 export default function SBS6(data) {
   const colors = sbsColor;
 
