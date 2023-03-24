@@ -44,8 +44,6 @@ export default function ID28(data, title = '') {
     return groups;
   }, {});
 
-  //console.log(groupByMutation);
-
   const groupByFirstGroup = Object.fromEntries(
     Object.entries(groupByMutation).slice(0, 4)
   );

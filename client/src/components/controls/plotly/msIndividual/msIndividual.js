@@ -39,7 +39,6 @@ export function MsIndividualComparison(
 
   const searchTerms = ['SBS'];
   const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
-  console.log(containsTerm);
   let signatureColors;
   containsTerm
     ? (signatureColors = colorPallet)
@@ -232,7 +231,6 @@ export function MsIndividualComparison(
     yaxis: 'y12',
   }));
 
-  //console.log(sampleTraceOriginal);
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
       name: group.mutations,
@@ -481,7 +479,6 @@ export function MsIndividualComparison(
     },
   }));
 
-  console.log(signaturePercentBox);
   // left side line for percent rectangle shape
   const signaturePercentLine = scaledPercents.map((val, i, arr) => ({
     type: 'line',

@@ -23,8 +23,6 @@ export default function SBS1536(data, title = '') {
     );
 
   // const maxValMutation = Math.max(...data.map((o) => o.mutations));
-  // console.log("maxValMutation:---");
-  // console.log(maxValMutation);
 
   const groupByMutationInner = data.reduce((groups, e, i) => {
     const mutation = e.mutationType.substring(1, 8);
@@ -213,18 +211,12 @@ export default function SBS1536(data, title = '') {
     return groups;
   }, {});
 
-  // console.log("groupByMutationBack:---");
-  // console.log(groupByMutationBack);
-
   const mutationSumBack = Object.entries(groupByMutationBack).map(
     ([key, value]) => ({
       mutationType: key,
       contribution: value.reduce((a, e) => a + parseInt(e.contribution), 0),
     })
   );
-
-  // console.log("mutationsumBack:---");
-  // console.log(mutationsumBack);
 
   // sort by the last letter
   mutationSumBack.sort((a, b) =>
@@ -339,12 +331,9 @@ export default function SBS1536(data, title = '') {
           ? 1
           : 0
       );
-      //console.log(value);
+
       heatmapY.push(key.charAt(0) + '--' + key.charAt(key.length - 1));
 
-      //console.log(totalMutations);
-      //console.log(value);
-      //console.log(Object.entries(value).map(([k, v]) => v.contribution));
       heatmapZ.push(
         Object.entries(value).map(([k, v]) => v.contribution / totalMutations)
       );
@@ -409,8 +398,6 @@ export default function SBS1536(data, title = '') {
     ...traceHeatMap3,
   ];
 
-  //console.log('traces:');
-  //console.log(traces);
   const annotations = Object.entries(groupByTotal).map(
     ([mutation, signatures], groupIndex, array) => ({
       xref: 'x',
@@ -582,8 +569,6 @@ export default function SBS1536(data, title = '') {
       yLabelAnnotation,
     ],
   };
-  // console.log("layout");
-  //console.log(layout);
 
   return { traces, layout };
 }
