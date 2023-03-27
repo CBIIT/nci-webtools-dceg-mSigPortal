@@ -47,18 +47,18 @@ export async function run(id, app, env = process.env) {
   await mkdirs([inputFolder, outputFolder]);
 
   // download folders from s3
-  await downloadDirectory(
-    inputFolder,
-    path.join(env.INPUT_KEY_PREFIX, id),
-    env.DATA_BUCKET,
-    { region: env.AWS_DEFAULT_REGION }
-  );
-  await downloadDirectory(
-    outputFolder,
-    path.join(env.OUTPUT_KEY_PREFIX, id),
-    env.DATA_BUCKET,
-    { region: env.AWS_DEFAULT_REGION }
-  );
+  // await downloadDirectory(
+  //   inputFolder,
+  //   path.join(env.INPUT_KEY_PREFIX, id),
+  //   env.DATA_BUCKET,
+  //   { region: env.AWS_DEFAULT_REGION }
+  // );
+  // await downloadDirectory(
+  //   outputFolder,
+  //   path.join(env.OUTPUT_KEY_PREFIX, id),
+  //   env.DATA_BUCKET,
+  //   { region: env.AWS_DEFAULT_REGION }
+  // );
 
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const params = await readJson(paramsFilePath);
