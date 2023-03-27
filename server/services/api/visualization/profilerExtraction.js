@@ -9,6 +9,7 @@ import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
 import { readJson, writeJson, mkdirs } from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
+import { sendNotification } from '../../notifications.js';
 const r = rWrapper.async;
 
 async function* getFiles(dir) {
@@ -67,16 +68,17 @@ export async function profilerExtraction(
   env = process.env
 ) {
   const { args, email } = params;
-  const id = args.Project_ID;
+  const paths = await getPaths(args, env);
+  const submittedTime = new Date(
+    (await readJson(paths.statusFile)).submittedAt
+  );
+
+  logger.info(paths);
+
   try {
+    const id = args.Project_ID;
     if (!id) throw new Error('Missing id');
     if (!isUUID(id)) throw new Error('Invalid id');
-
-    const paths = await getPaths(args, env);
-    const submittedTime = new Date(
-      (await readJson(paths.statusFile)).submittedAt
-    );
-    logger.info(paths);
 
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
@@ -169,14 +171,56 @@ export async function profilerExtraction(
       }`
     );
 
+    // send success notification if email was provided
     if (isEmail(email)) {
+      logger.info(`[${id}] Sending success notification`);
+      await sendNotification(
+        params.email,
+        `mSigPortal - Visualization Complete - ${params.jobName}`,
+        'templates/user-success-email.html',
+        {
+          jobName: params.jobName,
+          submittedAt: submittedTime.toISOString(),
+          executionTime:
+            (new Date().getTime() - submittedTime.getTime()) / 1000,
+          resultsUrl: path.join(env.APP_BASE_URL, '#', 'visualization', id),
+        }
+      );
     }
     return { id };
   } catch (error) {
     logger.error(error);
     if (isEmail(email)) {
+      // sending error notification
+      await sendNotification(
+        params.email,
+        `mSigPortal - Visualization Analysis Failed - ${params.jobName}`,
+        'templates/user-failure-email.html',
+        {
+          jobName: params.jobName,
+          submittedAt: submittedTime.toISOString(),
+          executionTime:
+            (new Date().getTime() - submittedTime.getTime()) / 1000,
+          error: formatObject(error),
+        }
+      );
     }
     return { error };
+  } finally {
+    // delete input files
+    fs.readdir(paths.inputFolder, (err, files) => {
+      if (err) {
+        console.log(err);
+      }
+
+      files.forEach((file) => {
+        const fileDir = path.join(paths.inputFolder, file);
+
+        if (file !== 'params.json') {
+          fs.unlinkSync(fileDir);
+        }
+      });
+    });
   }
 }
 

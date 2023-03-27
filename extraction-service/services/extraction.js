@@ -276,26 +276,13 @@ export async function extraction(
         (new Date().getTime() - submittedTime.getTime()) / 1000
       }`
     );
+
     // send success notification if email was provided
     if (params.email) {
       logger.info(`[${id}] Sending success notification`);
-      //delete input files
-      // readdir(paths.inputFolder, (err, files) => {
-      //   if (err) {
-      //     console.log(err);
-      //   }
-
-      //   files.forEach((file) => {
-      //     const fileDir = path.join(paths.inputFolder, file);
-
-      //     if (file !== 'params.json') {
-      //       unlinkSync(fileDir);
-      //     }
-      //   });
-      // });
       await sendNotification(
         params.email,
-        `Extraction Complete - ${params.jobName}`,
+        `mSigPortal - Extraction Complete - ${params.jobName}`,
         'templates/user-success-email.html',
         {
           jobName: params.jobName,
@@ -316,20 +303,6 @@ export async function extraction(
       status: 'FAILED',
       error: { ...error },
     });
-    //delete input files
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
-      }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          unlinkSync(fileDir);
-        }
-      });
-    });
 
     // await uploadWorkingDirectory(
     //   paths.inputFolder,
@@ -345,7 +318,7 @@ export async function extraction(
     if (params.email) {
       await sendNotification(
         params.email,
-        `Analysis Failed - ${params.jobName}`,
+        `mSigPortal - Extraction Analysis Failed - ${params.jobName}`,
         'templates/user-failure-email.html',
         {
           jobName: params.jobName,
@@ -358,6 +331,21 @@ export async function extraction(
 
       return false;
     }
+  } finally {
+    //delete input files
+    readdir(paths.inputFolder, (err, files) => {
+      if (err) {
+        console.log(err);
+      }
+
+      files.forEach((file) => {
+        const fileDir = path.join(paths.inputFolder, file);
+
+        if (file !== 'params.json') {
+          unlinkSync(fileDir);
+        }
+      });
+    });
   }
 }
 
