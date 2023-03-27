@@ -86,7 +86,6 @@ export async function profilerExtraction(
     );
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
-    await writeJson(paths.paramsFile, args);
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
       id,
