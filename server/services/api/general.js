@@ -39,18 +39,9 @@ function upload(req, res, next) {
   const { logger } = req.app.locals;
   const { module, id } = req.params;
   if (!validate(id)) next(new Error('Invalid ID'));
-  if (!module && !id) next(new Error('module name and session id required'));
-
-  const inputFolderMap = {
-    visualization: env.INPUT_FOLDER,
-    exploration: env.INPUT_FOLDER,
-    extraction: env.EXTRACTION_INPUT_FOLDER,
-  };
-  const inputFolder =
-    inputFolderMap[module] || path.resolve(env.DATA_FOLDER, module, 'input');
 
   const form = formidable({
-    uploadDir: path.resolve(inputFolder, id),
+    uploadDir: path.resolve(env.INPUT_FOLDER, id),
     multiples: true,
   });
 
@@ -196,7 +187,7 @@ const getDataUsingS3Select = (params) => {
 };
 
 const router = Router();
-router.post('/upload/:module?/:id?', upload);
+router.post('/upload/:id?', upload);
 router.post('/getImageS3Batch', getImageS3Batch);
 router.post('/getImageS3', getImageS3);
 router.post('/getFileS3', getFileS3);

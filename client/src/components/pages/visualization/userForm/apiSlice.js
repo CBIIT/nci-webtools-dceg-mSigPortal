@@ -5,7 +5,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     upload: builder.mutation({
       query: (body) => ({
-        url: `upload/visualization/${crypto.randomUUID()}`,
+        url: `upload/${crypto.randomUUID()}`,
         method: 'POST',
         body,
       }),
