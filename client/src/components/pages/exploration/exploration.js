@@ -40,8 +40,7 @@ export default function Exploration() {
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
-  const { displayTab, source, loading, id, openSidebar, submitted } =
-    main;
+  const { displayTab, source, loading, id, openSidebar, submitted } = main;
 
   // load example if available
   useEffect(() => {

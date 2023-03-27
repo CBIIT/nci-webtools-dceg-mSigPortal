@@ -29,7 +29,7 @@ export default function HeaderSearch() {
         <Form.Control
           className="search-control"
           type="search"
-          placeholder="Documentation Search"
+          placeholder="Site Search"
           aria-label="search"
           name="q"
         />

@@ -20,7 +20,8 @@ export default function PublicForm() {
   const mergeForm = (state) =>
     dispatch(actions.mergeExploration({ publicForm: state }));
   const resetExploration = (_) => dispatch(actions.resetExploration());
-  const mergeMain = (state) => dispatch(actions.mergeExploration({ main: state }));
+  const mergeMain = (state) =>
+    dispatch(actions.mergeExploration({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
