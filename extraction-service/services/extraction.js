@@ -84,7 +84,7 @@ export async function extraction(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
-    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+    // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // query signature data
     const connection = dbConnection;
@@ -254,7 +254,7 @@ export async function extraction(
       status: 'COMPLETED',
     });
 
-    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+    // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // // upload denovo output
     // await uploadDirectory(
@@ -331,12 +331,12 @@ export async function extraction(
       });
     });
 
-    await uploadWorkingDirectory(
-      paths.inputFolder,
-      paths.outputFolder,
-      id,
-      env
-    );
+    // await uploadWorkingDirectory(
+    //   paths.inputFolder,
+    //   paths.outputFolder,
+    //   id,
+    //   env
+    // );
     logger.debug(
       `Execution Time: ${
         (new Date().getTime() - submittedTime.getTime()) / 1000
