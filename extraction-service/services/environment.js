@@ -1,7 +1,6 @@
 export const required = [
   'APP_BASE_URL',
-  'APP_NAME',
-  'APP_PORT',
+  'EXTRACTION_APP_NAME',
   'APP_TIER',
   'LOG_LEVEL',
   'DATA_FOLDER',
