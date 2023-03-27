@@ -10,19 +10,23 @@
   <body>
     Dear mSigPortal User, <br />
     <p>
-      The job you submitted to the mSigPortal queue failed to be processed.
-      Please correct your settings and resubmit or contact us at
-      <a href="mailto:{supportEmail}">{supportEmail}</a> for more information or
-      if you have any questions.
+      The job you submitted to mSigPortal could not be processed due to an
+      error. Please ensure that any files or parameters provided are in the
+      correct format and resubmit your job. For further assistance, contact us
+      at
+      <a href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
+        >NCImSigPortalWebAdmin@mail.nih.gov</a
+      >
     </p>
-
     <b>Job Information</b>
     <ul style="list-style-type: none">
-      <li href="{id}">ID: {id}</li>
-      <li href="{originalTimestamp}">
-        Submitted Time: {originalTimestamp} EST
-      </li>
+      <li>Job Name: <%- jobName %></li>
+      <li>Submitted Time: <%- submittedAt %></li>
+      <li>Execution Time: <%- executionTime %> seconds</li>
     </ul>
+
+    <b>Error:</b><br />
+    <pre><%= error %></pre>
 
     <p>
       Respectfully, <br />
