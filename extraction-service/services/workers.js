@@ -25,7 +25,7 @@ export function getWorker(workerType = 'local') {
 export async function runLocalWorker(id, app, env = process.env) {
   const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, 'params.json');
   const params = await readJson(paramsFilePath);
-  // const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  // const logger = createLogger(env.EXTRACTION_APP_NAME, env.LOG_LEVEL);
   const logger = app.locals.logger;
   const dbConnection = app.locals.connection;
   return await extraction(params, logger, dbConnection, env);
@@ -41,7 +41,7 @@ export async function runFargateWorker(id, env = process.env) {
   const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS, WORKER_TASK_NAME } = env;
   const client = new ECSClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
-  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  const logger = createLogger(env.EXTRACTION_APP_NAME, env.LOG_LEVEL);
   const taskCommand = new RunTaskCommand({
     cluster: ECS_CLUSTER,
     count: 1,
