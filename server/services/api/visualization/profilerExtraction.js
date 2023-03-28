@@ -7,22 +7,10 @@ import isEmail from 'validator/lib/isEmail.js';
 import mapValues from 'lodash/mapValues.js';
 import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
-import { readJson, writeJson, mkdirs } from '../../utils.js';
+import { readJson, writeJson, mkdirs, getFiles } from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
 import { sendNotification } from '../../notifications.js';
 const r = rWrapper.async;
-
-async function* getFiles(dir) {
-  const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
-  for (const dirent of dirents) {
-    const res = path.resolve(dir, dirent.name);
-    if (dirent.isDirectory()) {
-      yield* getFiles(res);
-    } else {
-      yield res;
-    }
-  }
-}
 
 // transform all matrix files into a single json object
 async function getMatrices(matrixFolder) {
@@ -208,19 +196,11 @@ export async function profilerExtraction(
     return { error };
   } finally {
     // delete input files
-    fs.readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
+    for await (const file of getFiles(paths.inputFolder)) {
+      if (path.basename(file) !== 'params.json') {
+        fs.unlinkSync(file);
       }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          fs.unlinkSync(fileDir);
-        }
-      });
-    });
+    }
   }
 }
 

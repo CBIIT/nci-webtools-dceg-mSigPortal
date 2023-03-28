@@ -104,3 +104,25 @@ export async function copyFiles(source, destination, overwrite = false) {
 export function pickNonNullValues(object) {
   return pickBy(object, (v) => v !== null);
 }
+
+//
+/**
+ * async generator for retrieving paths for all files under a given directory
+ * @param {string} filePath
+ * @returns {AsyncGenerator} async generator to consume
+ * consume the generator like so:
+ * for await (const f of getFiles(filePath)) {
+    if (f) ...
+  }
+ */
+export async function* getFiles(filePath) {
+  const dirents = await readdir(filePath, { withFileTypes: true });
+  for (const dirent of dirents) {
+    const res = path.resolve(filePath, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* getFiles(res);
+    } else {
+      yield res;
+    }
+  }
+}
