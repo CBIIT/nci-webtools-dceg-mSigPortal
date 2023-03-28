@@ -14,7 +14,7 @@ const actions = { ...exposureActions, ...modalActions };
 
 export default function PublicForm() {
   const store = useSelector((state) => state.exploration);
-  const { submitted } = store.main;
+  const { submitted, openSidebar } = store.main;
 
   const dispatch = useDispatch();
   const mergeForm = (state) =>
@@ -62,7 +62,12 @@ export default function PublicForm() {
   async function onSubmit(data) {
     try {
       mergeForm(data);
-      mergeMain({ displayTab: 'tmb', submitted: true, loading: true });
+      mergeMain({
+        displayTab: 'tmb',
+        submitted: true,
+        loading: true,
+        openSidebar: false,
+      });
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeMain({
