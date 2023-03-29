@@ -347,6 +347,10 @@ export default function ExtractionForm() {
       max_nmf_iterations: data.max_nmf_iterations,
       nmf_test_conv: data.nmf_test_conv,
       gpu: data.gpu ? 'True' : 'False',
+      stability: data.stability,
+      min_stability: data.min_stability,
+      combined_stability: data.combined_stability,
+      allow_stability_drop: data.allow_stability_drop ? 'True' : 'False',
     };
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
@@ -784,6 +788,59 @@ export default function ExtractionForm() {
                   type="number"
                   defaultValue={1.0e-15}
                   disabled={submitted || id}
+                />
+              </Form.Group>
+            </fieldset>
+
+            <fieldset className="border rounded p-2 mb-3">
+              <legend className="font-weight-bold">
+                Solution Estimation Thresholds
+              </legend>
+              <Form.Group>
+                <Form.Label>Stability</Form.Label>
+                <Form.Control
+                  {...register('stability')}
+                  type="number"
+                  step="any"
+                  defaultValue={0.8}
+                  disabled={submitted || id}
+                ></Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Minimum Stability</Form.Label>
+                <Form.Control
+                  {...register('min_stability')}
+                  type="number"
+                  step="any"
+                  defaultValue={0.2}
+                  disabled={submitted || id}
+                ></Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Combined Stability</Form.Label>
+                <Form.Control
+                  {...register('combined_stability')}
+                  type="number"
+                  step="any"
+                  defaultValue={1}
+                  disabled={submitted || id}
+                ></Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Controller
+                  name="allow_stability_drop"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Check
+                      {...field}
+                      id="allow_stability_drop"
+                      type="checkbox"
+                      label={'Allow Stability Drop'}
+                      defaultChecked={false}
+                      checked={field.checked}
+                      disabled={submitted || id}
+                    />
+                  )}
                 />
               </Form.Group>
             </fieldset>
