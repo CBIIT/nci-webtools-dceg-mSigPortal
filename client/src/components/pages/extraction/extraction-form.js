@@ -625,14 +625,14 @@ export default function ExtractionForm() {
                   )}
                 />
               </Form.Group>
-              <Form.Group controlId="batch_size">
+              {/* <Form.Group controlId="batch_size">
                 <Form.Label>Batch Size</Form.Label>
                 <Form.Control
                   {...register('batch_size')}
                   type="number"
                   defaultValue={1}
                 />
-              </Form.Group>
+              </Form.Group> */}
             </fieldset>
             <fieldset className="border rounded p-2 mb-3">
               <legend className="font-weight-bold">NMF Replicates</legend>
