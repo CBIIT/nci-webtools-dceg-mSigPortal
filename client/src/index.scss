@@ -786,6 +786,11 @@ select.form-control-sm {
   }
 }
 
+@media (min--width: 1200px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
 /**** large devices ****/
 @media (min-width: 992px) and (max-width: 1199px) {
   .card-columns {
