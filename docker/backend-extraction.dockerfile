@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2022
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
     && dnf -y install \
@@ -52,5 +52,9 @@ RUN npm install
 
 # copy the rest of the application
 COPY extraction-service /deploy/app
+
+# ensure symlink exists for /data/genomes
+RUN mkdir -p /data/genomes /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/ \
+    && ln -s /data/genomes /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
 
 CMD npm run start
