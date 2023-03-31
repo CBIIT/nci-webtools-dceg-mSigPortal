@@ -10,12 +10,12 @@ import { createCacheMiddleware } from '../../cache.js';
 import isUUID from 'validator/lib/isUUID.js';
 import { profilerExtraction } from './profilerExtraction.js';
 import { mkdirs, writeJson } from '../../utils.js';
+import { getWorker } from '../../workers.js';
 
 const r = rWrapper.async;
 const env = process.env;
 
 export async function submit(req, res, next) {
-  const { logger, sqlite } = req.app.locals;
   const { id } = req.params;
   if (!isUUID(id)) res.status(500).json('Invalid ID');
 
@@ -31,11 +31,13 @@ export async function submit(req, res, next) {
     submittedAt: new Date(),
   };
 
+  // use fargate worker if email is provided, otherwise use local worker
+  const worker = getWorker(req.body?.email ? 'fargate' : 'local');
+
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
 
-  profilerExtraction(req.body, logger, sqlite(id, 'local'), env);
-
+  worker(id, req.app, env);
   res.json(status);
 }
 
