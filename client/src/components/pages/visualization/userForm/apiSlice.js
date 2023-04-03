@@ -24,9 +24,9 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
         try {
           const [{ data: status }, { data: params }, { data: manifest }] =
             await Promise.all([
-              fetchWithBQ(`data//output/${id}/status.json`),
-              fetchWithBQ(`data//input/${id}/params.json`),
-              fetchWithBQ(`data//output/${id}/manifest.json`),
+              fetchWithBQ(`data/output/${id}/status.json`),
+              fetchWithBQ(`data/input/${id}/params.json`),
+              fetchWithBQ(`data/output/${id}/manifest.json`),
             ]);
           return { data: { status, params, manifest } };
         } catch (error) {
