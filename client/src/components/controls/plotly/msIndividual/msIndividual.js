@@ -466,10 +466,11 @@ export function MsIndividualComparison(
     type: 'rect',
     xref: 'paper',
     yref: 'paper',
+    xanchor: 'right',
     y0: i === 0 ? 0 : arr[i - 1],
     y1: val,
-    x0: -0.07,
-    x1: -0.085,
+    x0: -0.045,
+    x1: -0.055,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     fillcolor: containsTerm
       ? signatureColors[
@@ -486,10 +487,11 @@ export function MsIndividualComparison(
     type: 'line',
     xref: 'paper',
     yref: 'paper',
+    xanchor: 'right',
     y0: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
     y1: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
-    x0: -0.085,
-    x1: -0.09,
+    x0: -0.055,
+    x1: -0.058,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
 
     line: {
@@ -552,10 +554,10 @@ export function MsIndividualComparison(
     {
       xref: 'paper',
       yref: 'paper',
-      xanchor: 'center',
+      xanchor: 'right',
       yanchor: 'middle',
       align: 'center',
-      x: -0.05,
+      x: -0.025,
       y: 1 - divide1 * 1.5 - 0.015,
       text: '<b>Relative contribution</b>',
       font: { size: 16, family: 'Times New Roman' },
@@ -565,10 +567,10 @@ export function MsIndividualComparison(
     {
       xref: 'paper',
       yref: 'paper',
-      xanchor: 'center',
+      xanchor: 'right',
       yanchor: 'middle',
       align: 'center',
-      x: -0.05,
+      x: -0.025,
       y: plotYrange2 / 2,
       text: '<b>Relative contribution</b>',
       font: { size: 16, family: 'Times New Roman' },
@@ -634,7 +636,7 @@ export function MsIndividualComparison(
     val1: arr[i - 1],
     y: i === 0 ? val / 2 : (val - arr[i - 1]) / 2 + arr[i - 1],
     //x: longest < 7 ? -0.09 : -0.1,
-    x: -0.095,
+    x: -0.058,
     signatureName: sortArr[i] ? sortArr[i].signatureName : '',
     font: {
       color: containsTerm
