@@ -43,11 +43,7 @@ export function createLogger(name, level = 'info') {
           )}`
       )
     ),
-    transports: [
-      new transports.Console({
-        format: format.combine(format.colorize({ all: true })),
-      }),
-    ],
+    transports: [new transports.Console()],
     exitOnError: false,
   });
 }
