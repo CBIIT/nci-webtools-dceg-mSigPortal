@@ -37,7 +37,7 @@ function parseCSV(filepath) {
 
 function upload(req, res, next) {
   const { logger } = req.app.locals;
-  const { module, id } = req.params;
+  const { id } = req.params;
   if (!validate(id)) next(new Error('Invalid ID'));
 
   const form = formidable({
@@ -69,6 +69,7 @@ function upload(req, res, next) {
 }
 
 async function associationWrapper(req, res, next) {
+  const { logger } = req.app.locals;
   const { fn, args, id } = req.body;
   const sessionId = id || randomUUID();
 
@@ -109,6 +110,7 @@ async function associationWrapper(req, res, next) {
 
 async function getImageS3Batch(req, res, next) {
   // serve static images from s3
+  const { logger } = req.app.locals;
   const { keys } = req.body;
   const s3 = new AWS.S3();
   const batch = Object.fromEntries(
