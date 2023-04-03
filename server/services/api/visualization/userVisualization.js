@@ -8,7 +8,6 @@ import { parseCSV } from '../general.js';
 import { getExposureData, getSignatureData } from '../../query.js';
 import { createCacheMiddleware } from '../../cache.js';
 import isUUID from 'validator/lib/isUUID.js';
-import { profilerExtraction } from './profilerExtraction.js';
 import { mkdirs, writeJson } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 
@@ -37,7 +36,7 @@ export async function submit(req, res, next) {
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
 
-  worker(id, req.app, env);
+  worker(id, req.app, 'visualization', env);
   res.json(status);
 }
 
