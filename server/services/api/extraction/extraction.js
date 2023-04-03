@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { downloadDirectory, uploadDirectory } from '../../s3.js';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
+import { getWorker } from '../../workers.js';
 
 const env = process.env;
 
@@ -22,27 +22,12 @@ export async function submit(req, res, next) {
     submittedAt: new Date(),
   };
 
+  const worker = getWorker(req.body?.email ? 'fargate' : 'local');
+
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
 
-  // const s3ClientConfig = { region: env.AWS_DEFAULT_REGION };
-
-  // await uploadDirectory(
-  //   inputFolder,
-  //   path.join(env.INPUT_KEY_PREFIX, id),
-  //   env.IO_BUCKET,
-  //   s3ClientConfig
-  // );
-
-  // await uploadDirectory(
-  //   outputFolder,
-  //   path.join(env.OUTPUT_KEY_PREFIX, id),
-  //   env.IO_BUCKET,
-  //   s3ClientConfig
-  // );
-
-  fetch(`${env.API_BASE_URL}/extraction/run/${id}`);
-
+  worker(id, req.app, 'extraction', env);
   res.json(status);
 }
 
@@ -52,20 +37,6 @@ async function getJobStatus(id) {
   try {
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-    // const s3ClientConfig = { region: env.AWS_DEFAULT_REGION };
-
-    // await downloadDirectory(
-    //   inputFolder,
-    //   path.join(env.INPUT_KEY_PREFIX, id),
-    //   env.IO_BUCKET,
-    //   s3ClientConfig
-    // );
-    // await downloadDirectory(
-    //   outputFolder,
-    //   path.join(env.OUTPUT_KEY_PREFIX, id),
-    //   env.IO_BUCKET,
-    //   s3ClientConfig
-    // );
 
     const paramsFilePath = path.resolve(inputFolder, 'params.json');
     const statusFilePath = path.resolve(outputFolder, 'status.json');

@@ -19,25 +19,43 @@ export function getWorker(workerType = 'local') {
  * Executes a worker process locally.
  * @param {string} id
  * @param {string} app
- * @param {string} env
+ * @param {string} taskName
+ * @param {object} env
  * @returns
  */
-export async function runLocalWorker(id, app, env = process.env) {
+export async function runLocalWorker(id, app, taskName, env = process.env) {
   const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, 'params.json');
   const params = await readJson(paramsFilePath);
   const logger = app.locals.logger;
   const dbConnection = app.locals.sqlite(id, 'local');
-  return await profilerExtraction(params, logger, dbConnection, env);
+
+  if (taskName === 'visualization') {
+    return await profilerExtraction(params, logger, dbConnection, env);
+  } else if (taskName === 'extraction') {
+    fetch(`${env.API_BASE_URL}/extraction/run/${id}`);
+  }
 }
 
 /**
  * Executes a worker process in an AWS Fargate task.
  * @param {string} id
- * @param {string} env
+ * @param {string} app
+ * @param {string} taskName
+ * @param {object} env
  * @returns {Promise<ECS.RunTaskCommandOutput>} task output
  */
-export async function runFargateWorker(id, env = process.env) {
-  const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS, WORKER_TASK_NAME } = env;
+export async function runFargateWorker(id, app, taskName, env = process.env) {
+  const {
+    ECS_CLUSTER,
+    SUBNET_IDS,
+    SECURITY_GROUP_IDS,
+    WORKER_TASK_NAME,
+    EXTRACTION_WORKER_TASK_NAME,
+  } = env;
+  const taskTypes = {
+    visualization: WORKER_TASK_NAME,
+    extraction: EXTRACTION_WORKER_TASK_NAME,
+  };
   const client = new ECSClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
@@ -51,7 +69,7 @@ export async function runFargateWorker(id, env = process.env) {
         subnets: SUBNET_IDS.split(','),
       },
     },
-    taskDefinition: WORKER_TASK_NAME,
+    taskDefinition: taskTypes[taskName],
     overrides: {
       containerOverrides: [
         {
