@@ -37,6 +37,8 @@ export function MsIndividualComparison(
   );
   const extraMargin = longest < 7 ? 200 : longest * 12.5;
 
+  //console.log(signatureNames);
+
   const searchTerms = ['SBS'];
   const containsTerm = arrayContainsTerms(signatureNames, searchTerms);
   let signatureColors;

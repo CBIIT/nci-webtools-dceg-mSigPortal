@@ -5,6 +5,7 @@ import id83 from '../../../controls/plotly/profileComparison/id83';
 import msIndividual_rs32 from '../../../controls/plotly/msIndividual/msIndividual_rs32';
 import MsIndividual_Error from '../../../controls/plotly/msIndividual/msIndividual_error';
 import { extractLastWord } from '../../../controls/utils/utils';
+import { groupBy } from 'lodash';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,7 +46,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
-        console.log(res);
+        //console.log(res);
         let profile;
 
         if (_arg.params_activity.userId) {
@@ -54,11 +55,16 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             res[1].data.length > 0 &&
             res[2].data.length > 0
           ) {
-            if (res[0].data[0].signatureName === res[1].data[0].signatureName) {
-              profile = res[0].data[0].signatureName;
-            } else {
-              profile = 'Data mismatch';
-            }
+            const exposure_groupBySignature = groupBy(
+              res[0].data.filter((o) => o['exposure'] > 0.01),
+              'signatureName'
+            );
+
+            const signatureNames = Object.keys(exposure_groupBySignature).map(
+              (e) => e
+            );
+
+            profile = signatureNames[0];
           } else {
             profile = 'No data/ Data is missing';
           }
