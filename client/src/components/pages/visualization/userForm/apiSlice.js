@@ -13,7 +13,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
 
     submit: builder.mutation({
       query: (body) => ({
-        url: `submitVisualization/${body.args.Project_ID}`,
+        url: `submitVisualization/${body.id}`,
         method: 'POST',
         body,
       }),
