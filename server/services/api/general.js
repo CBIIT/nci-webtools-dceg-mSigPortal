@@ -5,20 +5,11 @@ import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import Papa from 'papaparse';
 import rWrapper from 'r-wrapper';
-import AWS from 'aws-sdk';
 import Router from 'express-promise-router';
 import { mkdirs } from '../utils.js';
 const r = rWrapper.async;
-
+import { getObjectBuffer } from '../s3.js';
 const env = process.env;
-
-AWS.config.update({
-  region: env.AWS_DEFAULT_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: env.AWS_ACCESS_KEY_ID || null,
-    secretAccessKey: env.AWS_SECRET_ACCESS_KEY || null,
-  },
-});
 
 function parseCSV(filepath) {
   const file = fs.createReadStream(filepath);
@@ -112,25 +103,24 @@ async function getImageS3Batch(req, res, next) {
   // serve static images from s3
   const { logger } = req.app.locals;
   const { keys } = req.body;
-  const s3 = new AWS.S3();
+
   const batch = Object.fromEntries(
     await Promise.all(
-      (keys || []).map((Key) => {
+      (keys || []).map(async (Key) => {
         const key = decodeURIComponent(Key);
-        return s3
-          .getObject({
-            Bucket: env.DATA_BUCKET,
-            Key: key,
-          })
-          .promise()
-          .then(({ Body }) => [
+        try {
+          const image = await getObjectBuffer(key, env.DATA_BUCKET);
+          return [
             [path.parse(key).name],
-            'data:image/svg+xml;base64,' + Buffer.from(Body).toString('base64'),
-          ])
-          .catch((error) => {
-            logger.error(`${key}: ${error.message}`);
-            return [[path.parse(key).name], 'no image available'];
-          });
+            'data:image/svg+xml;base64,' + image.toString('base64'),
+          ];
+        } catch (error) {
+          logger.error(`${key}: ${error.message}`);
+          return [
+            [path.parse(key).name],
+            'no image available. ' + error.message,
+          ];
+        }
       })
     )
   );
@@ -139,54 +129,29 @@ async function getImageS3Batch(req, res, next) {
 
 async function getImageS3(req, res, next) {
   // serve static images from s3
-  const key = req.body.path;
-  const s3 = new AWS.S3();
-  s3.getObject({
-    Bucket: env.DATA_BUCKET,
-    Key: key,
-  })
-    .createReadStream()
-    .on('error', next)
-    .on('pipe', () => res.setHeader('Content-Type', 'image/svg+xml'))
-    .pipe(res);
+  const key = req.body?.path;
+  if (!key) {
+    next('Missing path to image');
+  } else {
+    const image = await getObjectBuffer(key, env.DATA_BUCKET);
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.send(image);
+  }
 }
 
 async function getFileS3(req, res, next) {
   // serve static files from s3
   const { path } = req.body;
-  const s3 = new AWS.S3();
-  s3.getObject({
-    Bucket: env.DATA_BUCKET,
-    Key: `msigportal/Database/${path}`,
-  })
-    .createReadStream()
-    .on('error', next)
-    .pipe(res);
+  if (path) {
+    const file = await getObjectBuffer(
+      `msigportal/Database/${path}`,
+      env.DATA_BUCKET
+    );
+    res.send(file);
+  } else {
+    next('Missing path to file');
+  }
 }
-
-const getDataUsingS3Select = (params) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const s3 = new AWS.S3();
-      const response = await s3.selectObjectContent(params).promise();
-      const events = response.Payload;
-      let records = [];
-      events.on('data', ({ Records, End }) => {
-        if (Records) {
-          records.push(Records.Payload);
-        } else if (End) {
-          let string = Buffer.concat(records).toString('utf8');
-          string = string.replace(/\,$/, '');
-          const results = JSON.parse(`[${string}]`);
-          resolve(results);
-        }
-      });
-      events.on('error', reject);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
 
 const router = Router();
 router.post('/upload/:id?', upload);
