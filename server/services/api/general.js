@@ -74,8 +74,8 @@ async function associationWrapper(req, res, next) {
   // create directory for results if needed
   const savePath = sessionId
     ? path.join('output', sessionId, 'results', fn, '/')
-    : null;
-  if (sessionId) await mkdirs(path.join(rConfig.wd, savePath));
+    : '';
+  if (sessionId) await mkdirs([path.join(rConfig.wd, savePath)]);
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
