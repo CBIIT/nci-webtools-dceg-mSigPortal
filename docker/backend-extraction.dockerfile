@@ -18,6 +18,7 @@ RUN dnf -y update \
     python3-devel \
     python3-pip \
     python3-setuptools \
+    python3-wheel \
     rsync \
     tar \
     wget \ 
