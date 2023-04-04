@@ -4,10 +4,9 @@ services:
     build:
       context: "."
       dockerfile: "./docker/backend.dockerfile"
+    env_file: "./server/.env"
     volumes:
-      - "./server/config.json:/deploy/server/config.json:ro"
-      - "./tmp:/deploy/tmp"
-      - "./data:/deploy/data"
+      - "./tmp:/data"
       - "~/.aws:/root/.aws:ro"
       - ./src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
     ports:
@@ -30,6 +29,7 @@ services:
       dockerfile: "./docker/frontend.dockerfile"
       args:
         APP_PATH: /mutational-signatures
+    env_file: "./server/.env"
     environment:
       API_BASE_URL: http://backend:8330
       API_EXTRACTION_URL: http://extraction:8331
