@@ -108,9 +108,10 @@ export async function profilerExtraction(
       all: true,
       shell: true,
     });
-    if (!fs.existsSync(path.join(outputFolder, 'svg_files_list.txt'))) {
-      logger.error('An error occurred while extracting profiles');
-    }
+    // if (!fs.existsSync(path.join(outputFolder, 'matrix_files_list.txt'))) {
+    //   logger.error(scriptOutput);
+    //   throw new Error('An error occurred while extracting profiles');
+    // }
     logger.debug(scriptOutput);
 
     // parse all matrix files and to json file
@@ -178,6 +179,11 @@ export async function profilerExtraction(
     return { id };
   } catch (error) {
     logger.error(error);
+    // write failed status
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      status: 'FAILED',
+    });
     if (isEmail(email)) {
       // sending error notification
       await sendNotification(
