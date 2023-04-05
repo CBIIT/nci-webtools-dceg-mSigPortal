@@ -173,11 +173,11 @@ export default function Visualization() {
       id: 'cluster',
       component: <ClusteredIdentification />,
     },
-    {
-      name: 'Download',
-      id: 'download',
-      component: <Download />,
-    },
+    // {
+    //   name: 'Download',
+    //   id: 'download',
+    //   component: <Download />,
+    // },
   ];
 
   return (
