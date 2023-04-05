@@ -55,7 +55,7 @@ RUN npm install
 COPY extraction-service /deploy/app
 
 # ensure symlink exists for /data/genomes
-RUN mkdir -p /data/genomes /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/ \
-    && ln -s /data/genomes /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+RUN mkdir -p /data/genomes /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb \
+    && ln -s /data/genomes/* /deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
 
 CMD npm run start
