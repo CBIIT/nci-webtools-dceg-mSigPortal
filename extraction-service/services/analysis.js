@@ -41,7 +41,8 @@ export async function query(params, env = process.env) {
 
 export async function run(id, app, env = process.env) {
   if (!id) throw new Error('Missing id');
-  app.locals.logger.debug(id);
+  const logger = app.locals.logger;
+  logger.debug(id);
   const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   await mkdirs([inputFolder, outputFolder]);
@@ -62,8 +63,7 @@ export async function run(id, app, env = process.env) {
 
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const params = await readJson(paramsFilePath);
-  const logger = app.locals.logger;
   const dbConnection = app.locals.connection;
-  logger.log({ params });
+  logger.debug(params);
   return await extraction(params, logger, dbConnection, env);
 }
