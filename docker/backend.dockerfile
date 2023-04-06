@@ -89,8 +89,10 @@ COPY server .
 CMD npm start
 
 # ensure symlink exists for /data/genomes
-RUN mkdir -p /data/genomes /deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb \
-    && ln -s /data/genomes/* /deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+ENV GENOME_PATH=/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+RUN mkdir -p /data/genomes ${GENOME_PATH} \
+    && rm -rf ${GENOME_PATH} \
+    && ln -sf /data/genomes ${GENOME_PATH}
 
 # docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/data/genomes:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb  -v ~/.aws/credentials:/root/.aws/credentials:ro --name msigportal-backend msigportal-backend 
