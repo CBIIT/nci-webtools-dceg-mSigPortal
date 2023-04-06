@@ -127,11 +127,12 @@ export default function Visualization() {
       id: 'cluster',
       disabled: !completed,
     },
-    {
-      name: 'Download',
-      id: 'download',
-      disabled: !completed,
-    },
+
+    // {
+    //   name: 'Download',
+    //   id: 'download',
+    //   component: <Download />,
+    // },
   ];
 
   return (

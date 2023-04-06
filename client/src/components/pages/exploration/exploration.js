@@ -189,14 +189,14 @@ export default function Exploration() {
       id: 'msIndividual',
       name: 'MS Individual',
     },
-    source == 'public' ? (
-      {
-        id: 'download',
-        name: 'Download',
-      }
-    ) : (
-      <></>
-    ),
+    // source == 'public' ? (
+    //   {
+    //     id: 'download',
+    //     name: 'Download',
+    //   }
+    // ) : (
+    //   <></>
+    // ),
   ];
 
   return (

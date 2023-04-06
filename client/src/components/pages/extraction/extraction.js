@@ -147,7 +147,6 @@ export default function Extraction() {
       disabled: explorationId === false,
     },
   ];
-
   function handleExplorationType(e) {
     mergeState({ explorationType: e.target.value });
   }
@@ -240,6 +239,7 @@ export default function Extraction() {
                         as="select"
                         value={explorationType}
                         onChange={handleExplorationType}
+                        disabled={displayTab === 'msAssociation'}
                       >
                         <option value="denovo">Denovo</option>
                         <option value="decomposed">Decomposed</option>

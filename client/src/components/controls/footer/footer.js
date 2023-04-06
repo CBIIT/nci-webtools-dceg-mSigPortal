@@ -15,13 +15,17 @@ export function Footer() {
             <div className="footer-nav text-left">
               <div className="mb-4 row justify-content-between">
                 <div className="col-md-auto footer-nav-col">
-                  <div className="d-none d-lg-block footer-header text-left mb-2">
+                  <div className="d-none d-lg-block footer-header text-left ">
                     <h5>
                       <b>Division of Cancer Epidemiology and Genetics</b>{' '}
                     </h5>
-                    <p>
-                      <b>at the National Cancer Institute</b>
-                    </p>
+                    <div class="h6">
+                      at the
+                      <a class="text-white" href="https://www.cancer.gov/">
+                        {' '}
+                        National Institutes of Health{' '}
+                      </a>
+                    </div>
                   </div>
                   <div className="d-lg-none footer-header-mobile text-left mb-2">
                     <h5>Division of Cancer Epidemiology and Genetics</h5>
@@ -31,8 +35,8 @@ export function Footer() {
               </div>
               <div className="row justify-content-between">
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-2">CONTACT INFORMATION</h6>
-                  <div className="my-2">
+                  <h6 className="mb-1">CONTACT INFORMATION</h6>
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
@@ -43,8 +47,8 @@ export function Footer() {
                   </div>
                 </div>
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-2">MORE INFORMATION</h6>
-                  <div className="my-2">
+                  <h6 className="mb-1">MORE INFORMATION</h6>
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://dceg.cancer.gov/"
@@ -53,7 +57,7 @@ export function Footer() {
                       DCEG
                     </a>
                   </div>
-                  <div className="my-2">
+                  <div className="">
                     <a
                       className="footer-link text-light"
                       href="https://prevention.cancer.gov/"
@@ -72,8 +76,8 @@ export function Footer() {
               </div> --> */}
                 </div>
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-2">POLICIES</h6>
-                  <div className="my-2">
+                  <h6 className="mb-1">POLICIES</h6>
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://www.cancer.gov/policies/accessibility"
@@ -82,7 +86,7 @@ export function Footer() {
                       Accessibility
                     </a>
                   </div>
-                  <div className="my-2">
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://www.cancer.gov/policies/disclaimer"
@@ -91,7 +95,7 @@ export function Footer() {
                       Disclaimer
                     </a>
                   </div>
-                  <div className="my-2">
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://www.cancer.gov/policies/foia"
@@ -100,7 +104,7 @@ export function Footer() {
                       FOIA
                     </a>
                   </div>
-                  <div className="my-2">
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://www.cancer.gov/policies/comments"
@@ -109,7 +113,7 @@ export function Footer() {
                       Comment Policy
                     </a>
                   </div>
-                  <div className="my-2">
+                  <div className="my-0">
                     <a
                       className="footer-link text-light"
                       href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html"
@@ -122,7 +126,7 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="footer-agencies my-4">
+            <div className="footer-agencies my-3">
               <div className="row justify-content-md-center">
                 <div className="col-sm-auto">
                   <a
@@ -164,10 +168,10 @@ export function Footer() {
             </div>
 
             <div className="footer-tagline">
-              <h6>
-                NIH ... Turning Discovery Into Health
-                <sup>®</sup>
-              </h6>
+              {/* <h6> */}
+              NIH ... Turning Discovery Into Health
+              <sup>®</sup>
+              {/* </h6> */}
             </div>
           </div>
         </div>
