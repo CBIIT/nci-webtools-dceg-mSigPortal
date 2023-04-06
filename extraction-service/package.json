@@ -28,5 +28,8 @@
     "pg": "^8.8.0",
     "pm2": "^5.2.2",
     "winston": "^3.8.2"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
