@@ -185,21 +185,22 @@ export async function profilerExtraction(
       ...(await readJson(paths.statusFile)),
       status: 'FAILED',
     });
-    if (isEmail(email)) {
-      // sending error notification
-      await sendNotification(
-        params.email,
-        `mSigPortal - Visualization Analysis Failed - ${params.jobName}`,
-        'templates/user-failure-email.html',
-        {
-          jobName: params.jobName,
-          submittedAt: submittedTime.toISOString(),
-          executionTime:
-            (new Date().getTime() - submittedTime.getTime()) / 1000,
-          error: formatObject(error),
-        }
-      );
-    }
+    logger.debug(email);
+    logger.debug(isEmail(email));
+    // if (isEmail(email)) {
+    // sending error notification
+    await sendNotification(
+      params.email,
+      `mSigPortal - Visualization Analysis Failed - ${params.jobName}`,
+      'templates/user-failure-email.html',
+      {
+        jobName: params.jobName,
+        submittedAt: submittedTime.toISOString(),
+        executionTime: (new Date().getTime() - submittedTime.getTime()) / 1000,
+        error: formatObject(error),
+      }
+    );
+    // }
     return { error };
   } finally {
     // delete input files
