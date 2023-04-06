@@ -7,8 +7,6 @@ services:
     env_file: "./server/.env"
     volumes:
       - "./tmp:/data"
-      - "~/.aws:/root/.aws:ro"
-      - ./src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
     ports:
       - "8330:8330"
 
@@ -16,10 +14,9 @@ services:
     build:
       context: "."
       dockerfile: "./docker/backend-extraction.dockerfile"
-    env_file: "./extraction-service/.env"
+    env_file: "./server/.env"
     volumes:
-      - "./tmp:/deploy/tmp"
-      - ./src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb:ro'
+      - "./tmp:/data"
     ports:
       - "8332:8332"
 
