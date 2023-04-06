@@ -748,6 +748,9 @@ export default function UserForm() {
             placeholder="Enter Job Name"
             disabled={submitted || id || !useQueue}
           />
+          <Form.Control.Feedback type="invalid">
+            {errors.jobName && 'Please enter a Job Name'}
+          </Form.Control.Feedback>
         </Form.Group>
       </div>
       <Row>
