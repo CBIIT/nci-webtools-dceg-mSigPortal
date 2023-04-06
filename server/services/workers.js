@@ -45,16 +45,10 @@ export async function runLocalWorker(id, app, taskName, env = process.env) {
  * @returns {Promise<ECS.RunTaskCommandOutput>} task output
  */
 export async function runFargateWorker(id, app, taskName, env = process.env) {
-  const {
-    ECS_CLUSTER,
-    SUBNET_IDS,
-    SECURITY_GROUP_IDS,
-    WORKER_TASK_NAME,
-    EXTRACTION_WORKER_TASK_NAME,
-  } = env;
+  const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS } = env;
   const taskTypes = {
-    visualization: WORKER_TASK_NAME,
-    extraction: EXTRACTION_WORKER_TASK_NAME,
+    visualization: env.WORKER_TASK_NAME,
+    extraction: env.EXTRACTION_WORKER_TASK_NAME,
   };
   const client = new ECSClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];

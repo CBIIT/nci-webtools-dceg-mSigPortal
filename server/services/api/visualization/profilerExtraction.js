@@ -10,6 +10,7 @@ import { schema } from './userSchema.js';
 import { readJson, writeJson, mkdirs, getFiles } from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
 import { sendNotification } from '../../notifications.js';
+import { formatObject } from '../../logger.js';
 const r = rWrapper.async;
 
 // transform all matrix files into a single json object
