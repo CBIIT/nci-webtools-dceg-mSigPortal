@@ -34,7 +34,7 @@ WORKDIR /deploy/app
 RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor 
 
 # install other python packages
-RUN pip3 install SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 PyPDF2==2.11.2
+RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 

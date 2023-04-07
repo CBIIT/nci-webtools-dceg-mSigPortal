@@ -49,7 +49,7 @@ WORKDIR /deploy/server
 RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 # install python packages
-RUN pip3 install pandas seaborn 
+RUN pip3 install pandas==1.5.3 seaborn 
 
 # install client python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
