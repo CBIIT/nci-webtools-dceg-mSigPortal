@@ -47,8 +47,11 @@ export async function runLocalWorker(id, app, taskName, env = process.env) {
 export async function runFargateWorker(id, app, taskName, env = process.env) {
   const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS } = env;
   const taskTypes = {
-    visualization: env.WORKER_TASK_NAME,
-    extraction: env.EXTRACTION_WORKER_TASK_NAME,
+    visualization: { name: 'worker', taskDefinition: env.WORKER_TASK_NAME },
+    extraction: {
+      name: 'extraction-worker',
+      taskDefinition: env.EXTRACTION_WORKER_TASK_NAME,
+    },
   };
   const client = new ECSClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
@@ -63,11 +66,11 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
         subnets: SUBNET_IDS.split(','),
       },
     },
-    taskDefinition: taskTypes[taskName],
+    taskDefinition: taskTypes[taskName].taskDefinition,
     overrides: {
       containerOverrides: [
         {
-          name: 'worker',
+          name: taskTypes[taskName].name,
           command: workerCommand,
         },
       ],
