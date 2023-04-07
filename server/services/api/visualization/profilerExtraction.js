@@ -3,7 +3,6 @@ import path from 'path';
 import rWrapper from 'r-wrapper';
 import { execa } from 'execa';
 import isUUID from 'validator/lib/isUUID.js';
-import isEmail from 'validator/lib/isEmail.js';
 import mapValues from 'lodash/mapValues.js';
 import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
@@ -162,7 +161,7 @@ export async function profilerExtraction(
     );
 
     // send success notification if email was provided
-    if (isEmail(email)) {
+    if (email) {
       logger.info(`[${id}] Sending success notification`);
       await sendNotification(
         params.email,
@@ -186,21 +185,22 @@ export async function profilerExtraction(
       status: 'FAILED',
     });
     logger.debug(email);
-    logger.debug(isEmail(email));
-    // if (isEmail(email)) {
-    // sending error notification
-    await sendNotification(
-      params.email,
-      `mSigPortal - Visualization Analysis Failed - ${params.jobName}`,
-      'templates/user-failure-email.html',
-      {
-        jobName: params.jobName,
-        submittedAt: submittedTime.toISOString(),
-        executionTime: (new Date().getTime() - submittedTime.getTime()) / 1000,
-        error: formatObject(error),
-      }
-    );
-    // }
+
+    if (email) {
+      logger.info(`[${id}] Sending error notification`);
+      await sendNotification(
+        params.email,
+        `mSigPortal - Visualization Analysis Failed - ${params.jobName}`,
+        'templates/user-failure-email.html',
+        {
+          jobName: params.jobName,
+          submittedAt: submittedTime.toISOString(),
+          executionTime:
+            (new Date().getTime() - submittedTime.getTime()) / 1000,
+          error: formatObject(error),
+        }
+      );
+    }
     return { error };
   } finally {
     // delete input files
