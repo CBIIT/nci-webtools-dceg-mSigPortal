@@ -3,7 +3,6 @@ import knex from 'knex';
 import { isMainModule, readJson } from './services/utils.js';
 import { createLogger } from './services/logger.js';
 import { extraction } from './services/extraction.js';
-import { downloadDirectory } from './services/s3.js';
 import { mkdirs } from './services/utils.js';
 
 if (isMainModule(import.meta)) {
@@ -23,20 +22,6 @@ export async function main(argv = process.argv, env = process.env) {
   const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   await mkdirs([inputFolder, outputFolder]);
-
-  // download folders from s3
-  // await downloadDirectory(
-  //   inputFolder,
-  //   path.join(env.INPUT_KEY_PREFIX, id),
-  //   env.DATA_BUCKET,
-  //   { region: env.AWS_DEFAULT_REGION }
-  // );
-  // await downloadDirectory(
-  //   outputFolder,
-  //   path.join(env.OUTPUT_KEY_PREFIX, id),
-  //   env.DATA_BUCKET,
-  //   { region: env.AWS_DEFAULT_REGION }
-  // );
 
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const params = await readJson(paramsFilePath);
