@@ -56,6 +56,7 @@ export async function profilerExtraction(
   env = process.env
 ) {
   const { args, email } = params;
+  const id = args.Project_ID;
   const paths = await getPaths(args, env);
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
@@ -64,7 +65,6 @@ export async function profilerExtraction(
   logger.info(paths);
 
   try {
-    const id = args.Project_ID;
     if (!id) throw new Error('Missing id');
     if (!isUUID(id)) throw new Error('Invalid id');
 
