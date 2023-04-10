@@ -84,9 +84,10 @@ export default function UserForm() {
     bedFile: '',
     collapse: false,
     useQueue: false,
-    email: '',
     seqInfo: false,
     cluster: false,
+    email: '',
+    jobName: '',
   };
 
   const {
