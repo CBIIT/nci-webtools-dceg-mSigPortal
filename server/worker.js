@@ -25,18 +25,14 @@ export async function main(argv = process.argv, env = process.env) {
 
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const params = await readJson(paramsFilePath);
-
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
-  const dbConnection = knex({
-    client: 'postgres',
+  const localDb = knex({
+    client: 'better-sqlite3',
     connection: {
-      host: env.POSTGRES_HOST,
-      port: env.POSTGRES_PORT,
-      user: env.POSTGRES_USER,
-      password: env.POSTGRES_PASS,
-      database: env.POSTGRES_DB,
+      filename: path.join(outputFolder, `local.sqlite3`),
     },
+    useNullAsDefault: true,
   });
   logger.log({ params });
-  return await profilerExtraction(params, logger, dbConnection, env);
+  return await profilerExtraction(params, logger, localDb, env);
 }
