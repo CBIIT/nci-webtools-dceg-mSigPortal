@@ -184,7 +184,6 @@ export async function profilerExtraction(
       ...(await readJson(paths.statusFile)),
       status: 'FAILED',
     });
-    logger.debug(email);
 
     if (email) {
       logger.info(`[${id}] Sending error notification`);
