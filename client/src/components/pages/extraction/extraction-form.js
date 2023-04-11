@@ -326,6 +326,8 @@ export default function ExtractionForm() {
   async function onSubmit(data) {
     mergeState({ submitted: true });
 
+    console.log(data);
+    console.log(data.inputFile);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
     const { id } = await uploadFiles(formData).unwrap();
@@ -339,7 +341,9 @@ export default function ExtractionForm() {
         study: data.study.value,
         cancer: data.cancer.value,
         strategy: data.strategy.value,
+        input_type: 'matrix',
       }),
+
       reference_genome: data.reference_genome.value,
       exome: data.exome ? 'True' : 'False',
       context_type: data.context_type.value,
@@ -378,6 +382,9 @@ export default function ExtractionForm() {
     };
     console.log(params);
     const submitStatus = await submitForm(params).unwrap();
+
+    console.log(submitStatus);
+
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id });
     mergeSuccess(
