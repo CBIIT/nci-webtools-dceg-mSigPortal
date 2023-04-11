@@ -31,7 +31,9 @@ export async function submit(req, res, next) {
   };
 
   // use fargate worker if email is provided, otherwise use local worker
-  const worker = getWorker(req.body?.email ? 'fargate' : 'local');
+  const type =
+    env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'fargate';
+  const worker = getWorker(type);
 
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
