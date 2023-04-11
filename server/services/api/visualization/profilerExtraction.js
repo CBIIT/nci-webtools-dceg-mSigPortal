@@ -98,21 +98,15 @@ export async function profilerExtraction(
     const cliArgs = Object.entries(transformArgs)
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
       .join(' ');
-    const command = [
-      'services/python/mSigPortal_Profiler_Extraction.py',
-      cliArgs,
-    ];
-    logger.info(command);
+
     logger.info(`[${id}] Run Profiler Extraction`);
-    const { all: scriptOutput } = await execa('python3', command, {
-      all: true,
-      shell: true,
-    });
-    // if (!fs.existsSync(path.join(outputFolder, 'matrix_files_list.txt'))) {
-    //   logger.error(scriptOutput);
-    //   throw new Error('An error occurred while extracting profiles');
-    // }
-    logger.debug(scriptOutput);
+    await execa(
+      'python3',
+      ['services/python/mSigPortal_Profiler_Extraction.py', cliArgs],
+      { shell: true }
+    )
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr);
 
     // parse all matrix files and to json file
     const matrixFiles = path.resolve(profilerExtractionOutput, 'output');

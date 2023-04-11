@@ -132,12 +132,14 @@ export async function extraction(
       .join(' ');
 
     logger.info(`[${id}] Run extraction`);
-    const { all } = await execa(
+
+    await execa(
       'python3',
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
-      { all: true, shell: true }
-    );
-    logger.debug(all);
+      { shell: true }
+    )
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr);
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
