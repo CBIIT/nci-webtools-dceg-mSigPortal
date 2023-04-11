@@ -326,15 +326,24 @@ export default function ExtractionForm() {
   async function onSubmit(data) {
     mergeState({ submitted: true });
 
+    console.log(data);
+    console.log(data.inputFile);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
     const { id } = await uploadFiles(formData).unwrap();
 
     const args = {
-      ...(source == 'user' && {
+      ...(source === 'user' && {
         input_type: data.input_type.value,
         input_data: data.inputFile.name,
       }),
+      ...(source === 'public' && {
+        study: data.study.value,
+        cancer: data.cancer.value,
+        strategy: data.strategy.value,
+        input_type: 'matrix',
+      }),
+
       reference_genome: data.reference_genome.value,
       exome: data.exome ? 'True' : 'False',
       context_type: data.context_type.value,
@@ -352,6 +361,9 @@ export default function ExtractionForm() {
       combined_stability: data.combined_stability,
       allow_stability_drop: data.allow_stability_drop ? 'True' : 'False',
     };
+
+    console.log(args);
+
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
       profile: data.context_type.value.match(/^\D*/)[0],
@@ -368,7 +380,11 @@ export default function ExtractionForm() {
       jobName: data.jobName || 'Extraction',
       form: data,
     };
+    console.log(params);
     const submitStatus = await submitForm(params).unwrap();
+
+    console.log(submitStatus);
+
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id });
     mergeSuccess(
@@ -403,7 +419,7 @@ export default function ExtractionForm() {
                     label={<span className="font-weight-normal">Public</span>}
                     value={'public'}
                     checked={field.value == 'public'}
-                    disabled={true}
+                    //disabled={true}
                   />
                 )}
               />

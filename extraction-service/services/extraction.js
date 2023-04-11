@@ -1,21 +1,21 @@
-import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
-import path from 'path';
-import { stringify } from 'csv-stringify';
-import { groupBy } from 'lodash-es';
-import { getSignatureData } from './query.js';
-import { execa } from 'execa';
-import validator from 'validator';
-import mapValues from 'lodash/mapValues.js';
-import { randomUUID } from 'crypto';
-import Papa from 'papaparse';
-import knex from 'knex';
-import { readJson, writeJson, mkdirs } from './utils.js';
-import { sendNotification } from './notifications.js';
-import { formatObject } from './logger.js';
-import axios from 'axios';
-import FormData from 'form-data';
-import { uploadDirectory } from './s3.js';
-import { importUserSession } from './importSignatures.js';
+import { readdir, unlinkSync, writeFileSync, createReadStream } from "fs";
+import path from "path";
+import { stringify } from "csv-stringify";
+import { groupBy } from "lodash-es";
+import { getSignatureData } from "./query.js";
+import { execa } from "execa";
+import validator from "validator";
+import mapValues from "lodash/mapValues.js";
+import { randomUUID } from "crypto";
+import Papa from "papaparse";
+import knex from "knex";
+import { readJson, writeJson, mkdirs } from "./utils.js";
+import { sendNotification } from "./notifications.js";
+import { formatObject } from "./logger.js";
+import axios from "axios";
+import FormData from "form-data";
+import { uploadDirectory } from "./s3.js";
+import { importUserSession } from "./importSignatures.js";
 
 function parseCSV(filepath) {
   const file = createReadStream(filepath);
@@ -63,22 +63,37 @@ export async function extraction(
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
   );
-
+  console.log("PATHS");
   logger.info(paths);
 
   try {
-    if (!id) throw new Error('Missing id');
-    if (!validator.isUUID(id)) throw new Error('Invalid id');
+    console.log("----------TEST----------------");
+    logger.debug("------LOGGER DEBUG-------");
+    logger.info("-------LOGGER INFO ----------------");
+    console.log("PARAMS:");
+    console.log(params);
+    console.log("ARGS");
+    console.log(args);
+    console.log("signatureQuery");
+    console.log(signatureQuery);
+    console.log("ID:");
+    logger.info(id);
+    if (!id) throw new Error("Missing id");
+    if (!validator.isUUID(id)) throw new Error("Invalid id");
 
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+    console.log("inputFolder");
+    console.log(inputFolder);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    console.log("outputFolder");
+    console.log(outputFolder);
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
       id,
-      status: 'IN_PROGRESS',
+      status: "IN_PROGRESS",
     });
     await writeJson(
       paths.manifestFile,
@@ -88,7 +103,7 @@ export async function extraction(
 
     // query signature data
     const connection = dbConnection;
-    const columns = ['signatureName', 'mutationType', 'contribution'];
+    const columns = ["signatureName", "mutationType", "contribution"];
     const limit = false;
     const signatureData = await getSignatureData(
       connection,
@@ -110,12 +125,12 @@ export async function extraction(
     );
 
     // write data to tsv file
-    const signatureFilePath = path.join(outputFolder, 'signature.tsv');
+    const signatureFilePath = path.join(outputFolder, "signature.tsv");
     stringify(
       transposeSignature,
       {
         header: true,
-        delimiter: '\t',
+        delimiter: "\t",
       },
       (error, output) => writeFileSync(signatureFilePath, output)
     );
@@ -129,12 +144,12 @@ export async function extraction(
     };
     const cliArgs = Object.entries(transformArgs)
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
-      .join(' ');
+      .join(" ");
 
     logger.info(`[${id}] Run extraction`);
     const { all } = await execa(
-      'python3',
-      ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
+      "python3",
+      ["services/python/mSigPortal-SigProfilerExtractor.py", cliArgs],
       { all: true, shell: true }
     );
     logger.debug(all);
@@ -155,7 +170,7 @@ export async function extraction(
       ...denovoSignatures.map(signatureMapping).flat(),
     ];
     const localDb = knex({
-      client: 'better-sqlite3',
+      client: "better-sqlite3",
       connection: {
         filename: path.join(outputFolder, `local.sqlite3`),
       },
@@ -172,13 +187,13 @@ export async function extraction(
     try {
       logger.info(`[${id}] Run Denovo Exploration`);
       const denovoFormData = new FormData();
-      denovoFormData.append('matrixFile', createReadStream(paths.matrixFile));
+      denovoFormData.append("matrixFile", createReadStream(paths.matrixFile));
       denovoFormData.append(
-        'exposureFile',
+        "exposureFile",
         createReadStream(paths.denovoExposureInput)
       );
       denovoFormData.append(
-        'signatureFile',
+        "signatureFile",
         createReadStream(paths.denovoSignatureInput)
       );
 
@@ -199,7 +214,7 @@ export async function extraction(
 
       denovoId = denovoExploration.data;
     } catch (error) {
-      logger.error('Denovo Exploration Error');
+      logger.error("Denovo Exploration Error");
       console.log(error);
       throw error.data;
     }
@@ -208,15 +223,15 @@ export async function extraction(
       logger.info(`[${id}] Run Decomposed Exploration`);
       const decomposedFormData = new FormData();
       decomposedFormData.append(
-        'matrixFile',
+        "matrixFile",
         createReadStream(paths.matrixFile)
       );
       decomposedFormData.append(
-        'exposureFile',
+        "exposureFile",
         createReadStream(paths.decomposedExposureInput)
       );
       decomposedFormData.append(
-        'signatureFile',
+        "signatureFile",
         createReadStream(paths.decomposedSignatureInput)
       );
 
@@ -237,7 +252,7 @@ export async function extraction(
 
       decomposedId = decomposedExploration.data;
     } catch (error) {
-      logger.error('Decomposed Exploration Error');
+      logger.error("Decomposed Exploration Error");
       throw error.data;
     }
 
@@ -251,7 +266,7 @@ export async function extraction(
     // write success status
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
-      status: 'COMPLETED',
+      status: "COMPLETED",
     });
 
     await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
@@ -296,13 +311,13 @@ export async function extraction(
       await sendNotification(
         params.email,
         `Extraction Complete - ${params.jobName}`,
-        'templates/user-success-email.html',
+        "templates/user-success-email.html",
         {
           jobName: params.jobName,
           submittedAt: submittedTime.toISOString(),
           executionTime:
             (new Date().getTime() - submittedTime.getTime()) / 1000,
-          resultsUrl: path.join(env.APP_BASE_URL, '#', 'extraction', id),
+          resultsUrl: path.join(env.APP_BASE_URL, "#", "extraction", id),
         }
       );
     }
@@ -313,7 +328,7 @@ export async function extraction(
     logger.error(error);
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
-      status: 'FAILED',
+      status: "FAILED",
       error: { ...error },
     });
     //delete input files
@@ -325,7 +340,7 @@ export async function extraction(
       files.forEach((file) => {
         const fileDir = path.join(paths.inputFolder, file);
 
-        if (file !== 'params.json') {
+        if (file !== "params.json") {
           unlinkSync(fileDir);
         }
       });
@@ -346,7 +361,7 @@ export async function extraction(
       await sendNotification(
         params.email,
         `Analysis Failed - ${params.jobName}`,
-        'templates/user-failure-email.html',
+        "templates/user-failure-email.html",
         {
           jobName: params.jobName,
           submittedAt: submittedTime.toISOString(),
@@ -371,16 +386,16 @@ export async function getPaths(params, env = process.env) {
   const { id, args } = params;
   const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-  const paramsFile = path.resolve(inputFolder, 'params.json');
-  const statusFile = path.resolve(outputFolder, 'status.json');
-  const manifestFile = path.resolve(outputFolder, 'manifest.json');
-  const databaseFile = path.resolve(outputFolder, 'results.db');
+  const paramsFile = path.resolve(inputFolder, "params.json");
+  const statusFile = path.resolve(outputFolder, "status.json");
+  const manifestFile = path.resolve(outputFolder, "manifest.json");
+  const databaseFile = path.resolve(outputFolder, "results.db");
 
   // map files to be used as input for exploration module
   const solutionsFolder = path.resolve(
     outputFolder,
     args.context_type,
-    'Suggested_Solution'
+    "Suggested_Solution"
   );
   const denovoFolder = path.resolve(
     solutionsFolder,
@@ -391,7 +406,7 @@ export async function getPaths(params, env = process.env) {
     `COSMIC_${args.context_type}_Decomposed_Solution`
   );
   // SigProfilerExtraction log
-  const extractionLog = path.resolve(outputFolder, 'JOB_METADATA.txt');
+  const extractionLog = path.resolve(outputFolder, "JOB_METADATA.txt");
 
   // matrix file - input for extraction and exploration
   const matrixFile = path.resolve(inputFolder, args.input_data);
@@ -399,22 +414,22 @@ export async function getPaths(params, env = process.env) {
   // files for denovo exploration input
   const denovoExposureInput = path.resolve(
     denovoFolder,
-    'Activities',
+    "Activities",
     `${args.context_type}_De-Novo_Activities_refit.txt`
   );
   const denovoSignatureInput = path.resolve(
     denovoFolder,
-    'Signatures',
+    "Signatures",
     `${args.context_type}_De-Novo_Signatures.txt`
   );
 
   // files for decomposed exploration input
   const decomposedExposureInput = path.resolve(
     decomposedFolder,
-    'Activities',
+    "Activities",
     `COSMIC_${args.context_type}_Activities.txt`
   );
-  const decomposedSignatureInput = path.resolve(outputFolder, 'signature.tsv');
+  const decomposedSignatureInput = path.resolve(outputFolder, "signature.tsv");
 
   // signature map file
   const signatureMapFile = path.resolve(
@@ -428,7 +443,7 @@ export async function getPaths(params, env = process.env) {
   );
   const decomposedSignatureFile = path.resolve(
     decomposedFolder,
-    'Signatures',
+    "Signatures",
     `COSMIC_${args.context_type}_Signatures.txt`
   );
 
@@ -457,12 +472,12 @@ export async function waitUntilComplete(
   checkInterval = 1000
 ) {
   const start = Date.now();
-  const statusFilePath = path.resolve(env.OUTPUT_FOLDER, id, 'status.json');
-  const isComplete = ({ status }) => ['COMPLETED', 'FAILED'].includes(status);
+  const statusFilePath = path.resolve(env.OUTPUT_FOLDER, id, "status.json");
+  const isComplete = ({ status }) => ["COMPLETED", "FAILED"].includes(status);
   let statusFile = await readJson(statusFilePath);
 
   if (!statusFile) {
-    throw new Error('No status file found');
+    throw new Error("No status file found");
   }
 
   while (!isComplete(statusFile)) {
