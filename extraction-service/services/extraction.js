@@ -337,7 +337,7 @@ export async function extraction(
     // delete input files
     for await (const file of getFiles(paths.inputFolder)) {
       if (path.basename(file) !== 'params.json') {
-        fs.unlinkSync(file);
+        unlinkSync(file);
       }
     }
   }
