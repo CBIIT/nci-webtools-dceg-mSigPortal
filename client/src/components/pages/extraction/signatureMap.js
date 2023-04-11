@@ -110,7 +110,7 @@ export default function SignatureMap({ state }) {
           </Col>
         </Row>
       </div>
-      {referenceSignature?.value && refSigPlots && (
+      {referenceSignature?.value && refSigPlots.length > 0 && (
         <div className="border rounded mt-3">
           <Plotly
             data={refSigPlots[referenceSignature.value].traces}
