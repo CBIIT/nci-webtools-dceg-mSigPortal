@@ -63,15 +63,30 @@ export async function extraction(
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
   );
-
+  console.log('PATHS');
   logger.info(paths);
 
   try {
+    console.log('----------TEST----------------');
+    logger.debug('------LOGGER DEBUG-------');
+    logger.info('-------LOGGER INFO ----------------');
+    console.log('PARAMS:');
+    console.log(params);
+    console.log('ARGS');
+    console.log(args);
+    console.log('signatureQuery');
+    console.log(signatureQuery);
+    console.log('ID:');
+    logger.info(id);
     if (!id) throw new Error('Missing id');
     if (!validator.isUUID(id)) throw new Error('Invalid id');
 
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+    console.log('inputFolder');
+    console.log(inputFolder);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    console.log('outputFolder');
+    console.log(outputFolder);
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
