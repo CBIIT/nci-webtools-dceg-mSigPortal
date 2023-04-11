@@ -9,7 +9,7 @@ import mapValues from 'lodash/mapValues.js';
 import { randomUUID } from 'crypto';
 import Papa from 'papaparse';
 import knex from 'knex';
-import { readJson, writeJson, mkdirs } from './utils.js';
+import { readJson, writeJson, mkdirs, getFiles } from './utils.js';
 import { sendNotification } from './notifications.js';
 import { formatObject } from './logger.js';
 import axios from 'axios';
@@ -334,20 +334,12 @@ export async function extraction(
       return false;
     }
   } finally {
-    //delete input files
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
+    // delete input files
+    for await (const file of getFiles(paths.inputFolder)) {
+      if (path.basename(file) !== 'params.json') {
+        fs.unlinkSync(file);
       }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          unlinkSync(fileDir);
-        }
-      });
-    });
+    }
   }
 }
 

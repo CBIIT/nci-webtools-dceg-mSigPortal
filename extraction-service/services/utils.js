@@ -1,10 +1,11 @@
-import { fileURLToPath } from "url";
-import { existsSync } from "fs";
-import { mkdir, writeFile, readFile, copyFile, readdir } from "fs/promises";
-import path from "path";
-import { promisify } from "util";
-import { execFile } from "child_process";
-import template from "lodash/template.js";
+import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
+import { mkdir, writeFile, readFile, copyFile, readdir } from 'fs/promises';
+import path from 'path';
+import { promisify } from 'util';
+import { execFile } from 'child_process';
+import template from 'lodash/template.js';
+import { pickBy } from 'lodash-es';
 
 // promisified executeFile
 export const execFileAsync = promisify(execFile);
@@ -37,7 +38,7 @@ export async function mkdirs(dirs) {
  * @returns {Promise<void>} fulfilled when the file is written
  */
 export async function writeJson(filepath, data) {
-  return await writeFile(filepath, JSON.stringify(data), "utf-8");
+  return await writeFile(filepath, JSON.stringify(data), 'utf-8');
 }
 
 /**
@@ -47,7 +48,7 @@ export async function writeJson(filepath, data) {
  */
 export async function readJson(filepath) {
   try {
-    const data = await readFile(filepath, "utf8");
+    const data = await readFile(filepath, 'utf8');
     return JSON.parse(data);
   } catch (e) {
     return null;
@@ -55,7 +56,7 @@ export async function readJson(filepath) {
 }
 
 export async function renderTemplate(filepath, data) {
-  const templateContents = await readFile(filepath, "utf8");
+  const templateContents = await readFile(filepath, 'utf8');
   return template(templateContents)(data);
 }
 
@@ -96,6 +97,32 @@ export async function copyFiles(source, destination, overwrite = false) {
     const destinationFilePath = path.resolve(destination, file.name);
     if (overwrite || !existsSync(destinationFilePath)) {
       await copyFile(sourceFilePath, destinationFilePath);
+    }
+  }
+}
+
+export function pickNonNullValues(object) {
+  return pickBy(object, (v) => v !== null);
+}
+
+//
+/**
+ * async generator for retrieving paths for all files under a given directory
+ * @param {string} filePath
+ * @returns {AsyncGenerator} async generator to consume
+ * consume the generator like so:
+ * for await (const f of getFiles(filePath)) {
+    if (f) ...
+  }
+ */
+export async function* getFiles(filePath) {
+  const dirents = await readdir(filePath, { withFileTypes: true });
+  for (const dirent of dirents) {
+    const res = path.resolve(filePath, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* getFiles(res);
+    } else {
+      yield res;
     }
   }
 }
