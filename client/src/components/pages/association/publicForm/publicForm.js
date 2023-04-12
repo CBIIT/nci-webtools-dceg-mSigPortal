@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../../services/store/association';

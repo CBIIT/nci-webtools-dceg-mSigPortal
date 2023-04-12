@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useForm, useFieldArray } from 'react-hook-form';
-import Select from '../../../../controls/select/selectForm';
+import Select from '../../../../controls/select/selectHookForm';
 import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,

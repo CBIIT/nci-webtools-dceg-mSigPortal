@@ -24,7 +24,7 @@ export const cosineSimilarityApiSlice = visualizationApiSlice.injectEndpoints({
       }),
     }),
     cosineSignatureSets: builder.query({
-      query: (params) => ({ url: 'mutational_signature', params }),
+      query: (params) => ({ url: 'mutational_signature_options', params }),
       transformResponse: (data) =>
         [...new Set(data.map((e) => e.signatureSetName))]
           .sort((a, b) =>

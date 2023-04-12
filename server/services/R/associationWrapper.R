@@ -28,7 +28,7 @@ getAssocVarData <- function(args, config) {
   setwd(config$wd)
   fullDataPath = paste0(config$savePath, 'vardata_refdata_selected.txt')
 
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
     s3load(association_data_file, config$bucket)
@@ -48,8 +48,8 @@ getAssocVarData <- function(args, config) {
 
 getExpVarData <- function(args, config) {
   # load exposure data files
-  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
 
   tryCatch({
     s3load(exposure_data_file, config$bucket)
@@ -84,8 +84,8 @@ getExpVarData <- function(args, config) {
 loadCollapse <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
   # load exposure data files
-  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, config$bucket)
   s3load(association_data_file, config$bucket)
 
@@ -162,8 +162,8 @@ univariable <- function(args, config) {
   assocTablePath = paste0(config$savePath, 'asssociation_test.txt')
 
   # load exposure data files
-  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, config$bucket)
   s3load(association_data_file, config$bucket)
 
@@ -278,8 +278,8 @@ loadCollapseMulti <- function(args, config) {
   associationVars = split(args$associationVars, 1:nrow(args$associationVars))
 
   # load exposure data files
-  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, config$bucket)
   s3load(association_data_file, config$bucket)
 
@@ -323,8 +323,8 @@ multivariable <- function(args, config) {
   associationVars = split(args$associationVars, 1:nrow(args$associationVars))
 
   # load exposure data files
-  exposure_data_file <- paste0(config$s3Data, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
-  association_data_file <- paste0(config$s3Data, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
+  exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
+  association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
   s3load(exposure_data_file, config$bucket)
   s3load(association_data_file, config$bucket)
 

@@ -1,18 +1,13 @@
+import { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 import PcaWithin from './pca-within';
 import PcaPublic from './pca-public';
-import { useSelector, useDispatch } from 'react-redux';
+
 import Description from '../../../controls/description/description';
-import { actions } from '../../../../services/store/visualization';
 
-export default function PCA() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
-
-  const { source } = store.main;
-  const { display } = store.pca;
+export default function PCA({ state }) {
+  const { source } = state;
+  const [display, setDisplay] = useState('within');
 
   return (
     <div>
@@ -27,7 +22,7 @@ export default function PCA() {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => mergeState({ display: tab })}
+        onSelect={(tab) => setDisplay(tab)}
       >
         <Nav variant="tabs">
           <Nav.Item>
@@ -48,11 +43,11 @@ export default function PCA() {
           style={{ overflowX: 'auto' }}
         >
           <Tab.Pane key="within" eventKey="within" className="border-0">
-            <PcaWithin />
+            <PcaWithin state={state} />
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              <PcaPublic />
+              <PcaPublic state={state} />
             </Tab.Pane>
           )}
         </Tab.Content>

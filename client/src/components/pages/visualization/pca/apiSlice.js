@@ -17,7 +17,7 @@ export const pcaApiSlice = visualizationApiSlice.injectEndpoints({
       }),
     }),
     pcaSignatureSets: builder.query({
-      query: (params) => ({ url: 'mutational_signature', params }),
+      query: (params) => ({ url: 'mutational_signature_options', params }),
       transformResponse: (data) =>
         [...new Set(data.map((e) => e.signatureSetName))]
           .sort((a, b) =>

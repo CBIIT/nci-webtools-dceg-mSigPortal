@@ -1,34 +1,37 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { Container, Form, Row, Col } from 'react-bootstrap';
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector, useDispatch } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Description from '../../../controls/description/description';
-import { useProfilerSummaryQuery } from './apiSlice';
-import { actions } from '../../../../services/store/visualization';
+import { useProfilerSummaryQuery } from './apiSlice.js';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 
-export default function ProfilerSummary() {
-  const store = useSelector((state) => state.visualization);
-  const publicForm = store.publicForm;
-  const { matrixData, source, id } = store.main;
-  const { filter } = store.profilerSummary;
-
-  const dispatch = useDispatch();
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ profilerSummary: state }));
+export default function ProfilerSummary({ state }) {
+  const { source, study, cancer, strategy, id } = state;
   const [params, setParams] = useState();
 
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
   const { data, error, isFetching } = useProfilerSummaryQuery(params, {
     skip: !params,
   });
 
-  const { control } = useForm();
+  const { control, watch, setValue } = useForm({
+    defaultValues: { filter: '' },
+  });
+  const { filter } = watch();
 
   const filterOptions = useMemo(() => {
-    const filters = matrixData.length
-      ? [...new Set(matrixData.map((d) => d.filter))].map((e) => ({
+    const filters = options
+      ? [...new Set(options.map((d) => d.filter))].map((e) => ({
           label: e ? e : 'N/A',
           value: e,
         }))
@@ -36,28 +39,27 @@ export default function ProfilerSummary() {
     return filters.length > 1
       ? [...filters, { label: 'All', value: false }]
       : filters;
-  }, [matrixData]);
+  }, [options]);
 
   // automatically select first filter option
   useEffect(() => {
-    if (filterOptions.length) mergeState({ filter: filterOptions[0] });
+    if (filterOptions.length && !filter) setValue('filter', filterOptions[0]);
   }, [filterOptions]);
 
-  // query new summary plot when data is recieved or filter is changed
+  // query new summary plot when data is received or filter is changed
   useEffect(() => {
-    if (matrixData.length) {
+    if (options) {
       const params = {
-        study: publicForm.study.value,
-        cancer: publicForm.cancer.value,
-        strategy: publicForm.strategy.value,
+        study: study.value,
+        cancer: cancer.value,
+        strategy: strategy.value,
         ...(source == 'user' && { userId: id }),
         ...(filter?.value !== false && { filter: filter.value }),
       };
-      if (source == 'public' || (source == 'user' && filter?.label)) {
-        setParams(params);
-      }
+
+      setParams(params);
     }
-  }, [matrixData, filter]);
+  }, [options, filter]);
 
   return (
     <div className="bg-white border rounded" style={{ minHeight: '500px' }}>
@@ -84,7 +86,6 @@ export default function ProfilerSummary() {
                     disabled={isFetching}
                     options={filterOptions}
                     control={control}
-                    onChange={(filter) => mergeState({ filter })}
                   />
                 </Col>
               </Row>
@@ -101,7 +102,7 @@ export default function ProfilerSummary() {
           config={data.config}
           filename={
             source == 'public'
-              ? `${publicForm.study.value}_profiler-summary`
+              ? `${state.study.value}_profiler-summary`
               : 'profiler-summary'
           }
         />

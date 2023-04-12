@@ -3,9 +3,9 @@ import { NavHashLink } from 'react-router-hash-link';
 import Description from '../../../controls/description/description';
 import MutationalPatternPlot from './mutPattern-plot';
 
-export default function MutationalPattern(props) {
+export default function MutationalPattern({ state }) {
   return (
-    <Container fluid className="bg-white border rounded p-0" {...props}>
+    <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
         <Description
           less={
@@ -38,7 +38,7 @@ export default function MutationalPattern(props) {
         />
       </div>
       <hr />
-      <MutationalPatternPlot />
+      <MutationalPatternPlot state={state} />
     </Container>
   );
 }

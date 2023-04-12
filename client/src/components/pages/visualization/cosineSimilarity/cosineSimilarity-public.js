@@ -1,56 +1,53 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
-import { useCosineWithinQuery } from './apiSlice';
+import { useCosinePublicQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { defaultMatrix2, defaultMatrix } from '../../../../services/utils';
+import {
+  defaultMatrix2,
+  defaultMatrix,
+  defaultProfile2,
+} from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { useMatrixListQuery } from '../userForm/apiSlice';
 
-export default function CsPublic() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        cosineSimilarity: { ...store.cosineSimilarity, withinForm: state },
-      })
-    );
-
-  const { matrixData, matrixList, id } = store.main;
-  const { withinForm } = store.cosineSimilarity;
+export default function CsPublic({ state }) {
+  const { id } = state;
 
   const [params, setParams] = useState('');
 
-  const { data, error, isFetching } = useCosineWithinQuery(params, {
+  const { data, error, isFetching } = useCosinePublicQuery(params, {
     skip: !params,
   });
-
+  const { data: options } = useSeqmatrixOptionsQuery(
+    { userId: id },
+    { skip: !id }
+  );
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
   const { data: publicOptions } = useSeqmatrixOptionsQuery();
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
+    defaultValues: { profile: '', matrix: '', study: '', cancer: '' },
   });
 
   const { profile, matrix, study, cancer } = watch();
 
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+  const profileOptions = options
+    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
   const matrixOptions = (profile) =>
-    matrixData && profile
+    options && profile
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.profile == profile.value)
               .map((e) => e.matrix)
           ),
@@ -62,7 +59,7 @@ export default function CsPublic() {
           }))
       : [];
 
-  const studyOptions = publicOptions.length
+  const studyOptions = publicOptions
     ? [...new Set(publicOptions.map((e) => e.study))].map((e) => ({
         label: e,
         value: e,
@@ -87,14 +84,14 @@ export default function CsPublic() {
 
   // set inital parameters
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+    if (!profile && profileOptions.length)
+      handleProfile(defaultProfile2(profileOptions));
   }, [profileOptions]);
   useEffect(() => {
     if (!study && studyOptions.length) handleStudy(studyOptions[0]);
   }, [studyOptions]);
 
   function onSubmit(data) {
-    mergeForm(data);
     const params = {
       fn: 'cosineSimilarityPublic',
       args: {

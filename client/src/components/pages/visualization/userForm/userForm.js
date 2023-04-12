@@ -10,25 +10,35 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
+import { useHistory, useParams } from 'react-router-dom';
+import Select from '../../../controls/select/selectHookForm';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { actions as visualizationActions } from '../../../../services/store/visualization';
 import { actions as modalActions } from '../../../../services/store/modal';
 import { resetVisualizationApi } from '../../../../services/store/rootApi';
 import {
-  useVisualizationUserUploadMutation,
-  useSubmitQueueMutation,
-  useSubmitVisualizationMutation,
-  useUserMatrixMutation,
+  useUploadMutation,
+  useSubmitMutation,
+  useParamsQuery,
 } from './apiSlice';
+import { useEffect } from 'react';
 
 const actions = { ...visualizationActions, ...modalActions };
 
 const { Title, Content } = Popover;
 
 export default function UserForm() {
-  const dispatch = useDispatch();
   const store = useSelector((state) => state.visualization);
+  const userForm = store.userForm;
+  const { submitted } = store.main;
+  const id = useParams().id || userForm.id || false;
+  const history = useHistory();
+  const { data: params } = useParamsQuery(id, {
+    skip: !id,
+  });
+
+  const dispatch = useDispatch();
+  const resetVisualization = (_) => dispatch(actions.resetVisualization());
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ userForm: state }));
   const mergeMain = (state) =>
@@ -37,17 +47,9 @@ export default function UserForm() {
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const mergeSuccess = (msg) =>
     dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
-  const resetVisualization = (_) => dispatch(actions.resetVisualization());
 
-  const { inputFilename, bedFilename, id, ...userForm } = store.userForm;
-  const { submitted } = store.main;
-
-  const [handleUpload, { isLoading: isUploading }] =
-    useVisualizationUserUploadMutation();
-  const [handleSubmitQueue, { isLoading: isQueueing }] =
-    useSubmitQueueMutation();
-  const [profilerExtraction, { isLoading }] = useSubmitVisualizationMutation();
-  const [fetchMatrix, { isLoading: loadingMatrix }] = useUserMatrixMutation();
+  const [handleUpload, { isLoading: isUploading }] = useUploadMutation();
+  const [profilerExtraction, { isLoading }] = useSubmitMutation();
 
   const formatOptions = [
     { label: 'VCF', value: 'vcf', example: 'demo_input_multi.vcf.gz' },
@@ -82,13 +84,15 @@ export default function UserForm() {
     bedFile: '',
     collapse: false,
     useQueue: false,
-    email: '',
     seqInfo: false,
     cluster: false,
+    email: '',
+    jobName: '',
   };
 
   const {
     control,
+    register,
     reset: resetForm,
     resetField,
     handleSubmit,
@@ -110,6 +114,14 @@ export default function UserForm() {
     seqInfo,
     cluster,
   } = watch();
+
+  // update form after job retrieval
+  useEffect(() => {
+    if (params?.form) {
+      resetForm(params.form);
+      mergeMain({ submitted: true });
+    }
+  }, [params]);
 
   function handleReset() {
     window.location.hash = '#/visualization';
@@ -136,24 +148,21 @@ export default function UserForm() {
 
   async function loadExample() {
     const filename = getValues('inputFormat').example;
-    if (inputFilename != filename) {
-      const file = 'assets/exampleInput/' + filename;
-      setValue(
-        'inputFile',
-        new File([await (await fetch(file)).blob()], filename)
-      );
-    }
+    // if (inputFilename != filename) {
+    const file = 'assets/exampleInput/' + filename;
+    setValue(
+      'inputFile',
+      new File([await (await fetch(file)).blob()], filename)
+    );
+    // }
   }
 
   async function loadBed() {
     const filename = 'demo_input_bed.bed';
-    if (bedFilename != filename) {
-      const file = 'assets/exampleInput/' + filename;
-      setValue(
-        'bedFile',
-        new File([await (await fetch(file)).blob()], filename)
-      );
-    }
+    // if (bedFilename != filename) {
+    const file = 'assets/exampleInput/' + filename;
+    setValue('bedFile', new File([await (await fetch(file)).blob()], filename));
+    // }
   }
 
   // upload files and continue with web or queue submit
@@ -196,32 +205,34 @@ export default function UserForm() {
         };
       }
 
-      if (useQueue) {
-        try {
-          await handleSubmitQueue({ args, state: { ...store } });
-
+      try {
+        mergeMain({ loading: { active: true } });
+        const params = {
+          args,
+          id,
+          email: data.email,
+          jobName: data.jobName,
+          form: data,
+        };
+        const response = await profilerExtraction(params).unwrap();
+        history.push(`/visualization/${response.id}`);
+        mergeMain(response);
+        if (data.email) {
           mergeSuccess(
-            `Your job was successfully submitted to the queue. You will recieve an email at ${userForm.email} with your results.`
+            `Your job was successfully submitted to the queue. You will receive an email at ${data.email} with your results.`
           );
-        } catch (err) {
-          mergeError('Failed to submit to queue. Please Try Again.');
         }
-      } else {
-        try {
-          mergeMain({ loading: { active: true } });
-          const response = await profilerExtraction(args).unwrap();
-          const matrixData = await fetchMatrix({ userId: id }).unwrap();
-          mergeMain({ ...response, matrixData });
-        } catch (error) {
-          mergeMain({
-            error: 'Please Reset Your Parameters and Try again.',
-          });
-          mergeError(error.data.scriptOutput);
-        } finally {
-          mergeMain({ loading: { active: false } });
-        }
+      } catch (error) {
+        mergeMain({
+          error: 'Please Reset Your Parameters and Try again.',
+        });
+        mergeError(error.data.scriptOutput);
+      } finally {
+        mergeMain({ loading: { active: false } });
       }
+      // }
     } catch (error) {
+      console.error(error);
       mergeError('An error occured while uploading files. Please try again.');
     }
   }
@@ -267,7 +278,7 @@ export default function UserForm() {
           <Col lg="6" className="p-0 d-flex">
             <Button
               className={`p-0 ml-auto font-14`}
-              disabled={submitted || isUploading || isQueueing || isLoading}
+              disabled={submitted || isUploading || isLoading}
               variant="link"
               type="button"
               onClick={() => loadExample()}
@@ -287,13 +298,13 @@ export default function UserForm() {
                   <Form.File
                     {...field}
                     value={''} // set dummy value for file input
-                    disabled={
-                      submitted || isUploading || isQueueing || isLoading
-                    }
+                    disabled={submitted || isUploading || isLoading}
                     id="inputFile"
-                    title={inputFile.name || 'Upload Data File...'}
+                    title="Upload Data File..."
                     label={
-                      inputFile.name || inputFilename || 'Upload Data File...'
+                      inputFile?.name ||
+                      params?.args.Input_Path ||
+                      'Upload Data File...'
                     }
                     //accept=".csv, .tsv, .vcf, .gz, .tar, .tar.gz, .txt"
                     accept=".csv, .tsv, .vcf, .gz, .tar, .gz, .txt"
@@ -314,7 +325,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
-                  disabled={submitted || isUploading || isQueueing || isLoading}
+                  disabled={submitted || isUploading || isLoading}
                   onClick={removeFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="lg" />
@@ -484,7 +495,6 @@ export default function UserForm() {
               disabled={
                 submitted ||
                 isUploading ||
-                isQueueing ||
                 isLoading ||
                 mutationSplit ||
                 ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
@@ -510,18 +520,13 @@ export default function UserForm() {
                       mutationSplit ||
                       ['catalog_csv', 'catalog_tsv'].includes(inputFormat) ||
                       isUploading ||
-                      isQueueing ||
                       isLoading
                     }
                     id="uploadDataFile"
-                    title={bedFilename || 'Upload Bed File...'}
+                    title="Upload Bed File..."
                     value={''} // set dummy value for file input
                     label={
-                      bedFile.size
-                        ? bedFile.name
-                        : bedFilename
-                        ? bedFilename
-                        : 'Upload Bed File...'
+                      bedFile.name || params?.args.Bed || 'Upload Bed File...'
                     }
                     accept=".bed"
                     onChange={(e) => {
@@ -539,7 +544,7 @@ export default function UserForm() {
                   size="sm"
                   title="Remove"
                   variant="danger"
-                  disabled={submitted || isUploading || isQueueing || isLoading}
+                  disabled={submitted || isUploading || isLoading}
                   onClick={removeBedFile}
                 >
                   <FontAwesomeIcon icon={faFolderMinus} size="lg" />
@@ -701,8 +706,7 @@ export default function UserForm() {
                 <Form.Check.Input
                   {...field}
                   type="checkbox"
-                  // disabled={submitted}
-                  disabled={true}
+                  disabled={submitted}
                 />
               )}
             />
@@ -722,7 +726,6 @@ export default function UserForm() {
                 {...field}
                 aria-label="Enter Email"
                 placeholder="Enter Email"
-                size="sm"
                 type="email"
                 disabled={!useQueue || submitted}
                 isInvalid={errors.email}
@@ -739,11 +742,22 @@ export default function UserForm() {
             </i>
           </Form.Text>
         </Form.Group>
+        <Form.Group controlId="jobName">
+          <Form.Label>Job Name</Form.Label>
+          <Form.Control
+            {...register('jobName', { required: useQueue })}
+            placeholder="Enter Job Name"
+            disabled={submitted || id || !useQueue}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.jobName && 'Please enter a Job Name'}
+          </Form.Control.Feedback>
+        </Form.Group>
       </div>
       <Row>
         <Col>
           <Button
-            disabled={isUploading || isQueueing || isLoading}
+            disabled={isUploading || isLoading}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -753,7 +767,7 @@ export default function UserForm() {
         </Col>
         <Col>
           <Button
-            disabled={submitted || isUploading || isQueueing || isLoading}
+            disabled={submitted || isUploading || isLoading}
             className="w-100"
             variant="primary"
             type="submit"

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Select from '../../controls/select/selectForm';
+import Select from '../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import {
   useSignatureMapTableQuery,
@@ -110,7 +110,7 @@ export default function SignatureMap({ state }) {
           </Col>
         </Row>
       </div>
-      {referenceSignature?.value && refSigPlots && (
+      {referenceSignature?.value && refSigPlots.length > 0 && (
         <div className="border rounded mt-3">
           <Plotly
             data={refSigPlots[referenceSignature.value].traces}

@@ -7,43 +7,52 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm, Controller } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonReferenceQuery } from './apiSlice';
 import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { defaultMatrix } from '../../../../services/utils';
 import Plotly from '../../../controls/plotly/plot/plot';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { defaultProfile2 } from '../../../../services/utils';
 
-export default function PcReference() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, referenceForm: state },
-      })
-    );
+export default function PcReference({ state }) {
+  const [params, setParams] = useState(null);
+  const { study, cancer, strategy, id, source } = state;
 
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, id } = store.main;
-  const { referenceForm } = store.profileComparison;
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
+  // get signature options
+  const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
+    useSignatureOptionsQuery();
+  // get plot data
+  const {
+    data: plot,
+    error,
+    isFetching,
+  } = useProfileComparisonReferenceQuery(params, {
+    skip: !params,
+  });
 
-  // main form
   const {
     control,
     handleSubmit,
     watch,
     setValue,
-    resetField,
+
     formState: { errors: formErrors },
   } = useForm({
-    defaultValues: referenceForm,
+    defaultValues: { profile: '', sample: '', signatureSet: '', compare: '' },
   });
   const { profile, sample, signatureSet, compare } = watch();
 
@@ -53,26 +62,11 @@ export default function PcReference() {
   });
   const { search } = watchSearch();
 
-  const [calculationQuery, setCalculationQuery] = useState('');
-
-  // get signature options
-  const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
-    useSignatureOptionsQuery();
-
-  // get plot data
-  const {
-    data: plot,
-    error,
-    isFetching,
-  } = useProfileComparisonReferenceQuery(calculationQuery, {
-    skip: !calculationQuery,
-  });
-
   // create form Options
-  const profileOptions = matrixData.length
+  const profileOptions = options
     ? [
         ...new Set(
-          matrixData.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+          options.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
         ),
       ].map((e) => ({
         label: e,
@@ -81,10 +75,10 @@ export default function PcReference() {
     : [];
 
   const sampleOptions = (profile) =>
-    matrixData && profile
+    options && profile
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -137,11 +131,10 @@ export default function PcReference() {
   // set inital form options
   useEffect(() => {
     if (!profile && profileOptions.length && signatureOptions)
-      handleProfile(profileOptions[0]);
+      handleProfile(defaultProfile2(profileOptions));
   }, [profileOptions, signatureOptions]);
 
   function onSubmit(data) {
-    mergeForm(data);
     const { profile, sample, signatureSet, compare } = data;
     const params_spectrum = {
       ...(source == 'public' && {
@@ -191,7 +184,7 @@ export default function PcReference() {
       paramsSignatureScalar: compare,
     };
 
-    setCalculationQuery({
+    setParams({
       params_spectrum,
       params_signature,
       params_signature_scalar,

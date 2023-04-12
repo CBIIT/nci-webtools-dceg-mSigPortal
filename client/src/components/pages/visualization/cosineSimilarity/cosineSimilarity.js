@@ -1,19 +1,13 @@
+import { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 import CsWithin from './cosineSimilarity-within';
 import CsReference from './cosineSimilarity-reference';
 import CsPublic from './cosineSimilarity-public';
-import { useSelector, useDispatch } from 'react-redux';
 import { NavHashLink } from 'react-router-hash-link';
-import { actions } from '../../../../services/store/visualization';
 
-export default function CosineSimilarity() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-
-  const { source } = store.main;
-  const { display } = store.cosineSimilarity;
+export default function CosineSimilarity({ state }) {
+  const { source } = state;
+  const [display, setDisplay] = useState('within');
 
   return (
     <div>
@@ -33,7 +27,7 @@ export default function CosineSimilarity() {
         className="mt-2"
         defaultActiveKey={display}
         activeKey={display}
-        onSelect={(tab) => mergeState({ display: tab })}
+        onSelect={(tab) => setDisplay(tab)}
       >
         <Nav variant="tabs">
           <Nav.Item>
@@ -59,14 +53,14 @@ export default function CosineSimilarity() {
           style={{ overflowX: 'auto' }}
         >
           <Tab.Pane key="within" eventKey="within" className="border-0">
-            <CsWithin />
+            <CsWithin state={state} />
           </Tab.Pane>
           <Tab.Pane key="reference" eventKey="reference" className="border-0">
-            <CsReference />
+            <CsReference state={state} />
           </Tab.Pane>
           {source == 'user' && (
             <Tab.Pane key="public" eventKey="public" className="border-0">
-              <CsPublic />
+              <CsPublic state={state} />
             </Tab.Pane>
           )}
         </Tab.Content>

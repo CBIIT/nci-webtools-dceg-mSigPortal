@@ -20,6 +20,7 @@
     "html-react-parser": "^1.4.0",
     "jstat": "^1.9.6",
     "moment": "^2.29.4",
+    "papaparse": "^5.4.0",
     "plotly.js": "^2.16.1",
     "react": "^17.0.2",
     "react-animated-css": "^1.2.1",

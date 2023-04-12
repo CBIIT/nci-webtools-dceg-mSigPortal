@@ -9,19 +9,12 @@ import {
 import { addBurden } from './burden.js';
 import rWrapper from 'r-wrapper';
 import path from 'path';
-import fs from 'fs-extra';
-import config from '../../../config.json' assert { type: 'json' };
-import logger from '../../logger.js';
+import { mkdirs } from '../../utils.js';
 const { Router } = express;
 const r = rWrapper.async;
 
-// config info for R functions
-const rConfig = {
-  s3Data: config.data.s3,
-  bucket: config.data.bucket,
-  localData: path.resolve(config.data.localData),
-  wd: path.resolve(config.results.folder),
-};
+const env = process.env;
+
 async function queryExposure(req, res, next) {
   try {
     const { userId, limit, offset, orderByCluster, ...query } = req.query;
@@ -62,14 +55,22 @@ async function exposureOptions(req, res, next) {
   }
 }
 async function explorationWrapper(req, res, next) {
-  const { fn, args, id, type = 'calc' } = req.body;
   logger.debug('/explorationWrapper: ' + fn);
-  // logger.debug('/explorationWrapper: %o', { ...req.body });
+  const { fn, args, id, type = 'calc' } = req.body;
+  const { logger } = req.app.locals;
   const sessionId = id ? id : type == 'calc' ? randomUUID() : false;
+
+  // config info for R functions
+  const rConfig = {
+    prefix: env.DATA_BUCKET_PREFIX,
+    bucket: env.DATA_BUCKET,
+    wd: path.resolve(env.DATA_FOLDER),
+  };
+
   // create directory for results if needed
-  const savePath = id ? path.join(id, 'results', fn, '/') : null;
-  if (sessionId)
-    fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+  const savePath = id ? path.join('output', id, 'results', fn, '/') : null;
+  if (sessionId) await mkdirs(path.join(rConfig.wd, savePath));
+
   try {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
@@ -93,6 +94,7 @@ async function explorationWrapper(req, res, next) {
 }
 // query 3 separate tables and return exposure data sorted by clusters and cosine similarity
 async function msLandscape(req, res, next) {
+  const { logger } = req.app.locals;
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
     const connection = userId
@@ -124,10 +126,6 @@ async function msLandscape(req, res, next) {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
-      config: {
-        ...rConfig,
-        id,
-      },
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({
@@ -141,6 +139,7 @@ async function msLandscape(req, res, next) {
   }
 }
 async function msDecomposition(req, res, next) {
+  const { logger } = req.app.locals;
   try {
     const { study, strategy, signatureSetName, cancer, userId } = req.query;
     const connection = userId
@@ -172,10 +171,6 @@ async function msDecomposition(req, res, next) {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
-      config: {
-        ...rConfig,
-        id,
-      },
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({
@@ -190,6 +185,7 @@ async function msDecomposition(req, res, next) {
 }
 // query signature data and calculate cosine similarity
 async function cosineSimilarity(req, res, next) {
+  const { logger } = req.app.locals;
   try {
     const { signatureSetName, userId, ...params } = req.query;
     const connection = userId
@@ -214,9 +210,6 @@ async function cosineSimilarity(req, res, next) {
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
-      config: {
-        ...rConfig,
-      },
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({ stdout, ...rest });
@@ -225,6 +218,7 @@ async function cosineSimilarity(req, res, next) {
     next(err);
   }
 }
+
 const router = Router();
 router.get('/signature_activity', queryExposure);
 router.get('/signature_activity_options', exposureOptions);
@@ -232,9 +226,5 @@ router.post('/explorationWrapper', explorationWrapper);
 router.get('/signature_landscape', msLandscape);
 router.get('/signature_decomposition', msDecomposition);
 router.get('/signature_cosine_similarity', cosineSimilarity);
-export { router };
-export { queryExposure };
-export default {
-  router,
-  queryExposure,
-};
+
+export { router, queryExposure };

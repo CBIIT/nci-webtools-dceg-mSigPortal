@@ -1,59 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import { useProfileComparisonWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 
-export default function PcWithin() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        profileComparison: { ...store.profileComparison, withinForm: state },
-      })
-    );
-
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, id } = store.main;
-  const { withinForm } = store.profileComparison;
-
+export default function PcWithin({ state }) {
   const [params, setParams] = useState(null);
+  const { study, cancer, strategy, id, source } = state;
 
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
   const { data, error, isFetching } = useProfileComparisonWithinQuery(params, {
     skip: !params,
   });
-  function getSampleOptions(profile) {
-    return matrixData && profile
-      ? [
-          ...new Set(
-            matrixData
-              .filter((e) => e.profile === profile.value)
-              .map((e) => e.sample)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-          ),
-        ].map((e) => ({
-          label: e,
-          value: e,
-        }))
-      : [];
-  }
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
+    defaultValues: { profile: '', sample1: '', sample2: '' },
   });
 
   const { profile, sample1, sample2 } = watch();
 
-  const profileOptions = matrixData.length
+  const profileOptions = options
     ? [
         ...new Set(
-          matrixData
+          options
             .map((e) => e.profile)
             .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
         ),
@@ -63,7 +43,20 @@ export default function PcWithin() {
       }))
     : [];
 
-  const sampleOptions = getSampleOptions(profile);
+  const sampleOptions = (profile) =>
+    options && profile
+      ? [
+          ...new Set(
+            options
+              .filter((e) => e.profile === profile.value)
+              .map((e) => e.sample)
+              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          ),
+        ].map((e) => ({
+          label: e,
+          value: e,
+        }))
+      : [];
 
   // set inital parameters
   useEffect(() => {
@@ -71,7 +64,6 @@ export default function PcWithin() {
   }, [profileOptions]);
 
   function onSubmit(data) {
-    mergeForm(data);
     const params = {
       ...(source == 'public' && {
         study: study.value,
@@ -94,8 +86,7 @@ export default function PcWithin() {
   }
 
   function handleProfile(e) {
-    const samples = getSampleOptions(e);
-
+    const samples = sampleOptions(e);
     setValue('profile', e);
     if (samples.length) {
       setValue('sample1', samples[0]);
@@ -129,19 +120,19 @@ export default function PcWithin() {
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
+              disabled={sampleOptions(profile).length < 2}
               name="sample1"
               label="Sample Name 1"
-              options={sampleOptions}
+              options={sampleOptions(profile)}
               control={control}
             />
           </Col>
           <Col lg="auto">
             <Select
-              disabled={sampleOptions.length < 2}
+              disabled={sampleOptions(profile).length < 2}
               name="sample2"
               label="Sample Name 2"
-              options={sampleOptions}
+              options={sampleOptions(profile)}
               control={control}
             />
           </Col>
@@ -156,7 +147,7 @@ export default function PcWithin() {
             </Button>
           </Col>
         </Row>
-        {sampleOptions.length < 2 && (
+        {sampleOptions(profile).length < 2 && (
           <Row>
             <Col>Unavailable - More than one Sample Required</Col>
           </Row>

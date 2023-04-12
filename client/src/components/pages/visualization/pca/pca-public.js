@@ -1,29 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import { usePcaPublicQuery } from './apiSlice';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
+import { useMatrixListQuery } from '../userForm/apiSlice';
+import { defaultProfile2, defaultMatrix2 } from '../../../../services/utils';
 
-export default function PcaPublic() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        pca: { ...store.pca, publicForm: state },
-      })
-    );
+export default function PcaPublic({ state }) {
+  const [params, setParams] = useState('');
+  const { id } = state;
 
-  const { matrixData, matrixList, id } = store.main;
-  const { publicForm } = store.pca;
-
-  const [params, setParams] = useState(null);
-
+  const { data: options } = useSeqmatrixOptionsQuery(
+    { userId: id },
+    { skip: !id }
+  );
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
   const { data, error, isFetching } = usePcaPublicQuery(params, {
     skip: !params,
   });
@@ -32,23 +26,23 @@ export default function PcaPublic() {
 
   // define form
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: publicForm,
+    defaultValues: { profile: '', matrix: '', study: '', cancer: '' },
   });
   const { profile, matrix, study, cancer } = watch();
 
   // define options
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+  const profileOptions = options
+    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
     : [];
 
   const matrixOptions = (profile) =>
-    profile && matrixData.length
+    profile && options
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.profile == profile.value)
               .map((e) => e.matrix)
           ),
@@ -90,7 +84,8 @@ export default function PcaPublic() {
 
   // set inital parameters
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+    if (!profile && profileOptions.length)
+      handleProfile(defaultProfile2(profileOptions));
   }, [profileOptions]);
   useEffect(() => {
     if (!study && studyOptions.length) handleStudy(studyOptions[0]);
@@ -100,7 +95,7 @@ export default function PcaPublic() {
   function handleProfile(profile) {
     const matrices = matrixOptions(profile);
     setValue('profile', profile);
-    setValue('matrix', matrices[0]);
+    setValue('matrix', defaultMatrix2(profile, matrices));
   }
 
   function handleStudy(study) {
@@ -123,7 +118,6 @@ export default function PcaPublic() {
       },
       id,
     };
-    mergeForm(data);
     setParams(params);
   }
 

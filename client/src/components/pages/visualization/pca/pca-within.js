@@ -1,49 +1,45 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectForm';
+import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/visualization';
 import { usePcaWithinQuery, usePcaSignatureSetsQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix } from '../../../../services/utils';
+import { defaultMatrix, defaultProfile2 } from '../../../../services/utils';
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { useMatrixListQuery } from '../userForm/apiSlice';
 
-export default function CsWithin() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
-  const mergeForm = (state) =>
-    dispatch(
-      actions.mergeVisualization({
-        pca: { ...store.pca, withinForm: state },
-      })
-    );
-
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, matrixData, matrixList, id } = store.main;
-  const { withinForm } = store.pca;
-
-  const [calculationQuery, setCalculationQuery] = useState('');
+export default function PcaWithin({ state }) {
+  const [params, setParams] = useState('');
   const [signatureSetQuery, setSignatureSetQuery] = useState('');
+  const { study, cancer, strategy, source, id } = state;
+
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
+  const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
 
   // get signature sets
   const { data: signatureSetOptions, isFetching: fetchingSigSets } =
     usePcaSignatureSetsQuery(signatureSetQuery, {
       skip: !signatureSetQuery,
     });
-
-  const { data, error, isFetching } = usePcaWithinQuery(calculationQuery, {
-    skip: !calculationQuery,
+  const { data, error, isFetching } = usePcaWithinQuery(params, {
+    skip: !params,
   });
 
   const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: withinForm,
+    defaultValues: { profile: '', signatureSet: '' },
   });
-
   const { profile, signatureSet } = watch();
 
-  const profileOptions = matrixData.length
-    ? [...new Set(matrixData.map((e) => e.profile))].map((e) => ({
+  const profileOptions = options
+    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
         label: e,
         value: e,
       }))
@@ -52,7 +48,7 @@ export default function CsWithin() {
   // set inital parameters
   useEffect(() => {
     if (!profile && profileOptions.length)
-      setValue('profile', profileOptions[0]);
+      setValue('profile', defaultProfile2(profileOptions));
   }, [profileOptions]);
   // set intital signature set
   useEffect(() => {
@@ -70,8 +66,6 @@ export default function CsWithin() {
   }, [profile]);
 
   function onSubmit(data) {
-    mergeForm(data);
-
     const params =
       source == 'user'
         ? {
@@ -99,7 +93,7 @@ export default function CsWithin() {
             },
             id,
           };
-    setCalculationQuery(params);
+    setParams(params);
   }
 
   return (
