@@ -607,7 +607,7 @@ export default function ExtractionForm() {
           </Button>
 
           <div className={showAdvanced ? 'd-block' : 'd-none'}>
-            <fieldset className="border rounded p-2 mb-3">
+            {/* <fieldset className="border rounded p-2 mb-3">
               <legend className="font-weight-bold">Execution</legend>
               <Form.Group>
                 <Controller
@@ -625,15 +625,15 @@ export default function ExtractionForm() {
                   )}
                 />
               </Form.Group>
-              {/* <Form.Group controlId="batch_size">
+              <Form.Group controlId="batch_size">
                 <Form.Label>Batch Size</Form.Label>
                 <Form.Control
                   {...register('batch_size')}
                   type="number"
                   defaultValue={1}
                 />
-              </Form.Group> */}
-            </fieldset>
+              </Form.Group>
+            </fieldset> */}
             <fieldset className="border rounded p-2 mb-3">
               <legend className="font-weight-bold">NMF Replicates</legend>
               <Form.Group controlId="minSignatures">
