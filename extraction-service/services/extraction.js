@@ -58,18 +58,10 @@ export async function extraction(
   dbConnection,
   env = process.env
 ) {
-  const { args, signatureQuery, id, email } = params;
-  const paths = await getPaths(params, env);
-  const submittedTime = new Date(
-    (await readJson(paths.statusFile)).submittedAt
-  );
-  console.log("PATHS");
-  logger.info(paths);
+  const { args, signatureQuery, id, form, email } = params;
 
   try {
     console.log("----------TEST----------------");
-    logger.debug("------LOGGER DEBUG-------");
-    logger.info("-------LOGGER INFO ----------------");
     console.log("PARAMS:");
     console.log(params);
     console.log("ARGS");
@@ -77,82 +69,103 @@ export async function extraction(
     console.log("signatureQuery");
     console.log(signatureQuery);
     console.log("ID:");
-    logger.info(id);
+    console.log(id);
+    console.log("FORM");
+    console.log(form);
+    console.log("form.source");
+    console.log(form.source);
+
+    let inputFolder;
+    let outputFolder;
+    const paths = await getPaths(params, env);
+
+    const submittedTime = new Date(
+      (await readJson(paths.statusFile)).submittedAt
+    );
+
     if (!id) throw new Error("Missing id");
     if (!validator.isUUID(id)) throw new Error("Invalid id");
 
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    console.log("inputFolder");
-    console.log(inputFolder);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-    console.log("outputFolder");
-    console.log(outputFolder);
+    if (form.source === "user") {
+      inputFolder = path.resolve(env.INPUT_FOLDER, id);
+      console.log("inputFolder");
+      console.log(inputFolder);
+      outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+      console.log("outputFolder");
+      console.log(outputFolder);
 
-    await mkdirs([paths.inputFolder, paths.outputFolder]);
-    await writeJson(paths.paramsFile, params);
-    await writeJson(paths.statusFile, {
-      ...(await readJson(paths.statusFile)),
-      id,
-      status: "IN_PROGRESS",
-    });
-    await writeJson(
-      paths.manifestFile,
-      mapValues(paths, (value) => path.parse(value).base)
-    );
-    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+      await mkdirs([paths.inputFolder, paths.outputFolder]);
+      await writeJson(paths.paramsFile, params);
+      await writeJson(paths.statusFile, {
+        ...(await readJson(paths.statusFile)),
+        id,
+        status: "IN_PROGRESS",
+      });
 
-    // query signature data
-    const connection = dbConnection;
-    const columns = ["signatureName", "mutationType", "contribution"];
-    const limit = false;
-    const signatureData = await getSignatureData(
-      connection,
-      signatureQuery,
-      columns,
-      limit
-    );
+      await writeJson(
+        paths.manifestFile,
+        mapValues(paths, (value) => path.parse(value).base)
+      );
+      await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
-    // transform data into format accepted by SigProfiler
-    const groupByType = groupBy(signatureData, (e) => e.mutationType);
-    const transposeSignature = Object.values(groupByType).map((signatures) =>
-      signatures.reduce((obj, e) => {
-        return {
-          Type: e.mutationType,
-          [e.signatureName]: e.contribution,
-          ...obj,
-        };
-      }, {})
-    );
+      // query signature data
+      const connection = dbConnection;
+      const columns = ["signatureName", "mutationType", "contribution"];
+      const limit = false;
+      const signatureData = await getSignatureData(
+        connection,
+        signatureQuery,
+        columns,
+        limit
+      );
 
-    // write data to tsv file
-    const signatureFilePath = path.join(outputFolder, "signature.tsv");
-    stringify(
-      transposeSignature,
-      {
-        header: true,
-        delimiter: "\t",
-      },
-      (error, output) => writeFileSync(signatureFilePath, output)
-    );
+      // transform data into format accepted by SigProfiler
+      const groupByType = groupBy(signatureData, (e) => e.mutationType);
+      const transposeSignature = Object.values(groupByType).map((signatures) =>
+        signatures.reduce((obj, e) => {
+          return {
+            Type: e.mutationType,
+            [e.signatureName]: e.contribution,
+            ...obj,
+          };
+        }, {})
+      );
 
-    // modify and include parameters
-    const transformArgs = {
-      ...args,
-      input_data: path.join(inputFolder, args.input_data),
-      output: path.join(outputFolder),
-      signature_database: signatureFilePath,
-    };
-    const cliArgs = Object.entries(transformArgs)
-      .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
-      .join(" ");
+      // write data to tsv file
+      const signatureFilePath = path.join(outputFolder, "signature.tsv");
+      stringify(
+        transposeSignature,
+        {
+          header: true,
+          delimiter: "\t",
+        },
+        (error, output) => writeFileSync(signatureFilePath, output)
+      );
 
-    logger.info(`[${id}] Run extraction`);
-    const { all } = await execa(
-      "python3",
-      ["services/python/mSigPortal-SigProfilerExtractor.py", cliArgs],
-      { all: true, shell: true }
-    );
-    logger.debug(all);
+      // modify and include parameters
+      const transformArgs = {
+        ...args,
+        input_data: path.join(inputFolder, args.input_data),
+        output: path.join(outputFolder),
+        signature_database: signatureFilePath,
+      };
+      const cliArgs = Object.entries(transformArgs)
+        .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
+        .join(" ");
+
+      logger.info(`[${id}] Run extraction`);
+      const { all } = await execa(
+        "python3",
+        ["services/python/mSigPortal-SigProfilerExtractor.py", cliArgs],
+        { all: true, shell: true }
+      );
+      logger.debug(all);
+    } else {
+      console.log("PUBLIC DATA --------");
+    }
+
+    console.log("PATHS---------");
+    logger.info(paths);
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
@@ -384,12 +397,22 @@ export async function extraction(
  */
 export async function getPaths(params, env = process.env) {
   const { id, args } = params;
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+  let inputFolder;
+  if (params.form === "user") {
+    inputFolder = path.resolve(env.INPUT_FOLDER, id);
+  } else {
+    inputFolder = "";
+  }
+  console.log("INPUT FOLDER");
+  console.log(inputFolder);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, "params.json");
   const statusFile = path.resolve(outputFolder, "status.json");
   const manifestFile = path.resolve(outputFolder, "manifest.json");
   const databaseFile = path.resolve(outputFolder, "results.db");
+
+  console.log("paramsFile");
+  console.log(paramsFile);
 
   // map files to be used as input for exploration module
   const solutionsFolder = path.resolve(

@@ -372,6 +372,8 @@ export default function ExtractionForm() {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
     };
+
+    
     const params = {
       args,
       signatureQuery,
