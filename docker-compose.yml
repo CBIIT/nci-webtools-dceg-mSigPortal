@@ -6,9 +6,11 @@ services:
       dockerfile: "./docker/backend.dockerfile"
     env_file: "./server/.env"
     volumes:
-      - "./tmp:/data"
+      - "./data:/data"
     environment:
-      NODE_ENV: development
+      DATA_FOLDER: /data
+      INPUT_FOLDER: /data/input
+      OUTPUT_FOLDER: /data/output
     ports:
       - "8330:8330"
 
@@ -18,9 +20,11 @@ services:
       dockerfile: "./docker/backend-extraction.dockerfile"
     env_file: "./server/.env"
     volumes:
-      - "./tmp:/data"
+      - "./data:/data"
     environment:
-      NODE_ENV: development
+      DATA_FOLDER: /data
+      INPUT_FOLDER: /data/input
+      OUTPUT_FOLDER: /data/output
     ports:
       - "8332:8332"
 
