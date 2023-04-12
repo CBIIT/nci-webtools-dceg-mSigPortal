@@ -1,3 +1,5 @@
+import Papa from 'papaparse';
+
 export function defaultProfile(profileOptions) {
   if (profileOptions.includes('SBS')) return 'SBS';
   if (profileOptions.includes('DBS')) return 'DBS';
@@ -29,30 +31,31 @@ export function defaultProfile2(profileOptions) {
 }
 
 export function defaultMatrix2(profile, matrixOptions) {
-  const options = matrixOptions.map(({ value }) => value);
+  const options = matrixOptions.map(({ value }) => +value);
 
-  if (profile.value == 'SBS')
-    return options.includes('96')
+  if (profile.value == 'SBS') {
+    return options.includes(96)
       ? { label: '96', value: '96' }
       : matrixOptions[0];
+  }
 
   if (profile.value == 'DBS')
-    return options.includes('78')
+    return options.includes(78)
       ? { label: '78', value: '78' }
       : matrixOptions[0];
 
   if (profile.value == 'ID')
-    return options.includes('83')
+    return options.includes(83)
       ? { label: '83', value: '83' }
       : matrixOptions[0];
 
   if (profile.value == 'RS')
-    return options.includes('32')
+    return options.includes(32)
       ? { label: '32', value: '32' }
       : matrixOptions[0];
 
   if (profile.value == 'CN')
-    return options.includes('48')
+    return options.includes(48)
       ? { label: '48', value: '48' }
       : matrixOptions[0];
 }
@@ -123,4 +126,18 @@ export function getBlob(path) {
   })
     .then((res) => res.blob())
     .then((data) => data);
+}
+
+export function parseCSV(data) {
+  return new Promise((resolve, reject) => {
+    Papa.parse(data, {
+      header: true,
+      complete(results, file) {
+        resolve(results.data);
+      },
+      error(err, file) {
+        reject(err);
+      },
+    });
+  });
 }

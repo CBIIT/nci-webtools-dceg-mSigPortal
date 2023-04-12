@@ -16,7 +16,7 @@
     "csv-parse": "^5.3.3",
     "csv-stringify": "^6.2.3",
     "dotenv": "^16.0.3",
-    "execa": "^6.1.0",
+    "execa": "^7.1.1",
     "express": "^4.18.2",
     "express-promise-router": "^4.1.1",
     "express-validator": "^6.14.2",
@@ -28,5 +28,8 @@
     "pg": "^8.8.0",
     "pm2": "^5.2.2",
     "winston": "^3.8.2"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }

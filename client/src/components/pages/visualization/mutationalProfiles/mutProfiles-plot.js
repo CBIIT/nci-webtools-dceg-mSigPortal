@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
-
 import Plotly from '../../../controls/plotly/plot/plot';
-import { useSelector } from 'react-redux';
 import { useMutationalProfilesQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
-export default function MutProfilePlot() {
-  const store = useSelector((state) => state.visualization);
-
-  const { sample, profile, matrix, filter } = store.mutationalProfiles;
-  const { study, cancer, strategy } = store.publicForm;
-  const { source, id } = store.main;
+export default function MutProfilePlot({ state, form }) {
+  const { sample, profile, matrix, filter } = form;
+  const { study, cancer, strategy, source, id } = state;
 
   const [params, setParams] = useState(null);
 
@@ -25,10 +20,11 @@ export default function MutProfilePlot() {
         study: study.value,
         cancer: cancer.value,
         strategy: strategy.value,
-        ...(source == 'user' && { userId: id, filter: filter.value }),
+        ...(source == 'user' && { userId: id }),
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
+        ...(filter?.value && { filter: filter.value }),
       };
       setParams(params);
     }

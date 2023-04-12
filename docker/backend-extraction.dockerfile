@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2022
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
     && dnf -y install \
@@ -18,6 +18,7 @@ RUN dnf -y update \
     python3-devel \
     python3-pip \
     python3-setuptools \
+    python3-wheel \
     rsync \
     tar \
     wget \ 
@@ -33,7 +34,7 @@ WORKDIR /deploy/app
 RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor 
 
 # install other python packages
-RUN pip3 install SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 PyPDF2==2.11.2
+RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 
@@ -52,5 +53,11 @@ RUN npm install
 
 # copy the rest of the application
 COPY extraction-service /deploy/app
+
+# ensure symlink exists for /data/genomes
+ENV GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+RUN mkdir -p /data/genomes ${GENOME_PATH} \
+    && rm -rf ${GENOME_PATH} \
+    && ln -sf /data/genomes ${GENOME_PATH}
 
 CMD npm run start

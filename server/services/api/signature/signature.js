@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import path from 'path';
 import {
   getSignatureData,
   getSignatureOptions,
   getSignatureSummary,
 } from '../../query.js';
+
+const env = process.env;
 
 async function querySignature(req, res, next) {
   try {

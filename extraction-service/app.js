@@ -18,11 +18,11 @@ if (isMainModule(import.meta)) {
  * @returns {http.Server} a node http server
  */
 export function main(env) {
-  const { APP_PORT, APP_NAME, SERVER_TIMEOUT } = env;
+  const { EXTRACTION_APP_PORT, EXTRACTION_APP_NAME, SERVER_TIMEOUT } = env;
   const serverTimeout = +SERVER_TIMEOUT || 1000 * 60 * 15;
   const app = createApp(env);
-  const server = app.listen(APP_PORT, () => {
-    app.locals.logger.info(`${APP_NAME} started on port ${APP_PORT}`);
+  const server = app.listen(EXTRACTION_APP_PORT, () => {
+    app.locals.logger.info(`${EXTRACTION_APP_NAME} started on port ${EXTRACTION_APP_PORT}`);
   });
   server.setTimeout(serverTimeout);
   return server;
@@ -34,7 +34,7 @@ export function main(env) {
  * @returns {express.Application} an Express app
  */
 export function createApp(env) {
-  const { APP_NAME, LOG_LEVEL } = env;
+  const { EXTRACTION_APP_NAME, LOG_LEVEL } = env;
   const app = express();
 
   // if behind a proxy, use the first x-forwarded-for address as the client's ip address
@@ -43,7 +43,7 @@ export function createApp(env) {
   app.set('x-powered-by', false);
 
   // register services as app locals
-  app.locals.logger = createLogger(APP_NAME, LOG_LEVEL);
+  app.locals.logger = createLogger(EXTRACTION_APP_NAME, LOG_LEVEL);
   app.locals.connection = knex({
     client: 'postgres',
     connection: {

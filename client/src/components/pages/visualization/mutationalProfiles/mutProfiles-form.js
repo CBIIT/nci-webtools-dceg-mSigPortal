@@ -1,29 +1,37 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectForm';
+import { NavHashLink } from 'react-router-hash-link';
+import Select from '../../../controls/select/selectHookForm';
 import Description from '../../../controls/description/description';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../../services/store/visualization';
 import {
   defaultProfile2,
   defaultMatrix2,
   defaultFilter2,
 } from '../../../../services/utils';
-import { NavHashLink } from 'react-router-hash-link';
-const actions = { ...visualizationActions };
+import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 
-export default function TreeLeafForm() {
-  const dispatch = useDispatch();
-  const store = useSelector((state) => state.visualization);
+export default function MutationalProfilesForm({ state, form, mergeForm }) {
+  const {
+    study,
+    cancer,
+    strategy,
+    id,
+    source,
+    mutationalProfiles: storeState,
+  } = state;
+  const { sample: externalSample } = storeState;
 
-  const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-
-  const { matrixData, source } = store.main;
-  const { sample, profile, matrix, filter } = store.mutationalProfiles;
-
-  const { control } = useForm();
+  const { data: options } = useSeqmatrixOptionsQuery(
+    {
+      ...(source == 'public'
+        ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
+        : { userId: id }),
+    },
+    { skip: source == 'user' ? !id : !study }
+  );
+  const { control, setValue, watch } = useForm({ defaultValues: form });
+  const { sample, profile, matrix, filter } = watch();
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -35,22 +43,29 @@ export default function TreeLeafForm() {
 
   // handle external sample change events
   useEffect(() => {
-    if (typeof sample === 'string') {
+    if (typeof externalSample === 'string') {
       const sampleOption =
-        sampleOptions.find((e) => e.value == sample) || sampleOptions[0];
+        sampleOptions.find((e) => e.value == externalSample) ||
+        sampleOptions[0];
       handleSample(sampleOption);
     }
-  }, [sample]);
+  }, [externalSample]);
 
   // populate controls
   useEffect(() => {
-    if (matrixData.length && !sample) {
+    if (options && options.length && !sample) {
       handleSample(sampleOptions[0]);
     }
-  }, [matrixData]);
+  }, [options]);
 
-  const sampleOptions = matrixData.length
-    ? [...new Set(matrixData.map((d) => d.sample))]
+  // update form
+  useEffect(() => {
+    if (sample || profile || matrix || filter)
+      mergeForm({ sample, profile, matrix, filter });
+  }, [sample, profile, matrix, filter]);
+
+  const sampleOptions = options
+    ? [...new Set(options.map((d) => d.sample))]
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .map((e) => ({
           label: e,
@@ -59,10 +74,10 @@ export default function TreeLeafForm() {
     : [];
 
   const profileOptions = (sample) =>
-    sample && matrixData.length
+    sample && options && options.length
       ? [
           ...new Set(
-            matrixData
+            options
               .filter((e) => e.sample == sample.value)
               .map((e) => e.profile)
               .sort((a, b) => b.localeCompare(a))
@@ -71,10 +86,10 @@ export default function TreeLeafForm() {
       : [];
 
   const matrixOptions = (sample, profile) =>
-    sample && profile && matrixData.length
+    sample && profile && options && options.length
       ? [
           ...new Set(
-            matrixData
+            options
               .filter(
                 (e) =>
                   e.sample == sample.value &&
@@ -88,10 +103,10 @@ export default function TreeLeafForm() {
       : [];
 
   const filterOptions = (sample, profile, matrix) =>
-    sample && profile && matrix && matrixData.length
+    sample && profile && matrix && options && options.length
       ? [
           ...new Set(
-            matrixData
+            options
               .filter(
                 (e) =>
                   e.sample == sample.value &&
@@ -107,32 +122,31 @@ export default function TreeLeafForm() {
   function handleSample(sample) {
     const profiles = profileOptions(sample);
     const profile = defaultProfile2(profiles);
-    const matrices = matrixOptions(sample, profile);
-    const matrix = defaultMatrix2(profile, matrices);
-    const filters = filterOptions(sample, profile, matrix);
-    const filter = defaultFilter2(filters);
 
-    mergeState({ sample, profile, matrix, filter });
+    setValue('sample', sample);
+    handleProfile(sample, profile);
   }
 
-  function handleProfile(profile) {
-    const matrices = matrixOptions(sample, profile);
-    const matrix = defaultMatrix2(profile, matrices);
-    const filters = filterOptions(sample, profile, matrix);
-    const filter = defaultFilter2(filters);
+  function handleProfile(sample, profile) {
+    if (profile) {
+      const matrices = matrixOptions(sample, profile);
+      const matrix = defaultMatrix2(profile, matrices);
 
-    mergeState({ profile, matrix, filter });
+      setValue('profile', profile);
+      handleMatrix(sample, profile, matrix);
+    }
   }
 
-  function handleMatrix(matrix) {
+  function handleMatrix(sample, profile, matrix) {
     const filters = filterOptions(sample, profile, matrix);
     const filter = defaultFilter2(filters);
 
-    mergeState({ matrix, filter });
+    setValue('matrix', matrix);
+    handleFilter(filter);
   }
 
   function handleFilter(filter) {
-    mergeState({ filter: filter });
+    setValue('filter', filter);
   }
 
   return (
@@ -164,7 +178,6 @@ export default function TreeLeafForm() {
             <Select
               name="sample"
               label="Sample Name"
-              value={sample}
               options={sampleOptions}
               control={control}
               onChange={handleSample}
@@ -174,20 +187,18 @@ export default function TreeLeafForm() {
             <Select
               name="profile"
               label="Profile Type"
-              value={profile}
               options={profileOptions(sample)}
               control={control}
-              onChange={handleProfile}
+              onChange={(e) => handleProfile(sample, e)}
             />
           </Col>
           <Col lg="auto">
             <Select
               name="matrix"
               label="Matrix Size"
-              value={matrix}
               options={matrixOptions(sample, profile)}
               control={control}
-              onChange={handleMatrix}
+              onChange={(e) => handleMatrix(sample, profile, e)}
             />
           </Col>
           {source == 'user' && (
@@ -195,7 +206,7 @@ export default function TreeLeafForm() {
               <Select
                 name="filter"
                 label="Filter"
-                value={filter}
+                disabled={!filterOptions(sample, profile, matrix).length}
                 options={filterOptions(sample, profile, matrix)}
                 control={control}
                 onChange={handleFilter}

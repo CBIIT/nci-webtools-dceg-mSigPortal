@@ -1,21 +1,21 @@
-import { readdir, unlinkSync, writeFileSync, createReadStream } from "fs";
-import path from "path";
-import { stringify } from "csv-stringify";
-import { groupBy } from "lodash-es";
-import { getSignatureData } from "./query.js";
-import { execa } from "execa";
-import validator from "validator";
-import mapValues from "lodash/mapValues.js";
-import { randomUUID } from "crypto";
-import Papa from "papaparse";
-import knex from "knex";
-import { readJson, writeJson, mkdirs } from "./utils.js";
-import { sendNotification } from "./notifications.js";
-import { formatObject } from "./logger.js";
-import axios from "axios";
-import FormData from "form-data";
-import { uploadDirectory } from "./s3.js";
-import { importUserSession } from "./importSignatures.js";
+import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
+import path from 'path';
+import { stringify } from 'csv-stringify';
+import { groupBy } from 'lodash-es';
+import { getSignatureData } from './query.js';
+import { execa } from 'execa';
+import validator from 'validator';
+import mapValues from 'lodash/mapValues.js';
+import { randomUUID } from 'crypto';
+import Papa from 'papaparse';
+import knex from 'knex';
+import { readJson, writeJson, mkdirs, getFiles } from './utils.js';
+import { sendNotification } from './notifications.js';
+import { formatObject } from './logger.js';
+import axios from 'axios';
+import FormData from 'form-data';
+import { uploadDirectory } from './s3.js';
+import { importUserSession } from './importSignatures.js';
 
 function parseCSV(filepath) {
   const file = createReadStream(filepath);
@@ -58,55 +58,48 @@ export async function extraction(
   dbConnection,
   env = process.env
 ) {
-  const { args, signatureQuery, id, form, email } = params;
+  const { args, signatureQuery, id, email } = params;
+  const paths = await getPaths(params, env);
+  const submittedTime = new Date(
+    (await readJson(paths.statusFile)).submittedAt
+  );
+  console.log('PATHS');
+  logger.info(paths);
 
   try {
-    console.log("----------TEST----------------");
-    console.log("PARAMS:");
+    console.log('----------TEST----------------');
+    logger.debug('------LOGGER DEBUG-------');
+    logger.info('-------LOGGER INFO ----------------');
+    console.log('PARAMS:');
     console.log(params);
-    console.log("ARGS");
+    console.log('ARGS');
     console.log(args);
-    console.log("signatureQuery");
+    console.log('signatureQuery');
     console.log(signatureQuery);
-    console.log("ID:");
-    console.log(id);
-    console.log("FORM");
-    console.log(form);
-    console.log("form.source");
-    console.log(form.source);
+    console.log('ID:');
+    logger.info(id);
+    if (!id) throw new Error('Missing id');
+    if (!validator.isUUID(id)) throw new Error('Invalid id');
 
-    let inputFolder;
-    let outputFolder;
-    const paths = await getPaths(params, env);
+    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+    console.log('inputFolder');
+    console.log(inputFolder);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    console.log('outputFolder');
+    console.log(outputFolder);
 
-    const submittedTime = new Date(
-      (await readJson(paths.statusFile)).submittedAt
+    await mkdirs([paths.inputFolder, paths.outputFolder]);
+    await writeJson(paths.paramsFile, params);
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      id,
+      status: "IN_PROGRESS",
+    });
+    await writeJson(
+      paths.manifestFile,
+      mapValues(paths, (value) => path.parse(value).base)
     );
-
-    if (!id) throw new Error("Missing id");
-    if (!validator.isUUID(id)) throw new Error("Invalid id");
-
-    if (form.source === "user") {
-      inputFolder = path.resolve(env.INPUT_FOLDER, id);
-      console.log("inputFolder");
-      console.log(inputFolder);
-      outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-      console.log("outputFolder");
-      console.log(outputFolder);
-
-      await mkdirs([paths.inputFolder, paths.outputFolder]);
-      await writeJson(paths.paramsFile, params);
-      await writeJson(paths.statusFile, {
-        ...(await readJson(paths.statusFile)),
-        id,
-        status: "IN_PROGRESS",
-      });
-
-      await writeJson(
-        paths.manifestFile,
-        mapValues(paths, (value) => path.parse(value).base)
-      );
-      await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+    // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
       // query signature data
       const connection = dbConnection;
@@ -153,19 +146,15 @@ export async function extraction(
         .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
         .join(" ");
 
-      logger.info(`[${id}] Run extraction`);
-      const { all } = await execa(
-        "python3",
-        ["services/python/mSigPortal-SigProfilerExtractor.py", cliArgs],
-        { all: true, shell: true }
-      );
-      logger.debug(all);
-    } else {
-      console.log("PUBLIC DATA --------");
-    }
+    logger.info(`[${id}] Run extraction`);
 
-    console.log("PATHS---------");
-    logger.info(paths);
+    await execa(
+      'python3',
+      ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
+      { shell: true }
+    )
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr);
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
@@ -282,7 +271,7 @@ export async function extraction(
       status: "COMPLETED",
     });
 
-    await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+    // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     // // upload denovo output
     // await uploadDirectory(
@@ -304,27 +293,14 @@ export async function extraction(
         (new Date().getTime() - submittedTime.getTime()) / 1000
       }`
     );
+
     // send success notification if email was provided
     if (params.email) {
       logger.info(`[${id}] Sending success notification`);
-      //delete input files
-      // readdir(paths.inputFolder, (err, files) => {
-      //   if (err) {
-      //     console.log(err);
-      //   }
-
-      //   files.forEach((file) => {
-      //     const fileDir = path.join(paths.inputFolder, file);
-
-      //     if (file !== 'params.json') {
-      //       unlinkSync(fileDir);
-      //     }
-      //   });
-      // });
       await sendNotification(
         params.email,
-        `Extraction Complete - ${params.jobName}`,
-        "templates/user-success-email.html",
+        `mSigPortal - Extraction Complete - ${params.jobName}`,
+        'templates/user-success-email.html',
         {
           jobName: params.jobName,
           submittedAt: submittedTime.toISOString(),
@@ -344,27 +320,13 @@ export async function extraction(
       status: "FAILED",
       error: { ...error },
     });
-    //delete input files
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
-      }
 
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== "params.json") {
-          unlinkSync(fileDir);
-        }
-      });
-    });
-
-    await uploadWorkingDirectory(
-      paths.inputFolder,
-      paths.outputFolder,
-      id,
-      env
-    );
+    // await uploadWorkingDirectory(
+    //   paths.inputFolder,
+    //   paths.outputFolder,
+    //   id,
+    //   env
+    // );
     logger.debug(
       `Execution Time: ${
         (new Date().getTime() - submittedTime.getTime()) / 1000
@@ -373,8 +335,8 @@ export async function extraction(
     if (params.email) {
       await sendNotification(
         params.email,
-        `Analysis Failed - ${params.jobName}`,
-        "templates/user-failure-email.html",
+        `mSigPortal - Extraction Analysis Failed - ${params.jobName}`,
+        'templates/user-failure-email.html',
         {
           jobName: params.jobName,
           submittedAt: submittedTime.toISOString(),
@@ -385,6 +347,13 @@ export async function extraction(
       );
 
       return false;
+    }
+  } finally {
+    // delete input files
+    for await (const file of getFiles(paths.inputFolder)) {
+      if (path.basename(file) !== 'params.json') {
+        unlinkSync(file);
+      }
     }
   }
 }

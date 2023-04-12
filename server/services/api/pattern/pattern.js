@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import logger from '../../logger.js';
 import { getPatternData } from '../../query.js';
 import { wrapper } from '../visualization/userVisualization.js';
-import path from 'path';
-import config from '../../../config.json' assert { type: 'json' };
+
+const env = process.env;
 
 // for public data, query the pattern table
 // for user data, generate pattern data in R
 async function queryPattern(req, res, next) {
+  const { logger } = req.app.locals;
   try {
     const { limit, offset, proportion, ...query } = req.query;
     if (query.study) {
@@ -24,13 +24,8 @@ async function queryPattern(req, res, next) {
         args: {
           pattern: query.pattern,
           proportion: proportion,
-          matrixFile: path.join(
-            config.results.folder,
-            query.userId,
-            query.matrixFile
-          ),
+          matrixFile: query.matrixFile,
         },
-        config: {},
       };
       const { output, ...logs } = await wrapper('wrapper', params);
       logger.debug(logs);

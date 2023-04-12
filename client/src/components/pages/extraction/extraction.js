@@ -86,7 +86,7 @@ export default function Extraction() {
   }, [isDone, refreshState]);
 
   useEffect(() => {
-    if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
+    if (status && status.status === 'COMPLETED')
       mergeState({ displayTab: 'signatureMap', openSidebar: false });
   }, [status]);
 

@@ -10,7 +10,7 @@ library(stringr)
 library(aws.s3)
 
 # capture console output for all functions called in wrapper
-wrapper <- function(fn, args, config) {
+wrapper <- function(fn, args, config = list()) {
   stdout <- vector("character")
   con <- textConnection("stdout", "wr", local = TRUE)
   sink(con, type = "message")
@@ -38,7 +38,7 @@ wrapper <- function(fn, args, config) {
 # get dataframe with column and filter arguments
 # getReferenceSignatureData <- function(args, config) {
 #   library(stringr)
-#   s3load(paste0(config$s3Data, 'Signature/signature_refsets.RData'), config$bucket)
+#   s3load(paste0(config$prefix, 'Signature/signature_refsets.RData'), config$bucket)
 
 #   columns = unlist(args$columns, use.names = FALSE)
 #   filters = args$filters
@@ -57,7 +57,7 @@ wrapper <- function(fn, args, config) {
 # retrieve signature names filtered by cancer type
 getSignatureNames <- function(args, config) {
   library(stringr)
-  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
   if (!is.null(args$cancerType)) exposure_refdata_selected <- exposure_refdata_selected %>% filter(Cancer_Type == args$cancerType)
@@ -71,7 +71,7 @@ getSignatureNames <- function(args, config) {
 # retrieve sample names filtered by cancer type
 getSampleNames <- function(args, config) {
   library(stringr)
-  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet)
 
@@ -82,7 +82,7 @@ getSampleNames <- function(args, config) {
 }
 
 exposureDownload <- function(args, config) {
-  s3load(paste0(config$s3Data, "Exposure/exposure_refdata.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
   setwd(config$wd)
 
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == args$study, Dataset == args$strategy, Signature_set_name == args$rsSet, Cancer_Type == args$cancerType)
@@ -102,7 +102,7 @@ exposureDownload <- function(args, config) {
 # Catalog - Signature  -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
 referenceSignatures <- function(args, config) {
-  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -129,11 +129,11 @@ referenceSignatures <- function(args, config) {
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
 mutationalProfiles <- function(args, config) {
-  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  path_profile <- paste0(config$s3Data, "Signature/Reference_Signature_Profiles_SVG/")
+  path_profile <- paste0(config$prefix, "Signature/Reference_Signature_Profiles_SVG/")
   signature_profile_files <- signature_refsets %>%
     select(Source, Profile, Signature_set_name, Dataset, Signature_name) %>%
     unique() %>%
@@ -154,10 +154,10 @@ mutationalProfiles <- function(args, config) {
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-rsCosineSimilarity <- function(args, config) {
+rsCosineSimilarity <- function(args, ...) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
   source("services/R/Sigvisualfunc.R")
-  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   setwd(config$wd)
 
   plotPath <- paste0(config$savePath, "signature_cos_sim_res.svg")
@@ -192,7 +192,7 @@ rsCosineSimilarity <- function(args, config) {
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
 mutationalSignatureComparison <- function(args, config) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
-  s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -409,7 +409,7 @@ mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure
   plot_individual_samples(exposure_refdata_input = exposure_refdata_input, signature_refsets_input = signature_refsets_input, seqmatrix_refdata_input = seqmatrix_refdata_input, condensed = FALSE, output_plot = plotPath)
 }
 
-# exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
+# exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$prefix, config$localData, config$bucket) {
 exposurePublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -443,14 +443,14 @@ exposurePublic <- function(args, config) {
   )
   genomesize <- genome2size(genome)
 
-  study_signature_file <- paste0(config$s3Data, "Exposure/Study_Signatures/", common$study, "_", common$strategy, "_signature_refsets.RData")
+  study_signature_file <- paste0(config$prefix, "Exposure/Study_Signatures/", common$study, "_", common$strategy, "_signature_refsets.RData")
   if (aws.s3::object_exists(study_signature_file, config$bucket)) {
     s3load(study_signature_file, config$bucket)
   } else {
-    s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+    s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   }
-  s3load(paste0(config$s3Data, "Exposure/", common$study, "_", common$strategy, "_exposure_refdata.RData"), config$bucket)
-  s3load(paste0(config$s3Data, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Exposure/", common$study, "_", common$strategy, "_exposure_refdata.RData"), config$bucket)
+  s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
   # filter data
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$rsSet)
@@ -463,7 +463,7 @@ exposurePublic <- function(args, config) {
   } else {
     seqmatrixFile <- paste0(common$study, "_", common$strategy, "_seqmatrix_refdata.RData")
   }
-  file <- get_object(paste0(config$s3Data, "Seqmatrix/", seqmatrixFile), config$bucket)
+  file <- get_object(paste0(config$prefix, "Seqmatrix/", seqmatrixFile), config$bucket)
   seqmatrix_refdata_selected <- get(load(rawConnection(file)))
   seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1], Cancer_Type == common$cancerType)
 
@@ -562,7 +562,7 @@ exposurePublic <- function(args, config) {
         print("Landscape of Mutational Signature Activity")
         varDataPath <- ""
         if (stringi::stri_length(landscape$variableFile) > 0) {
-          varDataPath <- file.path(paste0(config$wd, "/", config$id), landscape$variableFile)
+          varDataPath <- paste0(paste0(config$wd, "/", config$id), landscape$variableFile)
         }
         mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath
@@ -614,7 +614,7 @@ exposurePublic <- function(args, config) {
   return(c(output, errors))
 }
 
-# exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$s3Data, config$localData, config$bucket) {
+# exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$prefix, config$localData, config$bucket) {
 exposureUser <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -641,15 +641,15 @@ exposureUser <- function(args, config) {
   prevalence <- if (is.null(args$prevalence)) list() else fromJSON(args$prevalence)
   individual <- if (is.null(args$individual)) list() else fromJSON(args$individual)
 
-  exposure_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$exposureFile), delim = "\t", col_names = T)
-  seqmatrix_refdata_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$matrixFile), delim = "\t", col_names = T)
+  exposure_refdata_selected <- read_delim(paste0(paste0(config$wd, "/", config$id), files$exposureFile), delim = "\t", col_names = T)
+  seqmatrix_refdata_selected <- read_delim(paste0(paste0(config$wd, "/", config$id), files$matrixFile), delim = "\t", col_names = T)
 
   if (stringi::stri_length(files$signatureFile) > 0) {
     # if using user uploaded signature file
-    signature_refsets_selected <- read_delim(file.path(paste0(config$wd, "/", config$id), files$signatureFile), delim = "\t", col_names = T)
+    signature_refsets_selected <- read_delim(paste0(paste0(config$wd, "/", config$id), files$signatureFile), delim = "\t", col_names = T)
   } else {
     # else use public signature data
-    s3load(paste0(config$s3Data, "Signature/signature_refsets.RData"), config$bucket)
+    s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
 
     signature_refsets_selected <- signature_refsets %>%
       filter(Signature_set_name == common$rsSet) %>%
@@ -773,7 +773,7 @@ exposureUser <- function(args, config) {
         print("Landscape of Mutational Signature Activity")
         varDataPath <- ""
         if (stringi::stri_length(landscape$variableFile) > 0) {
-          varDataPath <- file.path(paste0(config$wd, "/", config$id), landscape$variableFile$signatureFile)
+          varDataPath <- paste0(paste0(config$wd, "/", config$id), landscape$variableFile$signatureFile)
         }
         mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath
@@ -824,7 +824,7 @@ exposureUser <- function(args, config) {
   return(c(output, errors))
 }
 
-msLandscape <- function(args, config) {
+msLandscape <- function(args, ...) {
   source("services/R/Sigvisualfunc.R")
 
   exposureData <- args$exposureData %>%
@@ -882,7 +882,7 @@ msLandscape <- function(args, config) {
   return(list(cosineData = cosineData, exposureData = exposureData, dendrogram = dendrogram_json))
 }
 
-msDecomposition <- function(args, config) {
+msDecomposition <- function(args, ...) {
   source("services/R/Sigvisualfunc.R")
 
   exposureData <- args$exposureData %>%

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import Plotly from '../../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
-import Select from '../../../../controls/select/selectForm';
+import Select from '../../../../controls/select/selectHookForm';
 import { actions as catalogActions } from '../../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../../services/store/modal';
 import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
