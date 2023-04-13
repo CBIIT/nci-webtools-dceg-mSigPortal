@@ -183,7 +183,7 @@ export default function PcReference({ state }) {
       arraySignature: paramsSig,
       paramsSignatureScalar: compare,
     };
-
+    
     setParams({
       params_spectrum,
       params_signature,

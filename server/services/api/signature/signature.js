@@ -33,8 +33,7 @@ async function querySignature(req, res, next) {
       for (var i = 0; i < signatureNameArray.length; i++) {
         for (var j = 0; j < data.length; j++) {
           if (data[j].signatureName === signatureNameArray[i]) {
-            data[j].contribution =
-              data[j].contribution * parseInt(scalarArray[i]);
+            data[j].contribution = data[j].contribution * scalarArray[i];
           }
         }
       }

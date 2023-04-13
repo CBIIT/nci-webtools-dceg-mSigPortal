@@ -106,7 +106,7 @@ export function compareProfiles(
 
   // get max mutations per sample
   const maxMutation1 = getMaxMutations(data1) / totalMutations1;
-  const maxMutation2 = getMaxMutations(data2) / totalMutations2;
+  const maxMutation2 = getMaxMutations(data2) / totalMutations2 || 0;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
 
   // normalize mutations per sample
