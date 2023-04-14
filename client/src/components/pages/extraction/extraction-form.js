@@ -324,9 +324,16 @@ export default function ExtractionForm() {
   }
 
   async function onSubmit(data) {
+    if (source === 'public') {
+      const file = 'ExtractionData.all';
+      const path = 'assets/exampleInput/' + file;
+      setValue('inputFile', new File([await (await fetch(path)).blob()], file));
+    }
     mergeState({ submitted: true });
-
+    console.log('Data:');
     console.log(data);
+
+    console.log('Input File:');
     console.log(data.inputFile);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
@@ -338,10 +345,8 @@ export default function ExtractionForm() {
         input_data: data.inputFile.name,
       }),
       ...(source === 'public' && {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        strategy: data.strategy.value,
         input_type: 'matrix',
+        input_data: 'ExtractionData.all',
       }),
 
       reference_genome: data.reference_genome.value,
@@ -373,10 +378,25 @@ export default function ExtractionForm() {
       }),
     };
 
-    
+    let seqmatrixQuery;
+
+    if (source === 'public') {
+      seqmatrixQuery = {
+        study: data.study.value,
+        cancer: data.cancer.value,
+        strategy: data.strategy.value,
+      };
+    } else {
+      seqmatrixQuery = {
+        study: '',
+        cancer: '',
+        strategy: '',
+      };
+    }
     const params = {
       args,
       signatureQuery,
+      seqmatrixQuery,
       id,
       email: data.email,
       jobName: data.jobName || 'Extraction',
