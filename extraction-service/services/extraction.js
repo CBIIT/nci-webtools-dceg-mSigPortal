@@ -102,67 +102,50 @@ export async function extraction(
     // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
 
     const connection = dbConnection;
-    let transformArgs;
     const limit = false;
-    if (params.form.source === 'user') {
-      // query signature data
 
-      const signatureColumns = [
-        'signatureName',
-        'mutationType',
-        'contribution',
-      ];
+    // query signature data
+    const signatureColumns = ['signatureName', 'mutationType', 'contribution'];
 
-      const signatureData = await getSignatureData(
-        connection,
-        signatureQuery,
-        signatureColumns,
-        limit
-      );
-      console.log('********* signatureData');
-      console.log(signatureData);
+    const signatureData = await getSignatureData(
+      connection,
+      signatureQuery,
+      signatureColumns,
+      limit
+    );
+    console.log('********* signatureData');
+    //console.log(signatureData);
 
-      // transform data into format accepted by SigProfiler
-      const groupByType = groupBy(signatureData, (e) => e.mutationType);
-      // console.log('*******----groupByType');
-      // console.log(groupByType);
-      const transposeSignature = Object.values(groupByType).map((signatures) =>
-        signatures.reduce((obj, e) => {
-          return {
-            Type: e.mutationType,
-            [e.signatureName]: e.contribution,
-            ...obj,
-          };
-        }, {})
-      );
-      // console.log('********---transposeSignature');
-      // console.log(transposeSignature);
+    // transform data into format accepted by SigProfiler
+    const groupByType = groupBy(signatureData, (e) => e.mutationType);
+    // console.log('*******----groupByType');
+    // console.log(groupByType);
+    const transposeSignature = Object.values(groupByType).map((signatures) =>
+      signatures.reduce((obj, e) => {
+        return {
+          Type: e.mutationType,
+          [e.signatureName]: e.contribution,
+          ...obj,
+        };
+      }, {})
+    );
+    // console.log('********---transposeSignature');
+    // console.log(transposeSignature);
 
-      // write data to tsv file
-      const signatureFilePath = path.join(outputFolder, 'signature.tsv');
-      stringify(
-        transposeSignature,
-        {
-          header: true,
-          delimiter: '\t',
-        },
-        (error, output) => writeFileSync(signatureFilePath, output)
-      );
-      console.log('****---signatureFilePath');
-      console.log(signatureFilePath);
+    // write data to tsv file
+    const signatureFilePath = path.join(outputFolder, 'signature.tsv');
+    stringify(
+      transposeSignature,
+      {
+        header: true,
+        delimiter: '\t',
+      },
+      (error, output) => writeFileSync(signatureFilePath, output)
+    );
+    console.log('****---signatureFilePath');
+    console.log(signatureFilePath);
 
-      // modify and include parameters
-      transformArgs = {
-        ...args,
-        input_data: path.join(inputFolder, args.input_data),
-        output: path.join(outputFolder),
-        signature_database: signatureFilePath,
-      };
-      console.log('******-----transformArgs');
-      console.log(transformArgs);
-    }
-
-    //query seqmatrix data
+    ////////////////// query seqmatrix data ////////////////////////
     let seqmatrixData;
     let seqmatrixFilePath;
     if (params.form.source === 'public') {
@@ -179,8 +162,8 @@ export async function extraction(
         seqmatrixColumns,
         limit
       );
-      // console.log('****** seqmatrixData');
-      // console.log(seqmatrixData);
+      console.log('****** seqmatrixData--------');
+      //console.log(seqmatrixData);
 
       // transform data into format accepted by SigProfiler
       // Extract unique mutation types and samples
@@ -222,39 +205,49 @@ export async function extraction(
         mt,
         ...samples.map((s) => counts[s] || 0),
       ]);
-      const tsvData = [headers, ...rows];
+      const tsvData = rows.map((row) => {
+        return {
+          MutationType: row[0],
+          ...Object.fromEntries(
+            samples.map((sample, i) => [sample, row[i + 1] || 0])
+          ),
+        };
+      });
+      console.log('==========TSV DATA===========');
+      console.log(tsvData);
       seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
       const tsvString = await new Promise((resolve, reject) => {
-        stringify(tsvData, { delimiter: '\t' }, (error, tsvString) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(tsvString);
+        stringify(
+          tsvData,
+          { delimiter: '\t', header: true },
+          (error, tsvString) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(tsvString);
+            }
           }
-        });
+        );
       });
-
       // Write the TSV string to the file using writeFileSync
       writeFileSync(seqmatrixFilePath, tsvString);
-
       console.log('Result written to signature.tsv');
 
       // Write the TSV data to the input_data file
-      writeFileSync(inputFolder + args.input_data, tsvString);
-
+      const inputFilePath = path.join(inputFolder, args.input_data);
+      writeFileSync(inputFilePath, tsvString);
       console.log('Data written to ExtractionData.all');
-
-      // modify and include parameters
-      transformArgs = {
-        ...args,
-        input_data: path.join(inputFolder, args.input_data),
-        output: path.join(outputFolder),
-        seqmatrix_database: seqmatrixFilePath,
-      };
-      console.log('******-----transformArgs');
-      console.log(transformArgs);
     }
 
+    // modify and include parameters
+    const transformArgs = {
+      ...args,
+      input_data: path.join(inputFolder, args.input_data),
+      output: path.join(outputFolder),
+      signature_database: signatureFilePath,
+    };
+    console.log('******-----transformArgs-----------****');
+    console.log(transformArgs);
     const cliArgs = Object.entries(transformArgs)
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
       .join(' ');
@@ -264,7 +257,7 @@ export async function extraction(
     logger.info(`[${id}] Run extraction`);
     console.log('-----==============================-------------');
     console.log('-----==============================-------------');
-    console.log('-----=========RUNNING EXTRACTION=======----------');
+    console.log('-----=========RUNNING PYTHON EXTRACTION=======----------');
     await execa(
       'python3',
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
@@ -274,6 +267,8 @@ export async function extraction(
       .pipeStderr(process.stderr);
 
     console.log('-----==============================-------------');
+    console.log('-----==============================-------------');
+    console.log('-----=========FINISH PYTHON EXTRACTION=======----------');
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
