@@ -33,8 +33,11 @@ WORKDIR /var/www/html
 EXPOSE 80
 EXPOSE 443
 
+ENV SERVER_TIMEOUT=900
+
 CMD rm -rf /run/httpd/* /tmp/httpd* \
     && exec /usr/sbin/httpd -DFOREGROUND
+
 
 # docker build -t msigportal-frontend -f frontend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8331:80 --name msigportal-frontend msigportal-frontend
