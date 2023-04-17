@@ -256,7 +256,12 @@ export default function Extraction() {
                   </Col>
                   <Col md="auto">
                     <b>Matrix File</b>
-                    <p>{manifest?.matrixFile}</p>
+                    {/* <p>{manifest?.matrixFile}</p> */}
+                    <p>
+                      {manifest.matrixFile
+                        ? manifest.matrixFile
+                        : 'public-data'}
+                    </p>
                   </Col>
                   <Col md="auto">
                     <b>Signature File</b>
