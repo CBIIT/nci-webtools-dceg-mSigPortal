@@ -345,7 +345,7 @@ export default function ExtractionForm() {
       }),
       ...(source === 'public' && {
         input_type: 'matrix',
-        input_data: 'ExtractionData.all',
+        //input_data: 'ExtractionData.all',
       }),
 
       reference_genome: data.reference_genome.value,

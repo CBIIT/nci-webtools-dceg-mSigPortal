@@ -319,6 +319,9 @@ export async function extraction(
     const signatureMap = await parseCSV(paths.signatureMapFile);
     await writeJson(paths.signatureMapJson, signatureMap);
 
+    console.log('signatureMap');
+    console.log(signatureMap);
+
     // run exploration calculation on denovo and decomposed solutions
     let denovoId, decomposedId;
     try {
@@ -359,8 +362,11 @@ export async function extraction(
           signatureFile: path.parse(paths.denovoSignatureInput).base,
         }
       );
-
+      console.log('---denovoExploration:');
+      console.log(denovoExploration);
       denovoId = denovoExploration.data;
+      console.log('------denovoId');
+      console.log(denovoId);
     } catch (error) {
       logger.error('Denovo Exploration Error');
       console.log(error);
@@ -409,7 +415,12 @@ export async function extraction(
         }
       );
 
+      console.log('------decomposedExploration');
+      console.log(decomposedExploration);
+
       decomposedId = decomposedExploration.data;
+      console.log('---------- decomposedId ---------');
+      console.log(decomposedId);
     } catch (error) {
       logger.error('Decomposed Exploration Error');
       throw error.data;
