@@ -377,8 +377,8 @@ export default function ExtractionForm() {
       study: data.study?.value,
       cancer: data.cancer?.value,
       strategy: data.strategy?.value,
-      profile: data.context_type?.value.value.match(/^\D*/)[0],
-      matrix: data.context_type?.value.match(/\d*$/)[0],
+      profile: data.context_type.value.match(/^\D*/)[0],
+      matrix: data.context_type.value.match(/\d*$/)[0],
     };
 
     const params = {
@@ -450,7 +450,7 @@ export default function ExtractionForm() {
                 )}
               />
             </Form.Group>
-            {source == 'public' ? (
+            {source === 'public' ? (
               <div>
                 <SelectForm
                   className="mb-2"
