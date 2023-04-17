@@ -148,6 +148,7 @@ export async function extraction(
     ////////////////// query seqmatrix data ////////////////////////
     let seqmatrixData;
     let seqmatrixFilePath;
+    let tsvString;
     if (params.form.source === 'public') {
       const seqmatrixColumns = [
         'sample',
@@ -216,7 +217,7 @@ export async function extraction(
       console.log('==========TSV DATA===========');
       console.log(tsvData);
       seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
-      const tsvString = await new Promise((resolve, reject) => {
+      tsvString = await new Promise((resolve, reject) => {
         stringify(
           tsvData,
           { delimiter: '\t', header: true },
@@ -233,16 +234,23 @@ export async function extraction(
       writeFileSync(seqmatrixFilePath, tsvString);
       console.log('Result written to signature.tsv');
 
+      console.log('------- seqmatrixFilePath ********');
+      console.log(seqmatrixFilePath);
+
       // Write the TSV data to the input_data file
-      const inputFilePath = path.join(inputFolder, args.input_data);
-      writeFileSync(inputFilePath, tsvString);
-      console.log('Data written to ExtractionData.all');
+      // const inputFilePath = path.join(inputFolder, args.input_data);
+      // writeFileSync(inputFilePath, tsvString);
+      // console.log('Data written to ExtractionData.all');
     }
 
     // modify and include parameters
     const transformArgs = {
       ...args,
-      input_data: path.join(inputFolder, args.input_data),
+      // input_data: path.join(inputFolder, args.input_data),
+      input_data:
+        params.form.source === 'public'
+          ? path.join(inputFolder, tsvString)
+          : path.join(inputFolder, args.input_data),
       output: path.join(outputFolder),
       signature_database: signatureFilePath,
     };

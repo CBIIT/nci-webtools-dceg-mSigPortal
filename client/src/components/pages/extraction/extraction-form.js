@@ -324,11 +324,6 @@ export default function ExtractionForm() {
   }
 
   async function onSubmit(data) {
-    if (source === 'public') {
-      const file = 'ExtractionData.all';
-      const path = 'assets/exampleInput/' + file;
-      setValue('inputFile', new File([await (await fetch(path)).blob()], file));
-    }
     mergeState({ submitted: true });
     console.log('Data:');
     console.log(data);
@@ -378,21 +373,14 @@ export default function ExtractionForm() {
       }),
     };
 
-    let seqmatrixQuery;
+    const seqmatrixQuery = {
+      study: data.study?.value,
+      cancer: data.cancer?.value,
+      strategy: data.strategy?.value,
+      profile: data.context_type?.value.value.match(/^\D*/)[0],
+      matrix: data.context_type?.value.match(/\d*$/)[0],
+    };
 
-    if (source === 'public') {
-      seqmatrixQuery = {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        strategy: data.strategy.value,
-      };
-    } else {
-      seqmatrixQuery = {
-        study: '',
-        cancer: '',
-        strategy: '',
-      };
-    }
     const params = {
       args,
       signatureQuery,
