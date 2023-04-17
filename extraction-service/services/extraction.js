@@ -147,6 +147,7 @@ export async function extraction(
 
     ////////////////// query seqmatrix data ////////////////////////
     let seqmatrixData;
+    let seqmatrixFilePath;
     let seqmatrixFileName;
     let tsvString;
     if (params.form.source === 'public') {
@@ -216,7 +217,7 @@ export async function extraction(
       });
       console.log('==========TSV DATA===========');
       console.log(tsvData);
-      const seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
+      seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
       tsvString = await new Promise((resolve, reject) => {
         stringify(
           tsvData,
@@ -242,9 +243,9 @@ export async function extraction(
       console.log(seqmatrixFileName);
 
       // Write the TSV data to the input_data file
-      // const inputFilePath = path.join(inputFolder, args.input_data);
-      // writeFileSync(inputFilePath, tsvString);
-      // console.log('Data written to ExtractionData.all');
+      const inputFilePath = path.join(inputFolder, args.input_data);
+      writeFileSync(inputFilePath, tsvString);
+      console.log('Data written to ExtractionData.all');
     }
 
     // modify and include parameters
@@ -253,7 +254,7 @@ export async function extraction(
       // input_data: path.join(inputFolder, args.input_data),
       input_data:
         params.form.source === 'public'
-          ? path.join(inputFolder, seqmatrixFileName)
+          ? seqmatrixFilePath
           : path.join(inputFolder, args.input_data),
       output: path.join(outputFolder),
       signature_database: signatureFilePath,
@@ -284,11 +285,11 @@ export async function extraction(
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
-    console.log('-===== decomposedSignatures');
-    console.log(decomposedSignatures);
+    // console.log('-===== decomposedSignatures');
+    // console.log(decomposedSignatures);
     const denovoSignatures = await parseCSV(paths.denovoSignatureInput);
-    console.log('-======= denovoSignatures');
-    console.log(denovoSignatures);
+    // console.log('-======= denovoSignatures');
+    // console.log(denovoSignatures);
     function signatureMapping(e) {
       const { MutationType, ...signatures } = e;
       return Object.entries(signatures).map(([signatureName, mutations]) => ({
@@ -301,8 +302,8 @@ export async function extraction(
       ...decomposedSignatures.map(signatureMapping).flat(),
       ...denovoSignatures.map(signatureMapping).flat(),
     ];
-    console.log('------- transformSignatures');
-    console.log(transformSignatures);
+    // console.log('------- transformSignatures');
+    // console.log(transformSignatures);
     const localDb = knex({
       client: 'better-sqlite3',
       connection: {

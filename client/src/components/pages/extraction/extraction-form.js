@@ -327,7 +327,11 @@ export default function ExtractionForm() {
     mergeState({ submitted: true });
     console.log('Data:');
     console.log(data);
-
+    // if (source === 'public') {
+    //   const file = 'ExtractionData.all';
+    //   const path = 'assets/exampleInput/' + file;
+    //   setValue('inputFile', new File([await (await fetch(path)).blob()], file));
+    // }
     console.log('Input File:');
     console.log(data.inputFile);
     const formData = new FormData();
