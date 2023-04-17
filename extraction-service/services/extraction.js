@@ -215,8 +215,8 @@ export async function extraction(
           ),
         };
       });
-      console.log('==========TSV DATA===========');
-      console.log(tsvData);
+      // console.log('==========TSV DATA===========');
+      // console.log(tsvData);
       seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
       tsvString = await new Promise((resolve, reject) => {
         stringify(
@@ -243,9 +243,9 @@ export async function extraction(
       console.log(seqmatrixFileName);
 
       // Write the TSV data to the input_data file
-      const inputFilePath = path.join(inputFolder, args.input_data);
-      writeFileSync(inputFilePath, tsvString);
-      console.log('Data written to ExtractionData.all');
+      // const inputFilePath = path.join(inputFolder, args.input_data);
+      // writeFileSync(inputFilePath, tsvString);
+      // console.log('Data written to ExtractionData.all');
     }
 
     // modify and include parameters
@@ -351,7 +351,10 @@ export async function extraction(
       const denovoExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
         {
-          matrixFile: path.parse(paths.matrixFile).base,
+          matrixFile:
+            params.form.source === 'public'
+              ? path.parse(seqmatrixFilePath).base
+              : path.parse(paths.matrixFile).base,
           exposureFile: path.parse(paths.denovoExposureInput).base,
           signatureFile: path.parse(paths.denovoSignatureInput).base,
         }
@@ -367,10 +370,18 @@ export async function extraction(
     try {
       logger.info(`[${id}] Run Decomposed Exploration`);
       const decomposedFormData = new FormData();
-      decomposedFormData.append(
-        'matrixFile',
-        createReadStream(paths.matrixFile)
-      );
+      if (params.form.source === 'public') {
+        decomposedFormData.append(
+          'matrixFile',
+          createReadStream(seqmatrixFilePath)
+        );
+      } else {
+        decomposedFormData.append(
+          'matrixFile',
+          createReadStream(paths.matrixFile)
+        );
+      }
+
       decomposedFormData.append(
         'exposureFile',
         createReadStream(paths.decomposedExposureInput)
@@ -389,7 +400,10 @@ export async function extraction(
       const decomposedExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
-          matrixFile: path.parse(paths.matrixFile).base,
+          matrixFile:
+            params.form.source === 'public'
+              ? path.parse(seqmatrixFilePath).base
+              : path.parse(paths.matrixFile).base,
           exposureFile: path.parse(paths.decomposedExposureInput).base,
           signatureFile: path.parse(paths.decomposedSignatureInput).base,
         }
@@ -565,7 +579,10 @@ export async function getPaths(params, env = process.env) {
   console.log('--------extractionLog');
   console.log(extractionLog);
   // matrix file - input for extraction and exploration
-  const matrixFile = path.resolve(inputFolder, args.input_data);
+  const matrixFile =
+    params.form.source === 'public'
+      ? ''
+      : path.resolve(inputFolder, args.input_data);
   console.log('---------matrixFile');
   console.log(matrixFile);
   // files for denovo exploration input
