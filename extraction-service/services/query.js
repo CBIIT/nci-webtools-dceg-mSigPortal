@@ -78,6 +78,27 @@ export function getSignatureData(
   );
 }
 
+export function getSeqmatrixData(
+  connection,
+  query,
+  columns = '*',
+  limit = 200000,
+  offset = 0,
+  rowMode = 'object',
+  distinct = false
+) {
+  return getData(
+    connection,
+    'seqmatrix',
+    query,
+    columns,
+    limit,
+    offset,
+    rowMode,
+    distinct
+  );
+}
+
 export function getQueryMiddleware(queryFunction) {
   return async function (req, res, next) {
     try {

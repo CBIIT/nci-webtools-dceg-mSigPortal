@@ -192,11 +192,11 @@ export default function ExtractionForm() {
 
   // define form
   const defaultValues = {
-    source: 'user',
+    source: 'public',
     study: { label: 'PCAWG', value: 'PCAWG' },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
     strategy: { label: 'WGS', value: 'WGS' },
-    input_type: { label: 'vcf', value: 'vcf' },
+    input_type: { label: 'matrix', value: 'matrix' },
     reference_genome: { label: 'GRCh37', value: 'GRCh37' },
     exome: false,
     signatureSetName: {
@@ -325,8 +325,14 @@ export default function ExtractionForm() {
 
   async function onSubmit(data) {
     mergeState({ submitted: true });
-
+    console.log('Data:');
     console.log(data);
+    // if (source === 'public') {
+    //   const file = 'ExtractionData.all';
+    //   const path = 'assets/exampleInput/' + file;
+    //   setValue('inputFile', new File([await (await fetch(path)).blob()], file));
+    // }
+    console.log('Input File:');
     console.log(data.inputFile);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
@@ -338,10 +344,8 @@ export default function ExtractionForm() {
         input_data: data.inputFile.name,
       }),
       ...(source === 'public' && {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        strategy: data.strategy.value,
         input_type: 'matrix',
+        //input_data: 'ExtractionData.all',
       }),
 
       reference_genome: data.reference_genome.value,
@@ -373,10 +377,18 @@ export default function ExtractionForm() {
       }),
     };
 
-    
+    const seqmatrixQuery = {
+      study: data.study?.value,
+      cancer: data.cancer?.value,
+      strategy: data.strategy?.value,
+      profile: data.context_type.value.match(/^\D*/)[0],
+      matrix: data.context_type.value.match(/\d*$/)[0],
+    };
+
     const params = {
       args,
       signatureQuery,
+      seqmatrixQuery,
       id,
       email: data.email,
       jobName: data.jobName || 'Extraction',
@@ -420,8 +432,8 @@ export default function ExtractionForm() {
                     type="radio"
                     label={<span className="font-weight-normal">Public</span>}
                     value={'public'}
-                    checked={field.value == 'public'}
-                    //disabled={true}
+                    checked={field.value === 'public'}
+                    disabled={submitted || id}
                   />
                 )}
               />
@@ -435,14 +447,14 @@ export default function ExtractionForm() {
                     id="radioUser"
                     type="radio"
                     label={<span className="font-weight-normal">User</span>}
-                    value={'vcf'}
-                    checked={field.value == 'user'}
+                    value={'user'}
+                    checked={field.value === 'user'}
                     disabled={submitted || id}
                   />
                 )}
               />
             </Form.Group>
-            {source == 'public' ? (
+            {source === 'public' ? (
               <div>
                 <SelectForm
                   className="mb-2"
@@ -551,7 +563,7 @@ export default function ExtractionForm() {
             disabled={submitted || id}
             options={genomeOptions}
             control={control}
-            rules={{ required: input_type == 'vcf' }}
+            rules={{ required: input_type === 'vcf' }}
           />
           <Form.Group>
             <Controller
