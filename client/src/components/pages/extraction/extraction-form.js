@@ -196,7 +196,7 @@ export default function ExtractionForm() {
     study: { label: 'PCAWG', value: 'PCAWG' },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
     strategy: { label: 'WGS', value: 'WGS' },
-    input_type: { label: 'vcf', value: 'vcf' },
+    input_type: { label: 'matrix', value: 'matrix' },
     reference_genome: { label: 'GRCh37', value: 'GRCh37' },
     exome: false,
     signatureSetName: {
