@@ -15,7 +15,7 @@ const actions = { ...visualizationActions, ...modalActions };
 
 export default function PublicForm() {
   const store = useSelector((state) => state.visualization);
-  const { submitted } = store.main;
+  const { submitted, openSidebar } = store.main;
 
   const dispatch = useDispatch();
   const mergeState = (state) =>
@@ -69,7 +69,11 @@ export default function PublicForm() {
   async function onSubmit(data) {
     try {
       const cancers = cancerOptions(data.study);
-      mergeMain({ submitted: true, loading: { active: true } });
+      mergeMain({
+        submitted: true,
+        loading: { active: true },
+        openSidebar: false,
+      });
       mergeState({ ...data, cancers });
       const params = {
         study: data.study.value,
