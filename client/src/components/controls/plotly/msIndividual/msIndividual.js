@@ -25,11 +25,12 @@ export function MsIndividualComparison(
   const segmatrixData = data[2].data;
 
   const exposure_groupBySignature = groupBy(
-    exposureData.filter((o) => o['exposure'] > 0.01),
+    exposureData.filter((o) => o['exposure'] > 0),
     'signatureName'
   );
 
   const signatureNames = Object.keys(exposure_groupBySignature).map((e) => e);
+
   // find the longest label to calculate extra height margin
   const longest = signatureNames.reduce(
     (a, e) => (a > e.length ? a : e.length),
@@ -417,23 +418,25 @@ export function MsIndividualComparison(
     },
   }));
 
-  const mutationLabelBox0 = groupSamples[0].map((group, groupIndex, array) => ({
-    type: 'rect',
-    xref: 'x',
-    yref: 'paper',
-    x0: array
-      .slice(0, groupIndex)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    x1: array
-      .slice(0, groupIndex + 1)
-      .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
-    y0: plotYrange2 - 0.02,
-    y1: plotYrange2 + 0.005,
-    fillcolor: colors[group.mutation],
-    line: {
-      width: 1,
-    },
-  }));
+  const mutationLabelBox0 = groupSamples[0]?.map(
+    (group, groupIndex, array) => ({
+      type: 'rect',
+      xref: 'x',
+      yref: 'paper',
+      x0: array
+        .slice(0, groupIndex)
+        .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+      x1: array
+        .slice(0, groupIndex + 1)
+        .reduce((lastIndex, e) => lastIndex + e.data.length, -0.5),
+      y0: plotYrange2 - 0.02,
+      y1: plotYrange2 + 0.005,
+      fillcolor: colors[group.mutation],
+      line: {
+        width: 1,
+      },
+    })
+  );
 
   const mutationLabelBox1 = groupOriginal.map((group, groupIndex, array) => ({
     type: 'rect',
@@ -590,7 +593,7 @@ export function MsIndividualComparison(
       align: 'center',
     },
   ];
-  const mutationAnnotation0 = groupSamples[0].map(
+  const mutationAnnotation0 = groupSamples[0]?.map(
     (group, groupIndex, array) => ({
       xref: 'x',
       yref: 'paper',
@@ -650,7 +653,8 @@ export function MsIndividualComparison(
 
     align: 'center',
   }));
-  const tickLabels = formatTickLabels(groupSamples[0]);
+  const tickLabels =
+    groupSamples.length > 0 ? formatTickLabels(groupSamples[0]) : '';
 
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
@@ -674,8 +678,8 @@ export function MsIndividualComparison(
       tickangle: tickAngle,
       tickfont: { family: 'Courier New, monospace' },
       tickmode: 'array',
-      tickvals: tickLabels.map((_, i) => i),
-      ticktext: tickLabels.map((e) => e),
+      tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
+      ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -687,8 +691,8 @@ export function MsIndividualComparison(
       tickangle: tickAngle,
       tickfont: { family: 'Courier New, monospace' },
       tickmode: 'array',
-      tickvals: tickLabels.map((_, i) => i),
-      ticktext: tickLabels.map((e) => e),
+      tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
+      ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
       linecolor: '#E0E0E0',
       linewidth: 1,
       mirror: 'all',
@@ -836,24 +840,46 @@ export function MsIndividualComparison(
       domain: [1 - divide1 - 0.01, 1],
       anchor: 'x2',
     },
-    shapes: [
-      ...mutationLabelBox0,
-      ...mutationLabelBox1,
-      ...sampleBorders,
-      ...sampleBorder1,
-      ...sampleBorder2,
-      ...differenceBorder,
-      ...signaturePercentBox,
-      ...signaturePercentLine,
-    ],
-    annotations: [
-      ...mutationAnnotation0,
-      ...mutationAnnotation1,
-      ...sampleLabels,
-      ...topSubplotAnnotations,
-      ...titleAnnotations,
-      ...signaturePercentAnnotation,
-    ],
+    shapes: mutationLabelBox0
+      ? [
+          ...mutationLabelBox0,
+          ...mutationLabelBox1,
+          ...sampleBorders,
+          ...sampleBorder1,
+          ...sampleBorder2,
+          ...differenceBorder,
+          ...signaturePercentBox,
+          ...signaturePercentLine,
+        ]
+      : [
+          [
+            ...mutationLabelBox1,
+            ...sampleBorders,
+            ...sampleBorder1,
+            ...sampleBorder2,
+            ...differenceBorder,
+            ...signaturePercentBox,
+            ...signaturePercentLine,
+          ],
+        ],
+    annotations: mutationAnnotation0
+      ? [
+          ...mutationAnnotation0,
+          ...mutationAnnotation1,
+          ...sampleLabels,
+          ...topSubplotAnnotations,
+          ...titleAnnotations,
+          ...signaturePercentAnnotation,
+        ]
+      : [
+          [
+            ...mutationAnnotation1,
+            ...sampleLabels,
+            ...topSubplotAnnotations,
+            ...titleAnnotations,
+            ...signaturePercentAnnotation,
+          ],
+        ],
 
     margin: {
       l: extraMargin,
