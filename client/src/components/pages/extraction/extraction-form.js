@@ -192,7 +192,7 @@ export default function ExtractionForm() {
 
   // define form
   const defaultValues = {
-    source: 'user',
+    source: 'public',
     study: { label: 'PCAWG', value: 'PCAWG' },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
     strategy: { label: 'WGS', value: 'WGS' },
@@ -432,8 +432,8 @@ export default function ExtractionForm() {
                     type="radio"
                     label={<span className="font-weight-normal">Public</span>}
                     value={'public'}
-                    checked={field.value == 'public'}
-                    //disabled={true}
+                    checked={field.value === 'public'}
+                    disabled={submitted || id}
                   />
                 )}
               />
@@ -447,8 +447,8 @@ export default function ExtractionForm() {
                     id="radioUser"
                     type="radio"
                     label={<span className="font-weight-normal">User</span>}
-                    value={'vcf'}
-                    checked={field.value == 'user'}
+                    value={'user'}
+                    checked={field.value === 'user'}
                     disabled={submitted || id}
                   />
                 )}
@@ -563,7 +563,7 @@ export default function ExtractionForm() {
             disabled={submitted || id}
             options={genomeOptions}
             control={control}
-            rules={{ required: input_type == 'vcf' }}
+            rules={{ required: input_type === 'vcf' }}
           />
           <Form.Group>
             <Controller
