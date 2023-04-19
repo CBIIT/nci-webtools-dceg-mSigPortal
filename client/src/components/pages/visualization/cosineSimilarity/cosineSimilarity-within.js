@@ -14,7 +14,7 @@ import { useMatrixListQuery } from '../userForm/apiSlice';
 export default function CsWithin({ state }) {
   const [params, setParams] = useState('');
   const { study, cancer, strategy, source, id } = state;
-  
+
   const { data: options } = useSeqmatrixOptionsQuery(
     {
       ...(source == 'public'
@@ -62,6 +62,7 @@ export default function CsWithin({ state }) {
   }, [profileOptions]);
 
   function onSubmit(data) {
+    const cacheBust = new Date().getTime();
     const params =
       source == 'user'
         ? {
@@ -74,6 +75,7 @@ export default function CsWithin({ state }) {
               )[0].Path,
             },
             id,
+            cacheBust,
           }
         : {
             fn: 'cosineSimilarityWithinPublic',
@@ -85,6 +87,7 @@ export default function CsWithin({ state }) {
               experimentalStrategy: strategy.value,
             },
             id,
+            cacheBust,
           };
     setParams(params);
   }

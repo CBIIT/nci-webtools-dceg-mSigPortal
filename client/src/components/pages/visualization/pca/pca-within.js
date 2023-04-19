@@ -66,6 +66,7 @@ export default function PcaWithin({ state }) {
   }, [profile]);
 
   function onSubmit(data) {
+    const cacheBust = new Date().getTime();
     const params =
       source == 'user'
         ? {
@@ -81,6 +82,7 @@ export default function PcaWithin({ state }) {
               )[0].Path,
             },
             id,
+            cacheBust,
           }
         : {
             fn: 'pcaPublic',
@@ -92,6 +94,7 @@ export default function PcaWithin({ state }) {
               experimentalStrategy: strategy.value,
             },
             id,
+            cacheBust,
           };
     setParams(params);
   }
