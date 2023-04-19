@@ -25,7 +25,7 @@ export function MsIndividualComparison(
   const segmatrixData = data[2].data;
 
   const exposure_groupBySignature = groupBy(
-    exposureData.filter((o) => o['exposure'] > 0),
+    exposureData.filter((o) => o['exposure'] > 0.01),
     'signatureName'
   );
 
