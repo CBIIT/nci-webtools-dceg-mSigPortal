@@ -656,236 +656,287 @@ export function MsIndividualComparison(
   const tickLabels =
     groupSamples.length > 0 ? formatTickLabels(groupSamples[0]) : '';
 
-  const layout = {
-    hoverlabel: { bgcolor: '#FFF' },
-    height: 1080,
-    autosize: true,
-    title: {
-      text:
-        '<b>Mutational Signature Association</b><br><b>RSS = ' +
-        rss +
-        '; Cosine Similarity = ' +
-        cosineSimilarity +
-        '</b>',
-      font: {
-        family: 'Times New Roman',
-        size: 20,
-      },
-    },
+  const layout =
+    traces.length > 0
+      ? {
+          hoverlabel: { bgcolor: '#FFF' },
+          height: 1080,
+          autosize: true,
+          title: {
+            text:
+              '<b>Mutational Signature Association</b><br><b>RSS = ' +
+              rss +
+              '; Cosine Similarity = ' +
+              cosineSimilarity +
+              '</b>',
+            font: {
+              family: 'Times New Roman',
+              size: 20,
+            },
+          },
 
-    xaxis: {
-      showline: true,
-      tickangle: tickAngle,
-      tickfont: { family: 'Courier New, monospace' },
-      tickmode: 'array',
-      tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
-      ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
-      linecolor: '#E0E0E0',
-      linewidth: 1,
-      mirror: 'all',
-      ticks: '',
-      anchor: 'y',
-    },
-    xaxis2: {
-      showline: true,
-      tickangle: tickAngle,
-      tickfont: { family: 'Courier New, monospace' },
-      tickmode: 'array',
-      tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
-      ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
-      linecolor: '#E0E0E0',
-      linewidth: 1,
-      mirror: 'all',
-      ticks: '',
-      anchor: 'y10',
-    },
-    yaxis: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      showgrid: true,
-      gridcolor: '#F5F5F5',
-      domain: [0, divide2 - 0.02],
-      anchor: 'x',
-    },
-    yaxis2: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 1 - 0.01, divide2 * 1 + divide2 - 0.02],
-      anchor: 'x',
-    },
-    yaxis3: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 2 - 0.01, divide2 * 2 + divide2 - 0.02],
-      anchor: 'x',
-    },
-    yaxis4: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 3 - 0.01, divide2 * 3 + divide2 - 0.02],
-      anchor: 'x',
-    },
-    yaxis5: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 4 - 0.01, divide2 * 4 + divide2 - 0.02],
-      anchor: 'x',
-    },
-    yaxis6: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 5 - 0.01, divide2 * 5 + divide2 - 0.02],
-    },
-    yaxis7: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 6 - 0.01, divide2 * 6 + divide2 - 0.02],
-    },
-    yaxis8: {
-      autorange: true,
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [divide2 * 8 - 0.01, divide2 * 8 + divide2 - 0.02],
-    },
-    yaxis10: {
-      autorange: false,
+          xaxis: {
+            showline: true,
+            tickangle: tickAngle,
+            tickfont: { family: 'Courier New, monospace' },
+            tickmode: 'array',
+            tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
+            ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
+            linecolor: '#E0E0E0',
+            linewidth: 1,
+            mirror: 'all',
+            ticks: '',
+            anchor: 'y',
+          },
+          xaxis2: {
+            showline: true,
+            tickangle: tickAngle,
+            tickfont: { family: 'Courier New, monospace' },
+            tickmode: 'array',
+            tickvals: tickLabels.length ? tickLabels.map((_, i) => i) : '',
+            ticktext: tickLabels.length ? tickLabels.map((e) => e) : '',
+            linecolor: '#E0E0E0',
+            linewidth: 1,
+            mirror: 'all',
+            ticks: '',
+            anchor: 'y10',
+          },
+          yaxis: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            showgrid: true,
+            gridcolor: '#F5F5F5',
+            domain: [0, divide2 - 0.02],
+            anchor: 'x',
+          },
+          yaxis2: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 1 - 0.01, divide2 * 1 + divide2 - 0.02],
+            anchor: 'x',
+          },
+          yaxis3: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 2 - 0.01, divide2 * 2 + divide2 - 0.02],
+            anchor: 'x',
+          },
+          yaxis4: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 3 - 0.01, divide2 * 3 + divide2 - 0.02],
+            anchor: 'x',
+          },
+          yaxis5: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 4 - 0.01, divide2 * 4 + divide2 - 0.02],
+            anchor: 'x',
+          },
+          yaxis6: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 5 - 0.01, divide2 * 5 + divide2 - 0.02],
+          },
+          yaxis7: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 6 - 0.01, divide2 * 6 + divide2 - 0.02],
+          },
+          yaxis8: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 8 - 0.01, divide2 * 8 + divide2 - 0.02],
+          },
+          yaxis10: {
+            autorange: false,
 
-      range: [
-        -1 * differenceTraceMaxYValue * 1.5,
-        differenceTraceMaxYValue * 1.5,
-      ],
+            range: [
+              -1 * differenceTraceMaxYValue * 1.5,
+              differenceTraceMaxYValue * 1.5,
+            ],
 
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      showgrid: true,
-      gridcolor: '#F5F5F5',
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            showgrid: true,
+            gridcolor: '#F5F5F5',
 
-      domain: [1 - divide1 * 3 - 0.01, 1 - divide1 * 2 - 0.02],
-      anchor: 'x2',
-    },
-    yaxis11: {
-      autorange: false,
-      range: [0, maxMutations * 1.2],
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      //title: { text: '<b>Relative contribution</b>' },
-      domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
-      anchor: 'x2',
-    },
-    yaxis12: {
-      autorange: false,
-      range: [0, maxMutations * 1.2],
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      ticks: '',
-      mirror: 'all',
-      tickfont: {
-        family: 'Arial',
-      },
-      domain: [1 - divide1 - 0.01, 1],
-      anchor: 'x2',
-    },
-    shapes: mutationLabelBox0
-      ? [
-          ...mutationLabelBox0,
-          ...mutationLabelBox1,
-          ...sampleBorders,
-          ...sampleBorder1,
-          ...sampleBorder2,
-          ...differenceBorder,
-          ...signaturePercentBox,
-          ...signaturePercentLine,
-        ]
-      : [
-          [
-            ...mutationLabelBox1,
-            ...sampleBorders,
-            ...sampleBorder1,
-            ...sampleBorder2,
-            ...differenceBorder,
-            ...signaturePercentBox,
-            ...signaturePercentLine,
+            domain: [1 - divide1 * 3 - 0.01, 1 - divide1 * 2 - 0.02],
+            anchor: 'x2',
+          },
+          yaxis11: {
+            autorange: false,
+            range: [0, maxMutations * 1.2],
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            //title: { text: '<b>Relative contribution</b>' },
+            domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
+            anchor: 'x2',
+          },
+          yaxis12: {
+            autorange: false,
+            range: [0, maxMutations * 1.2],
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [1 - divide1 - 0.01, 1],
+            anchor: 'x2',
+          },
+          shapes: mutationLabelBox0
+            ? [
+                ...mutationLabelBox0,
+                ...mutationLabelBox1,
+                ...sampleBorders,
+                ...sampleBorder1,
+                ...sampleBorder2,
+                ...differenceBorder,
+                ...signaturePercentBox,
+                ...signaturePercentLine,
+              ]
+            : [
+                [
+                  ...mutationLabelBox1,
+                  ...sampleBorders,
+                  ...sampleBorder1,
+                  ...sampleBorder2,
+                  ...differenceBorder,
+                  ...signaturePercentBox,
+                  ...signaturePercentLine,
+                ],
+              ],
+          annotations: mutationAnnotation0
+            ? [
+                ...mutationAnnotation0,
+                ...mutationAnnotation1,
+                ...sampleLabels,
+                ...topSubplotAnnotations,
+                ...titleAnnotations,
+                ...signaturePercentAnnotation,
+              ]
+            : [
+                [
+                  ...mutationAnnotation1,
+                  ...sampleLabels,
+                  ...topSubplotAnnotations,
+                  ...titleAnnotations,
+                  ...signaturePercentAnnotation,
+                ],
+              ],
+
+          margin: {
+            l: extraMargin,
+            t: 150,
+          },
+        }
+      : {
+          hoverlabel: { bgcolor: '#FFF' },
+          height: 250,
+          autosize: true,
+          title: {
+            text:
+              '<b>Mutational Signature Association</b><br><b>RSS = ' +
+              rss +
+              '; Cosine Similarity = ' +
+              cosineSimilarity +
+              '</b>',
+            font: {
+              family: 'Times New Roman',
+              size: 20,
+            },
+          },
+          xaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+          },
+          yaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+          },
+          annotations: [
+            {
+              text: 'No data available',
+              xref: 'paper',
+              yref: 'paper',
+              x: 0.5,
+              y: 0.5,
+              showarrow: false,
+              font: {
+                size: 28,
+                color: 'grey',
+              },
+            },
           ],
-        ],
-    annotations: mutationAnnotation0
-      ? [
-          ...mutationAnnotation0,
-          ...mutationAnnotation1,
-          ...sampleLabels,
-          ...topSubplotAnnotations,
-          ...titleAnnotations,
-          ...signaturePercentAnnotation,
-        ]
-      : [
-          [
-            ...mutationAnnotation1,
-            ...sampleLabels,
-            ...topSubplotAnnotations,
-            ...titleAnnotations,
-            ...signaturePercentAnnotation,
-          ],
-        ],
-
-    margin: {
-      l: extraMargin,
-      t: 150,
-    },
-  };
+        };
 
   return { traces, layout };
 }

@@ -63,29 +63,16 @@ export async function extraction(
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
   );
-  console.log('==========PATHS-extraction');
-  logger.info(paths);
 
   try {
-    console.log('==========PARAMS:');
-    console.log(params);
-    console.log('========ARGS');
-    console.log(args);
-    console.log('========signatureQuery');
-    console.log(signatureQuery);
-    console.log('========seqmatrixQuery');
-    console.log(seqmatrixQuery);
-    console.log('=========ID:');
     logger.info(id);
+    logger.info(params);
     if (!id) throw new Error('Missing id');
     if (!validator.isUUID(id)) throw new Error('Invalid id');
 
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    console.log('=======inputFolder');
-    console.log(inputFolder);
+
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-    console.log('=======outputFolder');
-    console.log(outputFolder);
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
@@ -113,13 +100,9 @@ export async function extraction(
       signatureColumns,
       limit
     );
-    console.log('********* signatureData');
-    //console.log(signatureData);
 
     // transform data into format accepted by SigProfiler
     const groupByType = groupBy(signatureData, (e) => e.mutationType);
-    // console.log('*******----groupByType');
-    // console.log(groupByType);
     const transposeSignature = Object.values(groupByType).map((signatures) =>
       signatures.reduce((obj, e) => {
         return {
@@ -129,8 +112,6 @@ export async function extraction(
         };
       }, {})
     );
-    // console.log('********---transposeSignature');
-    // console.log(transposeSignature);
 
     // write data to tsv file
     const signatureFilePath = path.join(outputFolder, 'signature.tsv');
@@ -142,8 +123,6 @@ export async function extraction(
       },
       (error, output) => writeFileSync(signatureFilePath, output)
     );
-    console.log('****---signatureFilePath');
-    console.log(signatureFilePath);
 
     ////////////////// query seqmatrix data ////////////////////////
     let seqmatrixData;
@@ -164,8 +143,6 @@ export async function extraction(
         seqmatrixColumns,
         limit
       );
-      console.log('****** seqmatrixData--------');
-      //console.log(seqmatrixData);
 
       // transform data into format accepted by SigProfiler
       // Extract unique mutation types and samples
@@ -193,13 +170,6 @@ export async function extraction(
           result[mt][s] = count;
         });
       });
-      // console.log('++++++++++++++++');
-      // // Print the result object in the desired format
-      // console.log('MutationType\t' + samples.join('\t'));
-      // Object.entries(result).forEach(([mt, counts]) => {
-      //   console.log(`${mt}\t${samples.map((s) => counts[s] || 0).join('\t')}`);
-      // });
-      // console.log('++++----------+++++');
 
       // Write the result to a TSV file using csv-stringify
       const headers = ['MutationType', ...samples];
@@ -215,8 +185,7 @@ export async function extraction(
           ),
         };
       });
-      // console.log('==========TSV DATA===========');
-      // console.log(tsvData);
+
       seqmatrixFilePath = path.join(outputFolder, 'seqmatrix.tsv');
       tsvString = await new Promise((resolve, reject) => {
         stringify(
@@ -233,14 +202,9 @@ export async function extraction(
       });
       // Write the TSV string to the file using writeFileSync
       writeFileSync(seqmatrixFilePath, tsvString);
-      console.log('Result written to signature.tsv');
-
-      console.log('------- seqmatrixFilePath ********');
-      console.log(seqmatrixFilePath);
+      logger.info('Result written to signature.tsv');
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
-      console.log('+++++++++++ seqmatrixFileName ++++++++++');
-      console.log(seqmatrixFileName);
 
       // Write the TSV data to the input_data file
       // const inputFilePath = path.join(inputFolder, args.input_data);
@@ -259,18 +223,12 @@ export async function extraction(
       output: path.join(outputFolder),
       signature_database: signatureFilePath,
     };
-    console.log('******-----transformArgs-----------****');
-    console.log(transformArgs);
+
     const cliArgs = Object.entries(transformArgs)
       .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
       .join(' ');
-    console.log('*****---cliArgs');
-    console.log(cliArgs);
 
     logger.info(`[${id}] Run extraction`);
-    console.log('-----==============================-------------');
-    console.log('-----==============================-------------');
-    console.log('-----=========RUNNING PYTHON EXTRACTION=======----------');
     await execa(
       'python3',
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
@@ -279,9 +237,7 @@ export async function extraction(
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr);
 
-    console.log('-----==============================-------------');
-    console.log('-----==============================-------------');
-    console.log('-----=========FINISH PYTHON EXTRACTION=======----------');
+    logger.info('Finished Extraction');
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
@@ -302,8 +258,7 @@ export async function extraction(
       ...decomposedSignatures.map(signatureMapping).flat(),
       ...denovoSignatures.map(signatureMapping).flat(),
     ];
-    // console.log('------- transformSignatures');
-    // console.log(transformSignatures);
+
     const localDb = knex({
       client: 'better-sqlite3',
       connection: {
@@ -311,16 +266,12 @@ export async function extraction(
       },
       useNullAsDefault: true,
     });
-    console.log('-----localDb');
-    console.log(localDb);
+
     await importUserSession(localDb, { signature: transformSignatures });
 
     // parse signatureMap csv to JSON
     const signatureMap = await parseCSV(paths.signatureMapFile);
     await writeJson(paths.signatureMapJson, signatureMap);
-
-    console.log('signatureMap');
-    console.log(signatureMap);
 
     // run exploration calculation on denovo and decomposed solutions
     let denovoId, decomposedId;
@@ -362,11 +313,8 @@ export async function extraction(
           signatureFile: path.parse(paths.denovoSignatureInput).base,
         }
       );
-      console.log('---denovoExploration:');
-      console.log(denovoExploration);
+
       denovoId = denovoExploration.data;
-      console.log('------denovoId');
-      console.log(denovoId);
     } catch (error) {
       logger.error('Denovo Exploration Error');
       console.log(error);
@@ -415,12 +363,7 @@ export async function extraction(
         }
       );
 
-      console.log('------decomposedExploration');
-      console.log(decomposedExploration);
-
       decomposedId = decomposedExploration.data;
-      console.log('---------- decomposedId ---------');
-      console.log(decomposedId);
     } catch (error) {
       logger.error('Decomposed Exploration Error');
       throw error.data;
@@ -533,8 +476,6 @@ export async function extraction(
  * @returns {any} paths
  */
 export async function getPaths(params, env = process.env) {
-  console.log('-----Params');
-  console.log(params);
   const { id, args } = params;
   let inputFolder;
   if (params.form.source === 'user' || params.form.source === 'public') {
@@ -542,28 +483,13 @@ export async function getPaths(params, env = process.env) {
   } else {
     inputFolder = '';
   }
-  console.log('---------INPUT FOLDER-------getPath');
-  console.log(inputFolder);
+
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, 'params.json');
   const statusFile = path.resolve(outputFolder, 'status.json');
   const manifestFile = path.resolve(outputFolder, 'manifest.json');
   const databaseFile = path.resolve(outputFolder, 'results.db');
 
-  console.log('------------outputFolder');
-  console.log(outputFolder);
-
-  console.log('------------paramsFile');
-  console.log(paramsFile);
-
-  console.log('------statusFile');
-  console.log(statusFile);
-
-  console.log('------manifestFile');
-  console.log(manifestFile);
-
-  console.log('---------databaseFile');
-  console.log(databaseFile);
   // map files to be used as input for exploration module
   const solutionsFolder = path.resolve(
     outputFolder,
@@ -571,78 +497,65 @@ export async function getPaths(params, env = process.env) {
     'Suggested_Solution'
   );
 
-  console.log('----------solutionsFolder');
-  console.log(solutionsFolder);
   const denovoFolder = path.resolve(
     solutionsFolder,
     `${args.context_type}_De-Novo_Solution`
   );
-  console.log('---------denovoFolder');
-  console.log(denovoFolder);
+
   const decomposedFolder = path.resolve(
     solutionsFolder,
     `COSMIC_${args.context_type}_Decomposed_Solution`
   );
-  console.log('----------decomposedFolder');
-  console.log(decomposedFolder);
+
   // SigProfilerExtraction log
   const extractionLog = path.resolve(outputFolder, 'JOB_METADATA.txt');
-  console.log('--------extractionLog');
-  console.log(extractionLog);
+
   // matrix file - input for extraction and exploration
   const matrixFile =
     params.form.source === 'public'
       ? ''
       : path.resolve(inputFolder, args.input_data);
-  console.log('---------matrixFile');
-  console.log(matrixFile);
+
   // files for denovo exploration input
   const denovoExposureInput = path.resolve(
     denovoFolder,
     'Activities',
     `${args.context_type}_De-Novo_Activities_refit.txt`
   );
-  console.log('----------denovoExposureInput');
-  console.log(denovoExposureInput);
+
   const denovoSignatureInput = path.resolve(
     denovoFolder,
     'Signatures',
     `${args.context_type}_De-Novo_Signatures.txt`
   );
-  console.log('--------denovoSignatureInput');
-  console.log(denovoSignatureInput);
+
   // files for decomposed exploration input
   const decomposedExposureInput = path.resolve(
     decomposedFolder,
     'Activities',
     `COSMIC_${args.context_type}_Activities.txt`
   );
-  console.log('---------decomposedExposureInput');
-  console.log(decomposedExposureInput);
+
   const decomposedSignatureInput = path.resolve(outputFolder, 'signature.tsv');
-  console.log('---------decomposedSignatureInput');
-  console.log(decomposedSignatureInput);
+
   // signature map file
   const signatureMapFile = path.resolve(
     decomposedFolder,
     `De_Novo_map_to_COSMIC_${args.context_type}.csv`
   );
-  console.log('-----signatureMapFile');
-  console.log(signatureMapFile);
+
   // signature map file
   const signatureMapJson = path.resolve(
     decomposedFolder,
     `De_Novo_map_to_COSMIC_${args.context_type}.json`
   );
-  console.log('----signatureMapJson');
-  console.log(signatureMapJson);
+
   const decomposedSignatureFile = path.resolve(
     decomposedFolder,
     'Signatures',
     `COSMIC_${args.context_type}_Signatures.txt`
   );
-  console.log('-----decomposedSignatureFile');
-  console.log(decomposedSignatureFile);
+
   return {
     inputFolder,
     outputFolder,
