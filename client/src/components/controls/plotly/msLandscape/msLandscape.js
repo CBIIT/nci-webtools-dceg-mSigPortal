@@ -379,7 +379,8 @@ export default function MsLandscape(
   const dendrogramTrace = Object.keys(dendrogram).length
     ? {
         ...dendrogram.data[1],
-        xaxis: 'x3',
+        x: dendrogram.data[1].x.map((e) => (typeof e === 'number' ? e - 1 : e)),
+        xaxis: 'x',
         yaxis: 'y6',
         text: dendrogram.data[1].x.map((e) =>
           samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
@@ -531,8 +532,6 @@ export default function MsLandscape(
 
     xaxis: {
       tickmode: 'array',
-      tickvals: samples.map((e, i) => i),
-      ticktext: samples,
       type: 'category',
       tickangle: -90,
       ticks: '',
@@ -541,16 +540,20 @@ export default function MsLandscape(
       zeroline: false,
       showline: false,
       zerolinewidth: 0,
+      ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis), // dendrogram layout
+      autorange: true,
+      tickvals: samples.map((e, i) => i),
+      ticktext: samples,
     },
     xaxis2: {
       showticklabels: false,
       zerolinecolor: 'rgba(0,0,0,0)',
     },
-    xaxis3: {
-      ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis),
-      showticklabels: false,
-      range: [0.5, samples.length + 0.5],
-    },
+    // xaxis3: {
+    //   ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis),
+    //   showticklabels: false,
+    //   range: [0.5, samples.length + 0.5],
+    // },
     yaxis: {
       title: 'Signature Contribution',
       domain: [0, 0.35],
