@@ -74,6 +74,7 @@ export default function CsReference({ state }) {
 
   function onSubmit(data) {
     const { profile, signatureSet } = data;
+    const cacheBust = new Date().getTime();
     const params =
       source == 'user'
         ? {
@@ -88,6 +89,7 @@ export default function CsReference({ state }) {
               )[0].Path,
             },
             id,
+            cacheBust,
           }
         : {
             fn: 'cosineSimilarityRefSigPublic',
@@ -99,6 +101,7 @@ export default function CsReference({ state }) {
               experimentalStrategy: strategy.value,
             },
             id,
+            cacheBust,
           };
     setParams(params);
   }

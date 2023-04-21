@@ -105,6 +105,7 @@ export default function PcaPublic({ state }) {
   }
 
   function onSubmit(data) {
+    const cacheBust = new Date().getTime();
     const params = {
       fn: 'pcaWithPublic',
       args: {
@@ -117,6 +118,7 @@ export default function PcaPublic({ state }) {
         )[0].Path,
       },
       id,
+      cacheBust,
     };
     setParams(params);
   }

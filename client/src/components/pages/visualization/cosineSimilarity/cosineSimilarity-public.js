@@ -92,6 +92,7 @@ export default function CsPublic({ state }) {
   }, [studyOptions]);
 
   function onSubmit(data) {
+    const cacheBust = new Date().getTime();
     const params = {
       fn: 'cosineSimilarityPublic',
       args: {
@@ -105,6 +106,7 @@ export default function CsPublic({ state }) {
         )[0].Path,
       },
       id,
+      cacheBust,
     };
     setParams(params);
   }
