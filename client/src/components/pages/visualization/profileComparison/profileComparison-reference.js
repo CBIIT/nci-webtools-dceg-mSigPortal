@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-  Form,
-  Row,
-  Col,
-  Button,
-  Popover,
-  OverlayTrigger,
-} from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import Select from '../../../controls/select/selectHookForm';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { useProfileComparisonReferenceQuery } from './apiSlice';
 import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -24,7 +15,8 @@ export default function PcReference({ state }) {
   const [params, setParams] = useState(null);
   const { study, cancer, strategy, id, source } = state;
 
-  const { data: options } = useSeqmatrixOptionsQuery(
+  // query form options
+  const { data: seqmatrixOptions } = useSeqmatrixOptionsQuery(
     {
       ...(source == 'public'
         ? { study: study.value, cancer: cancer.value, strategy: strategy.value }
@@ -32,10 +24,9 @@ export default function PcReference({ state }) {
     },
     { skip: source == 'user' ? !id : !study }
   );
-  // get signature options
   const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
     useSignatureOptionsQuery();
-  // get plot data
+  // query plot
   const {
     data: plot,
     error,
@@ -44,29 +35,34 @@ export default function PcReference({ state }) {
     skip: !params,
   });
 
+  // define forms
+  const defaultValues = {
+    profile: '',
+    sample: '',
+    signatureSet: '',
+    compare: [{ proportion: 1, signature: '' }],
+  };
   const {
     control,
     handleSubmit,
     watch,
     setValue,
-
     formState: { errors: formErrors },
-  } = useForm({
-    defaultValues: { profile: '', sample: '', signatureSet: '', compare: '' },
+  } = useForm({ defaultValues });
+  // dynamic signature form
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'compare',
   });
   const { profile, sample, signatureSet, compare } = watch();
 
-  //   signature search form
-  const { control: searchControl, watch: watchSearch } = useForm({
-    defaultValues: { search: '' },
-  });
-  const { search } = watchSearch();
-
   // create form Options
-  const profileOptions = options
+  const profileOptions = seqmatrixOptions
     ? [
         ...new Set(
-          options.map((e) => e.profile).sort((a, b) => b.localeCompare(a))
+          seqmatrixOptions
+            .map((e) => e.profile)
+            .sort((a, b) => b.localeCompare(a))
         ),
       ].map((e) => ({
         label: e,
@@ -75,10 +71,10 @@ export default function PcReference({ state }) {
     : [];
 
   const sampleOptions = (profile) =>
-    options && profile
+    seqmatrixOptions && profile
       ? [
           ...new Set(
-            options
+            seqmatrixOptions
               .filter((e) => e.profile == profile.value)
               .map((e) => e.sample)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -125,10 +121,12 @@ export default function PcReference({ state }) {
               )
               .map((e) => e.signatureName)
           ),
-        ].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        ]
+          .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          .map((e) => ({ label: e, value: e }))
       : [];
 
-  // set inital form options
+  // set initial form options
   useEffect(() => {
     if (!profile && profileOptions.length && signatureOptions)
       handleProfile(defaultProfile2(profileOptions));
@@ -136,7 +134,10 @@ export default function PcReference({ state }) {
 
   function onSubmit(data) {
     const { profile, sample, signatureSet, compare } = data;
-    const params_spectrum = {
+    const signatureName = compare.map((e) => e.signature.value).join(';');
+    const scalarValue = compare.map((e) => e.proportion).join(';');
+
+    const spectrumQueryParams = {
       ...(source == 'public' && {
         study: study.value,
         cancer: cancer.value,
@@ -152,21 +153,8 @@ export default function PcReference({ state }) {
           ? '78'
           : '83',
     };
-    const paramsArray = compare.split(';');
-    let paramsScalar = [];
-    let paramsSig = [];
-    for (var i = 0; i < paramsArray.length; i++) {
-      if (paramsArray[i].includes('*')) {
-        const parts = paramsArray[i].split('*');
-        paramsScalar.push(parts[0]);
-        paramsSig.push(parts[1]);
-      } else {
-        paramsScalar.push('1');
-        paramsSig.push(paramsArray[i]);
-      }
-    }
 
-    const params_signature = {
+    const signatureQueryParams = {
       profile: profile.value,
       matrix:
         data.profile.value === 'SBS'
@@ -175,20 +163,11 @@ export default function PcReference({ state }) {
           ? '78'
           : '83',
       signatureSetName: signatureSet.value,
-      signatureName: paramsSig.join(';'),
-      scalarValue: paramsScalar.join(';'),
-    };
-    const params_signature_scalar = {
-      arrayScalar: paramsScalar,
-      arraySignature: paramsSig,
-      paramsSignatureScalar: compare,
+      signatureName,
+      scalarValue,
     };
 
-    setParams({
-      params_spectrum,
-      params_signature,
-      params_signature_scalar,
-    });
+    setParams({ spectrumQueryParams, signatureQueryParams });
   }
 
   function handleProfile(profile) {
@@ -201,51 +180,16 @@ export default function PcReference({ state }) {
   }
 
   function handleSignatureSet(profile, signatureSet) {
-    const names = signatureNameOptions(profile, signatureSet);
+    const signatureOptions = signatureNameOptions(profile, signatureSet);
 
     setValue('signatureSet', signatureSet);
-    setValue('compare', names[0]);
+    fields.forEach((e, i) => {
+      setValue(
+        `compare.${i}.signature`,
+        signatureOptions[i] || signatureOptions[0]
+      );
+    });
   }
-
-  const signatureListPopover = signatureSet && (
-    <Popover id="popover-basic" style={{ minWidth: '400px' }}>
-      <Popover.Title as="h3">{signatureSet.value}</Popover.Title>
-      <Popover.Content>
-        <Controller
-          name="search"
-          control={searchControl}
-          render={({ field }) => (
-            <Form.Control {...field} placeholder="Search Signatures" />
-          )}
-        />
-        <div>
-          {signatureNameOptions(profile, signatureSet) ? (
-            signatureNameOptions(profile, signatureSet)
-              .filter((e) =>
-                search ? e.toLowerCase().includes(search.toLowerCase()) : true
-              )
-              .map((signature) => (
-                <Button
-                  key={signature}
-                  variant="link"
-                  onClick={() => {
-                    if (compare.length) {
-                      setValue('compare', compare + `;${signature}`);
-                    } else {
-                      setValue('compare', signature);
-                    }
-                  }}
-                >
-                  {signature}
-                </Button>
-              ))
-          ) : (
-            <p>No Signatures Available</p>
-          )}
-        </div>
-      </Popover.Content>
-    </Popover>
-  );
 
   return (
     <div>
@@ -262,13 +206,12 @@ export default function PcReference({ state }) {
       <hr />
       <LoadingOverlay active={isFetching} />
       <Form className="p-3" onSubmit={handleSubmit(onSubmit)}>
-        <Row>
+        <Form.Row>
           <Col lg="auto">
             <Select
               disabled={!profileOptions.length}
               name="profile"
               label="Profile Type"
-              className="m-auto"
               options={profileOptions}
               onChange={handleProfile}
               control={control}
@@ -277,7 +220,6 @@ export default function PcReference({ state }) {
           <Col lg="auto">
             <Select
               disabled={!profile}
-              className="m-auto"
               name="sample"
               label="Sample Name"
               options={sampleOptions(profile)}
@@ -287,7 +229,6 @@ export default function PcReference({ state }) {
           <Col lg="auto">
             <Select
               disabled={fetchingSignatureOptions}
-              className="m-auto"
               name="signatureSet"
               label="Reference Signature Set"
               options={signatureSetOptions(profile)}
@@ -295,49 +236,7 @@ export default function PcReference({ state }) {
               control={control}
             />
           </Col>
-          <Col lg="auto" className="d-flex">
-            <Form.Group controlId="compare" className="m-auto">
-              <Form.Label>
-                Compare Signatures{' '}
-                <OverlayTrigger
-                  trigger="click"
-                  placement="top"
-                  overlay={signatureListPopover}
-                  rootClose
-                >
-                  <Button
-                    disabled={!signatureSet}
-                    aria-label="compare signatures info"
-                    variant="link"
-                    className="p-0 font-weight-bold "
-                  >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
-                      style={{ verticalAlign: 'baseline' }}
-                    />
-                  </Button>
-                </OverlayTrigger>
-              </Form.Label>
-              <Controller
-                name="compare"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Form.Control
-                    {...field}
-                    isInvalid={formErrors?.compare}
-                    disabled={fetchingSignatureOptions}
-                  />
-                )}
-              />
-              <Form.Text className="text-muted">
-                (Ex. 0.8*SBS5;0.1*SBS1)
-              </Form.Text>
-              <Form.Control.Feedback type="invalid">
-                Enter a valid signature. Click info icon for options.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
+
           <Col lg="auto" className="d-flex justify-content-end">
             <Button
               className="mt-4 mb-4"
@@ -355,7 +254,75 @@ export default function PcReference({ state }) {
               Calculate
             </Button>
           </Col>
-        </Row>
+        </Form.Row>
+        {fields.map((item, index) => (
+          <Form.Row key={item.id}>
+            <Col sm="1">
+              <Form.Group controlId={`proportion-${index}`}>
+                <Form.Label>Proportion</Form.Label>
+                <Controller
+                  name={`compare.${index}.proportion`}
+                  rules={{ required: true, min: 0, max: 1 }}
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Control
+                      {...field}
+                      min={0}
+                      max={1}
+                      step={0.1}
+                      type="number"
+                      placeholder="Decimal value between 0 to 1 (e.g. 0.5)"
+                    />
+                  )}
+                />
+              </Form.Group>
+            </Col>
+            <Col sm="auto">
+              <Select
+                disabled={!signatureNameOptions(profile, signatureSet).length}
+                name="signature"
+                label="Signature Name"
+                value={compare[index].signature}
+                options={signatureNameOptions(profile, signatureSet)}
+                onChange={(e) => setValue(`compare.${index}.signature`, e)}
+                control={control}
+              />
+            </Col>
+            {index > 0 && (
+              <Col sm="auto" className="my-auto mx-3">
+                <Button
+                  className="text-danger p-0"
+                  variant="link"
+                  title="Remove Signature"
+                  onClick={() => remove(index)}
+                >
+                  - Remove Signature
+                </Button>
+              </Col>
+            )}
+            {index == fields.length - 1 && (
+              <Col sm="auto" className="my-auto">
+                <Button
+                  className="p-0"
+                  variant="link"
+                  title="Add Signature"
+                  aria-label="Add Signature"
+                  onClick={() =>
+                    append({
+                      ...defaultValues.compare[0],
+                      signature:
+                        signatureNameOptions(profile, signatureSet)[
+                          index + 1
+                        ] || signatureNameOptions(profile, signatureSet)[0],
+                    })
+                  }
+                >
+                  + Add Signature
+                </Button>
+              </Col>
+            )}
+          </Form.Row>
+        ))}
         {sampleOptions(profile).length < 2 && (
           <Row>
             <Col>Unavailable - More than one Sample Required</Col>

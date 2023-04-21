@@ -35,15 +35,15 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
 
     profileComparisonReference: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+        const { spectrumQueryParams, signatureQueryParams } = _arg;
         try {
           const res = await Promise.all([
             fetchWithBQ(
-              '/mutational_spectrum?' +
-                new URLSearchParams(_arg.params_spectrum)
+              '/mutational_spectrum?' + new URLSearchParams(spectrumQueryParams)
             ),
             fetchWithBQ(
               '/mutational_signature?' +
-                new URLSearchParams(_arg.params_signature)
+                new URLSearchParams(signatureQueryParams)
             ),
           ]);
 
@@ -56,18 +56,18 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
           );
           const normalizeSigData = groupByMutation.map((signatures) => ({
             ...signatures[0],
-            signatureName: _arg.params_signature.signatureName,
-            scalarSignature: _arg.params_signature_scalar.paramsSignatureScalar,
+            signatureName: signatureQueryParams.signatureName,
+            scalarSignature: signatureQueryParams.scalarValue,
             contribution:
               signatures.reduce((total, e) => total + e.contribution, 0) /
               signatures.length,
           }));
 
-          if (_arg.params_spectrum.profile === 'SBS') {
+          if (spectrumQueryParams.profile === 'SBS') {
             return {
               data: sbs96(spectrumData, normalizeSigData),
             };
-          } else if (_arg.params_spectrum.profile === 'DBS') {
+          } else if (spectrumQueryParams.profile === 'DBS') {
             return {
               data: dbs78(spectrumData, normalizeSigData),
             };
