@@ -48,7 +48,7 @@ export const colorPallet1 = [
   '#8C564B',
 ];
 
-export const colorPallet = {
+const originalColorPallet = {
   1: '#4a9855',
   2: '#e2a8ab',
   3: '#40004b',
@@ -124,9 +124,54 @@ export const colorPallet = {
   '96A': '#2F77B5',
   '96B': '#3F77B5',
   '96C': '#4F77B5',
+  '96D': '#1FBBB5',
   110: '#5E1855',
   '-others': '#cececa',
 };
+
+// The new object
+const additionalColorPallet = {};
+
+// Generate random colors for each entry not in originalColorPallet
+for (let i = 1; i <= 110; i++) {
+  const baseKey = i.toString();
+
+  // Add the base entry if it doesn't already exist
+  if (!originalColorPallet[baseKey]) {
+    additionalColorPallet[baseKey] = `#${Math.floor(
+      Math.random() * 16777215
+    ).toString(16)}`;
+  }
+
+  // Add the four sub-entries if they don't already exist
+  for (let j = 97; j <= 100; j++) {
+    const subKey = `${baseKey}${String.fromCharCode(j)}`;
+    if (!originalColorPallet[subKey]) {
+      additionalColorPallet[subKey] = `#${Math.floor(
+        Math.random() * 16777215
+      ).toString(16)}`;
+    }
+
+    const subKeyUpper = `${baseKey}${String.fromCharCode(j).toUpperCase()}`;
+    if (!originalColorPallet[subKeyUpper]) {
+      additionalColorPallet[subKeyUpper] = `#${Math.floor(
+        Math.random() * 16777215
+      ).toString(16)}`;
+    }
+  }
+}
+
+// Add the '-others' entry if it doesn't already exist
+if (!originalColorPallet['-others']) {
+  additionalColorPallet['-others'] = '#cececa';
+}
+
+// Merge the two objects using Object.assign()
+export const colorPallet = Object.assign(
+  {},
+  originalColorPallet,
+  additionalColorPallet
+);
 
 export const rs32Color = {
   'clustered_del_>10Mb': 'deeppink',
