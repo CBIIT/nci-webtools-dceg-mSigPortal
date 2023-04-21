@@ -22,13 +22,13 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         const publicData = data.filter(
           (e) => e.sample == sample2 || e.signatureName == sample2
         );
-
+        const tab = 'pc';
         if (arg.profile === 'SBS') {
-          return sbs96(userData, publicData, 'pc');
+          return sbs96(userData, publicData, tab);
         } else if (arg.profile === 'DBS') {
-          return dbs78(userData, publicData, 'pc');
-        } else if (arg.profile == 'ID') {
-          return id83(userData, publicData, 'pc');
+          return dbs78(userData, publicData, tab);
+        } else if (arg.profile === 'ID') {
+          return id83(userData, publicData, tab);
         } else throw Error(`Profile ${arg.profile} is not supported`);
       },
     }),
@@ -46,7 +46,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
                 new URLSearchParams(signatureQueryParams)
             ),
           ]);
-
           const spectrumData = res[0]['data'];
           const signatureData = res[1]['data'];
 
@@ -62,18 +61,18 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
               signatures.reduce((total, e) => total + e.contribution, 0) /
               signatures.length,
           }));
-
+          const tab = 'pc';
           if (spectrumQueryParams.profile === 'SBS') {
             return {
-              data: sbs96(spectrumData, normalizeSigData),
+              data: sbs96(spectrumData, normalizeSigData, tab),
             };
           } else if (spectrumQueryParams.profile === 'DBS') {
             return {
-              data: dbs78(spectrumData, normalizeSigData),
+              data: dbs78(spectrumData, normalizeSigData, tab),
             };
           } else {
             return {
-              data: id83(spectrumData, normalizeSigData),
+              data: id83(spectrumData, normalizeSigData, tab),
             };
           }
         } catch (error) {

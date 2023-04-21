@@ -25,7 +25,7 @@ export function MsIndividualComparison(
   const segmatrixData = data[2].data;
 
   const exposure_groupBySignature = groupBy(
-    exposureData.filter((o) => o['exposure'] > 0.01),
+    exposureData?.filter((o) => o['exposure'] > 0.01),
     'signatureName'
   );
 
@@ -67,7 +67,7 @@ export function MsIndividualComparison(
     .join('');
 
   const signature_groupBySignature = groupBy(
-    signatureData.filter((e) => signatureNames.includes(e.signatureName)),
+    signatureData?.filter((e) => signatureNames.includes(e.signatureName)),
     'signatureName'
   );
 
@@ -97,7 +97,7 @@ export function MsIndividualComparison(
   );
 
   const seqmatrix_groupByMutationType = groupBy(
-    segmatrixData.filter((e) =>
+    segmatrixData?.filter((e) =>
       Object.keys(signatureDataFiltergroupBymutationTypes)
         .map((m) => m)
         .includes(e.mutationType)
