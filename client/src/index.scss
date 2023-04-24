@@ -707,12 +707,14 @@ select.form-control-sm {
   background-color: #f1e4ef;
   border-color: #8e4b86;
   color: #8e4b86 !important;
-}
-.btn-secondary:hover {
-  background-color: #8e4b86;
-  border-color: #f1e4ef;
-  color: #f1e4ef !important;
-  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    background-color: #8e4b86;
+    border-color: #f1e4ef;
+    color: #f1e4ef !important;
+    text-decoration: none;
+  }
 }
 
 .border-12 {
