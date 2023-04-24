@@ -28,19 +28,19 @@ services:
     ports:
       - "8332:8332"
 
-  # frontend:
-  #   build:
-  #     context: "."
-  #     dockerfile: "./docker/frontend.dockerfile"
-  #     args:
-  #       APP_PATH: /mutational-signatures
-  #   env_file: "./server/.env"
-  #   environment:
-  #     API_BASE_URL: http://backend:8330
-  #     API_EXTRACTION_URL: http://extraction:8332
-  #     APP_PATH: /mutational-signatures
-  #   ports:
-  #     - "3000:80"
+  frontend:
+    build:
+      context: "."
+      dockerfile: "./docker/frontend.dockerfile"
+      args:
+        APP_PATH: /mutational-signatures
+    env_file: "./server/.env"
+    environment:
+      API_BASE_URL: http://backend:8330
+      API_EXTRACTION_URL: http://extraction:8332
+      APP_PATH: /mutational-signatures
+    ports:
+      - "3000:80"
 
   # database:
   #   image: postgres

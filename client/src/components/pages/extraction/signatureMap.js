@@ -13,9 +13,7 @@ export default function SignatureMap({ state }) {
   const { id, params, manifest } = state;
   const [denovoSigString, setDenovo] = useState('');
   const [decompSigString, setDecomposed] = useState('');
-  console.log(id);
-  console.log(params);
-  console.log(manifest);
+
   const { data: table, error: tableError } = useSignatureMapTableQuery(
     {
       id,
@@ -33,7 +31,6 @@ export default function SignatureMap({ state }) {
     { skip: !denovoSigString || !decompSigString }
   );
   const { denovoPlots, refSigPlots } = data || {};
-  console.log(data);
   const refSigOptions = Object.keys(refSigPlots || {})
     .sort((a, b) => {
       const regex = /\((\w+\.\w+)%\)/;
