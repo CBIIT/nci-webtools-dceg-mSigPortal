@@ -13,7 +13,7 @@ import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,
   defaultMatrix2,
-  defaultSignatureSet,
+  defaultSignatureSet2,
   defaultStrategy,
   defaultSignatureName,
 } from '../../../../../services/utils';
@@ -69,7 +69,6 @@ export default function ProfileFormPlot() {
           value: e,
         }))
     : [];
-
   const profileOptions = (source) =>
     //source && signatureOptions.length
     source
@@ -109,7 +108,7 @@ export default function ProfileFormPlot() {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value
+                  e.matrix == matrix.value
               )
               .map((e) => e.signatureSetName)
             // .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -126,7 +125,7 @@ export default function ProfileFormPlot() {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
+                  e.matrix == matrix.value &&
                   e.signatureSetName === signatureSetName.value
               )
               .map((e) => e.strategy)
@@ -155,7 +154,7 @@ export default function ProfileFormPlot() {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
+                  e.matrix == matrix.value &&
                   e.signatureSetName === signatureSetName.value &&
                   e.strategy === strategy.value
               )
@@ -175,7 +174,7 @@ export default function ProfileFormPlot() {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,
@@ -204,7 +203,7 @@ export default function ProfileFormPlot() {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,
@@ -231,7 +230,7 @@ export default function ProfileFormPlot() {
       profile,
       matrix
     );
-    const signatureSetName = defaultSignatureSet(signatureSetNames);
+    const signatureSetName = defaultSignatureSet2(signatureSetNames);
     const strategies = strategyOptions(
       source,
       profile,
@@ -267,7 +266,6 @@ export default function ProfileFormPlot() {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-
     setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
     handleStrategy(source, profile, matrix, signatureSetName, strategy, index);
   }
