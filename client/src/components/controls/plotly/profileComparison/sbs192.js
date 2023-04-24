@@ -6,7 +6,7 @@ import {
   getCosineSimilarity,
 } from './profileComparison.js';
 
-export default function sbs192(data1, data2) {
+export default function sbs192(data1, data2, tab) {
   const colors = {
     'C>A': '#03BCEE',
     'C>G': 'black',
@@ -409,7 +409,7 @@ export default function sbs192(data1, data2) {
   const sampleLabel1 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'center',
     yanchor: 'middle',
     align: 'center',
     x: 1.0175,
@@ -422,7 +422,7 @@ export default function sbs192(data1, data2) {
   const sampleLabel2 = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'center',
     yanchor: 'middle',
     align: 'center',
     x: 1.0175,
@@ -435,7 +435,7 @@ export default function sbs192(data1, data2) {
   const differenceLabel = {
     xref: 'paper',
     yref: 'paper',
-    xanchor: 'middle',
+    xanchor: 'center',
     yanchor: 'middle',
     align: 'center',
     x: 1.0175,
@@ -536,9 +536,6 @@ export default function sbs192(data1, data2) {
     },
     shapes: [
       ...mutationLabelBox,
-      differencLabelBox1,
-      sampleLabelBox2,
-      differenceLabelBox,
       ...sampleBorder1,
       ...sampleBorder2,
       ...differenceBorder,

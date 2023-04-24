@@ -28,12 +28,18 @@ export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
         console.log('--RS Comparison:');
         console.log(data1);
         console.log(data2);
-        if (args.profile == 'SBS' && args.matrix == '96')
-          return sbs96(data1, data2);
-        else if (args.profile == 'SBS' && args.matrix == '192')
-          return sbs192(data1, data2);
-        else if (args.profile == 'DBS') return dbs78(data1, data2);
-        else if (args.profile == 'ID') return id83(data1, data2);
+        if (args.profile === 'SBS') {
+          if (args.matrix == '96') {
+            return sbs96(data1, data2, 'pc');
+          } else if (args.matrix == '192') {
+            return sbs192(data1, data2, 'pc');
+          } else {
+            throw Error(
+              `Profile ${args.profile} , Matrix ${args.matrix} is not supported`
+            );
+          }
+        } else if (args.profile === 'DBS') return dbs78(data1, data2, 'pc');
+        else if (args.profile === 'ID') return id83(data1, data2, 'pc');
         else throw Error(`Profile ${args.profile} is not supported`);
       },
     }),

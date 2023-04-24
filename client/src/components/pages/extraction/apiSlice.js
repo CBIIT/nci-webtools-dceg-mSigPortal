@@ -84,9 +84,13 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
     signatureMapPlots: builder.query({
       async queryFn(params, queryApi, extraOptions, fetchWithBQ) {
         try {
+          console.log(params);
+          console.log(queryApi);
+          console.log(extraOptions);
           const profileMatrixMap = { SBS: 96, DBS: 78, ID: 83 };
           const { userId, decompSigString, denovoSigString } = params;
-
+          console.log(decompSigString);
+          console.log(denovoSigString);
           // parse signature distribution names and proportion
           const distributionRegex = new RegExp(
             /Signature\s(\w+)\s\((\d+.\d+)%\)/g
@@ -98,19 +102,21 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             return { ...obj, [key]: parseFloat(value) / 100 };
           }, {});
           const decomposedSignatureNames = Object.keys(distribution);
-
+          console.log(decomposedSignatureNames);
           // parse denovo signature name
           const profileRegex = /([a-zA-Z]+)/;
           const profile = decomposedSignatureNames[0].match(profileRegex)[1];
           const profileMatrix = profile + profileMatrixMap[profile];
           const denovoSignature = profileMatrix + denovoSigString.slice(-1);
-
+          console.log('profile', profile);
+          console.log('profileMatrix', profileMatrix);
+          console.log('denovoSignature', denovoSignature);
           // query signatures
           const { data: signatureData } = await fetchWithBQ({
             url: `mutational_signature`,
             params: { userId },
           });
-
+          console.log(signatureData);
           const allSignatures = groupBy(signatureData, (e) => e.signatureName);
           const reconstructed = Object.values(
             groupBy(signatureData, (e) => e.mutationType)
