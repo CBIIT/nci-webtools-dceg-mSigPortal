@@ -8,6 +8,7 @@ export default function MsLandscape(
   variableData,
   dendrogram = {}
 ) {
+  const dendrogramExists = Object.keys(dendrogram).length > 0;
   let charColors = {};
   let arrNames = [];
   let mixMatch = false;
@@ -376,7 +377,7 @@ export default function MsLandscape(
     }));
 
   // modify dendrogram trace
-  const dendrogramTrace = Object.keys(dendrogram).length
+  const dendrogramTrace = dendrogramExists
     ? {
         ...dendrogram.data[1],
         x: dendrogram.data[1].x.map((e) => (typeof e === 'number' ? e - 1 : e)),
@@ -540,7 +541,7 @@ export default function MsLandscape(
       zeroline: false,
       showline: false,
       zerolinewidth: 0,
-      ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis), // dendrogram layout
+      ...(dendrogramExists && dendrogram.layout.xaxis), // dendrogram layout
       autorange: true,
       tickvals: samples.map((e, i) => i),
       ticktext: samples,
@@ -550,7 +551,7 @@ export default function MsLandscape(
       zerolinecolor: 'rgba(0,0,0,0)',
     },
     // xaxis3: {
-    //   ...(Object.keys(dendrogram).length && dendrogram.layout.xaxis),
+    //   ...(dendrogramExists && dendrogram.layout.xaxis),
     //   showticklabels: false,
     //   range: [0.5, samples.length + 0.5],
     // },
@@ -584,7 +585,7 @@ export default function MsLandscape(
       zeroline: false,
     },
     yaxis6: {
-      ...(Object.keys(dendrogram).length && dendrogram.layout.yaxis),
+      ...(dendrogramExists && dendrogram.layout.yaxis),
       domain: [0.8, 1],
       zeroline: false,
     },

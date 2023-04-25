@@ -122,17 +122,12 @@ async function msLandscape(req, res, next) {
     );
     const fn = 'msLandscape';
     const args = { exposureData, signatureData, seqmatrixData };
-    const id = userId || randomUUID();
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
-    res.json({
-      id,
-      stdout,
-      ...rest,
-    });
+    res.json({ userId, stdout, ...rest });
   } catch (err) {
     logger.error(`/msLandscape: An error occured `);
     next(err);

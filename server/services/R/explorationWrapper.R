@@ -864,20 +864,28 @@ msLandscape <- function(args, ...) {
     select(where(~ is.character(.x) || sum(.x) != 0)) %>%
     janitor::adorn_percentages("row")
   mdata <- as.matrix(transformExposure[, -1])
-  rownames(mdata) <- transformExposure$sample
-  clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
-  cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
+  # check if mdata contains at least one signature
+  if (dim(mdata)[2] > 1) {
+    rownames(mdata) <- transformExposure$sample
+    clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
+    cluster <- ifelse(dim(mdata)[2] > 1, factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE), list())
 
-  # create ggplot plotly dendrogram
-  dendrogramPlot <- ggdendro::ggdendrogram(cluster)
-  dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
+    # create ggplot plotly dendrogram
+    dendrogramPlot <- ggdendro::ggdendrogram(cluster)
+    dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
 
-  # sort according to hierarchy order
-  exposureData <- args$exposureData %>%
-    arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
-    filter(exposure > 0)
-  cosineData <- cosineData %>%
-    arrange(factor(sample, levels = cluster$labels[cluster$order]))
+    # sort according to hierarchy order
+    exposureData <- args$exposureData %>%
+      arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
+      filter(exposure > 0)
+    cosineData <- cosineData %>%
+      arrange(factor(sample, levels = cluster$labels[cluster$order]))
+  } else {
+    exposureData <- args$exposureData %>%
+      filter(exposure > 0)
+
+    dendrogram_json <- list()
+  }
 
   return(list(cosineData = cosineData, exposureData = exposureData, dendrogram = dendrogram_json))
 }
