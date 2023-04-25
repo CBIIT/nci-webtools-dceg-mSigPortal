@@ -31,6 +31,8 @@ export default function Instructions({ props, loading }) {
     // },
   ];
 
+  const exampleFiles = [];
+
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
       <LoadingOverlay active={loading} />

@@ -7,7 +7,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as extractionActions } from '../../../services/store/extraction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { actions as modalActions } from '../../../services/store/modal';
 import {
   resetExtractionApi,
@@ -625,13 +625,18 @@ export default function ExtractionForm() {
             label={
               <div>
                 Extract Tool{' '}
-                <a
+                <Button
+                  variant="secondary"
+                  size="sm"
                   href="https://github.com/AlexandrovLab/SigProfilerExtractor"
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ color: 'black' }}
+                  className="mb-2"
                 >
-                  <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-1" />{' '}
-                </a>
+                  <FontAwesomeIcon icon={faGithub} className="mr-1" />
+                  GitHub
+                </Button>
               </div>
             }
             disabled={submitted || id}
