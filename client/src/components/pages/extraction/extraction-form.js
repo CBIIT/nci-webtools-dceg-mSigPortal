@@ -67,12 +67,6 @@ export default function ExtractionForm() {
       }))
     : [];
 
-  const signatureSetOptions = signatureOptions
-    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))].map(
-        (e) => ({ label: e, value: e })
-      )
-    : [];
-
   const signatureNameOptions = (signatureSetName) =>
     signatureOptions && signatureSetName
       ? [
@@ -102,6 +96,32 @@ export default function ExtractionForm() {
       ]
     : [];
 
+  const [filteredSignatureSetOptions, setFilteredSignatureSetOptions] =
+    useState();
+
+  const signatureSetOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
+        .map((e) => ({ label: e, value: e }))
+        .sort((a, b) => a.value.localeCompare(b.value))
+    : [];
+  //setFilteredSignatureSetOptions(signatureSetOptions);
+  const handleContextTypeChange = (selectedOption) => {
+    setValue('context_type', selectedOption);
+    const filteredOptions = signatureSetOptions
+      .filter((option) => option.value.includes(selectedOption.value))
+      .sort((a, b) => a.value.localeCompare(b.value));
+
+    setFilteredSignatureSetOptions(filteredOptions);
+
+    if (selectedOption.value === 'SBS96') {
+      const cosmicOption = filteredOptions.find(
+        (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
+      );
+      setValue('signatureSetName', cosmicOption);
+    } else {
+      setValue('signatureSetName', filteredOptions[0]);
+    }
+  };
   const dataTypeOptions = ['matrix', 'vcf'].map((e) => ({
     label: e,
     value: e,
@@ -329,13 +349,6 @@ export default function ExtractionForm() {
     mergeState({ submitted: true });
     console.log('Data:');
     console.log(data);
-    // if (source === 'public') {
-    //   const file = 'ExtractionData.all';
-    //   const path = 'assets/exampleInput/' + file;
-    //   setValue('inputFile', new File([await (await fetch(path)).blob()], file));
-    // }
-    console.log('Input File:');
-    console.log(data.inputFile);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
     const { id } = await uploadFiles(formData).unwrap();
@@ -368,8 +381,6 @@ export default function ExtractionForm() {
       allow_stability_drop: data.allow_stability_drop ? 'True' : 'False',
     };
 
-    console.log(args);
-
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
       profile: data.context_type.value.match(/^\D*/)[0],
@@ -396,10 +407,7 @@ export default function ExtractionForm() {
       jobName: data.jobName || 'Extraction',
       form: data,
     };
-    console.log(params);
     const submitStatus = await submitForm(params).unwrap();
-
-    console.log(submitStatus);
 
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id });
@@ -590,12 +598,14 @@ export default function ExtractionForm() {
             defaultValue={contextTypeOptions[0]}
             options={contextTypeOptions}
             control={control}
+            onChange={handleContextTypeChange}
           />
           <SelectForm
             name="signatureSetName"
             label="Reference Signature Set"
             disabled={submitted || id}
-            options={signatureSetOptions}
+            //options={signatureSetOptions}
+            options={filteredSignatureSetOptions}
             control={control}
           />
           <SelectForm
