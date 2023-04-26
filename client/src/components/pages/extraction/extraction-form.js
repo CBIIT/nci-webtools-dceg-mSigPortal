@@ -632,7 +632,7 @@ export default function ExtractionForm() {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: 'black' }}
-                  className="mb-2"
+                  className="ml-2 mb-2"
                 >
                   <FontAwesomeIcon icon={faGithub} className="mr-1" />
                   GitHub
