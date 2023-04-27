@@ -4,34 +4,34 @@ import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 
 export default function Instructions({ props, loading }) {
-  const examples = [
-    // {
-    //   title: 'Sherlock-Lung-232',
-    //   path: 'sherlock-lung-232',
-    // },
-    // {
-    //   title: 'Mutographs-ESCC',
-    //   path: 'mutographs-escc',
-    // },
-    // {
-    //   title: 'PCAWG Lung-AdenoCA',
-    //   path: 'pcawg-lungadenoca',
-    // },
-    // {
-    //   title: 'PCAWG Lung-SCC',
-    //   path: 'pcawg-lungscc',
-    // },
-    // {
-    //   title: 'PCAWG Breast-AdenoCA',
-    //   path: 'pcawg-breastadenoca',
-    // },
-    // {
-    //   title: 'PCAWG Skin-Melanoma',
-    //   path: 'pcawg-skinmelanoma',
-    // },
-  ];
+  //const examples = [
+  // {
+  //   title: 'Sherlock-Lung-232',
+  //   path: 'sherlock-lung-232',
+  // },
+  // {
+  //   title: 'Mutographs-ESCC',
+  //   path: 'mutographs-escc',
+  // },
+  // {
+  //   title: 'PCAWG Lung-AdenoCA',
+  //   path: 'pcawg-lungadenoca',
+  // },
+  // {
+  //   title: 'PCAWG Lung-SCC',
+  //   path: 'pcawg-lungscc',
+  // },
+  // {
+  //   title: 'PCAWG Breast-AdenoCA',
+  //   path: 'pcawg-breastadenoca',
+  // },
+  // {
+  //   title: 'PCAWG Skin-Melanoma',
+  //   path: 'pcawg-skinmelanoma',
+  // },
+  //];
 
-  const exampleFiles = [
+  const examples = [
     {
       title: 'Example results based on SBS96 profiles',
       path: 'Example_SBS96_SigProfileExtractor',
@@ -66,7 +66,7 @@ export default function Instructions({ props, loading }) {
       </p>
       <h6>SigProfilerExtraction</h6>
 
-      {exampleFiles.map(({ title, external, path }, index) => (
+      {examples.map(({ title, external, path }, index) => (
         <div key={index}>
           <Link to={`/extraction/${path}`} disabled>
             <span className="sr-only">{title + ' link'}</span>
