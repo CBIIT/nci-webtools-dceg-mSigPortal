@@ -34,15 +34,15 @@ export default function Instructions({ props, loading }) {
   const exampleFiles = [
     {
       title: 'Example results based on SBS96 profiles',
-      path: 'extraction-SBS96',
+      path: 'Example_SBS96_SigProfileExtractor',
     },
     {
       title: 'Example results based on DBS78 profiles',
-      path: 'extraction-DBS78',
+      path: 'Example_DBS78_SigProfileExtractor',
     },
     {
       title: 'Example results based on ID83 profiles',
-      path: 'extraction-ID83',
+      path: 'Example_ID83_SigProfileExtractor',
     },
   ];
 
@@ -64,7 +64,7 @@ export default function Instructions({ props, loading }) {
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
       </p>
-      <h5>SigProfilerExtraction</h5>
+      <h6>SigProfilerExtraction</h6>
 
       {exampleFiles.map(({ title, external, path }, index) => (
         <div key={index}>
