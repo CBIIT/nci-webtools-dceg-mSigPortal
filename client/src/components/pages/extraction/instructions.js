@@ -31,7 +31,20 @@ export default function Instructions({ props, loading }) {
     // },
   ];
 
-  const exampleFiles = [];
+  const exampleFiles = [
+    {
+      title: 'Example results based on SBS96 profiles',
+      path: 'Example_SBS96_SigProfileExtractor',
+    },
+    {
+      title: 'Example results based on DBS78 profiles',
+      path: 'Example_DBS78_SigProfileExtractor',
+    },
+    {
+      title: 'Example results based on ID83 profiles',
+      path: 'Example_ID83_SigProfileExtractor',
+    },
+  ];
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
@@ -45,16 +58,17 @@ export default function Instructions({ props, loading }) {
       <h4>Data Source</h4>
       <p>Public: Perform analysis using data available on the website</p>
       <p>User: Upload your own data</p>
-      {/* <hr />
+      <hr />
       <h4>Example Queries</h4>
       <p>
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
-      </p> */}
+      </p>
+      <h6>SigProfilerExtraction</h6>
 
-      {/* {examples.map(({ title, external, path }, index) => (
+      {exampleFiles.map(({ title, external, path }, index) => (
         <div key={index}>
-          <Link to={`/exploration/${path}`} disabled>
+          <Link to={`/extraction/${path}`} disabled>
             <span className="sr-only">{title + ' link'}</span>
             {title}
           </Link>
@@ -67,7 +81,7 @@ export default function Instructions({ props, loading }) {
             </span>
           )}
         </div>
-      ))} */}
+      ))}
     </Container>
   );
 }
