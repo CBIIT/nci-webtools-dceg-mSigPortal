@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
-
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { readFile, parseMatrix } from '../../../controls/utils/utils';
@@ -34,7 +33,12 @@ export default function MsLandscapePlot({ state, variableFile }) {
   return (
     <div style={{ minHeight: '500px' }}>
       <LoadingOverlay active={isFetching} />
-      {error && <p className="p-3 text-danger">{error}</p>}
+      {error && (
+        <p className="p-3 text-danger">
+          {error.name}
+          {error.message}
+        </p>
+      )}
       {data && (
         <Plotly data={data.traces} layout={data.layout} config={data.config} />
       )}

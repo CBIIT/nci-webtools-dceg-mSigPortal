@@ -18,7 +18,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
             dendrogram
           );
         } else {
-          return false;
+          throw new Error(data.stdout);
         }
       },
     }),
