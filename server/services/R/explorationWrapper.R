@@ -868,8 +868,8 @@ msLandscape <- function(args, ...) {
   if (dim(mdata)[2] > 1) {
     rownames(mdata) <- transformExposure$sample
     clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
-    cluster <- ifelse(dim(mdata)[2] > 1, factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE), list())
-
+    cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
+    
     # create ggplot plotly dendrogram
     dendrogramPlot <- ggdendro::ggdendrogram(cluster)
     dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
