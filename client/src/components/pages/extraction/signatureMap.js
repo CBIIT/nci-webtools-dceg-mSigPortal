@@ -56,11 +56,16 @@ export default function SignatureMap({ state }) {
       setDecomposed(row['Global NMF Signatures']);
     }
   }, [table]);
+
   // select initial reference signature
   useEffect(() => {
-    if (refSigOptions.length && !referenceSignature)
+    if (
+      refSigOptions.length &&
+      (!referenceSignature ||
+        !refSigOptions.some((e) => e.label === referenceSignature.label))
+    )
       setValue('referenceSignature', refSigOptions[0]);
-  }, [refSigOptions]);
+  }, [refSigOptions, referenceSignature]);
 
   // table options
   const options = {
@@ -109,14 +114,16 @@ export default function SignatureMap({ state }) {
           </Col>
         </Row>
       </div>
-      {referenceSignature?.value && Object.keys(refSigPlots).length > 0 && (
-        <div className="border rounded mt-3">
-          <Plotly
-            data={refSigPlots[referenceSignature.value].traces}
-            layout={refSigPlots[referenceSignature.value].layout}
-          />
-        </div>
-      )}
+      {referenceSignature?.value &&
+        Object.keys(refSigPlots).length > 0 &&
+        refSigPlots[referenceSignature.value] && (
+          <div className="border rounded mt-3">
+            <Plotly
+              data={refSigPlots[referenceSignature.value].traces}
+              layout={refSigPlots[referenceSignature.value].layout}
+            />
+          </div>
+        )}
     </div>
   );
 }
