@@ -59,7 +59,11 @@ export async function refresh(req, res, next) {
   try {
     const id = req.params.id;
     const data = await getJobStatus(id);
-    res.json(data);
+    if (typeof data === 'string') {
+      res.status(500).json(data);
+    } else {
+      res.json(data);
+    }
   } catch (error) {
     logger.error('/refreshExtraction Error');
     next(error);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { Button, Nav, Form, Row, Col } from 'react-bootstrap';
+import { Button, Nav, Form, Row, Col, Alert } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { actions as extractionActions } from '../../../services/store/extraction';
@@ -34,10 +34,11 @@ export default function Extraction() {
   );
   const id = useParams().id || state.id || false;
 
-  const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
-    id,
-    { skip: !id }
-  );
+  const {
+    data: refreshStatus,
+    error,
+    refetch: refreshExtraction,
+  } = useRefreshQuery(id, { skip: !id });
 
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
@@ -81,9 +82,9 @@ export default function Extraction() {
 
   useEffect(() => {
     const interval = setInterval(refreshState, 1000 * 60);
-    if (isDone) clearInterval(interval);
+    if (isDone || error) clearInterval(interval);
     return () => clearInterval(interval);
-  }, [isDone, refreshState]);
+  }, [isDone, error, refreshState]);
 
   useEffect(() => {
     if (status && status.status === 'COMPLETED')
@@ -225,6 +226,7 @@ export default function Extraction() {
           <ExtractionForm />
         </SidebarPanel>
         <MainPanel>
+          {error && <Alert variant="danger">Results expired</Alert>}
           {status &&
             status.status === 'COMPLETED' &&
             !['instructions', 'status', 'signatureMap'].includes(
