@@ -100,7 +100,7 @@ export async function runBatchWorker(id, app, taskName, env = process.env) {
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   const jobCommand = new SubmitJobCommand({ // SubmitJobRequest
-    jobName: taskName,
+    jobName: `${taskName}-${id}`,
     jobQueue: BATCH_JOB_QUEUE,
     jobDefinition: BATCH_JOB_DEFINITION,
     containerOverrides: {
