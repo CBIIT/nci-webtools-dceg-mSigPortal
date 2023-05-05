@@ -237,7 +237,6 @@ export default function ExtractionForm() {
 
     email: '',
     jobName: '',
-    gpu: false,
   };
 
   const sbsSample = {
@@ -374,7 +373,6 @@ export default function ExtractionForm() {
       min_nmf_iterations: data.min_nmf_iterations,
       max_nmf_iterations: data.max_nmf_iterations,
       nmf_test_conv: data.nmf_test_conv,
-      gpu: data.gpu ? 'True' : 'False',
       stability: data.stability,
       min_stability: data.min_stability,
       combined_stability: data.combined_stability,

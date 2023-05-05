@@ -222,6 +222,7 @@ export async function extraction(
           : path.join(inputFolder, args.input_data),
       output: path.join(outputFolder),
       signature_database: signatureFilePath,
+      gpu: 'True'
     };
 
     const cliArgs = Object.entries(transformArgs)
