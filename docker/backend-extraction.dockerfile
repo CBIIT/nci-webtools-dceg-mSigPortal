@@ -6,6 +6,7 @@ RUN dnf -y update \
     cairo-devel \
     cmake \
     dnf-plugins-core \
+    gcc \
     git \
     gmp-devel \
     libcurl-devel \
@@ -23,7 +24,7 @@ RUN dnf -y update \
     tar \
     wget \ 
     which \
-    gcc \
+    https://us.download.nvidia.com/tesla/470.182.03/nvidia-driver-local-repo-rhel8-470.182.03-1.0-1.x86_64.rpm \
     && dnf clean all
 
 RUN mkdir -p /deploy/app /deploy/logs
