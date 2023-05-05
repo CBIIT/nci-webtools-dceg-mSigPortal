@@ -23,7 +23,7 @@ export async function submit(req, res, next) {
   };
 
   const type =
-    env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'fargate';
+    env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'batch';
 
   const worker = getWorker(type);
 
