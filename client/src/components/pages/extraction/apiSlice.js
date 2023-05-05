@@ -46,6 +46,12 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
       }),
     }),
 
+    example: builder.query({
+      query: (id) => ({
+        url: `extractionExample/${id}`,
+      }),
+    }),
+
     multiJobStatus: builder.query({
       query: (body) => ({
         url: `refreshExtractionMulti`,
@@ -206,4 +212,5 @@ export const {
   useMultiJobStatusQuery,
   useSignatureMapTableQuery,
   useSignatureMapPlotsQuery,
+  useExampleQuery,
 } = inputFormApiSlice;

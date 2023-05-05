@@ -3,6 +3,8 @@ import { validate } from 'uuid';
 import path from 'path';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
 import { getWorker } from '../../workers.js';
+import { exampleProcessor } from './exampleProcessor.js';
+import { fs } from 'fs';
 
 const env = process.env;
 
@@ -78,9 +80,34 @@ export async function refreshMulti(req, res, next) {
   }
 }
 
+export async function extractionExample(req, res, next) {
+  const id = req.params.id;
+  console.log('ID -------- ', id);
+
+  const { logger } = req.app.locals;
+  try {
+    const exampleFolderPath = '/data/examples/extraction/id'; // path to the example folder
+    if (fs.existsSync(exampleFolderPath)) {
+      console.log('Example Folder exist');
+      const exampleFolderName = path.basename(exampleFolderPath);
+      console.log('exampleFolderName', exampleFolderName);
+      console.log('Params', params);
+      const result = exampleProcessor(exampleFolderName, env);
+      res.json(result);
+    } else {
+      console.log('Example folder does not exist - ID ', id);
+      res.status(404).json({ error: 'Example folder does not exist' });
+    }
+  } catch (error) {
+    logger.error('/extractionExample Error');
+    next(error);
+  }
+}
+
 const router = Router();
 router.post('/submitExtraction/:id?', submit);
 router.get('/refreshExtraction/:id?', refresh);
 router.post('/refreshExtractionMulti', refreshMulti);
+router.get('/extractionExample/:id', extractionExample);
 
 export { router };

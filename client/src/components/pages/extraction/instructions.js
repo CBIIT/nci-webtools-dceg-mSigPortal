@@ -2,35 +2,10 @@ import React from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import { useExampleQuery } from './apiSlice';
+import { useLocation } from 'react-router-dom';
 
 export default function Instructions({ props, loading }) {
-  //const examples = [
-  // {
-  //   title: 'Sherlock-Lung-232',
-  //   path: 'sherlock-lung-232',
-  // },
-  // {
-  //   title: 'Mutographs-ESCC',
-  //   path: 'mutographs-escc',
-  // },
-  // {
-  //   title: 'PCAWG Lung-AdenoCA',
-  //   path: 'pcawg-lungadenoca',
-  // },
-  // {
-  //   title: 'PCAWG Lung-SCC',
-  //   path: 'pcawg-lungscc',
-  // },
-  // {
-  //   title: 'PCAWG Breast-AdenoCA',
-  //   path: 'pcawg-breastadenoca',
-  // },
-  // {
-  //   title: 'PCAWG Skin-Melanoma',
-  //   path: 'pcawg-skinmelanoma',
-  // },
-  //];
-
   const examples = [
     {
       title: 'Example results based on SBS96 profiles',
@@ -45,6 +20,15 @@ export default function Instructions({ props, loading }) {
       path: 'Example_ID83_SigProfileExtractor',
     },
   ];
+  const location = useLocation();
+  const pathParts = location.pathname.split('/');
+  const id = pathParts[pathParts.length - 1];
+  console.log('id', id);
+
+  const { data: exampleData, refetch: refreshExtraction } = useExampleQuery(
+    id,
+    { skip: !id }
+  );
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
