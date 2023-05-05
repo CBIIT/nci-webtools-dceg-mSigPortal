@@ -13,6 +13,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { createLogger } from 'winston';
 import { mkdir, writeFile, readFile, copyFile } from 'fs/promises';
+import { copy, move, emptyDir } from 'fs-extra';
 
 //import env from './env.js';
 //import params from "./params_SBS96.js";
@@ -155,7 +156,7 @@ export async function exampleProcessor(exampleID, env) {
     // logger.info(params);
     if (!id) throw new Error('Missing id');
     //if (!validator.isUUID(id)) throw new Error("Invalid id");
-
+    const exampleFolderPath = `/data/examples/extraction/${id}`;
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
 
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
@@ -173,6 +174,9 @@ export async function exampleProcessor(exampleID, env) {
     );
 
     // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+
+    //copy example folder into outputFolder
+    await copy(exampleFolderPath, outputFolder);
 
     const connection = dbConnection;
     const limit = false;

@@ -4,8 +4,7 @@ import path from 'path';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 import { exampleProcessor } from './exampleProcessor.js';
-import { fs } from 'fs';
-
+import fs from 'fs';
 const env = process.env;
 
 export async function submit(req, res, next) {
@@ -81,17 +80,17 @@ export async function refreshMulti(req, res, next) {
 }
 
 export async function extractionExample(req, res, next) {
-  const id = req.params.id;
-  console.log('ID -------- ', id);
-
   const { logger } = req.app.locals;
   try {
-    const exampleFolderPath = '/data/examples/extraction/id'; // path to the example folder
+    const id = req.params.id;
+    console.log('ID -------- ', id);
+    const exampleFolderPath = `/data/examples/extraction/${id}`; // path to the example folder
+    console.log('exampleFolderPath: ++++ ', exampleFolderPath);
     if (fs.existsSync(exampleFolderPath)) {
-      console.log('Example Folder exist');
+      console.log('Example Folder exist', exampleFolderPath);
       const exampleFolderName = path.basename(exampleFolderPath);
       console.log('exampleFolderName', exampleFolderName);
-      console.log('Params', params);
+      console.log('Params', req.params);
       const result = exampleProcessor(exampleFolderName, env);
       res.json(result);
     } else {
@@ -99,7 +98,8 @@ export async function extractionExample(req, res, next) {
       res.status(404).json({ error: 'Example folder does not exist' });
     }
   } catch (error) {
-    logger.error('/extractionExample Error');
+    logger.error('/extractionExample Error', error);
+    console.log("'/extractionExample Error'");
     next(error);
   }
 }
