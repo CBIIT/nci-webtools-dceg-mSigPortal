@@ -28,6 +28,7 @@ export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
               fetchWithBQ(`data/input/${id}/params.json`),
               fetchWithBQ(`data/output/${id}/manifest.json`),
             ]);
+          if (!status && !params && !manifest) return { error: 'invalid id' };
           return { data: { status, params, manifest } };
         } catch (error) {
           return { error };

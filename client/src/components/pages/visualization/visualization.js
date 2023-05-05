@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
+import { Form, Row, Col, Nav, Button, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import {
   SidebarContainer,
@@ -32,8 +32,8 @@ export default function Visualization() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
+  // const mergeError = (msg) =>
+  //   dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { main, publicForm, mutationalProfiles } = useSelector(
     (state) => state.visualization
@@ -49,7 +49,11 @@ export default function Visualization() {
   } = main;
 
   const id = useParams().id || state.id;
-  const { data: jobInfo, refetch: refreshJob } = useRefreshQuery(id, {
+  const {
+    data: jobInfo,
+    error: refreshError,
+    refetch: refreshJob,
+  } = useRefreshQuery(id, {
     skip: !id,
   });
   const status = jobInfo?.status;
@@ -261,6 +265,7 @@ export default function Visualization() {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel className="col-lg-9 col-md-7">
+          {refreshError && <Alert variant="danger">Results expired</Alert>}
           {status && status.status === 'SUBMITTED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
