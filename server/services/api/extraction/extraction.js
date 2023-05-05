@@ -37,7 +37,10 @@ export async function submit(req, res, next) {
 
 // downloads latest files from s3 and returns status, params, and manifest
 async function getJobStatus(id) {
-  if (!validate(id)) return `${id} is not a valid ID`;
+  //if (!validate(id)) return `${id} is not a valid ID`;
+  if (!/^Example_/.test(id) && !validate(id)) {
+    return `${id} is not a valid ID`;
+  }
   try {
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);

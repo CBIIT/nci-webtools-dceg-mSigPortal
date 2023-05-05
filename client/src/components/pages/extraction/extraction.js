@@ -34,6 +34,8 @@ export default function Extraction() {
   );
   const id = useParams().id || state.id || false;
 
+  console.log('---ID : ', id);
+
   const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
     id,
     { skip: !id }
@@ -50,6 +52,7 @@ export default function Extraction() {
   // });
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
+  console.log('isDone ', isDone);
   const explorationId = (() => {
     if (isDone) {
       switch (explorationType) {
