@@ -306,11 +306,9 @@ export default function Visualization() {
                   state={{ ...publicForm, ...main, mutationalProfiles, id }}
                 />
               </div>
-              <div
-                className={displayTab === 'treeAndLeaf' ? 'd-block' : 'd-none'}
-              >
+              {displayTab === 'treeAndLeaf' && (
                 <TreeAndLeaf state={{ ...publicForm, ...main, id }} />
-              </div>
+              )}
               <div
                 className={
                   displayTab === 'cosineSimilarity' ? 'd-block' : 'd-none'
