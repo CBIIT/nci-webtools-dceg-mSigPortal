@@ -71,9 +71,9 @@ export default function Visualization() {
   // refresh job status every minute
   useEffect(() => {
     const interval = setInterval(refreshState, 1000 * 60);
-    if (isDone) clearInterval(interval);
+    if (isDone || refreshError) clearInterval(interval);
     return () => clearInterval(interval);
-  }, [isDone, refreshState]);
+  }, [isDone, refreshError, refreshState]);
   // switch to first tab when job is complete
   useEffect(() => {
     if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
