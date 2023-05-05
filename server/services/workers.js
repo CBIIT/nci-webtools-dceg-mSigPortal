@@ -95,49 +95,16 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
  * @returns {Promise<Batch.>} task output
  */
 export async function runBatchWorker(id, app, taskName, env = process.env) {
-  const { BATCH_JOB_QUEUE, BATCH_INSTANCE_TYPE, BATCH_INSTANCE_CPUS, BATCH_INSTANCE_GPUS, BATCH_INSTANCE_MEMORY } = env;
-  const taskTypes = {
-    visualization: { 
-      name: 'worker', 
-      jobDefinition: env.BATCH_WORKER_JOB_DEFINITION 
-    },
-    extraction: {
-      name: 'extraction-worker',
-      jobDefinition: env.BATCH_EXTRACTION_WORKER_JOB_DEFINITION,
-    },
-  };
+  const { BATCH_JOB_QUEUE, BATCH_JOB_DEFINITION } = env;
   const client = new BatchClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   const jobCommand = new SubmitJobCommand({ // SubmitJobRequest
     jobName: taskName,
     jobQueue: BATCH_JOB_QUEUE,
-    jobDefinition: taskTypes[taskName].jobDefinition,
-    nodeOverrides: {
-      numNodes: 1,
-      nodePropertyOverrides: [
-        { 
-          targetNodes: "0",
-          containerOverrides: {
-            command: workerCommand,
-            instanceType: BATCH_INSTANCE_TYPE,
-            resourceRequirements: [
-              {
-                value: BATCH_INSTANCE_GPUS,
-                type: "GPU",
-              },
-              {
-                value: BATCH_INSTANCE_CPUS,
-                type: "VCPU",
-              },
-              {
-                value: BATCH_INSTANCE_MEMORY,
-                type: "MEMORY",
-              },
-            ],
-          },
-        },
-      ],
+    jobDefinition: BATCH_JOB_DEFINITION,
+    containerOverrides: {
+      command: workerCommand,
     },
     propagateTags: true,
   });
