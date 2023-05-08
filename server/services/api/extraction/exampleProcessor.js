@@ -1,4 +1,10 @@
-import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
+import {
+  readdir,
+  unlinkSync,
+  readdirSync,
+  writeFileSync,
+  createReadStream,
+} from 'fs';
 import path from 'path';
 import { stringify } from 'csv-stringify';
 import { groupBy } from 'lodash-es';
@@ -54,8 +60,8 @@ export async function exampleProcessor(exampleID, env) {
       matrix: '78',
     },
     id: 'Example_DBS78_SigProfileExtractor',
-    email: 'thuong.nguyen@nih.gov',
-    jobName: 'lou-examples-pub',
+    email: '',
+    jobName: 'examples-pub',
     form: {
       source: 'public',
       study: { label: 'PCAWG', value: 'PCAWG' },
@@ -137,19 +143,23 @@ export async function exampleProcessor(exampleID, env) {
 
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
   let paths = await getPaths(params, env);
-  paths = {
-    ...paths,
-    //status: {
-    id: id,
-    status: 'COMPLETED',
-    submittedAt: '2023-04-26T21:53:26.916Z',
-    // },
-  };
-
+  console.log('PATHS: ----');
   console.log(paths);
+
+  // paths = {
+  //   ...paths,
+  //   //status: {
+  //   id: id,
+  //   status: 'COMPLETED',
+  //   submittedAt: timestamp,
+  //   // },
+  // };
+
   // const submittedTime = new Date(
   //   (await readJson(paths.statusFile)).submittedAt
   // );
+  console.log('PATHS UPDATES ......');
+  console.log(paths);
 
   try {
     // logger.info(id);
@@ -162,11 +172,15 @@ export async function exampleProcessor(exampleID, env) {
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
+
+    //copy example folder into outputFolder
+    await copy(exampleFolderPath, outputFolder);
+
     await writeJson(paths.paramsFile, params);
     // await writeJson(paths.statusFile, {
     //   ...(await readJson(paths.statusFile)),
     //   id,
-    //   status: "IN_PROGRESS",
+    //   status: 'IN_PROGRESS',
     // });
     await writeJson(
       paths.manifestFile,
@@ -174,9 +188,6 @@ export async function exampleProcessor(exampleID, env) {
     );
 
     // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
-
-    //copy example folder into outputFolder
-    await copy(exampleFolderPath, outputFolder);
 
     const connection = dbConnection;
     const limit = false;
@@ -237,7 +248,7 @@ export async function exampleProcessor(exampleID, env) {
         limit
       );
 
-      //console.log("seqmatrixData", seqmatrixData);
+      console.log('=============seqmatrixData', seqmatrixData);
 
       // transform data into format accepted by SigProfiler
       // Extract unique mutation types and samples
@@ -296,6 +307,8 @@ export async function exampleProcessor(exampleID, env) {
           }
         );
       });
+
+      console.log('seqmatrixFilePath ========= ', seqmatrixFilePath);
       // Write the TSV string to the file using writeFileSync
       writeFileSync(seqmatrixFilePath, tsvString);
       //logger.info("Result written to signature.tsv");
@@ -356,46 +369,6 @@ export async function exampleProcessor(exampleID, env) {
     // ];
 
     // console.log(transformSignatures);
-
-    const transformSignatures = [];
-
-    // iterate through each object in decomposedSignatures array
-    decomposedSignatures.forEach((decomposedSig) => {
-      const { MutationsType, ...mutations } = decomposedSig; // extract MutationsType and values
-      Object.entries(mutations).forEach(([signatureName, value]) => {
-        transformSignatures.push({
-          signatureName,
-          MutationType: MutationsType,
-          mutations: value,
-        });
-      });
-    });
-
-    // iterate through each object in denovoSignatures array
-    denovoSignatures.forEach((denovoSig) => {
-      const { MutationsType, ...mutations } = denovoSig; // extract MutationsType and values
-      Object.entries(mutations).forEach(([signatureName, value]) => {
-        transformSignatures.push({
-          signatureName,
-          MutationType: MutationsType,
-          mutations: value,
-        });
-      });
-    });
-
-    //console.log(transformSignatures);
-
-    const localDb = knex({
-      client: 'better-sqlite3',
-      connection: {
-        filename: path.join(outputFolder, `local.sqlite3`),
-      },
-      useNullAsDefault: true,
-      pool: { min: 0, max: 100 },
-    });
-    console.log('localDb', localDb);
-    await importUserSession(localDb, { signature: transformSignatures });
-    console.log('localDb created!!!----------');
 
     // parse signatureMap csv to JSON
     const signatureMap = await parseCSV(paths.signatureMapFile);
@@ -531,6 +504,10 @@ export async function exampleProcessor(exampleID, env) {
           signatureFile: path.parse(paths.decomposedSignatureInput).base,
         }
       );
+      console.log(
+        'MATRIX FILE =================== ',
+        path.parse(seqmatrixFilePath).base
+      );
       console.log('decomposedExploration-----------');
       console.log(decomposedExploration);
       decomposedId = decomposedExploration.data;
@@ -543,12 +520,20 @@ export async function exampleProcessor(exampleID, env) {
       throw error.data;
     }
 
+    console.log('PATHS ------ ', paths);
+
     // add exploration ids to manifest
+    // await writeJson(paths.manifestFile, {
+    //   ...mapValues(paths, (value) => path.parse(value).base),
+    //   denovoId,
+    //   decomposedId,
+    // });
     await writeJson(paths.manifestFile, {
       ...mapValues(paths, (value) => path.parse(value).base),
       denovoId,
       decomposedId,
     });
+    console.log('------- WROTE EXPLORATION ID INTO MANIFEST FILE --------');
 
     // write success status
     await writeJson(paths.statusFile, {
@@ -556,87 +541,77 @@ export async function exampleProcessor(exampleID, env) {
       status: 'COMPLETED',
     });
 
-    // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
+    const transformSignatures = [];
 
-    // // upload denovo output
-    // await uploadDirectory(
-    //   path.resolve(env.OUTPUT_FOLDER, denovoId),
-    //   path.join(env.OUTPUT_KEY_PREFIX, denovoId),
-    //   env.DATA_BUCKET,
-    //   { region: env.AWS_DEFAULT_REGION }
-    // );
+    // iterate through each object in decomposedSignatures array
+    decomposedSignatures.forEach((decomposedSig) => {
+      const { MutationsType, ...mutations } = decomposedSig; // extract MutationsType and values
+      Object.entries(mutations).forEach(([signatureName, value]) => {
+        transformSignatures.push({
+          signatureName,
+          MutationType: MutationsType,
+          mutations: value,
+        });
+      });
+    });
 
-    // // upload decmoposed output
-    // await uploadDirectory(
-    //   path.resolve(env.OUTPUT_FOLDER, decomposedId),
-    //   path.join(env.OUTPUT_KEY_PREFIX, decomposedId),
-    //   env.DATA_BUCKET,
-    //   { region: env.AWS_DEFAULT_REGION }
-    // );
+    // iterate through each object in denovoSignatures array
+    denovoSignatures.forEach((denovoSig) => {
+      const { MutationsType, ...mutations } = denovoSig; // extract MutationsType and values
+      Object.entries(mutations).forEach(([signatureName, value]) => {
+        transformSignatures.push({
+          signatureName,
+          MutationType: MutationsType,
+          mutations: value,
+        });
+      });
+    });
+
+    //console.log(transformSignatures);
+
+    const filePath = path.join(outputFolder, 'local.sqlite3');
+   
+    // Check if the file exists
+    if (readdirSync(outputFolder).includes('local.sqlite3')) {
+      console.log('File exists. Deleting...');
+      // If the file exists, remove it
+      try {
+        unlinkSync(filePath);
+        console.log('File deleted.');
+      } catch (err) {
+        console.error('Error deleting file:', err);
+      }
+    } else {
+      console.log('File does not exist. Continuing...');
+    }
+
+    // Create a new file with the same name
+    const localDb = knex({
+      client: 'better-sqlite3',
+      connection: {
+        filename: filePath,
+        createIfNotExist: true,
+      },
+      useNullAsDefault: true,
+      pool: { min: 0, max: 100 },
+    });
+
+    console.log('localDb', localDb);
+
+    await importUserSession(localDb, { signature: transformSignatures });
+
+    console.log('localDb created!!!----------');
+
     logger.debug(
       `Execution Time: ${
         (new Date().getTime() - submittedTime.getTime()) / 1000
       }`
     );
 
-    // send success notification if email was provided
-    //   if (params.email) {
-    //     logger.info(`[${id}] Sending success notification`);
-    //     await sendNotification(
-    //       params.email,
-    //       `mSigPortal - Extraction Complete - ${params.jobName}`,
-    //       'templates/user-success-email.html',
-    //       {
-    //         jobName: params.jobName,
-    //         submittedAt: submittedTime.toISOString(),
-    //         executionTime:
-    //           (new Date().getTime() - submittedTime.getTime()) / 1000,
-    //         resultsUrl: path.join(env.APP_BASE_URL, '#', 'extraction', id),
-    //       }
-    //     );
-    //   }
-    //   return { id };
-    // } catch (error) {
-    //   // send error notification if email was provided
-    //   logger.error(`[${id}] Sending error notification`);
-    //   logger.error(error);
-    //   await writeJson(paths.statusFile, {
-    //     ...(await readJson(paths.statusFile)),
-    //     status: 'FAILED',
-    //     error: { ...error },
-    //   });
-
-    // await uploadWorkingDirectory(
-    //   paths.inputFolder,
-    //   paths.outputFolder,
-    //   id,
-    //   env
-    // );
-    // logger.debug(
-    //   `Execution Time: ${
-    //     (new Date().getTime() - submittedTime.getTime()) / 1000
-    //   }`
-    // );
-    if (params.email) {
-      // await sendNotification(
-      //   params.email,
-      //   `mSigPortal - Extraction Analysis Failed - ${params.jobName}`,
-      //   'templates/user-failure-email.html',
-      //   {
-      //     jobName: params.jobName,
-      //     submittedAt: submittedTime.toISOString(),
-      //     executionTime:
-      //       (new Date().getTime() - submittedTime.getTime()) / 1000,
-      //     error: formatObject(error),
-      //   }
-      // );
-      //
-      // return false;
-    }
-  } finally {
+      } finally {
     // delete input files
     // for await (const file of getFiles(paths.inputFolder)) {
-    //   if (path.basename(file) !== "params.json") {
+    //   if (path.basename(file) !== 'params.json') {
     //     unlinkSync(file);
     //   }
     // }

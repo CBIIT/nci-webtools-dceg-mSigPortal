@@ -21,7 +21,7 @@ import MsAssociation from '../exploration/msAssociation/msAssociation';
 import MsLandscape from '../exploration/msLandscape/msLandscape';
 import MsPrevalence from '../exploration/msPrevalence/msPrevalence';
 import MsIndividual from '../exploration/msIndividual/msIndividual';
-import { useRefreshQuery } from './apiSlice';
+import { useRefreshQuery, useManifestQuery, useStatusQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
@@ -41,15 +41,20 @@ export default function Extraction() {
     { skip: !id }
   );
 
+  const { data: statusData, refetch: refetchStatus } = useStatusQuery(id, {
+    skip: !id,
+  });
+  const { data: manifestData, refetch: refetchManifest } = useManifestQuery(
+    id,
+    {
+      skip: !id,
+    }
+  );
+
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
   const params = refreshStatus?.params;
-  // const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
-  //   skip: !id,
-  // });
-  // const { data: manifest, refetch: refetchManifest } = useManifestQuery(id, {
-  //   skip: !id,
-  // });
+  console.log('manifestData ', manifestData);
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   console.log('isDone ', isDone);
@@ -73,6 +78,8 @@ export default function Extraction() {
       : manifest.denovoId
     : false;
 
+  console.log('explorationId', explorationId);
+  console.log('id2 ', id2);
   const refreshState = useCallback(() => {
     refreshExtraction();
   }, [refreshExtraction]);

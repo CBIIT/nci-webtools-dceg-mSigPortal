@@ -14,7 +14,9 @@ export default function dbs78(data1, data2, tab) {
     TG: '#CB98FD',
     TT: '#4C0299',
   };
-
+  console.log('Data1 ', data1);
+  console.log('Data 2', data2);
+  console.log(tab);
   const mutationRegex = /^(.{2})/;
   const mutationLabels = (e) => `<b>${e.mutation}>NN</b>`;
   const formatTickLabels = (mutationGroups) =>

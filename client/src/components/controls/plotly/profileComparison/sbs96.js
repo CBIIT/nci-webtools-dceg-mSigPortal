@@ -10,7 +10,9 @@ export default function sbs96(data1, data2, tab) {
     'T>C': '#A1CE63',
     'T>G': '#EBC6C4',
   };
-
+  console.log('Data1 ', data1);
+  console.log('Data 2', data2);
+  console.log(tab);
   const mutationRegex = /\[(.*)\]/;
   const mutationLabels = (e) => `<b>${e.mutation}</b>`;
   const formatTickLabels = (mutationGroups) =>
