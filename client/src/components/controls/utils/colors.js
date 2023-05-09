@@ -1057,7 +1057,7 @@ for (let i = 1; i <= 110; i++) {
   }
 
   // Add the four sub-entries if they don't already exist
-  for (let j = 97; j <= 115; j++) {
+  for (let j = 65; j <= 115; j++) {
     const subKey = `${baseKey}${String.fromCharCode(j)}`;
     if (!originalColorPallet[subKey]) {
       additionalColorPallet[subKey] = `#${Math.floor(

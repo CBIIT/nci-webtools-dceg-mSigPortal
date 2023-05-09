@@ -21,11 +21,6 @@ import { createLogger } from 'winston';
 import { mkdir, writeFile, readFile, copyFile } from 'fs/promises';
 import { copy, move, emptyDir } from 'fs-extra';
 
-//import env from './env.js';
-//import params from "./params_SBS96.js";
-
-//const exampleID = 'Example_SBS96_SigProfilerExtractor';
-
 export async function exampleProcessor(exampleID, env) {
   const params = {
     args: {
@@ -48,31 +43,31 @@ export async function exampleProcessor(exampleID, env) {
       allow_stability_drop: 'False',
     },
     signatureQuery: {
-      signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
+      signatureSetName: 'COSMIC_v3_Signatures_GRCh37_DBS78',
       profile: 'DBS',
       matrix: '78',
     },
     seqmatrixQuery: {
-      study: 'PCAWG',
-      cancer: 'Lung-AdenoCA',
+      study: 'Sherlock-Lung-232',
+      cancer: 'LCINS',
       strategy: 'WGS',
       profile: 'DBS',
       matrix: '78',
     },
     id: 'Example_DBS78_SigProfileExtractor',
     email: '',
-    jobName: 'examples-pub',
+    jobName: 'Examples-DBS78',
     form: {
       source: 'public',
-      study: { label: 'PCAWG', value: 'PCAWG' },
-      cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+      study: { label: 'Sherlock-Lung-232', value: 'Sherlock-Lung-232' },
+      cancer: { label: 'LCINS', value: 'LCINS' },
       strategy: { label: 'WGS', value: 'WGS' },
       input_type: { label: 'matrix', value: 'matrix' },
       reference_genome: { label: 'GRCh37', value: 'GRCh37' },
       exome: false,
       signatureSetName: {
-        label: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
-        value: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
+        label: 'COSMIC_v3_Signatures_GRCh37_DBS78',
+        value: 'COSMIC_v3_Signatures_GRCh37_DBS78',
       },
       signatureName: [{ label: 'all', value: 'all' }],
       extractTool: {
@@ -82,7 +77,7 @@ export async function exampleProcessor(exampleID, env) {
       matrix_normalization: 'gmm',
       nmf_init: 'random',
       precision: 'single',
-      email: 'thuong.nguyen@nih.gov',
+      email: '',
       jobName: exampleID,
       gpu: false,
       minimum_signatures: '1',
@@ -111,16 +106,17 @@ export async function exampleProcessor(exampleID, env) {
         console.log('profileType ', profileType);
         console.log('matrixSize ', matrixSize);
         params.args.context_type = profileType + matrixSize;
-        params.signatureQuery.signatureSetName = `COSMIC_v3.3_Signatures_GRCh37_${profileType}${matrixSize}`;
+        params.signatureQuery.signatureSetName = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.signatureQuery.profile = profileType;
         params.signatureQuery.matrix = matrixSize;
         params.seqmatrixQuery.profile = profileType;
         params.seqmatrixQuery.matrix = matrixSize;
         params.id = `Example_${profileType}${matrixSize}_SigProfileExtractor`;
-        params.form.signatureSetName.value = `COSMIC_v3.3_Signatures_${profileType}${matrixSize}`;
-        params.form.signatureSetName.label = `COSMIC_v3.3_Signatures_${profileType}${matrixSize}`;
+        params.form.signatureSetName.value = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
+        params.form.signatureSetName.label = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.form.context_type.label = `${profileType}${matrixSize}`;
         params.form.context_type.value = `${profileType}${matrixSize}`;
+        params.jobName = `Example_${profileType}${matrixSize}_SigProfileExtractor`;
       } else {
         throw new Error(`Invalid example ID: ${exampleID}`);
       }
@@ -570,7 +566,7 @@ export async function exampleProcessor(exampleID, env) {
     //console.log(transformSignatures);
 
     const filePath = path.join(outputFolder, 'local.sqlite3');
-   
+
     // Check if the file exists
     if (readdirSync(outputFolder).includes('local.sqlite3')) {
       console.log('File exists. Deleting...');
@@ -607,8 +603,7 @@ export async function exampleProcessor(exampleID, env) {
         (new Date().getTime() - submittedTime.getTime()) / 1000
       }`
     );
-
-      } finally {
+  } finally {
     // delete input files
     // for await (const file of getFiles(paths.inputFolder)) {
     //   if (path.basename(file) !== 'params.json') {
