@@ -33,6 +33,7 @@ export default function Extraction() {
     (state) => state.extraction
   );
   const id = useParams().id || state.id || false;
+  console.log('ID ', id);
 
   const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
     id,
@@ -268,6 +269,8 @@ export default function Extraction() {
                     <p>
                       {manifest.matrixFile
                         ? manifest.matrixFile
+                        : id.toLowerCase().includes('example')
+                        ? 'example-data'
                         : 'public-data'}
                     </p>
                   </Col>
