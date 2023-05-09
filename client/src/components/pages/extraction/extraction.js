@@ -34,8 +34,6 @@ export default function Extraction() {
   );
   const id = useParams().id || state.id || false;
 
-  console.log('---ID : ', id);
-
   const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
     id,
     { skip: !id }
@@ -54,10 +52,10 @@ export default function Extraction() {
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
   const params = refreshStatus?.params;
-  console.log('manifestData ', manifestData);
+  //console.log('manifestData ', manifestData);
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
-  console.log('isDone ', isDone);
+  //console.log('isDone ', isDone);
   const explorationId = (() => {
     if (isDone) {
       switch (explorationType) {
@@ -78,8 +76,8 @@ export default function Extraction() {
       : manifest.denovoId
     : false;
 
-  console.log('explorationId', explorationId);
-  console.log('id2 ', id2);
+  // console.log('explorationId', explorationId);
+  // console.log('id2 ', id2);
   const refreshState = useCallback(() => {
     refreshExtraction();
   }, [refreshExtraction]);
