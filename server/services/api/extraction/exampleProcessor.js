@@ -103,8 +103,7 @@ export async function exampleProcessor(exampleID, env) {
       if (match) {
         const profileType = match[1];
         const matrixSize = match[2];
-        console.log('profileType ', profileType);
-        console.log('matrixSize ', matrixSize);
+
         params.args.context_type = profileType + matrixSize;
         params.signatureQuery.signatureSetName = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.signatureQuery.profile = profileType;
@@ -124,8 +123,6 @@ export async function exampleProcessor(exampleID, env) {
       throw new Error(`Invalid example ID: ${exampleID}`);
     }
   }
-  console.log('+++++++ PARAMS +++++++++', params);
-
   const dbConnection = knex({
     client: 'postgres',
     connection: {
@@ -139,23 +136,10 @@ export async function exampleProcessor(exampleID, env) {
 
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
   let paths = await getPaths(params, env);
-  console.log('PATHS: ----');
-  console.log(paths);
-
-  // paths = {
-  //   ...paths,
-  //   //status: {
-  //   id: id,
-  //   status: 'COMPLETED',
-  //   submittedAt: timestamp,
-  //   // },
-  // };
 
   // const submittedTime = new Date(
   //   (await readJson(paths.statusFile)).submittedAt
   // );
-  console.log('PATHS UPDATES ......');
-  console.log(paths);
 
   try {
     // logger.info(id);
@@ -198,11 +182,8 @@ export async function exampleProcessor(exampleID, env) {
       limit
     );
 
-    console.log('signatureData');
-    //console.log(signatureData);
     // transform data into format accepted by SigProfiler
     const groupByType = groupBy(signatureData, (e) => e.mutationType);
-    //console.log(groupByType);
     const transposeSignature = Object.values(groupByType).map((signatures) =>
       signatures.reduce((obj, e) => {
         return {
@@ -244,14 +225,11 @@ export async function exampleProcessor(exampleID, env) {
         limit
       );
 
-      console.log('=============seqmatrixData', seqmatrixData);
-
       // transform data into format accepted by SigProfiler
       // Extract unique mutation types and samples
       const mutationTypes = [
         ...new Set(seqmatrixData.map((d) => d.mutationType)),
       ];
-      //console.log(mutationTypes);
       const samples = [...new Set(seqmatrixData.map((d) => d.sample))];
 
       // Initialize the result object with mutation types as keys
@@ -273,7 +251,6 @@ export async function exampleProcessor(exampleID, env) {
           result[mt][s] = count;
         });
       });
-      //console.log(result);
       // Write the result to a TSV file using csv-stringify
       const headers = ['MutationType', ...samples];
       const rows = Object.entries(result).map(([mt, counts]) => [
@@ -304,7 +281,6 @@ export async function exampleProcessor(exampleID, env) {
         );
       });
 
-      console.log('seqmatrixFilePath ========= ', seqmatrixFilePath);
       // Write the TSV string to the file using writeFileSync
       writeFileSync(seqmatrixFilePath, tsvString);
       //logger.info("Result written to signature.tsv");
@@ -364,8 +340,6 @@ export async function exampleProcessor(exampleID, env) {
     //   ...denovoSignatures.map(signatureMapping).flat(),
     // ];
 
-    // console.log(transformSignatures);
-
     // parse signatureMap csv to JSON
     const signatureMap = await parseCSV(paths.signatureMapFile);
     await writeJson(paths.signatureMapJson, signatureMap);
@@ -388,35 +362,28 @@ export async function exampleProcessor(exampleID, env) {
           createReadStream(seqmatrixFilePath)
         );
       }
-      console.log('denovoFormData 1 --------');
-      console.log(denovoFormData);
+
       denovoFormData.append(
         'exposureFile',
         createReadStream(paths.denovoExposureInput)
       );
 
-      console.log('denovoFormData 2 --------');
-      console.log(denovoFormData);
       denovoFormData.append(
         'signatureFile',
         createReadStream(paths.denovoSignatureInput)
       );
-      console.log('denovoFormData 3 --------');
-      console.log(denovoFormData);
+
       // const denovoUpload = await axios.post(
       //   `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
       //   denovoFormData,
       //   { headers: denovoFormData.getHeaders() }
       // );
-      console.log('------ before denovoUpload ---------------------------- ');
       const denovoUpload = await axios.post(
         `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
         denovoFormData,
         { headers: denovoFormData.getHeaders() }
       );
 
-      console.log('denovoUpload ----------------------------');
-      console.log(denovoUpload);
       const denovoExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
         {
@@ -431,15 +398,11 @@ export async function exampleProcessor(exampleID, env) {
           signatureFile: path.parse(paths.denovoSignatureInput).base,
         }
       );
-      console.log('----------------denovoExploration');
-      console.log(denovoExploration);
+
       denovoId = denovoExploration.data;
-      console.log('denovoId------------------');
-      console.log(denovoId);
     } catch (error) {
       //logger.error("Denovo Exploration Error");
-      console.log('Denovo Exploration Error');
-      console.log(error);
+
       throw error.data;
     }
 
@@ -461,33 +424,23 @@ export async function exampleProcessor(exampleID, env) {
           createReadStream(seqmatrixFilePath)
         );
       }
-      console.log('---- Decomposed 1 --------------------------');
-      console.log(decomposedFormData);
+
       decomposedFormData.append(
         'exposureFile',
         createReadStream(paths.decomposedExposureInput)
       );
 
-      console.log('---- Decomposed 2 --------------------------');
-      console.log(decomposedFormData);
       decomposedFormData.append(
         'signatureFile',
         createReadStream(paths.decomposedSignatureInput)
       );
 
-      console.log('---- Decomposed 3 --------------------------');
-      console.log(decomposedFormData);
-      console.log(
-        '------ before decomposedUpload ---------------------------- '
-      );
       const decomposedUpload = await axios.post(
         `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
         decomposedFormData,
         { headers: decomposedFormData.getHeaders() }
       );
 
-      console.log('--------------decomposedUpload');
-      console.log(decomposedUpload);
       const decomposedExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
@@ -500,23 +453,13 @@ export async function exampleProcessor(exampleID, env) {
           signatureFile: path.parse(paths.decomposedSignatureInput).base,
         }
       );
-      console.log(
-        'MATRIX FILE =================== ',
-        path.parse(seqmatrixFilePath).base
-      );
-      console.log('decomposedExploration-----------');
-      console.log(decomposedExploration);
+
       decomposedId = decomposedExploration.data;
-      console.log('----------------- decomposedId');
-      console.log(decomposedId);
     } catch (error) {
       //logger.error("Decomposed Exploration Error");
-      console.log('Decomposed Exploration Error');
-      console.log(error);
+
       throw error.data;
     }
-
-    console.log('PATHS ------ ', paths);
 
     // add exploration ids to manifest
     // await writeJson(paths.manifestFile, {
@@ -529,7 +472,6 @@ export async function exampleProcessor(exampleID, env) {
       denovoId,
       decomposedId,
     });
-    console.log('------- WROTE EXPLORATION ID INTO MANIFEST FILE --------');
 
     // write success status
     await writeJson(paths.statusFile, {
@@ -591,8 +533,6 @@ export async function exampleProcessor(exampleID, env) {
       useNullAsDefault: true,
       pool: { min: 0, max: 100 },
     });
-
-    console.log('localDb', localDb);
 
     await importUserSession(localDb, { signature: transformSignatures });
 
