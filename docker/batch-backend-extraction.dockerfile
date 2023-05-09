@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+FROM nvidia/cuda:11.8.0-runtime-rockylinux8
 
 RUN dnf -y update \
     && dnf -y install \
@@ -19,11 +19,12 @@ RUN dnf -y update \
     python3-devel \
     python3-pip \
     python3-setuptools \
-    python3-wheel \
+    # python3-wheel \
     rsync \
     tar \
     wget \ 
     which \
+    # https://us.download.nvidia.com/tesla/470.182.03/nvidia-driver-local-repo-rhel8-470.182.03-1.0-1.x86_64.rpm \
     && dnf clean all
 
 RUN mkdir -p /deploy/app /deploy/logs
