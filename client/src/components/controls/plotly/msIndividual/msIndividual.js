@@ -20,7 +20,6 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
-  console.log('MS Individual data ', data);
   const exposureData = data[0].data;
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
@@ -132,7 +131,7 @@ export function MsIndividualComparison(
     mutationRegex,
     mutationGroupSort
   );
-  console.log('groupOriginal------------------------', groupOriginal);
+
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
   );

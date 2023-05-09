@@ -46,14 +46,14 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
-        console.log('msIndividual: ', res);
+
         let profile;
 
-        console.log('_arg, ', _arg);
-        console.log(
-          ' _arg.params_activity.userId ---- ',
-          _arg.params_activity.userId
-        );
+        // console.log('_arg, ', _arg);
+        // console.log(
+        //   ' _arg.params_activity.userId ---- ',
+        //   _arg.params_activity.userId
+        // );
 
         if (_arg.params_activity.userId) {
           // if (
@@ -66,10 +66,10 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
               res[0].data.filter((o) => o['exposure'] > 0.01),
               'signatureName'
             );
-            console.log(
-              'exposure_groupBySignature ',
-              exposure_groupBySignature
-            );
+            // console.log(
+            //   'exposure_groupBySignature ',
+            //   exposure_groupBySignature
+            // );
             const signatureNames = Object.keys(exposure_groupBySignature).map(
               (e) => e
             );
@@ -89,7 +89,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             profile = 'No data / Data is missing';
           }
         }
-        console.log('profile ', profile);
+        //console.log('profile ', profile);
         if (profile === 'SBS96' || profile.includes('SBS')) {
           return { data: sbs96(res, _arg, 'msIndividual') };
         } else if (profile === 'DBS78' || profile.includes('DBS')) {

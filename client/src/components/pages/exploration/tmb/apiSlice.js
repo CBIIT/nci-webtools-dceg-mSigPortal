@@ -42,7 +42,6 @@ export const tmbApiSlice = explorationApiSlice.injectEndpoints({
           })
           .filter((e) => e.medianBurden)
           .sort((a, b) => a.medianBurden - b.medianBurden);
-        console.log('tmb transform ', transform);
 
         return TMB(transform, 'TMB');
       },

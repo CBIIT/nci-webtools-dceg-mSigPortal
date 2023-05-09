@@ -3,7 +3,6 @@ import TmbPlot from './tmb-plot';
 import Description from '../../../controls/description/description';
 
 export default function TMB({ state }) {
-  console.log(state);
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">

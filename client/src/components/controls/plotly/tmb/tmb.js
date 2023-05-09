@@ -1,5 +1,4 @@
 export default function TMB(data, tmbTabName, signatureName) {
-  console.log('tmb plotly  ', data);
   const totalCancer = data.length;
 
   const absYValue = data
