@@ -43,10 +43,8 @@ export default function Extraction() {
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
   const params = refreshStatus?.params;
-  //console.log('manifestData ', manifestData);
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
-  //console.log('isDone ', isDone);
   const explorationId = (() => {
     if (isDone) {
       switch (explorationType) {
@@ -67,8 +65,6 @@ export default function Extraction() {
       : manifest.denovoId
     : false;
 
-  // console.log('explorationId', explorationId);
-  // console.log('id2 ', id2);
   const refreshState = useCallback(() => {
     refreshExtraction();
   }, [refreshExtraction]);
