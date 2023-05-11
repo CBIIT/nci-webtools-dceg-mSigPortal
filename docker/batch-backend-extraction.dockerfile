@@ -16,9 +16,9 @@ RUN dnf -y update \
     nodejs \
     npm \
     openssl-devel \
-    python3-devel \
-    python3-pip \
-    python3-setuptools \
+    python39-devel \
+    python39-pip \
+    python39-setuptools \
     # python3-wheel \
     rsync \
     tar \
