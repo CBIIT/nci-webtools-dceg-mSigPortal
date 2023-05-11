@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.8.0-runtime-rockylinux8
+FROM nvidia/cuda:12.1.1-runtime-rockylinux9
 
 RUN dnf -y update \
     && dnf -y install \
@@ -17,9 +17,9 @@ RUN dnf -y update \
     nodejs \
     npm \
     openssl-devel \
-    python39-devel \
-    python39-pip \
-    python39-setuptools \
+    python3-devel \
+    python3-pip \
+    python3-setuptools \
     # python3-wheel \
     rsync \
     tar \
