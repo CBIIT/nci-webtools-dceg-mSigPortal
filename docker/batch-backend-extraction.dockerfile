@@ -7,6 +7,7 @@ RUN dnf -y update \
     cmake \
     dnf-plugins-core \
     gcc \
+    gcc-c++ \
     git \
     gmp-devel \
     libcurl-devel \
