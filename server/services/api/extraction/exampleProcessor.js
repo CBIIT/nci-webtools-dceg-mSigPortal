@@ -8,18 +8,14 @@ import {
 import path from 'path';
 import { stringify } from 'csv-stringify';
 import { groupBy } from 'lodash-es';
-import { execa } from 'execa';
-import validator from 'validator';
 import mapValues from 'lodash/mapValues.js';
-import { formatObject } from './logger.js';
 import { randomUUID } from 'crypto';
 import Papa from 'papaparse';
 import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
-import { createLogger } from 'winston';
-import { mkdir, writeFile, readFile, copyFile } from 'fs/promises';
-import { copy, move, emptyDir } from 'fs-extra';
+import { mkdir, writeFile, readFile } from 'fs/promises';
+import { copy } from 'fs-extra';
 
 export async function exampleProcessor(exampleID, env) {
   const params = {
@@ -286,11 +282,6 @@ export async function exampleProcessor(exampleID, env) {
       //logger.info("Result written to signature.tsv");
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
-
-      // Write the TSV data to the input_data file
-      // const inputFilePath = path.join(inputFolder, args.input_data);
-      // writeFileSync(inputFilePath, tsvString);
-      // console.log('Data written to ExtractionData.all');
     }
 
     // modify and include parameters
@@ -551,7 +542,7 @@ export async function exampleProcessor(exampleID, env) {
     //   }
     // }
     console.log('===============files created successfully!=================');
-    return id;
+    return { id: id, status: 'DONE' };
   }
 }
 

@@ -63,6 +63,7 @@ export async function refresh(req, res, next) {
   try {
     const id = req.params.id;
     const data = await getJobStatus(id);
+    console.log('data return --- ', data);
     res.json(data);
   } catch (error) {
     logger.error('/refreshExtraction Error');
@@ -86,14 +87,11 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
-    console.log('ID -------- ', id);
+    console.log('Example ID: ', id);
     const exampleFolderPath = `/data/examples/extraction/${id}`; // path to the example folder
-    console.log('exampleFolderPath: ++++ ', exampleFolderPath);
     if (fs.existsSync(exampleFolderPath)) {
-      console.log('Example Folder exist', exampleFolderPath);
+      console.log('Example Folder exsit!');
       const exampleFolderName = path.basename(exampleFolderPath);
-      console.log('exampleFolderName', exampleFolderName);
-      console.log('Params', req.params);
       const result = exampleProcessor(exampleFolderName, env);
       res.json(result);
     } else {

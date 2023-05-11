@@ -25,10 +25,9 @@ export default function Instructions({ props, loading }) {
   const id = pathParts[pathParts.length - 1];
   console.log('id', id);
 
-  const { data: exampleData, refetch: refreshExtraction } = useExampleQuery(
-    id,
-    { skip: !id }
-  );
+  const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
+    skip: !id,
+  });
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>

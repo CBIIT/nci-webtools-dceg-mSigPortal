@@ -40,16 +40,6 @@ export default function Extraction() {
     { skip: !id }
   );
 
-  const { data: statusData, refetch: refetchStatus } = useStatusQuery(id, {
-    skip: !id,
-  });
-  const { data: manifestData, refetch: refetchManifest } = useManifestQuery(
-    id,
-    {
-      skip: !id,
-    }
-  );
-
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
   const params = refreshStatus?.params;
