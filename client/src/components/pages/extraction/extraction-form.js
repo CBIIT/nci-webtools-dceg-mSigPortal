@@ -710,7 +710,7 @@ export default function ExtractionForm() {
                   type="number"
                   min="1"
                   max="25"
-                  defaultValue={15}
+                  defaultValue={6}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -721,7 +721,7 @@ export default function ExtractionForm() {
                   type="number"
                   min="1"
                   max="1000"
-                  defaultValue={100}
+                  defaultValue={50}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -815,7 +815,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('min_nmf_iterations')}
                   type="number"
-                  defaultValue={10000}
+                  defaultValue={500}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -824,7 +824,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('max_nmf_iterations')}
                   type="number"
-                  defaultValue={1000000}
+                  defaultValue={50000}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -833,7 +833,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('nmf_test_conv')}
                   type="number"
-                  defaultValue={10000}
+                  defaultValue={5000}
                   disabled={submitted || id}
                 />
               </Form.Group>
