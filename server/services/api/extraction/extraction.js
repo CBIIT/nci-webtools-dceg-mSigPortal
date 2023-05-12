@@ -87,20 +87,26 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
-    console.log('Example ID: ', id);
-    const exampleFolderPath = `/data/examples/extraction/${id}`; // path to the example folder
+    const dataFolder = path.resolve(env.DATA_FOLDER);
+    const exampleFolderPath = path.resolve(
+      dataFolder,
+      'examples',
+      'extraction',
+      id
+    );
+
     if (fs.existsSync(exampleFolderPath)) {
-      console.log('Example Folder exsit!');
       const exampleFolderName = path.basename(exampleFolderPath);
       const result = exampleProcessor(exampleFolderName, env);
       res.json(result);
     } else {
-      console.log('Example folder does not exist - ID ', id);
-      res.status(404).json({ error: 'Example folder does not exist' });
+      res.status(404).json({
+        error: 'Example folder does not exist: ',
+        exampleFolderPath,
+      });
     }
   } catch (error) {
     logger.error('/extractionExample Error', error);
-    console.log("'/extractionExample Error'");
     next(error);
   }
 }

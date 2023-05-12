@@ -21,7 +21,7 @@ import MsAssociation from '../exploration/msAssociation/msAssociation';
 import MsLandscape from '../exploration/msLandscape/msLandscape';
 import MsPrevalence from '../exploration/msPrevalence/msPrevalence';
 import MsIndividual from '../exploration/msIndividual/msIndividual';
-import { useRefreshQuery, useManifestQuery, useStatusQuery } from './apiSlice';
+import { useRefreshQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
