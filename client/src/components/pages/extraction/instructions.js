@@ -23,7 +23,7 @@ export default function Instructions({ props, loading }) {
   const location = useLocation();
   const pathParts = location.pathname.split('/');
   const id = pathParts[pathParts.length - 1];
-  console.log('id', id);
+  
 
   function ExampleComponent({ id }) {
     const { data: exampleData, refetch: refresh } = useExampleQuery(id, {

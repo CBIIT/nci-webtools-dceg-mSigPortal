@@ -63,7 +63,6 @@ export async function refresh(req, res, next) {
   try {
     const id = req.params.id;
     const data = await getJobStatus(id);
-    console.log('data return --- ', data);
     res.json(data);
   } catch (error) {
     logger.error('/refreshExtraction Error');

@@ -339,7 +339,6 @@ export async function exampleProcessor(exampleID, env) {
     let denovoId, decomposedId;
     try {
       //logger.info(`[${id}] Run Denovo Exploration`);
-      console.log('Run Denovo Exploration ============');
       const denovoFormData = new FormData();
       if (params.form.source === 'public') {
         denovoFormData.append(
@@ -435,10 +434,7 @@ export async function exampleProcessor(exampleID, env) {
       const decomposedExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
-          // matrixFile:
-          //   params.form.source === "public"
-          //     ? path.parse(seqmatrixFilePath).base
-          //     : path.parse(paths.matrixFile).base,
+
           matrixFile: path.parse(seqmatrixFilePath).base,
           exposureFile: path.parse(paths.decomposedExposureInput).base,
           signatureFile: path.parse(paths.decomposedSignatureInput).base,
