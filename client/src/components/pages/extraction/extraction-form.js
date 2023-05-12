@@ -697,6 +697,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('minimum_signatures')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   min="1"
                   max="24"
                   defaultValue={1}
@@ -708,6 +709,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('maximum_signatures')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   min="1"
                   max="25"
                   defaultValue={6}
@@ -719,6 +721,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('nmf_replicates')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   min="1"
                   max="1000"
                   defaultValue={50}
@@ -815,6 +818,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('min_nmf_iterations')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   defaultValue={500}
                   disabled={submitted || id}
                 />
@@ -824,6 +828,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('max_nmf_iterations')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   defaultValue={50000}
                   disabled={submitted || id}
                 />
@@ -833,6 +838,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('nmf_test_conv')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   defaultValue={5000}
                   disabled={submitted || id}
                 />
@@ -842,6 +848,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('nmf_tolerance')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   defaultValue={1.0e-15}
                   disabled={submitted || id}
                 />
@@ -857,6 +864,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('stability')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   step="any"
                   defaultValue={0.8}
                   disabled={submitted || id}
@@ -867,6 +875,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('min_stability')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   step="any"
                   defaultValue={0.2}
                   disabled={submitted || id}
@@ -877,6 +886,7 @@ export default function ExtractionForm() {
                 <Form.Control
                   {...register('combined_stability')}
                   type="number"
+                  onWheel={(e) => e.target.blur()}
                   step="any"
                   defaultValue={1}
                   disabled={submitted || id}
