@@ -6,8 +6,10 @@ import { useRecoilValue } from 'recoil';
 import { formState, graphDataSelector } from './treeLeaf.state';
 import {
   groupBy,
-  forceHierarchical,
+  hierarchicalForce,
   getAttractionMatrix,
+  createIdGenerator,
+  assignParents,
 } from './treeLeaf.utils';
 
 export default function D3TreeLeaf({
@@ -27,29 +29,36 @@ export default function D3TreeLeaf({
   const params = { study, strategy,  signatureSetName, profileMatrix, cancer: form?.cancerType?.value };
   const graphData = useRecoilValue(graphDataSelector(params));
   const { hierarchy, attributes } = cloneDeep(graphData) || {};
-  const plotData = {
-    data: hierarchy,
-    attributes: groupBy(attributes, 'Sample'),
-    form: form,
-  };
-  const plotLayout = {
-    id,
-    width,
-    height,
-    radius: Math.min(width, height) / 2,
-    plotTitle: `${publicForm?.study?.label} - ${form.color.label}`,
-  };
-  const plotEvents = {
-    onClick: onSelect,
-  };
-
-
   useEffect(() => {
+    const plotData = {
+      data: hierarchy,
+      attributes: groupBy(attributes, 'Sample'),
+      form: form,
+    };
+
     if (plotRef.current && plotData.data) {
-      const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
-      plotRef.current.replaceChildren(plot);
+
+      const plotLayout = {
+        id,
+        width,
+        height,
+        radius: Math.min(width, height) / 2,
+        plotTitle: `${publicForm?.study?.label} - ${form.color.label}`,
+      };
+
+      const plotEvents = {
+        onClick: onSelect,
+      };
+
+      const loading = document.createElement('div');
+      loading.innerHTML = `Please wait while your plot is rendered...`
+      plotRef.current.replaceChildren(loading);
+      setTimeout(() => {
+        const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
+        plotRef.current.replaceChildren(plot);
+      }, 100);
     }
-  }, [plotRef, plotData, plotLayout]);
+  }, [plotRef, attributes, form, hierarchy, id, width, height, publicForm?.study?.label, form.color.label, onSelect]);
 
   return (
     <div className="border rounded p-3 position-relative" {...props}>
@@ -67,7 +76,7 @@ function createForceDirectedTree(
     id,
     children, // if hierarchical data, given a d in data, returns its children
     tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 1 : 2) / a.depth,
+    separation = (a, b) => (a.parent == b.parent ? 0.001 : 2) / a.depth,
     sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
     label = (d) => d.name, // given a node d, returns the display name
     title, // given a node d, returns its hover text
@@ -95,7 +104,7 @@ function createForceDirectedTree(
     strokeLinecap, // stroke line cap for links
     halo = '#fff', // color of label halo
     haloWidth = 3, // padding around the labels
-    scale = 2,
+    scale = 1.5,
     highlightQuery = null,
     plotTitle,
   },
@@ -125,11 +134,15 @@ function createForceDirectedTree(
     .separation(separation)(treeData);
 
   treeData.each((d) => {
+    console.log(d);
     let angle = d.x;
     let distance = d.y;
     d.x = distance * Math.cos(angle) * scale;
     d.y = distance * Math.sin(angle) * scale;
   });
+
+  assignParents(data, createIdGenerator());
+  const distanceMatrix = getAttractionMatrix(data, node => node.id);
 
   // Compute labels and titles.
   const nodes = root.descendants();
@@ -140,8 +153,8 @@ function createForceDirectedTree(
       ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
       : 0;
 
-  const attractionMatrix = getAttractionMatrix();
-
+  // console.log(distanceMatrix);
+  
   const simulation = d3
     .forceSimulation(nodes)
     .force(
@@ -153,18 +166,22 @@ function createForceDirectedTree(
         .strength(1)
     )
     .force(
-      'charge',
-      forceHierarchical(attractionMatrix).strength((d) =>
-        d.children ? -15 : 15
-      )
+      'hierarchical',
+      hierarchicalForce(distanceMatrix, nodes)
     )
+    // .force(
+    //   'charge',
+    //   forceHierarchical(attractionMatrix).strength((d, i, nodes) =>
+    //     d.children ? -15 : 15
+    //   )
+    // )
     // .force("center", d3.forceCenter().strength(1))
     .force('x', d3.forceX().strength(0.005))
     .force('y', d3.forceY().strength(0.005))
     .force('collision', d3.forceCollide().radius(nodeRadius));
 
-  // simulation.stop();
-  // simulation.tick(40);
+  simulation.stop();
+  simulation.tick(120);
 
   const zoom = d3.zoom().on('zoom', zoomed);
 
