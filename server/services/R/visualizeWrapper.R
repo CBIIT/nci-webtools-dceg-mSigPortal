@@ -1141,6 +1141,10 @@ getTreeLeaf <- function(args, config) {
 
   mdata0 <- as.matrix(mdata[, -1])
   rownames(mdata0) <- mdata$sample
+  # distance <- dist(mdata0)
+  # p_i <- as.numeric(genomes[, i])
+  # q_i = (est_genomes[, i])
+  # cosineSimilarity <- cos_sim(mdata0)
 
   mdatax <- mdata %>%
     select(sample) %>%
@@ -1157,18 +1161,6 @@ getTreeLeaf <- function(args, config) {
     group_by(row_number()) %>%
     mutate(Cosine_similarity = runif(1)) # todo: implement
 
-  # TreeAndLeaf -------------------------------------------------------------
-  hc <- hclust(dist(mdata0), "ward.D") # ave #ward.D
-  # plot(hc, main="Dendrogram for the PCAWG dataset", xlab="", sub="")
-
-  #-- Convert the 'hclust' object into a 'tree-and-leaf' object
-  tal <- treeAndLeaf(hc)
-
-  # convert to d3
-  wc <- cluster_walktrap(tal)
-  members <- membership(wc)
-  # Convert to object suitable for networkD3
-  d3 <- igraph_to_networkD3(tal, group = members)
-
-  return(list(graph = d3, hierarchy = as.radialNetwork(hc, ""), attributes = mdatax))
+  hc <- hclust(dist(mdata0), "ward.D") 
+  return(list(hierarchy = as.radialNetwork(hc), attributes = mdatax))
 }
