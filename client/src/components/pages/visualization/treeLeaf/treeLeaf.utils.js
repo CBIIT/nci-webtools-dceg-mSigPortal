@@ -22,9 +22,147 @@ export function groupBy(array, key) {
   );
 }
 
-export function getAttractionMatrix() {
-
+export function createIdGenerator() {
+  let start = 0;
+  return () => ++start;
 }
+
+export function assignParents(node, getId) {
+  node.id = getId();
+  let children = Array.isArray(node.children) ? node.children : [node.children];
+  for (let child of children) {
+    if (child) {
+      child.parent = node;
+      assignParents(child, getId);
+    }
+  }
+  return node;
+}
+
+export function getParents(node) {
+  if (node.parents && node.parents.length)
+    return node.parents;
+
+  const parents = [];
+  let parent = node.parent;
+  while (parent) {
+    parents.push(parent);
+    parent = parent.parent;
+  }
+  node.parents = parents;
+  return parents;
+}
+
+
+export function getLeafNodes(node) {
+  // iterate through the tree and return all leaf nodes
+  const leafNodes = [];
+  const stack = [node];
+  while (stack.length) {
+    const node = stack.pop();
+    if (node && node.children) {
+      if (!Array.isArray(node.children)) {
+        node.children = [node.children];
+      }
+      stack.push(...node.children);
+    } else if (node) {
+      leafNodes.push(node);
+    }
+  }
+  return leafNodes;
+}
+
+export function getAllChildren(node, nodes = []) {
+  nodes.push(node);
+  if (node.children) {
+    if (!Array.isArray(node.children)) {
+      node.children = [node.children];
+    }
+    for (let child of node.children) {
+      getAllChildren(child, nodes);
+    }
+  }
+  return nodes;
+}
+
+/**
+ * Returns the distance to the closest common parent of two nodes
+ * @param {any} nodeA 
+ * @param {any} nodeB 
+ */
+export function getClosestParentDistance(nodeA, nodeB) {
+  const parentsA = getParents(nodeA);
+  const parentsB = getParents(nodeB);
+  let distanceA = 0;
+  let distanceB = 0;
+
+  // find the sum of the distances to the closest common parent
+  for (let i = 0; i < parentsA.length; i++) {
+    const parentA = parentsA[i];
+    const indexB = parentsB.indexOf(parentA);
+    if (indexB !== -1) {
+      distanceA = i;
+      distanceB = indexB;
+      break;
+    }
+  }
+
+  return distanceA + distanceB;
+}
+
+export function getAttractionMatrix(node, id = node => node.id) {
+  let matrix = {};
+  const nodes = getAllChildren(node);// || getLeafNodes(node);// || getAllChildren(node);
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      let a = nodes[i];
+      let b = nodes[j];
+
+      let distance = getClosestParentDistance(a, b);
+      let idA = id(nodes[i]);
+      let idB = id(nodes[j]);
+
+      matrix[idA] = matrix[idA] || {};
+      matrix[idB] = matrix[idB] || {};
+      matrix[idA][idB] = distance;
+      matrix[idB][idA] = distance;
+    }
+  }
+      
+  return matrix;
+}
+
+export function hierarchicalForce(distanceMatrix, nodes) {
+  return function(alpha) {
+    for (var i = 0; i < nodes.length; i++) {
+      for (var j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i];
+        const b = nodes[j];
+        const idA = a?.data?.id;
+        const idB = b?.data?.id;
+
+        // only include leaf nodes in the comparison
+        if (a.depth === 0 || b.depth === 0 || !a.data.name || !b.data.name) continue;
+        const distance = distanceMatrix[idA]?.[idB] || distanceMatrix[idB]?.[idA];
+        if (!distance) continue;
+
+        // get the angle between a and b
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const angle = Math.atan2(dy, dx);
+
+        // move each node away from each other, multiplied by the scaled distance
+        const distanceFactor = 0.001;
+        const delta = ((distance - 4 - Math.floor(Math.log2(nodes.length))) * distanceFactor * (alpha ** 2));
+        a.x -= Math.cos(angle) * delta;
+        a.y -= Math.sin(angle) * delta;
+        b.x += Math.cos(angle) * delta;
+        b.y += Math.sin(angle) * delta;
+      }
+    }
+  };
+}
+
 
 export function forceHierarchical(attractionMatrix) {
   let nodes,
