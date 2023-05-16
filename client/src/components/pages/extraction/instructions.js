@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { useExampleQuery } from './apiSlice';
 import { useLocation } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Instructions({ props, loading }) {
   const examples = [
@@ -23,7 +24,7 @@ export default function Instructions({ props, loading }) {
   const location = useLocation();
   const pathParts = location.pathname.split('/');
   const id = pathParts[pathParts.length - 1];
-  
+  const randomUUID = uuidv4();
 
   function ExampleComponent({ id }) {
     const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
@@ -60,7 +61,7 @@ export default function Instructions({ props, loading }) {
 
       {examples.map(({ title, external, path }, index) => (
         <div key={index}>
-          <Link to={`/extraction/${path}`} disabled>
+          <Link to={`/extraction/${path}_${randomUUID}`} disabled>
             <span className="sr-only">{title + ' link'}</span>
             {title}
           </Link>

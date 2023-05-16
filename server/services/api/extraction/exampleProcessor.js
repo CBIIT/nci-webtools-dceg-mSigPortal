@@ -17,7 +17,12 @@ import FormData from 'form-data';
 import { mkdir, writeFile, readFile } from 'fs/promises';
 import { copy } from 'fs-extra';
 
-export async function exampleProcessor(exampleID, env) {
+export async function exampleProcessor(
+  exampleOutputFolderName,
+  inputFolderId,
+  randomID,
+  env
+) {
   const params = {
     args: {
       input_type: 'matrix',
@@ -50,9 +55,9 @@ export async function exampleProcessor(exampleID, env) {
       profile: 'DBS',
       matrix: '78',
     },
-    id: 'Example_DBS78_SigProfileExtractor',
+    id: exampleOutputFolderName,
     email: '',
-    jobName: 'Examples-DBS78',
+    jobName: exampleOutputFolderName,
     form: {
       source: 'public',
       study: { label: 'Sherlock-Lung-232', value: 'Sherlock-Lung-232' },
@@ -74,7 +79,7 @@ export async function exampleProcessor(exampleID, env) {
       nmf_init: 'random',
       precision: 'single',
       email: '',
-      jobName: exampleID,
+      jobName: exampleOutputFolderName,
       gpu: false,
       minimum_signatures: '1',
       maximum_signatures: '18',
@@ -92,8 +97,8 @@ export async function exampleProcessor(exampleID, env) {
     },
   };
 
-  if (exampleID.startsWith('Example_')) {
-    const parts = exampleID.split('_');
+  if (exampleOutputFolderName.startsWith('Example_')) {
+    const parts = exampleOutputFolderName.split('_');
     if (parts.length >= 2) {
       const match = parts[1].match(/([A-Za-z]+)(\d+)/);
       if (match) {
@@ -106,17 +111,16 @@ export async function exampleProcessor(exampleID, env) {
         params.signatureQuery.matrix = matrixSize;
         params.seqmatrixQuery.profile = profileType;
         params.seqmatrixQuery.matrix = matrixSize;
-        params.id = `Example_${profileType}${matrixSize}_SigProfileExtractor`;
+        params.id = `Example_${profileType}${matrixSize}_SigProfileExtractor_${randomID}`;
         params.form.signatureSetName.value = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.form.signatureSetName.label = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.form.context_type.label = `${profileType}${matrixSize}`;
         params.form.context_type.value = `${profileType}${matrixSize}`;
-        params.jobName = `Example_${profileType}${matrixSize}_SigProfileExtractor`;
       } else {
-        throw new Error(`Invalid example ID: ${exampleID}`);
+        throw new Error(`Invalid example ID: ${exampleOutputFolderName}`);
       }
     } else {
-      throw new Error(`Invalid example ID: ${exampleID}`);
+      throw new Error(`Invalid example ID: ${exampleOutputFolderName}`);
     }
   }
   const dbConnection = knex({
@@ -131,7 +135,7 @@ export async function exampleProcessor(exampleID, env) {
   });
 
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
-  let paths = await getPaths(params, env);
+  let paths = await getPaths(params, inputFolderId, randomID, env);
 
   // const submittedTime = new Date(
   //   (await readJson(paths.statusFile)).submittedAt
@@ -141,23 +145,18 @@ export async function exampleProcessor(exampleID, env) {
     // logger.info(id);
     // logger.info(params);
     if (!id) throw new Error('Missing id');
-    //if (!validator.isUUID(id)) throw new Error("Invalid id");
-    const exampleFolderPath = `/data/examples/extraction/${id}`;
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
+
+    const inputFolder = path.resolve(env.INPUT_FOLDER, inputFolderId);
 
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
 
     await mkdirs([paths.inputFolder, paths.outputFolder]);
 
     //copy example folder into outputFolder
-    await copy(exampleFolderPath, outputFolder);
+    //await copy(exampleFolderPath, outputFolder);
 
     await writeJson(paths.paramsFile, params);
-    // await writeJson(paths.statusFile, {
-    //   ...(await readJson(paths.statusFile)),
-    //   id,
-    //   status: 'IN_PROGRESS',
-    // });
+
     await writeJson(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
@@ -285,16 +284,16 @@ export async function exampleProcessor(exampleID, env) {
     }
 
     // modify and include parameters
-    const transformArgs = {
-      ...args,
-      // input_data: path.join(inputFolder, args.input_data),
-      input_data:
-        params.form.source === 'public'
-          ? seqmatrixFilePath
-          : path.join(inputFolder, args.input_data),
-      output: path.join(outputFolder),
-      signature_database: signatureFilePath,
-    };
+    // const transformArgs = {
+    //   ...args,
+    //   // input_data: path.join(inputFolder, args.input_data),
+    //   input_data:
+    //     params.form.source === 'public'
+    //       ? seqmatrixFilePath
+    //       : path.join(inputFolder, args.input_data),
+    //   output: path.join(outputFolder),
+    //   signature_database: signatureFilePath,
+    // };
 
     // const cliArgs = Object.entries(transformArgs)
     //   .reduce((params, [key, value]) => [...params, `--${key} ${value}`], [])
@@ -313,11 +312,7 @@ export async function exampleProcessor(exampleID, env) {
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
-    //console.log("-===== decomposedSignatures");
-    //console.log(decomposedSignatures);
     const denovoSignatures = await parseCSV(paths.denovoSignatureInput);
-    //console.log("-======= denovoSignatures");
-    //console.log(denovoSignatures);
     function signatureMapping(e) {
       const { MutationType, ...signatures } = e;
       return Object.entries(signatures).map(([signatureName, mutations]) => ({
@@ -339,6 +334,7 @@ export async function exampleProcessor(exampleID, env) {
     let denovoId, decomposedId;
     try {
       //logger.info(`[${id}] Run Denovo Exploration`);
+
       const denovoFormData = new FormData();
       if (params.form.source === 'public') {
         denovoFormData.append(
@@ -352,68 +348,52 @@ export async function exampleProcessor(exampleID, env) {
           createReadStream(seqmatrixFilePath)
         );
       }
-
       denovoFormData.append(
         'exposureFile',
         createReadStream(paths.denovoExposureInput)
       );
-
       denovoFormData.append(
         'signatureFile',
         createReadStream(paths.denovoSignatureInput)
       );
 
-      // const denovoUpload = await axios.post(
-      //   `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
-      //   denovoFormData,
-      //   { headers: denovoFormData.getHeaders() }
-      // );
-      const denovoUpload = await axios.post(
-        `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
-        denovoFormData,
-        { headers: denovoFormData.getHeaders() }
-      );
+      try {
+        const denovoUpload = await axios.post(
+          `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
+          denovoFormData,
+          { headers: denovoFormData.getHeaders() }
+        );
 
-      const denovoExploration = await axios.post(
-        `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
-        {
-          matrixFile:
-            // params.form.source === "public"
-            //   ? path.parse(seqmatrixFilePath).base
-            //   : path.parse(paths.matrixFile).base,
+        const denovoExploration = await axios.post(
+          `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
+          {
+            matrixFile: path.parse(seqmatrixFilePath).base,
 
-            path.parse(seqmatrixFilePath).base,
+            exposureFile: path.parse(paths.denovoExposureInput).base,
+            signatureFile: path.parse(paths.denovoSignatureInput).base,
+          }
+        );
 
-          exposureFile: path.parse(paths.denovoExposureInput).base,
-          signatureFile: path.parse(paths.denovoSignatureInput).base,
-        }
-      );
-
-      denovoId = denovoExploration.data;
+        denovoId = denovoExploration.data;
+      } catch (error) {
+        console.log('ERROR denovoUpload');
+        console.log(error);
+      }
     } catch (error) {
       //logger.error("Denovo Exploration Error");
-
+      console.log('Denovo Exploration Error');
+      console.log(error);
       throw error.data;
     }
 
     try {
       //logger.info(`[${id}] Run Decomposed Exploration`);
       const decomposedFormData = new FormData();
-      if (params.form.source === 'public') {
-        decomposedFormData.append(
-          'matrixFile',
-          createReadStream(seqmatrixFilePath)
-        );
-      } else {
-        // decomposedFormData.append(
-        //   "matrixFile",
-        //   createReadStream(paths.matrixFile)
-        // );
-        decomposedFormData.append(
-          'matrixFile',
-          createReadStream(seqmatrixFilePath)
-        );
-      }
+
+      decomposedFormData.append(
+        'matrixFile',
+        createReadStream(seqmatrixFilePath)
+      );
 
       decomposedFormData.append(
         'exposureFile',
@@ -434,7 +414,6 @@ export async function exampleProcessor(exampleID, env) {
       const decomposedExploration = await axios.post(
         `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
         {
-
           matrixFile: path.parse(seqmatrixFilePath).base,
           exposureFile: path.parse(paths.decomposedExposureInput).base,
           signatureFile: path.parse(paths.decomposedSignatureInput).base,
@@ -466,7 +445,7 @@ export async function exampleProcessor(exampleID, env) {
       status: 'COMPLETED',
     });
 
-    const transformSignatures = [];
+    let transformSignatures = [];
 
     // iterate through each object in decomposedSignatures array
     decomposedSignatures.forEach((decomposedSig) => {
@@ -491,8 +470,6 @@ export async function exampleProcessor(exampleID, env) {
         });
       });
     });
-
-    //console.log(transformSignatures);
 
     const filePath = path.join(outputFolder, 'local.sqlite3');
 
@@ -531,19 +508,14 @@ export async function exampleProcessor(exampleID, env) {
       }`
     );
   } finally {
-    // delete input files
-    // for await (const file of getFiles(paths.inputFolder)) {
-    //   if (path.basename(file) !== 'params.json') {
-    //     unlinkSync(file);
-    //   }
-    // }
     console.log('===============files created successfully!=================');
     return { id: id, status: 'DONE' };
   }
 }
 
-async function getPaths(params, env = process.env) {
+async function getPaths(params, exampleId, randomID, env = process.env) {
   const { id, args } = params;
+
   let inputFolder;
   if (params.form.source === 'user' || params.form.source === 'public') {
     inputFolder = path.resolve(env.INPUT_FOLDER, id);
