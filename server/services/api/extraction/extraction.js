@@ -104,7 +104,7 @@ export async function extractionExample(req, res, next) {
       const exampleOutputFolderName = path.basename(outputFolder);
       //copy example folder into outputFolder
       await copy(exampleFolderPath, outputFolder);
-      const result = exampleProcessor(
+      const result = await exampleProcessor(
         exampleOutputFolderName,
         firstPart,
         secondPart,

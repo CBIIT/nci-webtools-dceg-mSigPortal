@@ -26,15 +26,19 @@ export default function Instructions({ props, loading }) {
   const id = pathParts[pathParts.length - 1];
   const randomUUID = uuidv4();
 
+  let uuid;
   function ExampleComponent({ id }) {
     const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
       skip: !id,
     });
+
+    console.log(exampleData);
+    uuid = exampleData.id;
   }
   if (id.startsWith('Example_')) {
     ExampleComponent({ id });
   }
-
+  console.log(uuid);
   // const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
   //   skip: !id,
   // });
