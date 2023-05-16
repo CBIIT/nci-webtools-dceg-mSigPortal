@@ -712,7 +712,7 @@ export default function ExtractionForm() {
                   onWheel={(e) => e.target.blur()}
                   min="1"
                   max="25"
-                  defaultValue={6}
+                  defaultValue={12}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -819,7 +819,7 @@ export default function ExtractionForm() {
                   {...register('min_nmf_iterations')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={500}
+                  defaultValue={1000}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -829,7 +829,7 @@ export default function ExtractionForm() {
                   {...register('max_nmf_iterations')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={50000}
+                  defaultValue={100000}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -839,7 +839,7 @@ export default function ExtractionForm() {
                   {...register('nmf_test_conv')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={5000}
+                  defaultValue={10000}
                   disabled={submitted || id}
                 />
               </Form.Group>
