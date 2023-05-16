@@ -2,7 +2,7 @@ import React from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
-import { useExampleQuery } from './apiSlice';
+import { useExampleQuery, useRefreshQuery } from './apiSlice';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 

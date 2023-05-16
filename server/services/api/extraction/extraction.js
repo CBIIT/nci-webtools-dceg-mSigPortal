@@ -88,11 +88,9 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
-    console.log('id ', id);
     const parts = id.split('_'); // Split the ID by underscores
     const firstPart = parts.slice(0, 3).join('_'); // Join the first three parts with underscores
     const secondPart = parts.slice(3).join('_'); // Join the remaining parts with underscores
-    console.log('secondpart ', secondPart);
     const dataFolder = path.resolve(env.DATA_FOLDER);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
     const exampleFolderPath = path.resolve(
@@ -102,11 +100,8 @@ export async function extractionExample(req, res, next) {
       firstPart
     );
 
-    console.log('exampleFolderPath ', exampleFolderPath);
-
     if (fs.existsSync(exampleFolderPath)) {
       const exampleOutputFolderName = path.basename(outputFolder);
-      console.log('======= ', exampleOutputFolderName);
       //copy example folder into outputFolder
       await copy(exampleFolderPath, outputFolder);
       const result = exampleProcessor(
