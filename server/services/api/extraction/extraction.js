@@ -89,8 +89,6 @@ export async function extractionExample(req, res, next) {
   try {
     const id = req.params.id;
     const uuid = randomUUID();
-    console.log('id-------', id);
-    console.log('UUID ------- ', uuid);
     const dataFolder = path.resolve(env.DATA_FOLDER);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, uuid);
     const exampleFolderPath = path.resolve(

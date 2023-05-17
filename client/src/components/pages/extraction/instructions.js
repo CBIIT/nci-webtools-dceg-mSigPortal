@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
-import { useExampleQuery, useRefreshQuery } from './apiSlice';
+import { useExampleQuery } from './apiSlice';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
@@ -31,8 +30,6 @@ export default function Instructions({ props, loading }) {
   const { data: exampleData } = useExampleQuery(id, {
     skip: !id,
   });
-
-  console.log('exampleData', exampleData);
 
   useEffect(() => {
     if (exampleData && exampleData.id) {

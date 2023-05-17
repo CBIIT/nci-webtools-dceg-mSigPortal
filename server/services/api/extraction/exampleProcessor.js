@@ -15,7 +15,6 @@ import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
 import { mkdir, writeFile, readFile } from 'fs/promises';
-import { copy } from 'fs-extra';
 
 export async function exampleProcessor(
   exampleOutputFolderName,
@@ -123,7 +122,6 @@ export async function exampleProcessor(
       throw new Error(`Invalid example ID: ${exampleOutputFolderName}`);
     }
   }
-  console.log('PARAMS -----', params);
   const dbConnection = knex({
     client: 'postgres',
     connection: {
@@ -138,7 +136,6 @@ export async function exampleProcessor(
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
   let paths = await getPaths(params, inputFolderId, randomID, env);
 
-  console.log('paths ', paths);
   // const submittedTime = new Date(
   //   (await readJson(paths.statusFile)).submittedAt
   // );
@@ -378,12 +375,10 @@ export async function exampleProcessor(
 
         denovoId = denovoExploration.data;
       } catch (error) {
-        console.log('ERROR denovoUpload');
         console.log(error);
       }
     } catch (error) {
       //logger.error("Denovo Exploration Error");
-      console.log('Denovo Exploration Error');
       console.log(error);
       throw error.data;
     }
@@ -477,11 +472,9 @@ export async function exampleProcessor(
 
     // Check if the file exists
     if (readdirSync(outputFolder).includes('local.sqlite3')) {
-      console.log('File exists. Deleting...');
       // If the file exists, remove it
       try {
         unlinkSync(filePath);
-        console.log('File deleted.');
       } catch (err) {
         console.error('Error deleting file:', err);
       }
@@ -502,15 +495,12 @@ export async function exampleProcessor(
 
     await importUserSession(localDb, { signature: transformSignatures });
 
-    console.log('localDb created!!!----------');
-
     logger.debug(
       `Execution Time: ${
         (new Date().getTime() - submittedTime.getTime()) / 1000
       }`
     );
   } finally {
-    console.log('===============files created successfully!=================');
     return { id: id, status: 'DONE' };
   }
 }
@@ -896,8 +886,3 @@ async function* getFiles(filePath) {
     }
   }
 }
-
-// exampleProcessor(params, dbConnection, env).catch((err) => {
-//   console.error(err);
-//   process.exit(1);
-// });
