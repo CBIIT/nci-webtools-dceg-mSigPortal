@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { useExampleQuery, useRefreshQuery } from './apiSlice';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { useHistory } from 'react-router-dom';
 
 export default function Instructions({ props, loading }) {
   const examples = [
@@ -22,26 +23,43 @@ export default function Instructions({ props, loading }) {
     },
   ];
   const location = useLocation();
+  const history = useHistory();
+
   const pathParts = location.pathname.split('/');
-  const id = pathParts[pathParts.length - 1];
+  //const id = pathParts[pathParts.length - 1];
   const randomUUID = uuidv4();
 
-  let uuid;
-  function ExampleComponent({ id }) {
-    const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
-      skip: !id,
-    });
+  const [uuid, setUuid] = useState(null);
 
-    console.log(exampleData);
-    uuid = exampleData.id;
+  const [id, setId] = useState(null);
+
+  const { data: exampleData } = useExampleQuery(id, {
+    skip: !id,
+  });
+
+  const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
+    uuid,
+    { skip: !uuid }
+  );
+
+  if (exampleData && exampleData.id) {
+    setUuid(exampleData.id);
+    history.push(`/extraction/${exampleData.id}`);
+    window.location.reload(); // Refresh the page
+  } else {
+    console.log('NO ID');
   }
-  if (id.startsWith('Example_')) {
-    ExampleComponent({ id });
-  }
-  console.log(uuid);
-  // const { data: exampleData, refetch: refresh } = useExampleQuery(id, {
-  //   skip: !id,
-  // });
+
+  const handleExampleClick = async (exampleFolder) => {
+    try {
+      // Fetch example data here if needed
+      setId(exampleFolder);
+      console.log(exampleData);
+      console.log(id);
+    } catch (error) {
+      console.error(error); // Handle the error
+    }
+  };
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
@@ -64,11 +82,9 @@ export default function Instructions({ props, loading }) {
       <h6>SigProfilerExtraction</h6>
 
       {examples.map(({ title, external, path }, index) => (
-        <div key={index}>
-          <Link to={`/extraction/${path}_${randomUUID}`} disabled>
-            <span className="sr-only">{title + ' link'}</span>
-            {title}
-          </Link>
+        <div key={index} onClick={() => handleExampleClick(path)}>
+          <span className="sr-only">{title + ' link'}</span>
+          {title}
           {external && (
             <span>
               {'; '}

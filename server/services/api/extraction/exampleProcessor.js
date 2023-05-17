@@ -97,8 +97,8 @@ export async function exampleProcessor(
     },
   };
 
-  if (exampleOutputFolderName.startsWith('Example_')) {
-    const parts = exampleOutputFolderName.split('_');
+  if (inputFolderId.startsWith('Example_')) {
+    const parts = inputFolderId.split('_');
     if (parts.length >= 2) {
       const match = parts[1].match(/([A-Za-z]+)(\d+)/);
       if (match) {
@@ -111,7 +111,7 @@ export async function exampleProcessor(
         params.signatureQuery.matrix = matrixSize;
         params.seqmatrixQuery.profile = profileType;
         params.seqmatrixQuery.matrix = matrixSize;
-        params.id = `Example_${profileType}${matrixSize}_SigProfileExtractor_${randomID}`;
+        //params.id = `Example_${profileType}${matrixSize}_SigProfileExtractor_${randomID}`;
         params.form.signatureSetName.value = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.form.signatureSetName.label = `COSMIC_v3_Signatures_GRCh37_${profileType}${matrixSize}`;
         params.form.context_type.label = `${profileType}${matrixSize}`;
@@ -123,6 +123,7 @@ export async function exampleProcessor(
       throw new Error(`Invalid example ID: ${exampleOutputFolderName}`);
     }
   }
+  console.log('PARAMS -----', params);
   const dbConnection = knex({
     client: 'postgres',
     connection: {
@@ -137,6 +138,7 @@ export async function exampleProcessor(
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
   let paths = await getPaths(params, inputFolderId, randomID, env);
 
+  console.log('paths ', paths);
   // const submittedTime = new Date(
   //   (await readJson(paths.statusFile)).submittedAt
   // );

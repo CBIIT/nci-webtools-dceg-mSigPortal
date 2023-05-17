@@ -88,16 +88,16 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
-    const parts = id.split('_'); // Split the ID by underscores
-    const firstPart = parts.slice(0, 3).join('_'); // Join the first three parts with underscores
-    const secondPart = parts.slice(3).join('_'); // Join the remaining parts with underscores
+    const uuid = randomUUID();
+    console.log('id-------', id);
+    console.log('UUID ------- ', uuid);
     const dataFolder = path.resolve(env.DATA_FOLDER);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, uuid);
     const exampleFolderPath = path.resolve(
       dataFolder,
       'examples',
       'extraction',
-      firstPart
+      id
     );
 
     if (fs.existsSync(exampleFolderPath)) {
@@ -106,8 +106,8 @@ export async function extractionExample(req, res, next) {
       await copy(exampleFolderPath, outputFolder);
       const result = await exampleProcessor(
         exampleOutputFolderName,
-        firstPart,
-        secondPart,
+        id,
+        uuid,
         env
       );
       res.json(result);
