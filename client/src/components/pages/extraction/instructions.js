@@ -1,36 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import { useExampleQuery } from './apiSlice';
+import { useHistory } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 export default function Instructions({ props, loading }) {
-  //const examples = [
-  // {
-  //   title: 'Sherlock-Lung-232',
-  //   path: 'sherlock-lung-232',
-  // },
-  // {
-  //   title: 'Mutographs-ESCC',
-  //   path: 'mutographs-escc',
-  // },
-  // {
-  //   title: 'PCAWG Lung-AdenoCA',
-  //   path: 'pcawg-lungadenoca',
-  // },
-  // {
-  //   title: 'PCAWG Lung-SCC',
-  //   path: 'pcawg-lungscc',
-  // },
-  // {
-  //   title: 'PCAWG Breast-AdenoCA',
-  //   path: 'pcawg-breastadenoca',
-  // },
-  // {
-  //   title: 'PCAWG Skin-Melanoma',
-  //   path: 'pcawg-skinmelanoma',
-  // },
-  //];
-
   const examples = [
     {
       title: 'Example results based on SBS96 profiles',
@@ -45,10 +20,37 @@ export default function Instructions({ props, loading }) {
       path: 'Example_ID83_SigProfileExtractor',
     },
   ];
+  const history = useHistory();
+
+  //const id = pathParts[pathParts.length - 1];
+
+  const [id, setId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { data: exampleData } = useExampleQuery(id, {
+    skip: !id,
+  });
+
+  useEffect(() => {
+    if (exampleData && exampleData.id) {
+      history.push(`/extraction/${exampleData.id}`);
+      setIsLoading(false); // Set loading state to false when exampleData is available
+    }
+  }, [exampleData, history]);
+
+  const handleExampleClick = async (exampleFolder) => {
+    try {
+      setIsLoading(true); // Set loading state to true
+      setId(exampleFolder);
+    } catch (error) {
+      console.error(error); // Handle the error
+    }
+  };
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
-      <LoadingOverlay active={loading} />
+      {/* Include isLoading in the LoadingOverlay */}
+      <LoadingOverlay active={loading || isLoading} />
       <h4>Instructions</h4>
       <p>
         Choose a Data Source and its associated options to submit a query using
@@ -65,21 +67,24 @@ export default function Instructions({ props, loading }) {
         must reset between queries.
       </p>
       <h6>SigProfilerExtraction</h6>
-
       {examples.map(({ title, external, path }, index) => (
-        <div key={index}>
-          <Link to={`/extraction/${path}`} disabled>
+        <div>
+          <Button
+            key={index}
+            onClick={() => handleExampleClick(path)}
+            variant="link"
+          >
             <span className="sr-only">{title + ' link'}</span>
             {title}
-          </Link>
-          {external && (
-            <span>
-              {'; '}
-              <a href={external.href} target="_blank">
-                {external.name}
-              </a>
-            </span>
-          )}
+            {external && (
+              <span>
+                {'; '}
+                <a href={external.href} target="_blank">
+                  {external.name}
+                </a>
+              </span>
+            )}
+          </Button>
         </div>
       ))}
     </Container>

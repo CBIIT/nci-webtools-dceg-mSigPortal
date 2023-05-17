@@ -231,7 +231,7 @@ export function MsIndividualComparison(
     hoverinfo: 'x+y',
     showlegend: false,
     xaxis: 'x2',
-    yaxis: 'y12',
+    yaxis: 'y22',
   }));
 
   const sampleTraceDestructed = groupDestructed.map(
@@ -250,14 +250,14 @@ export function MsIndividualComparison(
       hoverinfo: 'x+y',
       showlegend: false,
       xaxis: 'x2',
-      yaxis: 'y11',
+      yaxis: 'y21',
     })
   );
   //console.log(sampleTraceDestructed);
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
     y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),
-    yaxis: 'y10',
+    yaxis: 'y20',
     axis: 'x2',
   }));
   const differenceTraceMaxYValue = findMaxAbsoluteYValue(differenceTrace);
@@ -365,7 +365,7 @@ export function MsIndividualComparison(
     ...sampleTraceDestructed,
   ];
   // ----- Shapes -------//
-  const sampleBorder1 = groupOriginal.map((group, groupIndex, array) => ({
+  const sampleBorder1 = groupDestructed.map((group, groupIndex, array) => ({
     type: 'rect',
     xref: 'x',
     yref: 'paper',
@@ -793,9 +793,76 @@ export function MsIndividualComparison(
             tickfont: {
               family: 'Arial',
             },
+            domain: [divide2 * 7 - 0.01, divide2 * 7 + divide2 - 0.02],
+          },
+          yaxis9: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
             domain: [divide2 * 8 - 0.01, divide2 * 8 + divide2 - 0.02],
           },
           yaxis10: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 9 - 0.01, divide2 * 9 + divide2 - 0.02],
+          },
+          yaxis11: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 10 - 0.01, divide2 * 10 + divide2 - 0.02],
+          },
+          yaxis12: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 11 - 0.01, divide2 * 11 + divide2 - 0.02],
+          },
+          yaxis13: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 12 - 0.01, divide2 * 12 + divide2 - 0.02],
+          },
+          yaxis14: {
+            autorange: true,
+            linecolor: '#D3D3D3',
+            linewidth: 1,
+            ticks: '',
+            mirror: 'all',
+            tickfont: {
+              family: 'Arial',
+            },
+            domain: [divide2 * 13 - 0.01, divide2 * 13 + divide2 - 0.02],
+          },
+
+          yaxis20: {
             autorange: false,
 
             range: [
@@ -815,7 +882,7 @@ export function MsIndividualComparison(
             domain: [1 - divide1 * 3 - 0.01, 1 - divide1 * 2 - 0.02],
             anchor: 'x2',
           },
-          yaxis11: {
+          yaxis21: {
             autorange: false,
             range: [0, maxMutations * 1.2],
             linecolor: '#D3D3D3',
@@ -829,7 +896,7 @@ export function MsIndividualComparison(
             domain: [1 - divide1 * 2 - 0.01, 1 - divide1 - 0.02],
             anchor: 'x2',
           },
-          yaxis12: {
+          yaxis22: {
             autorange: false,
             range: [0, maxMutations * 1.2],
             linecolor: '#D3D3D3',

@@ -9,6 +9,7 @@ export default function TmbPlot({ state }) {
     skip: !params,
   });
 
+  //console.log('TMB ', data);
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
   // query after public form is submitted
   useEffect(() => {

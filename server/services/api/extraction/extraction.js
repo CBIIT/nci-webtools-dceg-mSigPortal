@@ -3,7 +3,10 @@ import { validate } from 'uuid';
 import path from 'path';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
 import { getWorker } from '../../workers.js';
-
+import { exampleProcessor } from './exampleProcessor.js';
+import fs from 'fs';
+import { copy } from 'fs-extra';
+import { randomUUID } from 'crypto';
 const env = process.env;
 
 export async function submit(req, res, next) {
@@ -36,7 +39,10 @@ export async function submit(req, res, next) {
 
 // downloads latest files from s3 and returns status, params, and manifest
 async function getJobStatus(id) {
-  if (!validate(id)) return `${id} is not a valid ID`;
+  //if (!validate(id)) return `${id} is not a valid ID`;
+  if (!/^Example_/.test(id) && !validate(id)) {
+    return `${id} is not a valid ID`;
+  }
   try {
     const inputFolder = path.resolve(env.INPUT_FOLDER, id);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
@@ -82,9 +88,47 @@ export async function refreshMulti(req, res, next) {
   }
 }
 
+export async function extractionExample(req, res, next) {
+  const { logger } = req.app.locals;
+  try {
+    const id = req.params.id;
+    const uuid = randomUUID();
+    const dataFolder = path.resolve(env.DATA_FOLDER);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, uuid);
+    const exampleFolderPath = path.resolve(
+      dataFolder,
+      'examples',
+      'extraction',
+      id
+    );
+
+    if (fs.existsSync(exampleFolderPath)) {
+      const exampleOutputFolderName = path.basename(outputFolder);
+      //copy example folder into outputFolder
+      await copy(exampleFolderPath, outputFolder);
+      const result = await exampleProcessor(
+        exampleOutputFolderName,
+        id,
+        uuid,
+        env
+      );
+      res.json(result);
+    } else {
+      res.status(404).json({
+        error: 'Example folder does not exist: ',
+        exampleFolderPath,
+      });
+    }
+  } catch (error) {
+    logger.error('/extractionExample Error', error);
+    next(error);
+  }
+}
+
 const router = Router();
 router.post('/submitExtraction/:id?', submit);
 router.get('/refreshExtraction/:id?', refresh);
 router.post('/refreshExtractionMulti', refreshMulti);
+router.get('/extractionExample/:id', extractionExample);
 
 export { router };

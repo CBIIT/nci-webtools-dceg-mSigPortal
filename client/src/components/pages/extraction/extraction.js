@@ -43,12 +43,6 @@ export default function Extraction() {
   const status = refreshStatus?.status;
   const manifest = refreshStatus?.manifest;
   const params = refreshStatus?.params;
-  // const { data: status, refetch: refetchStatus } = useStatusQuery(id, {
-  //   skip: !id,
-  // });
-  // const { data: manifest, refetch: refetchManifest } = useManifestQuery(id, {
-  //   skip: !id,
-  // });
 
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   const explorationId = (() => {
@@ -262,6 +256,8 @@ export default function Extraction() {
                     <p>
                       {manifest.matrixFile
                         ? manifest.matrixFile
+                        : id.toLowerCase().includes('example')
+                        ? 'example-data'
                         : 'public-data'}
                     </p>
                   </Col>
