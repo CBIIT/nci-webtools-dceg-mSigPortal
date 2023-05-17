@@ -39,9 +39,7 @@
     "react-table": "^7.7.0",
     "react-zoom-pan-pinch": "^2.1.3",
     "recoil": "^0.7.4",
-    "swagger-ui-react": "^4.12.0",
-    "typescript": "^4.0.3",
-    "uuid": "^9.0.0"
+    "swagger-ui-react": "^4.12.0"
   },
   "scripts": {
     "start": "BROWSER=firefox react-app-rewired start",

@@ -817,3 +817,9 @@ select.form-control-sm {
     column-count: 1;
   }
 }
+
+.clickable-link {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}

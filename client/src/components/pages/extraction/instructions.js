@@ -3,8 +3,6 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { useExampleQuery, useRefreshQuery } from './apiSlice';
-import { useLocation } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { useHistory } from 'react-router-dom';
 
 export default function Instructions({ props, loading }) {
@@ -22,12 +20,9 @@ export default function Instructions({ props, loading }) {
       path: 'Example_ID83_SigProfileExtractor',
     },
   ];
-  const location = useLocation();
   const history = useHistory();
 
-  const pathParts = location.pathname.split('/');
   //const id = pathParts[pathParts.length - 1];
-  const randomUUID = uuidv4();
 
   const [uuid, setUuid] = useState(null);
 
@@ -54,8 +49,6 @@ export default function Instructions({ props, loading }) {
     try {
       // Fetch example data here if needed
       setId(exampleFolder);
-      console.log(exampleData);
-      console.log(id);
     } catch (error) {
       console.error(error); // Handle the error
     }
@@ -82,7 +75,11 @@ export default function Instructions({ props, loading }) {
       <h6>SigProfilerExtraction</h6>
 
       {examples.map(({ title, external, path }, index) => (
-        <div key={index} onClick={() => handleExampleClick(path)}>
+        <div
+          key={index}
+          onClick={() => handleExampleClick(path)}
+          className="clickable-link"
+        >
           <span className="sr-only">{title + ' link'}</span>
           {title}
           {external && (
