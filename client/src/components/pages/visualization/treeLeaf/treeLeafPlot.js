@@ -27,7 +27,7 @@ export default function D3TreeLeaf({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const worker = createPromiseWorker('/workers/treeLeaf.js', { type: 'module' });
+    const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
     setLoading(true);
 
     worker.submit({
