@@ -25,9 +25,8 @@ export default function Instructions({ props, loading }) {
 
   //const id = pathParts[pathParts.length - 1];
 
-  const [uuid, setUuid] = useState(null);
-
   const [id, setId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: exampleData } = useExampleQuery(id, {
     skip: !id,
@@ -38,12 +37,13 @@ export default function Instructions({ props, loading }) {
   useEffect(() => {
     if (exampleData && exampleData.id) {
       history.push(`/extraction/${exampleData.id}`);
+      setIsLoading(false); // Set loading state to false when exampleData is available
     }
   }, [exampleData, history]);
 
   const handleExampleClick = async (exampleFolder) => {
     try {
-      // Fetch example data here if needed
+      setIsLoading(true); // Set loading state to true
       setId(exampleFolder);
     } catch (error) {
       console.error(error); // Handle the error
@@ -52,7 +52,8 @@ export default function Instructions({ props, loading }) {
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
-      <LoadingOverlay active={loading} />
+      {/* Include isLoading in the LoadingOverlay */}
+      <LoadingOverlay active={loading || isLoading} />
       <h4>Instructions</h4>
       <p>
         Choose a Data Source and its associated options to submit a query using
@@ -69,7 +70,6 @@ export default function Instructions({ props, loading }) {
         must reset between queries.
       </p>
       <h6>SigProfilerExtraction</h6>
-
       {examples.map(({ title, external, path }, index) => (
         <div>
           <Button
