@@ -83,13 +83,44 @@ export default function About() {
             <p>
               This module allows users to perform both mutational signature de
               novo extraction and decomposition analysis using state-of-the-art
-              algorithms such as SigProfiler, Signal, MuSiCal, and
-              SignatureAnalyzer. It supports both user input and mutation
-              profile data collected from popular cancer genomic studies. Users
-              can select any combination of known mutational signatures for the
-              signature decomposition analysis as a reference. The results from
-              this module can be fully imported into the Signature Exploration
-              module for visualization and comparison.
+              algorithms such as{' '}
+              <a
+                href="https://github.com/AlexandrovLab/SigProfilerExtractor"
+                target="_blank"
+                rel="noreferrer"
+              >
+                SigProfiler
+              </a>
+              ,{' '}
+              <a
+                href="https://github.com/Nik-Zainal-Group/signature.tools.lib"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Signal
+              </a>
+              ,{' '}
+              <a
+                href="https://github.com/parklab/MuSiCal"
+                target="_blank"
+                rel="noreferrer"
+              >
+                MuSiCal
+              </a>
+              , and{' '}
+              <a
+                href="https://github.com/getzlab/SignatureAnalyzer"
+                target="_blank"
+                rel="noreferrer"
+              >
+                SignatureAnalyzer
+              </a>
+              . It supports both user input and mutation profile data collected
+              from popular cancer genomic studies. Users can select any
+              combination of known mutational signatures for the signature
+              decomposition analysis as a reference. The results from this
+              module can be fully imported into the Signature Exploration module
+              for visualization and comparison.
             </p>
           </div>
           <div id="exploration">
