@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { useExampleQuery, useRefreshQuery } from './apiSlice';
 import { useHistory } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 export default function Instructions({ props, loading }) {
   const examples = [
@@ -32,18 +33,13 @@ export default function Instructions({ props, loading }) {
     skip: !id,
   });
 
-  const { data: refreshStatus, refetch: refreshExtraction } = useRefreshQuery(
-    uuid,
-    { skip: !uuid }
-  );
+  console.log('exampleData', exampleData);
 
-  if (exampleData && exampleData.id) {
-    setUuid(exampleData.id);
-    history.push(`/extraction/${exampleData.id}`);
-    window.location.reload(); // Refresh the page
-  } else {
-    console.log('NO ID');
-  }
+  useEffect(() => {
+    if (exampleData && exampleData.id) {
+      history.push(`/extraction/${exampleData.id}`);
+    }
+  }, [exampleData, history]);
 
   const handleExampleClick = async (exampleFolder) => {
     try {
@@ -75,21 +71,23 @@ export default function Instructions({ props, loading }) {
       <h6>SigProfilerExtraction</h6>
 
       {examples.map(({ title, external, path }, index) => (
-        <div
-          key={index}
-          onClick={() => handleExampleClick(path)}
-          className="clickable-link"
-        >
-          <span className="sr-only">{title + ' link'}</span>
-          {title}
-          {external && (
-            <span>
-              {'; '}
-              <a href={external.href} target="_blank">
-                {external.name}
-              </a>
-            </span>
-          )}
+        <div>
+          <Button
+            key={index}
+            onClick={() => handleExampleClick(path)}
+            variant="link"
+          >
+            <span className="sr-only">{title + ' link'}</span>
+            {title}
+            {external && (
+              <span>
+                {'; '}
+                <a href={external.href} target="_blank">
+                  {external.name}
+                </a>
+              </span>
+            )}
+          </Button>
         </div>
       ))}
     </Container>
