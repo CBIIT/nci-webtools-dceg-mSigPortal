@@ -39,7 +39,13 @@ export const formState = atom({
   default: defaultFormState,
 });
 
+
 export const defaultTreeLeafData = { links: [], nodes: [] };
+
+export const treeLeafDataState = atom({
+  key: 'treeLeaf.coordinateState',
+  default: defaultTreeLeafData,
+})
 
 export const graphDataSelector = selectorFamily({
   key: 'treeLeaf.plotData',
@@ -55,3 +61,4 @@ export const graphDataSelector = selectorFamily({
     }
   },
 });
+

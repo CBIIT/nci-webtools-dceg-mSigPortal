@@ -1,16 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
-import { useRecoilValue } from 'recoil';
-import { formState, graphDataSelector } from './treeLeaf.state';
-import {
-  groupBy,
-  hierarchicalForce,
-  getAttractionMatrix,
-  createIdGenerator,
-  assignParents,
-} from './treeLeaf.utils';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { formState, graphDataSelector, treeLeafDataState } from './treeLeaf.state';
+import { groupBy, createPromiseWorker } from './treeLeaf.utils';
 
 export default function D3TreeLeaf({
   id = 'treeleaf-plot',
@@ -24,19 +18,37 @@ export default function D3TreeLeaf({
   const publicForm = useSelector((state) => state.visualization.publicForm);
   const study = publicForm?.study?.value ?? 'PCAWG';
   const strategy = publicForm?.strategy?.value ?? 'WGS';
-  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
-  const profileMatrix = ['SBS96', 'DBS78', 'ID83'];
+  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96'; // todo: allow user to select signature set
+  const profileMatrix = ['SBS96']; // todo: allow user to select profile matrix
   const params = { study, strategy,  signatureSetName, profileMatrix, cancer: form?.cancerType?.value };
-  const graphData = useRecoilValue(graphDataSelector(params));
-  const { hierarchy, attributes } = cloneDeep(graphData) || {};
+  const { hierarchy, attributes } = useRecoilValue(graphDataSelector(params));
+  // const { hierarchy, attributes } = cloneDeep(graphData) || {};
+  const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const plotData = {
+    const worker = createPromiseWorker('/workers/treeLeaf.js', { type: 'module' });
+    setLoading(true);
+
+    worker.submit({
       data: hierarchy,
       attributes: groupBy(attributes, 'Sample'),
-      form: form,
-    };
-
-    if (plotRef.current && plotData.data) {
+      radius: Math.min(width, height) / 2,
+    }).then(setTreeLeafData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+    return () => worker?.terminate();
+  }, [hierarchy, attributes, width, height, setTreeLeafData, setLoading]);
+  
+  useEffect(() => {
+    if (plotRef.current && hierarchy && attributes) {
+      const plotData = {
+        data: hierarchy,
+        attributes: groupBy(attributes, 'Sample'),
+        form: form,
+        nodes: treeLeafData.nodes,
+        links: treeLeafData.links,
+      };
 
       const plotLayout = {
         id,
@@ -50,19 +62,17 @@ export default function D3TreeLeaf({
         onClick: onSelect,
       };
 
-      const loading = document.createElement('div');
-      loading.innerHTML = `Please wait while your plot is rendered...`
-      plotRef.current.replaceChildren(loading);
-      setTimeout(() => {
-        const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
-        plotRef.current.replaceChildren(plot);
-      }, 100);
+      const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
+      plotRef.current?.replaceChildren(plot);
+    } else {
+      plotRef.current?.replaceChildren(null);
     }
-  }, [plotRef, attributes, form, hierarchy, id, width, height, publicForm?.study?.label, form.color.label, onSelect]);
+  }, [plotRef, attributes, form, hierarchy, id, width, height, publicForm?.study?.label, form.color.label, onSelect, treeLeafData]);
 
   return (
     <div className="border rounded p-3 position-relative" {...props}>
-      <div ref={plotRef} />
+      <div hidden={!loading}>Please wait one minute while your plot is being rendered...</div>
+      <div hidden={loading} ref={plotRef}  />
     </div>
   );
 }
@@ -71,14 +81,9 @@ export default function D3TreeLeaf({
 // Released under the ISC license.
 // https://observablehq.com/@d3/force-directed-tree
 function createForceDirectedTree(
-  { data, attributes, form },
+  { attributes, form, nodes, links },
   {
     id,
-    children, // if hierarchical data, given a d in data, returns its children
-    tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-    separation = (a, b) => (a.parent == b.parent ? 0.001 : 2) / a.depth,
-    sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-    label = (d) => d.name, // given a node d, returns the display name
     title, // given a node d, returns its hover text
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
@@ -91,30 +96,41 @@ function createForceDirectedTree(
       width - marginLeft - marginRight,
       height - marginTop - marginBottom
     ) / 2, // outer radius
-    r = d3.scaleSqrt().range([5, 20]), // radius of nodes
-    padding = 1, // horizontal padding for first and last column
     fill = form.color.continuous
-      ? d3.scaleSequential(d3.interpolateBlues)
+      ? d3.scaleSequential(d3.interpolateRgb("white", "steelblue"))
       : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
-    fillOpacity, // fill opacity for nodes
     stroke = '#555', // stroke for links
-    strokeWidth = 1.5, // stroke width for links
+    strokeWidth = 0.5, // stroke width for links
     strokeOpacity = 0.4, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
     strokeLinecap, // stroke line cap for links
-    halo = '#fff', // color of label halo
-    haloWidth = 3, // padding around the labels
-    scale = 1.5,
-    highlightQuery = null,
     plotTitle,
   },
-  { onClick }
+  { onClick },
 ) {
-  // gather range of attributes
-  const mutations = Object.values(attributes).map((e) => e.Mutations);
-  const mutationMin = d3.min(mutations);
-  const mutationMax = d3.max(mutations);
+  const range = {
+    xMin: 0,
+    xMax: 0,
+    yMin: 0,
+    yMax: 0,
+  };
 
+  nodes.forEach((d) => {
+    if (d.x < range.xMin) range.xMin = d.x;
+    if (d.x > range.xMax) range.xMax = d.x;
+    if (d.y < range.yMin) range.yMin = d.y;
+    if (d.y > range.yMax) range.yMax = d.y;
+  });
+
+  const treeScale = Math.min(
+    Math.log2(Object.keys(attributes).length),
+    Math.max(
+      width / (range.xMax - range.xMin),
+      height / (range.yMax - range.yMin)
+    )
+  ) * 0.75;
+
+  // gather range of attributes
   const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
   const colorMin = d3.min(colorValues);
   const colorMax = d3.max(colorValues);
@@ -122,69 +138,7 @@ function createForceDirectedTree(
     ? fill.domain([colorMin, colorMax])
     : fill.domain(colorValues);
 
-  const treeData = d3.hierarchy(data, children);
-
-  // Sort the nodes.
-  if (sort != null) treeData.sort(sort);
-
-  // Compute the layout.
-  const root = d3
-    .tree()
-    .size([2 * Math.PI, radius])
-    .separation(separation)(treeData);
-
-  treeData.each((d) => {
-    console.log(d);
-    let angle = d.x;
-    let distance = d.y;
-    d.x = distance * Math.cos(angle) * scale;
-    d.y = distance * Math.sin(angle) * scale;
-  });
-
-  assignParents(data, createIdGenerator());
-  const distanceMatrix = getAttractionMatrix(data, node => node.id);
-
-  // Compute labels and titles.
-  const nodes = root.descendants();
-  const links = root.links();
-
-  const nodeRadius = ({ data, children }) =>
-    !children && data.name && attributes[data.name]
-      ? r.domain([mutationMin, mutationMax])(attributes[data.name].Mutations)
-      : 0;
-
-  // console.log(distanceMatrix);
-  
-  const simulation = d3
-    .forceSimulation(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(1)
-        .strength(1)
-    )
-    .force(
-      'hierarchical',
-      hierarchicalForce(distanceMatrix, nodes)
-    )
-    // .force(
-    //   'charge',
-    //   forceHierarchical(attractionMatrix).strength((d, i, nodes) =>
-    //     d.children ? -15 : 15
-    //   )
-    // )
-    // .force("center", d3.forceCenter().strength(1))
-    .force('x', d3.forceX().strength(0.005))
-    .force('y', d3.forceY().strength(0.005))
-    .force('collision', d3.forceCollide().radius(nodeRadius));
-
-  simulation.stop();
-  simulation.tick(120);
-
   const zoom = d3.zoom().on('zoom', zoomed);
-
   const viewBoxScale = 1.3;
   const container = d3.create('div');
   const svg = container
@@ -207,7 +161,12 @@ function createForceDirectedTree(
     .call(zoom);
 
   // add tree container
-  const treeGroup = svg.append('g').attr('transform', `translate(0, 20)`);
+  const treeZoomContainer = svg.append('g')
+    .attr('id', 'treeleaf-zoom-container')
+
+  const treeGroup = treeZoomContainer.append('g')
+    .attr('id', 'treeleaf-tree')
+    .attr('transform', `translate(0, 20) scale(${treeScale})`);
 
   // add lines
   const link = treeGroup
@@ -218,7 +177,7 @@ function createForceDirectedTree(
     .attr('stroke-opacity', strokeOpacity)
     .attr('stroke-linecap', strokeLinecap)
     .attr('stroke-linejoin', strokeLinejoin)
-    .attr('stroke-width', strokeWidth)
+    .attr('stroke-width', strokeWidth * 2)
     .selectAll('path')
     .data(links)
     .join('line')
@@ -265,7 +224,7 @@ function createForceDirectedTree(
     .attr('opacity', getNodeOpacity)
     .attr('stroke', stroke)
     .attr('stroke-width', strokeWidth)
-    .attr('r', nodeRadius)
+    .attr('r', (d) => d.r)
     .attr('cx', (d) => d.x)
     .attr('cy', (d) => d.y)
     .attr('class', 'c-pointer')
@@ -274,20 +233,10 @@ function createForceDirectedTree(
     .on('mouseleave', mouseleave)
     .on('click', click);
 
-  simulation.on('tick', () => {
-    link
-      .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => d.source.y)
-      .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => d.target.y);
-
-    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-  });
-
   if (title != null) node.append('title').text((d) => title(d.data, d));
 
   function zoomed({ transform }) {
-    d3.selectAll('#treeleaf-links,#treeleaf-nodes').attr(
+    d3.selectAll('#treeleaf-zoom-container').attr(
       'transform',
       transform
     );

@@ -1,7 +1,9 @@
-import {quadtree} from "d3-quadtree";
+import { quadtree } from 'd3-quadtree';
 
 export function exportSvg(selector, filename) {
-  const svgString = new XMLSerializer().serializeToString(document.querySelector(selector));
+  const svgString = new XMLSerializer().serializeToString(
+    document.querySelector(selector)
+  );
   const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
   const svgUrl = URL.createObjectURL(svgBlob);
   const downloadLink = document.createElement('a');
@@ -40,8 +42,7 @@ export function assignParents(node, getId) {
 }
 
 export function getParents(node) {
-  if (node.parents && node.parents.length)
-    return node.parents;
+  if (node.parents && node.parents.length) return node.parents;
 
   const parents = [];
   let parent = node.parent;
@@ -52,7 +53,6 @@ export function getParents(node) {
   node.parents = parents;
   return parents;
 }
-
 
 export function getLeafNodes(node) {
   // iterate through the tree and return all leaf nodes
@@ -87,8 +87,8 @@ export function getAllChildren(node, nodes = []) {
 
 /**
  * Returns the distance to the closest common parent of two nodes
- * @param {any} nodeA 
- * @param {any} nodeB 
+ * @param {any} nodeA
+ * @param {any} nodeB
  */
 export function getClosestParentDistance(nodeA, nodeB) {
   const parentsA = getParents(nodeA);
@@ -110,9 +110,9 @@ export function getClosestParentDistance(nodeA, nodeB) {
   return distanceA + distanceB;
 }
 
-export function getAttractionMatrix(node, id = node => node.id) {
+export function getAttractionMatrix(node, id = (node) => node.id) {
   let matrix = {};
-  const nodes = getAllChildren(node);// || getLeafNodes(node);// || getAllChildren(node);
+  const nodes = getAllChildren(node); // || getLeafNodes(node);// || getAllChildren(node);
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       let a = nodes[i];
@@ -128,12 +128,29 @@ export function getAttractionMatrix(node, id = node => node.id) {
       matrix[idB][idA] = distance;
     }
   }
-      
+
   return matrix;
 }
 
+export function createPromiseWorker(url, options) {
+  const worker = new Worker(url, options);
+  return {
+    submit: (params) =>
+      new Promise((resolve, reject) => {
+        worker.onmessage = (event) => {
+          resolve(event.data);
+        };
+        worker.onerror = (error) => {
+          reject(error);
+        };
+        worker.postMessage(params);
+      }),
+    terminate: () => worker.terminate(),
+  };
+}
+
 export function hierarchicalForce(distanceMatrix, nodes) {
-  return function(alpha) {
+  return function (alpha) {
     for (var i = 0; i < nodes.length; i++) {
       for (var j = i + 1; j < nodes.length; j++) {
         const a = nodes[i];
@@ -142,8 +159,10 @@ export function hierarchicalForce(distanceMatrix, nodes) {
         const idB = b?.data?.id;
 
         // only include leaf nodes in the comparison
-        if (a.depth === 0 || b.depth === 0 || !a.data.name || !b.data.name) continue;
-        const distance = distanceMatrix[idA]?.[idB] || distanceMatrix[idB]?.[idA];
+        if (a.depth === 0 || b.depth === 0 || !a.data.name || !b.data.name)
+          continue;
+        const distance =
+          distanceMatrix[idA]?.[idB] || distanceMatrix[idB]?.[idA];
         if (!distance) continue;
 
         // get the angle between a and b
@@ -152,8 +171,11 @@ export function hierarchicalForce(distanceMatrix, nodes) {
         const angle = Math.atan2(dy, dx);
 
         // move each node away from each other, multiplied by the scaled distance
-        const distanceFactor = 0.001;
-        const delta = ((distance - 4 - Math.floor(Math.log2(nodes.length))) * distanceFactor * (alpha ** 2));
+        const distanceFactor = 0.003;
+        const delta =
+          (distance - 4 - Math.floor(Math.log2(nodes.length))) *
+          distanceFactor *
+          alpha ** 2;
         a.x -= Math.cos(angle) * delta;
         a.y -= Math.sin(angle) * delta;
         b.x += Math.cos(angle) * delta;
@@ -163,27 +185,27 @@ export function hierarchicalForce(distanceMatrix, nodes) {
   };
 }
 
-
 export function forceHierarchical(attractionMatrix) {
   let nodes,
-      node,
-      random,
-      alpha,
-      strength = () => (-30),
-      strengths,
-      distanceMin2 = 1,
-      distanceMax2 = Infinity,
-      theta2 = 0.81,
-      x = d => d.x,
-      y = d => d.y;
+    node,
+    random,
+    alpha,
+    strength = () => -30,
+    strengths,
+    distanceMin2 = 1,
+    distanceMax2 = Infinity,
+    theta2 = 0.81,
+    x = (d) => d.x,
+    y = (d) => d.y;
 
   function jiggle(random) {
     return (random() - 0.5) * 1e-6;
   }
 
   function force(_) {
-
-    let i, n = nodes.length, tree = quadtree(nodes, x, y).visitAfter(accumulate);
+    let i,
+      n = nodes.length,
+      tree = quadtree(nodes, x, y).visitAfter(accumulate);
     for (alpha = _, i = 0; i < n; ++i) {
       node = nodes[i];
       tree.visit(apply);
@@ -192,7 +214,9 @@ export function forceHierarchical(attractionMatrix) {
 
   function initialize() {
     if (!nodes) return;
-    let i, n = nodes.length, node;
+    let i,
+      n = nodes.length,
+      node;
     strengths = new Array(n);
     for (i = 0; i < n; ++i) {
       node = nodes[i];
@@ -201,7 +225,13 @@ export function forceHierarchical(attractionMatrix) {
   }
 
   function accumulate(quad) {
-    let strength = 0, q, c, weight = 0, x, y, i;
+    let strength = 0,
+      q,
+      c,
+      weight = 0,
+      x,
+      y,
+      i;
 
     // For internal nodes, accumulate forces from child quadrants.
     if (quad.length) {
@@ -223,7 +253,7 @@ export function forceHierarchical(attractionMatrix) {
       q.x = q.data.x;
       q.y = q.data.y;
       do strength += strengths[q.data.index];
-      while (q = q.next);
+      while ((q = q.next));
     }
 
     quad.value = strength;
@@ -233,13 +263,13 @@ export function forceHierarchical(attractionMatrix) {
     if (!quad.value) return true;
 
     let x = quad.x - node.x,
-        y = quad.y - node.y,
-        w = x2 - x1,
-        l = x * x + y * y;
+      y = quad.y - node.y,
+      w = x2 - x1,
+      l = x * x + y * y;
 
     // Apply the Barnes-Hut approximation if possible.
     // Limit forces for very close nodes; randomize direction if coincident.
-    if (w * w / theta2 < l) {
+    if ((w * w) / theta2 < l) {
       if (l < distanceMax2) {
         if (x === 0) {
           x = jiggle(random);
@@ -248,10 +278,10 @@ export function forceHierarchical(attractionMatrix) {
         if (y === 0) {
           y = jiggle(random);
           l += y * y;
-        } 
+        }
         if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
-        node.vx += x * quad.value * alpha / l;
-        node.vy += y * quad.value * alpha / l;
+        node.vx += (x * quad.value * alpha) / l;
+        node.vy += (y * quad.value * alpha) / l;
       }
       return true;
     }
@@ -272,33 +302,43 @@ export function forceHierarchical(attractionMatrix) {
       if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
     }
 
-    do if (quad.data !== node) {
-      w = strengths[quad.data.index] * alpha / l;
-      node.vx += x * w;
-      node.vy += y * w;
-    } while (quad = quad.next);
+    do
+      if (quad.data !== node) {
+        w = (strengths[quad.data.index] * alpha) / l;
+        node.vx += x * w;
+        node.vy += y * w;
+      }
+    while ((quad = quad.next));
   }
 
-  force.initialize = function(_nodes, _random) {
+  force.initialize = function (_nodes, _random) {
     nodes = _nodes;
     random = _random;
     initialize();
   };
 
-  force.strength = function(_) {
-    return arguments.length ? (strength = typeof _ === "function" ? _ : () => (+_), initialize(), force) : strength;
+  force.strength = function (_) {
+    return arguments.length
+      ? ((strength = typeof _ === 'function' ? _ : () => +_),
+        initialize(),
+        force)
+      : strength;
   };
 
-  force.distanceMin = function(_) {
-    return arguments.length ? (distanceMin2 = _ * _, force) : Math.sqrt(distanceMin2);
+  force.distanceMin = function (_) {
+    return arguments.length
+      ? ((distanceMin2 = _ * _), force)
+      : Math.sqrt(distanceMin2);
   };
 
-  force.distanceMax = function(_) {
-    return arguments.length ? (distanceMax2 = _ * _, force) : Math.sqrt(distanceMax2);
+  force.distanceMax = function (_) {
+    return arguments.length
+      ? ((distanceMax2 = _ * _), force)
+      : Math.sqrt(distanceMax2);
   };
 
-  force.theta = function(_) {
-    return arguments.length ? (theta2 = _ * _, force) : Math.sqrt(theta2);
+  force.theta = function (_) {
+    return arguments.length ? ((theta2 = _ * _), force) : Math.sqrt(theta2);
   };
 
   return force;
