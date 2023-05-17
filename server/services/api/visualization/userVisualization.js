@@ -346,6 +346,21 @@ async function getPublicTreeLeafData(req, res, next) {
       .from('seqmatrix')
       .where(params)
       .andWhere(connection.raw('concat(profile, matrix)'), 'in', profileMatrix);
+    
+    let cosineSimilarityData = await connection
+      .select('sample', 'cosineSimilarity')
+      .from('etiology')
+      .where({
+        study,
+        strategy,
+        signatureSetName
+      });
+
+    let cosineSimilarityMap = cosineSimilarityData.reduce((acc, curr) => ({
+      ...acc,
+      [curr.sample]: curr.cosineSimilarity
+    }), {});
+
     // console.log('exposureData', exposureData[0], exposureData?.length);
     // console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
     // console.log('signatureData', signatureData[0], signatureData?.length);
@@ -358,6 +373,13 @@ async function getPublicTreeLeafData(req, res, next) {
     }
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
+    console.log(results);
+
+    for (let record of results.output?.attributes || []) {
+      if (cosineSimilarityMap[record.Sample]) {
+        record.Cosine_similarity = cosineSimilarityMap[record.Sample];
+      }
+    }
     res.json(results);
   } catch (error) {
     console.log(error);

@@ -1104,14 +1104,6 @@ getTreeLeaf <- function(args, config) {
     pivot_wider(names_from = signatureName, values_from = exposure) %>%
     ungroup()
 
-  exposure_refdata <- exposure_refdata %>%
-    filter(exposure > 0) %>%
-    select(sample, cancer, signatureName, exposure) %>%
-    group_by(sample) %>%
-    mutate(exposure = exposure / sum(exposure)) %>%
-    pivot_wider(names_from = signatureName, values_from = exposure) %>%
-    ungroup()
-
   # determine dominant signature
   dsigdata <- exposure_refdata_ratio %>%
     select(-cancer) %>%
@@ -1141,10 +1133,6 @@ getTreeLeaf <- function(args, config) {
 
   mdata0 <- as.matrix(mdata[, -1])
   rownames(mdata0) <- mdata$sample
-  # distance <- dist(mdata0)
-  # p_i <- as.numeric(genomes[, i])
-  # q_i = (est_genomes[, i])
-  # cosineSimilarity <- cos_sim(mdata0)
 
   mdatax <- mdata %>%
     select(sample) %>%
@@ -1161,6 +1149,8 @@ getTreeLeaf <- function(args, config) {
     group_by(row_number()) %>%
     mutate(Cosine_similarity = runif(1)) # todo: implement
 
-  hc <- hclust(dist(mdata0), "ward.D") 
+  # determine the distance between samples
+  hc <- hclust(dist(mdata0), "ward.D")
+
   return(list(hierarchy = as.radialNetwork(hc), attributes = mdatax))
 }
