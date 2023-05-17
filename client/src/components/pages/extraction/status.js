@@ -27,7 +27,6 @@ export default function Status() {
     const remaining = jobs.filter((e) => e !== id);
     setJobs(remaining);
   }
-  console.log('test');
   const columns = useMemo(() => [
     {
       accessor: 'jobName',
