@@ -633,7 +633,7 @@ export default function ExtractionForm() {
             label={
               <div>
                 Extract Tool{' '}
-                {/* <Button
+                <Button
                   variant="secondary"
                   size="sm"
                   href="https://github.com/AlexandrovLab/SigProfilerExtractor"
@@ -644,7 +644,7 @@ export default function ExtractionForm() {
                 >
                   <FontAwesomeIcon icon={faGithub} className="mr-1" />
                   GitHub
-                </Button> */}
+                </Button>
               </div>
             }
             disabled={submitted || id}
