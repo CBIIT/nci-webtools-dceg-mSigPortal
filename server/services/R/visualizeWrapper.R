@@ -1146,11 +1146,10 @@ getTreeLeaf <- function(args, config) {
         ungroup()
     ) %>%
     rename(Cancer_Type = cancer, Sample = sample, Mutations = mutations) %>%
-    group_by(row_number()) %>%
-    mutate(Cosine_similarity = runif(1)) # todo: implement
+    group_by(row_number())
 
   # determine the distance between samples
-  hc <- hclust(dist(mdata0), "ward.D")
+  hc <- hclust(dist(na.omit(unlist(mdata0))), "ward.D")
 
   return(list(hierarchy = as.radialNetwork(hc), attributes = mdatax))
 }

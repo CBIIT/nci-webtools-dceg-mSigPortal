@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { randomUUID } from 'crypto';
+import { randomUUID, sign } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import archiver from 'archiver';
@@ -321,64 +321,113 @@ async function downloadWorkspace(req, res, next) {
 async function getPublicTreeLeafData(req, res, next) {
   try {
     const { connection } = req.app.locals;
-    const { study, strategy, cancer, signatureSetName, profileMatrix } =
+    let { study, strategy, cancer, signatureSetName, profile, matrix } =
       req.body;
+    const pickNotNull = (obj, nulls = [null, undefined, '']) => 
+      Object.fromEntries(Object.entries(obj).filter(([_, v]) => !nulls.includes(v)));
+
+    // determine signature set names from profile and matrix (e.g. SBS96 -> *_SBS96)
+    const signatureSetNames = await connection
+      .select('signatureSetName')
+      .from('exposure')
+      .where({study})
+      .andWhere('signatureSetName', 'like', `%${profile + matrix}`);
+
+    signatureSetName = signatureSetNames[0]?.signatureSetName || signatureSetName;
+
     const exposureData = await getExposureData(
       connection,
-      { study, strategy },
+      pickNotNull({ study, strategy }),
       '*',
       1e8
     );
+    
     const signatureData = await getSignatureData(
       connection,
-      { strategy, signatureSetName },
+      pickNotNull({ strategy, signatureSetName }),
       '*',
       1e8
     );
-    let params = {};
-    for (let key of ['study', 'strategy', 'cancer']) {
-      if (req.body[key]) {
-        params[key] = req.body[key];
-      }
-    }
+
     let seqmatrixData = await connection
       .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
       .from('seqmatrix')
-      .where(params)
-      .andWhere(connection.raw('concat(profile, matrix)'), 'in', profileMatrix);
-    
-    let cosineSimilarityData = await connection
-      .select('sample', 'cosineSimilarity')
-      .from('etiology')
-      .where({
-        study,
-        strategy,
-        signatureSetName
-      });
+      .where(pickNotNull({ study, strategy, cancer, profile, matrix }))
 
-    let cosineSimilarityMap = cosineSimilarityData.reduce((acc, curr) => ({
+    const estimatedMutations = connection
+      .select('e.cancer', 'e.sample', 'mutationType', connection.raw('SUM(contribution * exposure) as estimated'))
+      .from('signature as s')
+      .innerJoin('exposure as e', function() {
+          this.on('s.strategy', '=', 'e.strategy')
+              .andOn('s.signatureSetName', '=', 'e.signatureSetName')
+              .andOn('s.signatureName', '=', 'e.signatureName')
+      })
+      .where(pickNotNull({
+          'e.study': study,
+          'e.strategy': strategy,
+          'e.cancer': cancer,
+          's.profile': profile,
+          's.matrix': matrix,
+          's.signatureSetName': signatureSetName
+      }))
+      .andWhere('exposure', '>', 0)
+      .groupBy('e.cancer', 'e.sample', 'mutationType')
+  
+    const mutations = connection('seqmatrix as s')
+      .select(
+        's.study', 's.strategy', 's.cancer', 's.sample', 's.profile', 's.matrix', 's.mutationType', 
+          connection.raw('cast(s.mutations as bigint) as mutations'),
+          connection.raw(`cast(floor(a.estimated) as bigint) as estimated`),
+        // connection.raw(`1.0 * s.mutations * a.estimated as mutations_estimated`),
+        // connection.raw(`1.0 * s.mutations * s.mutations as mutations2`), // we need to materialize these columns types to avoid underflow/overflow when calculating cosine similarity
+        // connection.raw(`1.0 * a.estimated * a.estimated as estimated2`),
+      )
+      .join('estimated_mutations as a', function() {
+          this.on('s.mutationType', '=', 'a.mutationType')
+              .andOn('s.sample', '=', 'a.sample')
+              .andOn('s.cancer', '=', 'a.cancer')
+      })
+      .where(pickNotNull({
+          's.study': study,
+          's.strategy': strategy,
+          's.cancer': cancer,
+          's.profile': profile,
+          's.matrix': matrix
+      }))
+  
+    const cosineSimilarityData = await connection
+      .with('estimated_mutations', estimatedMutations)
+      .with('mutations', mutations)
+      .select(
+          'b.cancer', 
+          'b.sample', 
+          connection.raw('SUM(b.mutations * b.estimated) as numerator'),
+          connection.raw('SUM(b.mutations * b.mutations) as denominator1'),
+          connection.raw('SUM(b.estimated * b.estimated) as denominator2')
+      )
+      .from('mutations as b')
+      .groupBy('b.cancer', 'b.sample');
+    
+    // todo: execute this in the database (requires that we resolve underflow/overflow issues)
+    const cosineSimilarityMap = cosineSimilarityData.reduce((acc, curr) => ({
       ...acc,
-      [curr.sample]: curr.cosineSimilarity
+      [curr.sample]: +curr.numerator / (Math.sqrt(+curr.denominator1) * Math.sqrt(curr.denominator2))
     }), {});
 
-    // console.log('exposureData', exposureData[0], exposureData?.length);
-    // console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
-    // console.log('signatureData', signatureData[0], signatureData?.length);
     if (
       !exposureData?.length ||
       !seqmatrixData?.length ||
       !signatureData?.length
     ) {
+      console.log('exposureData', exposureData[0], exposureData?.length);
+      console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
+      console.log('signatureData', signatureData[0], signatureData?.length);
       throw new Error('No data found');
     }
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
-    console.log(results);
-
     for (let record of results.output?.attributes || []) {
-      if (cosineSimilarityMap[record.Sample]) {
-        record.Cosine_similarity = cosineSimilarityMap[record.Sample];
-      }
+      record.Cosine_similarity = cosineSimilarityMap[record.Sample] || 0;
     }
     res.json(results);
   } catch (error) {
@@ -403,7 +452,8 @@ router.post(
       req.body.strategy,
       req.body.cancer,
       req.body.signatureSetName,
-      req.body.profileMatrix,
+      req.body.profile,
+      req.body.matrix,
     ].join(':')
   ),
   getPublicTreeLeafData
