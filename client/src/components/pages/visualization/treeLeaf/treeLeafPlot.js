@@ -19,8 +19,9 @@ export default function D3TreeLeaf({
   const study = publicForm?.study?.value ?? 'PCAWG';
   const strategy = publicForm?.strategy?.value ?? 'WGS';
   const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96'; // todo: allow user to select signature set
-  const profileMatrix = ['SBS96']; // todo: allow user to select profile matrix
-  const params = { study, strategy,  signatureSetName, profileMatrix, cancer: form?.cancerType?.value };
+  const profile = 'SBS';
+  const matrix = 96;
+  const params = { study, strategy,  signatureSetName, profile, matrix, cancer: form?.cancerType?.value };
   const { hierarchy, attributes } = useRecoilValue(graphDataSelector(params));
   // const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);
@@ -266,9 +267,9 @@ function createForceDirectedTree(
           <div>Sample: ${sample ?? 'Unavailable'}</div>
           <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
           <div>Cosine Similarity: ${
-            data.Cosine_similarity ?? 'Unavailable'
+            data.Cosine_similarity || 'Unavailable'
           }</div>
-          <div>Mutations: ${data.Mutations ?? 'Unavailable'}</div>
+          <div>Mutations: ${data.Mutations || 'Unavailable'}</div>
         </div>`
       )
       .style('left', e.layerX + 'px')

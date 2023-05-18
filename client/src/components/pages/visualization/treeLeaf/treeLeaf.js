@@ -51,7 +51,7 @@ export default function TreeAndLeaf(props) {
           </Alert>
         }
       >
-        <Suspense fallback={<Loader message="Loading Plot" />}>
+        <Suspense fallback={<Loader message="Loading Plot Data" />}>
           <div className="d-flex justify-content-between align-items-end">
             <TreeLeafForm />
             <Button variant="link" onClick={handleExport}>Export Plot</Button>

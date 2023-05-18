@@ -13,10 +13,11 @@ export default function TreeLeafForm() {
   const cancers = store?.publicForm?.cancers?.filter(c => c.value !== '*ALL') || [];
   const cancerTypes = [{ label: 'All', value: '' }].concat(cancers);
   const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
-  const profileMatrix = ['SBS96'];
+  const profile = 'SBS';
+  const matrix = 96;
   const [form, setForm] = useRecoilState(formState);
   const cancer = form?.cancerType?.value;
-  const params = { study, strategy,  signatureSetName, profileMatrix, cancer };
+  const params = { study, strategy,  signatureSetName, profile, matrix, cancer };
   const { attributes } = useRecoilValue(graphDataSelector(params));
   const resetForm = useResetRecoilState(formState);
   const mergeForm = (state) => setForm({ ...form, ...state });
