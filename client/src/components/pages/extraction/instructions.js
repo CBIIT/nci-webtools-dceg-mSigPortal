@@ -73,6 +73,7 @@ export default function Instructions({ props, loading }) {
             key={index}
             onClick={() => handleExampleClick(path)}
             variant="link"
+            className="pl-0 pr-0"
           >
             <span className="sr-only">{title + ' link'}</span>
             {title}
