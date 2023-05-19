@@ -24,6 +24,8 @@ export function MsIndividualComparison(
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
 
+  console.log('data ', data);
+
   const exposure_groupBySignature = groupBy(
     exposureData?.filter((o) => o['exposure'] > 0.01),
     'signatureName'
@@ -109,12 +111,16 @@ export function MsIndividualComparison(
     seqmatrix_groupByMutationType
   ).flat(); //original data for the comparison
 
+  console.log('seqmatrixDataFilter ', seqmatrixDataFilter);
+
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
   };
 
   const totalMutationsOriginal = getTotalMutations(seqmatrixDataFilter);
+
+  console.log('totalMutationsOriginal---- ', totalMutationsOriginal);
 
   const normalizedOriginal = seqmatrixDataFilter.map((e) => ({
     ...e,
@@ -126,11 +132,15 @@ export function MsIndividualComparison(
     }),
   }));
 
+  console.log('normalizedOriginal', normalizedOriginal);
+
   const groupOriginal = groupDataByMutation(
     normalizedOriginal,
     mutationRegex,
     mutationGroupSort
   );
+
+  console.log('groupOriginal', groupOriginal);
 
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
@@ -215,6 +225,9 @@ export function MsIndividualComparison(
   const maxMutation1 = getMaxMutations(normalizedOriginal) / totalMutations1;
   const maxMutation2 = getMaxMutations(newDestructedData) / totalMutations2;
   const maxMutations = Math.max(maxMutation1, maxMutation2);
+  console.log('maxMutation1', maxMutation1);
+  console.log('maxMutation2 ', maxMutation2);
+  console.log(maxMutations);
   // --- Top subplots : original, destructed, different
   const sampleTraceOriginal = groupOriginal.map((group, groupIndex, array) => ({
     name: group.mutation,

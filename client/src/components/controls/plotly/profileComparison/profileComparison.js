@@ -21,14 +21,17 @@ export function groupDataByMutation(
 }
 
 export function getTotalMutations(data) {
-  return data.reduce(
-    (total, e) => total + (e.mutations || e.contribution || 0),
-    0
-  );
+  return data.reduce((total, e) => {
+    const mutations = Number(e.mutations) || 0;
+    const contribution = Number(e.contribution) || 0;
+    return total + mutations + contribution;
+  }, 0);
 }
 
 export function getMaxMutations(data) {
-  return Math.max(...data.map((e) => e.mutations || e.contribution || 0));
+  return Math.max(
+    ...data.map((e) => Number(e.mutations) || Number(e.contribution) || 0)
+  );
 }
 
 export function findMaxYValue(data) {
