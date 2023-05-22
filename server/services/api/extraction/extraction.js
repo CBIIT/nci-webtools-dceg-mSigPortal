@@ -25,10 +25,7 @@ export async function submit(req, res, next) {
     submittedAt: new Date(),
   };
 
-  const type =
-    env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'batch';
-
-  const worker = getWorker(type);
+  const worker = getWorker(env.WORKER_TYPE || 'local');
 
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
