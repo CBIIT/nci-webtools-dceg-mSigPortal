@@ -7,6 +7,8 @@ import { exampleProcessor } from './exampleProcessor.js';
 import fs from 'fs';
 import { copy } from 'fs-extra';
 import { randomUUID } from 'crypto';
+import { handleValidationErrors } from '../../middleware.js';
+import { check } from 'express-validator';
 const env = process.env;
 
 export async function submit(req, res, next) {
@@ -122,8 +124,24 @@ export async function extractionExample(req, res, next) {
   }
 }
 
+// validate parameter limits for extraction submit
+const minMaxValidation = (param, min, max) =>
+  check(param)
+    .custom((e) => e >= min && e <= max)
+    .withMessage(`${param} must be between ${min} and ${max}`);
+
 const router = Router();
-router.post('/submitExtraction/:id?', submit);
+router.post(
+  '/submitExtraction/:id?',
+  minMaxValidation('args.minimum_signatures', 1, 20),
+  minMaxValidation('args.maximum_signatures', 1, 20),
+  minMaxValidation('args.nmf_replicates', 1, 200),
+  minMaxValidation('args.min_nmf_iterations', 1, 20000),
+  minMaxValidation('args.max_nmf_iterations', 1, 2000000),
+  minMaxValidation('args.nmf_test_conv', 1, 20000),
+  handleValidationErrors,
+  submit
+);
 router.get('/refreshExtraction/:id?', refresh);
 router.post('/refreshExtractionMulti', refreshMulti);
 router.get('/extractionExample/:id', extractionExample);
