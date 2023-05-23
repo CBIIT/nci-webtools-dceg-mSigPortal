@@ -25,7 +25,7 @@ export async function submit(req, res, next) {
     submittedAt: new Date(),
   };
 
-  const worker = getWorker(env.WORKER_TYPE || 'local');
+  const worker = getWorker(env.EXTRACTION_WORKER_TYPE || 'local');
 
   await writeJson(paramsFilePath, req.body);
   await writeJson(statusFilePath, status);
