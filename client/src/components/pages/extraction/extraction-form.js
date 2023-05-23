@@ -235,29 +235,21 @@ export default function ExtractionForm() {
     nmf_init: 'random',
     precision: 'single',
 
+    minimum_signatures: 1,
+    maximum_signatures: 12,
+    nmf_replicates: 50,
+    min_nmf_iterations: 1000,
+    max_nmf_iterations: 100000,
+    nmf_test_conv: 1000,
+
     email: '',
     jobName: '',
   };
 
   const sbsSample = {
+    ...defaultValues,
     source: 'user',
-    study: { label: 'PCAWG', value: 'PCAWG' },
-    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
-    strategy: { label: 'WGS', value: 'WGS' },
-    input_type: { label: 'matrix', value: 'matrix' },
-    reference_genome: { label: 'GRCh37', value: 'GRCh37' },
-    exome: false,
     context_type: { label: 'SBS96', value: 'SBS96' },
-    signatureSetName: {
-      label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
-      value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
-    },
-    signatureName: [{ label: 'all', value: 'all' }],
-    extractTool: {
-      label: 'SigProfilerExtractor',
-      value: 'SigProfilerExtractor',
-    },
-
     minimum_signatures: 1,
     maximum_signatures: 2,
     min_nmf_iterations: 2,
@@ -266,24 +258,13 @@ export default function ExtractionForm() {
     nmf_replicates: 10,
   };
   const dbsSample = {
+    ...defaultValues,
     source: 'user',
-    study: { label: 'PCAWG', value: 'PCAWG' },
-    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
-    strategy: { label: 'WGS', value: 'WGS' },
-    input_type: { label: 'matrix', value: 'matrix' },
-    reference_genome: { label: 'GRCh37', value: 'GRCh37' },
-    exome: false,
     context_type: { label: 'DBS78', value: 'DBS78' },
     signatureSetName: {
       label: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
       value: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
     },
-    signatureName: [{ label: 'all', value: 'all' }],
-    extractTool: {
-      label: 'SigProfilerExtractor',
-      value: 'SigProfilerExtractor',
-    },
-
     minimum_signatures: 1,
     maximum_signatures: 2,
     min_nmf_iterations: 2,
@@ -699,7 +680,7 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   min="1"
-                  max="24"
+                  max="20"
                   defaultValue={1}
                   disabled={submitted || id}
                 />
@@ -711,7 +692,7 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   min="1"
-                  max="25"
+                  max="20"
                   defaultValue={12}
                   disabled={submitted || id}
                 />
@@ -723,7 +704,7 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   min="1"
-                  max="1000"
+                  max="200"
                   defaultValue={50}
                   disabled={submitted || id}
                 />
@@ -816,9 +797,11 @@ export default function ExtractionForm() {
               <Form.Group controlId="minNmfIterations">
                 <Form.Label>Minimum NMF Iterations</Form.Label>
                 <Form.Control
-                  {...register('min_nmf_iterations')}
+                  {...register('min_nmf_iterations', {})}
                   type="number"
                   onWheel={(e) => e.target.blur()}
+                  min={1}
+                  max={20000}
                   defaultValue={1000}
                   disabled={submitted || id}
                 />
@@ -829,6 +812,8 @@ export default function ExtractionForm() {
                   {...register('max_nmf_iterations')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
+                  min={1}
+                  max={2000000}
                   defaultValue={100000}
                   disabled={submitted || id}
                 />
@@ -839,7 +824,9 @@ export default function ExtractionForm() {
                   {...register('nmf_test_conv')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={10000}
+                  defaultValue={1000}
+                  min={1}
+                  max={20000}
                   disabled={submitted || id}
                 />
               </Form.Group>
@@ -866,6 +853,8 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   step="any"
+                  min={0}
+                  max={1}
                   defaultValue={0.8}
                   disabled={submitted || id}
                 ></Form.Control>
@@ -877,6 +866,8 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   step="any"
+                  min={0}
+                  max={1}
                   defaultValue={0.2}
                   disabled={submitted || id}
                 ></Form.Control>
@@ -888,6 +879,8 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   step="any"
+                  min={0}
+                  max={1}
                   defaultValue={1}
                   disabled={submitted || id}
                 ></Form.Control>
