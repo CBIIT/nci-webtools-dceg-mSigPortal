@@ -19,10 +19,12 @@ if (isMainModule(import.meta)) {
  */
 export function main(env) {
   const { EXTRACTION_APP_PORT, EXTRACTION_APP_NAME, SERVER_TIMEOUT } = env;
-  const serverTimeout = +SERVER_TIMEOUT || 1000 * 60 * 15;
+  const serverTimeout = (+SERVER_TIMEOUT || 900) * 1000;
   const app = createApp(env);
   const server = app.listen(EXTRACTION_APP_PORT, () => {
-    app.locals.logger.info(`${EXTRACTION_APP_NAME} started on port ${EXTRACTION_APP_PORT}`);
+    app.locals.logger.info(
+      `${EXTRACTION_APP_NAME} started on port ${EXTRACTION_APP_PORT}`
+    );
   });
   server.setTimeout(serverTimeout);
   return server;
