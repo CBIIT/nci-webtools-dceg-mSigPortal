@@ -30,7 +30,10 @@ export default function SignatureMap({ state }) {
     },
     { skip: !denovoSigString || !decompSigString }
   );
+
+  console.log('error', error);
   const { denovoPlots, refSigPlots } = data || {};
+
   const refSigOptions = Object.keys(refSigPlots || {})
     .sort((a, b) => {
       const regex = /\((\w+\.\w+)%\)/;
@@ -101,19 +104,24 @@ export default function SignatureMap({ state }) {
             <Plotly {...e} data={e.traces} />
           </div>
         ))}
-      <div className="border rounded p-3">
-        <Row>
-          <Col lg="auto">
-            <Select
-              name="referenceSignature"
-              label="Reference Signature"
-              disabled={!refSigOptions.length}
-              options={refSigOptions}
-              control={control}
-            />
-          </Col>
-        </Row>
-      </div>
+      {decompSigString !== denovoSigString ? (
+        <div className="border rounded p-3">
+          <Row>
+            <Col lg="auto">
+              <Select
+                name="referenceSignature"
+                label="Reference Signature"
+                disabled={!refSigOptions.length}
+                options={refSigOptions}
+                control={control}
+              />
+            </Col>
+          </Row>
+        </div>
+      ) : (
+        <></>
+      )}
+
       {referenceSignature?.value &&
         Object.keys(refSigPlots).length > 0 &&
         refSigPlots[referenceSignature.value] && (
