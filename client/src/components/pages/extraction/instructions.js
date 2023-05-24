@@ -56,38 +56,93 @@ export default function Instructions({ props, loading }) {
         Choose a Data Source and its associated options to submit a query using
         the panel on the left
       </p>
-      <hr />
-      <h4>Data Source</h4>
-      <p>Public: Perform analysis using data available on the website</p>
-      <p>User: Upload your own data</p>
-      <hr />
-      <h4>Example Queries</h4>
-      <p>
-        Choose an example query to view results for pre-selected parameters. You
-        must reset between queries.
-      </p>
-      <h6>SigProfilerExtraction</h6>
-      {examples.map(({ title, external, path }, index) => (
+      <div className="pt-2">
+        {' '}
+        <h6>SigProfilerExtraction Note</h6>
         <div>
-          <Button
-            key={index}
-            onClick={() => handleExampleClick(path)}
-            variant="link"
-            className="pl-0 pr-0"
-          >
-            <span className="sr-only">{title + ' link'}</span>
-            {title}
-            {external && (
-              <span>
-                {'; '}
-                <a href={external.href} target="_blank">
-                  {external.name}
-                </a>
-              </span>
-            )}
-          </Button>
+          <p>
+            To enhance the performance of mutational signature extraction using
+            SigProfilerExtractor, we recommend a two-step analysis approach with
+            the following parameters:
+          </p>
+          <p>
+            <b>Step 1: Determine the optimal number of detected signatures.</b>
+          </p>
+          <div>
+            <p>Update the Advanced Parameters (default values):</p>
+            <ol>
+              <li>Minimum Signatures: 1</li>
+              <li>Maximum Signatures: 12</li>
+              <li>NMF Replicates Size: 100</li>
+              <li>Minimum NMF Iterations: 1000</li>
+              <li>Maximum NMF Iterations: 100000</li>
+              <li>NMF Test Convergence: 1000</li>
+            </ol>
+            <p>
+              After completing this step, refer to the "Signature Map" table to
+              identify the best number of detected signatures (denoted as N, for
+              example).
+            </p>
+            <p>
+              <b>
+                {' '}
+                Step 2: Refine the results of mutational signature extraction:
+              </b>
+            </p>
+            <ol>
+              <li>Minimum Signatures: N</li>
+              <li>Maximum Signatures: N</li>
+              <li>NMF Replicates Size: 100</li>
+              <li>Minimum NMF Iterations: 10000</li>
+              <li>Maximum NMF Iterations: 1000000</li>
+              <li>NMF Test Convergence: 10000</li>
+            </ol>
+            <p>
+              Performing these two-step analyses can significantly enhance the
+              performance of mutational signature analysis using
+              SigProfilerExtractor, particularly for jobs with large sample
+              size.
+            </p>
+          </div>
         </div>
-      ))}
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Data Source</h4>
+        <p>Public: Perform analysis using data available on the website</p>
+        <p>User: Upload your own data</p>
+      </div>
+      <hr />
+      <div className="mt-2 mb-2">
+        <h4>Example Queries</h4>
+        <p>
+          Choose an example query to view results for pre-selected parameters.
+          You must reset between queries.
+        </p>
+        <h6>SigProfilerExtraction</h6>
+        {examples.map(({ title, external, path }, index) => (
+          <div>
+            <Button
+              key={index}
+              onClick={() => handleExampleClick(path)}
+              variant="link"
+              className="pl-0 pr-0"
+            >
+              <span className="sr-only">{title + ' link'}</span>
+              {title}
+              {external && (
+                <span>
+                  {'; '}
+                  <a href={external.href} target="_blank">
+                    {external.name}
+                  </a>
+                </span>
+              )}
+            </Button>
+          </div>
+        ))}
+      </div>
+      <hr />
     </Container>
   );
 }
