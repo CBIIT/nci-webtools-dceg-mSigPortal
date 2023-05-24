@@ -82,7 +82,6 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
           Header: e,
           accessor: e,
         }));
-
         return { data, columns };
       },
     }),
@@ -93,66 +92,12 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
           const profileMatrixMap = { SBS: 96, DBS: 78, ID: 83 };
           const { userId, decompSigString, denovoSigString } = params;
 
-          // parse signature distribution names and proportion
-          const distributionRegex = new RegExp(
-            /Signature\s(\w+)\s\((\d+.\d+)%\)/g
-          );
-          const distribution = [
-            ...decompSigString.matchAll(distributionRegex),
-          ].reduce((obj, e) => {
-            const [_, key, value] = e;
-            return { ...obj, [key]: parseFloat(value) / 100 };
-          }, {});
-          const decomposedSignatureNames = Object.keys(distribution);
-          // parse denovo signature name
-          const profileRegex = /([a-zA-Z]+)/;
-          const profile = decomposedSignatureNames[0].match(profileRegex)[1];
-          const profileMatrix = profile + profileMatrixMap[profile];
-          const denovoSignature = profileMatrix + denovoSigString.slice(-1);
-
-          // query signatures
-          const { data: signatureData } = await fetchWithBQ({
-            url: `mutational_signature`,
-            params: { userId },
-          });
-          const allSignatures = groupBy(signatureData, (e) => e.signatureName);
-          const reconstructed = Object.values(
-            groupBy(signatureData, (e) => e.mutationType)
-          ).map((data) =>
-            data
-              .filter((e) => decomposedSignatureNames.includes(e.signatureName))
-              .reduce(
-                (obj, e) => ({
-                  ...obj,
-                  ...e,
-                  mutations:
-                    (obj?.mutations || 0) +
-                    e.mutations * distribution[e.signatureName],
-                  signatureName: `${denovoSignature} (Reconstructed)`,
-                }),
-                {}
-              )
-          );
-
-          const denovo = allSignatures[denovoSignature].map((e) => ({
-            ...e,
-            signatureName: `${denovoSignature} (Original)`,
-          }));
-
-          const decomposed = decomposedSignatureNames.map((e) =>
-            allSignatures[e].reduce(
-              (array, e) => [
-                ...array,
-                {
-                  ...e,
-                  signatureName: `${e.signatureName} (${(
-                    distribution[e.signatureName] * 100
-                  ).toFixed(2)}%)`,
-                },
-              ],
-              []
-            )
-          );
+          let denovo;
+          let reconstructed;
+          let decomposed;
+          let profileMatrix;
+          let refSigPlots;
+          let denovoPlots;
 
           const createPlot = (profileMatrix, data, title) => {
             switch (profileMatrix) {
@@ -167,26 +112,125 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             }
           };
 
-          const denovoPlots = [
-            { title: 'Denovo Signature', data: denovo },
-            { title: 'Reconstructed Signature', data: reconstructed },
-          ].map((e) => createPlot(profileMatrix, e.data, e.title));
-          const refSigPlots = decomposed
-            .map((e) => ({
-              title: 'Reference Signature',
-              data: e,
-            }))
-            .reduce(
-              (obj, e) => ({
-                ...obj,
-                [e.data[0].signatureName]: createPlot(
-                  profileMatrix,
-                  e.data,
-                  e.title
-                ),
-              }),
-              {}
+          // query signatures
+          const { data: signatureData } = await fetchWithBQ({
+            url: `mutational_signature`,
+            params: { userId },
+          });
+          const allSignatures = groupBy(signatureData, (e) => e.signatureName);
+          if (decompSigString === denovoSigString) {
+            const filteredSignatures = {};
+
+            for (const key in allSignatures) {
+              if (key.endsWith(denovoSigString.split('-')[1])) {
+                filteredSignatures[key] = allSignatures[key];
+              }
+            }
+
+            profileMatrix = Object.keys(filteredSignatures)[0].substring(
+              0,
+              Object.keys(filteredSignatures)[0].length - 1
             );
+
+            const groupByMutationType = groupBy(
+              Object.values(filteredSignatures)[0],
+              'mutationType'
+            );
+
+            const firstValues = Object.keys(groupByMutationType).map(
+              (key) => groupByMutationType[key][0]
+            );
+
+            denovo = firstValues;
+            decomposed = firstValues;
+
+            refSigPlots = [];
+            denovoPlots = [{ title: 'Denovo Signature', data: denovo }].map(
+              (e) => createPlot(profileMatrix, e.data, e.title)
+            );
+          } else {
+            const distributionRegex = new RegExp(
+              /Signature\s(\w+)\s\((\d+.\d+)%\)/g
+            );
+            const distribution = [
+              ...decompSigString.matchAll(distributionRegex),
+            ].reduce((obj, e) => {
+              const [_, key, value] = e;
+              return { ...obj, [key]: parseFloat(value) / 100 };
+            }, {});
+
+            const decomposedSignatureNames = Object.keys(distribution);
+
+            // parse denovo signature name
+            const profileRegex = /([a-zA-Z]+)/;
+            const profile = decomposedSignatureNames[0].match(profileRegex)[1];
+            profileMatrix = profile + profileMatrixMap[profile];
+            const denovoSignature = profileMatrix + denovoSigString.slice(-1);
+
+            reconstructed = Object.values(
+              groupBy(signatureData, (e) => e.mutationType)
+            ).map((data) =>
+              data
+                .filter((e) =>
+                  decomposedSignatureNames.includes(e.signatureName)
+                )
+                .reduce(
+                  (obj, e) => ({
+                    ...obj,
+                    ...e,
+                    mutations:
+                      (obj?.mutations || 0) +
+                      e.mutations * distribution[e.signatureName],
+                    signatureName: `${denovoSignature} (Reconstructed)`,
+                  }),
+                  {}
+                )
+            );
+
+            denovo = allSignatures[denovoSignature].map((e) => ({
+              ...e,
+              signatureName: `${denovoSignature} (Original)`,
+            }));
+
+            decomposed = decomposedSignatureNames.map((e) =>
+              allSignatures[e].reduce(
+                (array, e) => [
+                  ...array,
+                  {
+                    ...e,
+                    signatureName: `${e.signatureName} (${(
+                      distribution[e.signatureName] * 100
+                    ).toFixed(2)}%)`,
+                  },
+                ],
+                []
+              )
+            );
+
+            refSigPlots = decomposed
+              .map((e) => ({
+                title: 'Reference Signature',
+                data: e,
+              }))
+              .reduce(
+                (obj, e) => ({
+                  ...obj,
+                  [e.data[0].signatureName]: createPlot(
+                    profileMatrix,
+                    e.data,
+                    e.title
+                  ),
+                }),
+                {}
+              );
+
+            denovoPlots = [
+              { title: 'Denovo Signature', data: denovo },
+              { title: 'Reconstructed Signature', data: reconstructed },
+            ].map((e) => createPlot(profileMatrix, e.data, e.title));
+          }
+
+          // parse signature distribution names and proportion
 
           return {
             data: {
