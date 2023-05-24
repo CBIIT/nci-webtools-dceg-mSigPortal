@@ -30,8 +30,10 @@ export default function SignatureMap({ state }) {
     },
     { skip: !denovoSigString || !decompSigString }
   );
+  if (error) {
+    console.log('error', error);
+  }
 
-  console.log('error', error);
   const { denovoPlots, refSigPlots } = data || {};
 
   const refSigOptions = Object.keys(refSigPlots || {})
