@@ -188,6 +188,9 @@ export default function ID83(apiData, title = '') {
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     //width:1080,
+    margin: {
+      t: 130,
+    },
     autosize: true,
     xaxis: {
       showticklabels: false,
