@@ -8,15 +8,15 @@ import { Button } from 'react-bootstrap';
 export default function Instructions({ props, loading }) {
   const examples = [
     {
-      title: 'Example results based on SBS96 profiles',
+      label: 'Example results based on SBS96 profiles',
       path: 'Example_SBS96_SigProfileExtractor',
     },
     {
-      title: 'Example results based on DBS78 profiles',
+      label: 'Example results based on DBS78 profiles',
       path: 'Example_DBS78_SigProfileExtractor',
     },
     {
-      title: 'Example results based on ID83 profiles',
+      label: 'Example results based on ID83 profiles',
       path: 'Example_ID83_SigProfileExtractor',
     },
   ];
@@ -120,26 +120,16 @@ export default function Instructions({ props, loading }) {
           You must reset between queries.
         </p>
         <h6>SigProfilerExtraction</h6>
-        {examples.map(({ title, external, path }, index) => (
-          <div>
-            <Button
-              key={index}
-              onClick={() => handleExampleClick(path)}
-              variant="link"
-              className="pl-0 pr-0"
-            >
-              <span className="sr-only">{title + ' link'}</span>
-              {title}
-              {external && (
-                <span>
-                  {'; '}
-                  <a href={external.href} target="_blank">
-                    {external.name}
-                  </a>
-                </span>
-              )}
-            </Button>
-          </div>
+
+        {examples.map(({ label, path }, index) => (
+          <Button
+            key={index}
+            onClick={() => handleExampleClick(path)}
+            variant="link"
+            className="d-block px-0"
+          >
+            {label}
+          </Button>
         ))}
       </div>
       <hr />
