@@ -8,15 +8,15 @@ import { Button } from 'react-bootstrap';
 export default function Instructions({ props, loading }) {
   const examples = [
     {
-      title: 'Example results based on SBS96 profiles',
+      label: 'Example results based on SBS96 profiles',
       path: 'Example_SBS96_SigProfileExtractor',
     },
     {
-      title: 'Example results based on DBS78 profiles',
+      label: 'Example results based on DBS78 profiles',
       path: 'Example_DBS78_SigProfileExtractor',
     },
     {
-      title: 'Example results based on ID83 profiles',
+      label: 'Example results based on ID83 profiles',
       path: 'Example_ID83_SigProfileExtractor',
     },
   ];
