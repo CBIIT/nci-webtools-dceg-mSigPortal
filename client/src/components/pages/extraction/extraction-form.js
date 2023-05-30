@@ -327,8 +327,6 @@ export default function ExtractionForm() {
 
   async function onSubmit(data) {
     mergeState({ submitted: true });
-    console.log('Data:');
-    console.log(data);
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
     const { id } = await uploadFiles(formData).unwrap();
@@ -444,7 +442,7 @@ export default function ExtractionForm() {
               />
             </Form.Group>
             {source === 'public' ? (
-              <div>
+              <div key="public">
                 <SelectForm
                   className="mb-2"
                   name="study"
@@ -473,7 +471,7 @@ export default function ExtractionForm() {
                 />
               </div>
             ) : (
-              <div>
+              <div key="user">
                 <SelectForm
                   name="input_type"
                   label="Data Type"
