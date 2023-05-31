@@ -242,11 +242,7 @@ export async function extraction(
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
-    console.log('-===== decomposedSignatures');
-    console.log(decomposedSignatures);
     const denovoSignatures = await parseCSV(paths.denovoSignatureInput);
-    console.log('-======= denovoSignatures');
-    console.log(denovoSignatures);
     function signatureMapping(e) {
       const { MutationType, ...signatures } = e;
       return Object.entries(signatures).map(([signatureName, mutations]) => ({
