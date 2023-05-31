@@ -111,10 +111,8 @@ export function simplifyTree(node) {
   let children = getChildren(node);
   // debugger;
   if (children.length === 1) {
-    console.log('simplifying 1 child', node)
     let grandchildren = getChildren(children[0]);
     if (grandchildren.length === 1) {
-      console.log('simplifying 1 grandchild', node)
       node.children = grandchildren;
     }
   }

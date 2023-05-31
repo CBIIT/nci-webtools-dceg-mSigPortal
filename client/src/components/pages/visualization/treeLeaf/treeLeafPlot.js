@@ -129,7 +129,7 @@ function createForceDirectedTree(
       width / (range.xMax - range.xMin),
       height / (range.yMax - range.yMin)
     )
-  ) * 0.75;
+  ) * 1.05;
 
   // gather range of attributes
   const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
@@ -167,7 +167,7 @@ function createForceDirectedTree(
 
   const treeGroup = treeZoomContainer.append('g')
     .attr('id', 'treeleaf-tree')
-    .attr('transform', `translate(0, 20) scale(${treeScale})`);
+    .attr('transform', `translate(0, 0) scale(${treeScale})`);
 
   // add lines
   const link = treeGroup
