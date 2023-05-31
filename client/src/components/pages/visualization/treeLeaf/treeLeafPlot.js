@@ -100,9 +100,9 @@ function createForceDirectedTree(
     fill = form.color.continuous
       ? d3.scaleSequential(d3.interpolateRgb("white", "steelblue"))
       : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
-    stroke = '#555', // stroke for links
-    strokeWidth = 0.5, // stroke width for links
-    strokeOpacity = 0.4, // stroke opacity for links
+    stroke = '#666', // stroke for links
+    strokeWidth = 0.3, // stroke width for links
+    strokeOpacity = 1, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
     strokeLinecap, // stroke line cap for links
     plotTitle,

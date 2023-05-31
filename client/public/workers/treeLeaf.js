@@ -11,13 +11,15 @@ function createForceDirectedTree({
 }) {
   // gather range of attributes
   const separation = (a, b) => (a.parent === b.parent ? 1 : 2) / a.depth;
+  simplifyTree(data);
+  assignParents(data, createIdGenerator());
 
   // const attributeLookup = groupBy(attributes, 'name')
   const mutations = Object.values(attributes).map((e) => e.Mutations);
   const mutationMin = d3.min(mutations);
   const mutationMax = d3.max(mutations);
   const treeData = d3.hierarchy(data);
-  const scale = Math.log10(Object.keys(attributes).length) / 10;
+  const scale = Math.max(0.5, Math.log10(Object.keys(attributes).length) / 10);
 
   // Compute the layout.
   const root = d3
@@ -36,7 +38,6 @@ function createForceDirectedTree({
     : 0
   });
 
-  assignParents(data, createIdGenerator());
   const distanceMatrix = getAttractionMatrix(data, (node) => node.id);
 
   // Compute labels and titles.
@@ -45,19 +46,14 @@ function createForceDirectedTree({
 
   const simulation = d3
     .forceSimulation(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(1)
-        .strength(1)
-    )
+    .force('link', d3.forceLink(links).id((d) => d.id).distance(1).strength(1))
     .force('hierarchical', hierarchicalForce(distanceMatrix, nodes))
+    // .force('manyBody', d3.forceManyBody().strength(d => d.children ? -5 : -15))
+    // .force('manyBody', d3.forceManyBody().strength(-1))
     .force('center', d3.forceCenter().strength(1))
     .force('x', d3.forceX().strength(0.005))
     .force('y', d3.forceY().strength(0.005))
-    .force('collision', d3.forceCollide().radius(d => d.r));
+    .force('collision', d3.forceCollide().radius(d => d.r * 1.2));
   
   simulation.stop();
   simulation.tick(120);
@@ -106,9 +102,31 @@ export function createIdGenerator() {
   return () => ++start;
 }
 
+export function getChildren(node) {
+  return Array.isArray(node.children) ? node.children : [node.children].filter(Boolean);
+}
+
+// ensures nodes with only one child and one parent are removed
+export function simplifyTree(node) {
+  let children = getChildren(node);
+  // debugger;
+  if (children.length === 1) {
+    console.log('simplifying 1 child', node)
+    let grandchildren = getChildren(children[0]);
+    if (grandchildren.length === 1) {
+      console.log('simplifying 1 grandchild', node)
+      node.children = grandchildren;
+    }
+  }
+  
+  for (let child of getChildren(node)) {
+    simplifyTree(child);
+  }
+}
+
 export function assignParents(node, getId) {
   node.id = getId();
-  let children = Array.isArray(node.children) ? node.children : [node.children];
+  let children = getChildren(node);
   for (let child of children) {
     if (child) {
       child.parent = node;
