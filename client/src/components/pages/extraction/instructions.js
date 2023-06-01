@@ -56,6 +56,34 @@ export default function Instructions({ props, loading }) {
         Choose a Data Source and its associated options to submit a query using
         the panel on the left
       </p>
+
+      <hr />
+      <div className="mt-2">
+        <h4>Data Source</h4>
+        <p>Public: Perform analysis using data available on the website</p>
+        <p>User: Upload your own data</p>
+      </div>
+      <hr />
+      <div className="mt-2 mb-2">
+        <h4>Example Queries</h4>
+        <p>
+          Choose an example query to view results for pre-selected parameters.
+          You must reset between queries.
+        </p>
+        <h6>SigProfilerExtraction</h6>
+
+        {examples.map(({ label, path }, index) => (
+          <Button
+            key={index}
+            onClick={() => handleExampleClick(path)}
+            variant="link"
+            className="d-block px-0"
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+      <hr />
       <div className="pt-2">
         {' '}
         <h6>SigProfilerExtraction Note</h6>
@@ -106,33 +134,6 @@ export default function Instructions({ props, loading }) {
           </div>
         </div>
       </div>
-      <hr />
-      <div className="mt-2">
-        <h4>Data Source</h4>
-        <p>Public: Perform analysis using data available on the website</p>
-        <p>User: Upload your own data</p>
-      </div>
-      <hr />
-      <div className="mt-2 mb-2">
-        <h4>Example Queries</h4>
-        <p>
-          Choose an example query to view results for pre-selected parameters.
-          You must reset between queries.
-        </p>
-        <h6>SigProfilerExtraction</h6>
-
-        {examples.map(({ label, path }, index) => (
-          <Button
-            key={index}
-            onClick={() => handleExampleClick(path)}
-            variant="link"
-            className="d-block px-0"
-          >
-            {label}
-          </Button>
-        ))}
-      </div>
-      <hr />
     </Container>
   );
 }
