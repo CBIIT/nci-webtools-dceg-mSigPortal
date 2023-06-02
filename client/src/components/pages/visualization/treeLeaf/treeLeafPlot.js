@@ -22,7 +22,7 @@ export default function D3TreeLeaf({
   const profile = 'SBS';
   const matrix = 96;
   const params = { study, strategy,  signatureSetName, profile, matrix, cancer: form?.cancerType?.value };
-  const { hierarchy, attributes } = useRecoilValue(graphDataSelector(params));
+  const { hierarchy, attributes, params: parameters } = useRecoilValue(graphDataSelector(params));
   // const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function D3TreeLeaf({
   }, [hierarchy, attributes, width, height, setTreeLeafData, setLoading]);
   
   useEffect(() => {
-    if (plotRef.current && hierarchy && attributes) {
+    if (plotRef.current && hierarchy && attributes && parameters) {
       const plotData = {
         data: hierarchy,
         attributes: groupBy(attributes, 'Sample'),
@@ -51,12 +51,18 @@ export default function D3TreeLeaf({
         links: treeLeafData.links,
       };
 
+      let plotTitle = `${publicForm?.study?.label} - ${form.color.label}`;
+
+      if (form.color.label === 'Dominant Signature' && parameters.signatureSetName) {
+        plotTitle += ' - ' + parameters.signatureSetName;
+      }
+
       const plotLayout = {
         id,
         width,
         height,
         radius: Math.min(width, height) / 2,
-        plotTitle: `${publicForm?.study?.label} - ${form.color.label}`,
+        plotTitle,
       };
 
       const plotEvents = {
@@ -293,7 +299,7 @@ function createForceDirectedTree(
     .attr('x', 0)
     .attr('y', 20)
     .attr('fill', 'black')
-    .attr('text-anchor', 'center')
+    .attr('text-anchor', 'middle')
     .style('font-weight', 'bold')
     .style('font-size', '24px')
     //.attr('class', 'h2')
