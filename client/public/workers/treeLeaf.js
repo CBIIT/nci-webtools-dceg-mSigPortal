@@ -11,7 +11,7 @@ function createForceDirectedTree({
 }) {
   // gather range of attributes
   const separation = (a, b) => (a.parent === b.parent ? 1 : 2) / a.depth;
-  simplifyTree(data);
+  // simplifyTree(data);
   assignParents(data, createIdGenerator());
 
   // const attributeLookup = groupBy(attributes, 'name')
@@ -19,7 +19,7 @@ function createForceDirectedTree({
   const mutationMin = d3.min(mutations);
   const mutationMax = d3.max(mutations);
   const treeData = d3.hierarchy(data);
-  const scale = Math.max(0.5, Math.log10(Object.keys(attributes).length) / 10);
+  const scale = Math.max(0.5, Math.log10(Object.keys(attributes).length) / 2);
 
   // Compute the layout.
   const root = d3
@@ -27,15 +27,14 @@ function createForceDirectedTree({
     .size([2 * Math.PI, radius])
     .separation(separation)(treeData);
 
-  const r = d3.scaleSqrt().range([2, 10]);
+  const r = d3.scaleLog().domain([mutationMin, mutationMax].map(e => Math.max(1, e))).range([2, 10]);
   treeData.each((d) => {
-    let angle = d.x;
-    let distance = d.y;
+    const angle = d.x;
+    const distance = d.y;
+    const mutations = !d.children && d.data.name && attributes[d.data.name] && attributes[d.data.name].Mutations;
     d.x = distance * Math.cos(angle) * scale;
     d.y = distance * Math.sin(angle) * scale;
-    d.r = !d.children && d.data.name && attributes[d.data.name] && attributes[d.data.name].Mutations
-    ? r.domain([mutationMin, mutationMax])(attributes[d.data.name].Mutations)
-    : 0
+    d.r =  mutations ? r(mutations) : 0;
   });
 
   const distanceMatrix = getAttractionMatrix(data, (node) => node.id);
@@ -53,7 +52,7 @@ function createForceDirectedTree({
     .force('center', d3.forceCenter().strength(1))
     .force('x', d3.forceX().strength(0.005))
     .force('y', d3.forceY().strength(0.005))
-    .force('collision', d3.forceCollide().radius(d => d.r * 1.2));
+    .force('collision', d3.forceCollide().radius(d => d.children ? 1 : d.r * (d.r < 4 ? 1.5 : 1.25)));
   
   simulation.stop();
   simulation.tick(120);
