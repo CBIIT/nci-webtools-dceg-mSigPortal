@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Container } from 'react-bootstrap';
 import { useExampleQuery } from './apiSlice';
@@ -21,36 +21,25 @@ export default function Instructions({ props, loading }) {
     },
   ];
   const history = useHistory();
-
-  //const id = pathParts[pathParts.length - 1];
-
   const [id, setId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: exampleData } = useExampleQuery(id, {
+  const { data: exampleData, isFetching } = useExampleQuery(id, {
     skip: !id,
   });
 
   useEffect(() => {
     if (exampleData && exampleData.id) {
       history.push(`/extraction/${exampleData.id}`);
-      setIsLoading(false); // Set loading state to false when exampleData is available
     }
   }, [exampleData, history]);
 
-  const handleExampleClick = async (exampleFolder) => {
-    try {
-      setIsLoading(true); // Set loading state to true
-      setId(exampleFolder);
-    } catch (error) {
-      console.error(error); // Handle the error
-    }
+  const handleExampleClick = (exampleFolder) => {
+    setId(exampleFolder);
   };
 
   return (
     <Container fluid className="bg-white border rounded p-3" {...props}>
-      {/* Include isLoading in the LoadingOverlay */}
-      <LoadingOverlay active={loading || isLoading} />
+      <LoadingOverlay active={loading || isFetching} />
       <h4>Instructions</h4>
       <p>
         Choose a Data Source and its associated options to submit a query using
@@ -85,7 +74,6 @@ export default function Instructions({ props, loading }) {
       </div>
       <hr />
       <div className="pt-2">
-        {' '}
         <h6>SigProfilerExtraction Note</h6>
         <div>
           <p>
