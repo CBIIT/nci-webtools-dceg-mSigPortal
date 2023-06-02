@@ -333,11 +333,14 @@ async function getPublicTreeLeafData(req, res, next) {
       .where({study})
       .andWhere('signatureSetName', 'like', `%${profile + matrix}`);
 
-    signatureSetName = signatureSetNames[0]?.signatureSetName || signatureSetName;
+    const signatureSetNameValues = signatureSetNames.map(s => s.signatureSetName);
+    if (!signatureSetName || !signatureSetNameValues.includes(signatureSetName)) {
+      signatureSetName = signatureSetNameValues[0];
+    }
 
     const exposureData = await getExposureData(
       connection,
-      pickNotNull({ study, strategy }),
+      pickNotNull({ study, strategy, signatureSetName }),
       '*',
       1e8
     );
@@ -426,6 +429,7 @@ async function getPublicTreeLeafData(req, res, next) {
     }
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
+    results.params = { study, strategy, cancer, signatureSetName, profile, matrix };
     for (let record of results.output?.attributes || []) {
       record.Cosine_similarity = cosineSimilarityMap[record.Sample] || 0;
     }
