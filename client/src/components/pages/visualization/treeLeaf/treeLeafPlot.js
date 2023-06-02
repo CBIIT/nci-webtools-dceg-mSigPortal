@@ -167,6 +167,15 @@ function createForceDirectedTree(
     .attr('font-size', 10)
     .call(zoom);
 
+  // add zoom reset control
+  const zoomReset = container
+      .append('button')
+      .attr('id', 'treeleaf-zoom-reset')
+      .attr('class', 'btn btn-outline-secondary btn-sm')
+      .attr('style', 'position: absolute; top: 10px; left: 10px; z-index: 1;')
+      .text('Reset Zoom')
+      .on('click', () => svg.transition().duration(250).call(zoom.transform,d3.zoomIdentity));
+
   // add tree container
   const treeZoomContainer = svg.append('g')
     .attr('id', 'treeleaf-zoom-container')
