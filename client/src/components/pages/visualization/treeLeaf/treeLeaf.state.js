@@ -53,7 +53,6 @@ export const graphDataSelector = selectorFamily({
     try {
       const response = await axios.post('web/treeLeaf', params);
       const data = response.data.output;
-      console.log(data);
       return data;
     } catch (error) {
       console.error(error);
