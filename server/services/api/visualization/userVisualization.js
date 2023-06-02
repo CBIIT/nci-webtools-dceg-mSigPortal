@@ -429,7 +429,7 @@ async function getPublicTreeLeafData(req, res, next) {
     }
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
-    results.params = { study, strategy, cancer, signatureSetName, profile, matrix };
+    results.output.params = { study, strategy, cancer, signatureSetName, profile, matrix };
     for (let record of results.output?.attributes || []) {
       record.Cosine_similarity = cosineSimilarityMap[record.Sample] || 0;
     }
