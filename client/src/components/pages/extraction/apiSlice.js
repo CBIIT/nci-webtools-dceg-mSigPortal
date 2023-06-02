@@ -1,8 +1,5 @@
 import { extractionApiSlice } from '../../../services/store/rootApi';
 import { groupBy } from 'lodash';
-import SBS96 from '../../controls/plotly/mutationalProfiles/sbs96';
-import DBS78 from '../../controls/plotly/mutationalProfiles/dbs78';
-import ID83 from '../../controls/plotly/mutationalProfiles/id83';
 
 export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -99,18 +96,17 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
           let refSigPlots;
           let denovoPlots;
 
-          const createPlot = (profileMatrix, data, title) => {
-            switch (profileMatrix) {
-              case 'SBS96':
-                return SBS96(data, title);
-              case 'DBS78':
-                return DBS78(data, title);
-              case 'ID83':
-                return ID83(data, title);
-              default:
-                throw new Error(`${profileMatrix} is not supported`);
+          async function createPlot(profileMatrix, data, title) {
+            try {
+              const plotFn = await import(
+                `../../controls/plotly/mutationalProfiles/${profileMatrix.toLowerCase()}.js`
+              );
+              return plotFn.default(data, title);
+            } catch (error) {
+              console.log(error);
+              throw new Error(`${profileMatrix} is not supported`);
             }
-          };
+          }
 
           // query signatures
           const { data: signatureData } = await fetchWithBQ({
@@ -145,8 +141,10 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             decomposed = firstValues;
 
             refSigPlots = [];
-            denovoPlots = [{ title: 'Denovo Signature', data: denovo }].map(
-              (e) => createPlot(profileMatrix, e.data, e.title)
+            denovoPlots = await Promise.all(
+              [{ title: 'Denovo Signature', data: denovo }].map(
+                async (e) => await createPlot(profileMatrix, e.data, e.title)
+              )
             );
           } else {
             const distributionRegex = new RegExp(
@@ -207,31 +205,24 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               )
             );
 
-            refSigPlots = decomposed
-              .map((e) => ({
-                title: 'Reference Signature',
-                data: e,
-              }))
-              .reduce(
-                (obj, e) => ({
-                  ...obj,
-                  [e.data[0].signatureName]: createPlot(
-                    profileMatrix,
-                    e.data,
-                    e.title
-                  ),
-                }),
-                {}
+            refSigPlots = {};
+            decomposed.forEach(async (e) => {
+              refSigPlots[e[0].signatureName] = await createPlot(
+                profileMatrix,
+                e,
+                'Reference Signature'
               );
+            });
 
-            denovoPlots = [
-              { title: 'Denovo Signature', data: denovo },
-              { title: 'Reconstructed Signature', data: reconstructed },
-            ].map((e) => createPlot(profileMatrix, e.data, e.title));
+            denovoPlots = await Promise.all(
+              [
+                { title: 'Denovo Signature', data: denovo },
+                { title: 'Reconstructed Signature', data: reconstructed },
+              ].map((e) => createPlot(profileMatrix, e.data, e.title))
+            );
           }
 
           // parse signature distribution names and proportion
-
           return {
             data: {
               denovoPlots: denovoPlots,
