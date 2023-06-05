@@ -44,7 +44,6 @@ export default function D3TreeLeaf({
       setLoading(false);
     } else {
       worker.submit(params).then(data => {
-        console.log(data);
         setTreeLeafData(data);
         window.sessionCache[key] = data;
       })
