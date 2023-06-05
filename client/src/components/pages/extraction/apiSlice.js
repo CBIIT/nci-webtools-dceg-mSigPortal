@@ -154,7 +154,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             // parse denovo signature name
             const denovoSignature = contextType + denovoSigString.slice(-1);
 
-            const profileRegex = /([a-zA-Z]+)/;
+            const profileRegex = /(SBS|DBS|ID|RS|CN)/;
             const profile = decomposedSignatureNames[0].match(profileRegex)[1];
             const profileMatrix = profile + profileMatrixMap[profile];
 

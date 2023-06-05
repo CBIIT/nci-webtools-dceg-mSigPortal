@@ -51,7 +51,6 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
 
         if (_arg.params_activity.userId) {
           if (res[0].data.length > 0 && res[1].data.length > 0) {
-            console.log(res);
             const exposure_groupBySignature = groupBy(
               res[0].data.filter((o) => o['exposure'] > 0.01),
               'signatureName'
