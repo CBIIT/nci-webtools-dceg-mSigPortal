@@ -41,7 +41,7 @@ export default function SBS288(data, sample, tab) {
       mutationType: mutation,
       signatures: signatures,
       total: signatures.reduce(
-        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        (a, e) => a + parseFloat(e?.mutations || e?.contribution),
         0
       ),
     })
@@ -102,7 +102,7 @@ export default function SBS288(data, sample, tab) {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce((a, e) => a + parseFloat(e.contribution), 0),
     })
   );
 
@@ -123,7 +123,7 @@ export default function SBS288(data, sample, tab) {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce((a, e) => a + parseFloat(e.contribution), 0),
     })
   );
 
@@ -145,7 +145,7 @@ export default function SBS288(data, sample, tab) {
       mutationType: mutation,
       signatures: signatures,
       total: signatures.reduce(
-        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        (a, e) => a + parseFloat(e?.mutations || e?.contribution),
         0
       ),
     })
@@ -169,7 +169,7 @@ export default function SBS288(data, sample, tab) {
       mutationType: mutation,
       signatures: signatures,
       total: signatures.reduce(
-        (a, e) => a + parseInt(e?.mutations || e?.contribution),
+        (a, e) => a + parseFloat(e?.mutations || e?.contribution),
         0
       ),
     })

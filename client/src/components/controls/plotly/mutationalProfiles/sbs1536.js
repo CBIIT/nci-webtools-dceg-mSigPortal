@@ -16,7 +16,7 @@ export default function SBS1536(data, title = '') {
     [1, 'rgb(255,255,39)'],
   ];
 
-  const totalMutations = data.reduce((a, e) => a + parseInt(e.mutations), 0);
+  const totalMutations = data.reduce((a, e) => a + parseFloat(e.mutations), 0);
   const chunks = (a, size) =>
     Array.from(new Array(Math.ceil(a.length / size)), (_, i) =>
       a.slice(i * size, i * size + size)
@@ -55,7 +55,7 @@ export default function SBS1536(data, title = '') {
     ([mutation, signatures], groupIndex, array) => ({
       mutationType: mutation,
       signatures: signatures,
-      total: signatures.reduce((a, e) => a + parseInt(e.contribution), 0),
+      total: signatures.reduce((a, e) => a + parseFloat(e.contribution), 0),
     })
   );
 
@@ -116,7 +116,7 @@ export default function SBS1536(data, title = '') {
   const mutationSumFront = Object.entries(groupByMutationFront).map(
     ([key, value]) => ({
       mutationType: key,
-      contribution: value.reduce((a, e) => a + parseInt(e.contribution), 0),
+      contribution: value.reduce((a, e) => a + parseFloat(e.contribution), 0),
     })
   );
 
@@ -214,7 +214,7 @@ export default function SBS1536(data, title = '') {
   const mutationSumBack = Object.entries(groupByMutationBack).map(
     ([key, value]) => ({
       mutationType: key,
-      contribution: value.reduce((a, e) => a + parseInt(e.contribution), 0),
+      contribution: value.reduce((a, e) => a + parseFloat(e.contribution), 0),
     })
   );
 
