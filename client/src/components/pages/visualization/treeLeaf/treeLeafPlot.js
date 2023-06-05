@@ -28,16 +28,30 @@ export default function D3TreeLeaf({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
     setLoading(true);
-
-    worker.submit({
+    window.sessionCache = window.sessionCache || {};
+    const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
+    const params = {
       data: hierarchy,
       attributes: groupBy(attributes, 'Sample'),
       radius: Math.min(width, height) / 2,
-    }).then(setTreeLeafData)
+    };
+    const key = JSON.stringify(params);
+    const sessionTreeLeafData = window.sessionCache[key];
+
+    if (sessionTreeLeafData) {
+      setTreeLeafData(sessionTreeLeafData);
+      setLoading(false);
+    } else {
+      worker.submit(params).then(data => {
+        console.log(data);
+        setTreeLeafData(data);
+        window.sessionCache[key] = data;
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
+    }
+
     return () => worker?.terminate();
   }, [hierarchy, attributes, width, height, setTreeLeafData, setLoading]);
   
