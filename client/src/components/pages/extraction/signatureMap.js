@@ -25,6 +25,7 @@ export default function SignatureMap({ state }) {
   const { data, error } = useSignatureMapPlotsQuery(
     {
       userId: id,
+      contextType: params.args.context_type,
       denovoSigString,
       decompSigString,
     },

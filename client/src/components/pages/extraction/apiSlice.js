@@ -87,12 +87,11 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
       async queryFn(params, queryApi, extraOptions, fetchWithBQ) {
         try {
           const profileMatrixMap = { SBS: 96, DBS: 78, ID: 83 };
-          const { userId, decompSigString, denovoSigString } = params;
+          const { userId, contextType, decompSigString, denovoSigString } =
+            params;
 
           let denovo;
-          let reconstructed;
           let decomposed;
-          let profileMatrix;
           let refSigPlots;
           let denovoPlots;
 
@@ -123,11 +122,6 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               }
             }
 
-            profileMatrix = Object.keys(filteredSignatures)[0].substring(
-              0,
-              Object.keys(filteredSignatures)[0].length - 1
-            );
-
             const groupByMutationType = groupBy(
               Object.values(filteredSignatures)[0],
               'mutationType'
@@ -141,11 +135,9 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             decomposed = firstValues;
 
             refSigPlots = [];
-            denovoPlots = await Promise.all(
-              [{ title: 'Denovo Signature', data: denovo }].map(
-                async (e) => await createPlot(profileMatrix, e.data, e.title)
-              )
-            );
+            denovoPlots = [
+              await createPlot(contextType, denovo, 'Denovo Signature'),
+            ];
           } else {
             const distributionRegex = new RegExp(
               /Signature\s(\w+)\s\((\d+.\d+)%\)/g
@@ -160,30 +152,33 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             const decomposedSignatureNames = Object.keys(distribution);
 
             // parse denovo signature name
+            const denovoSignature = contextType + denovoSigString.slice(-1);
+
             const profileRegex = /([a-zA-Z]+)/;
             const profile = decomposedSignatureNames[0].match(profileRegex)[1];
-            profileMatrix = profile + profileMatrixMap[profile];
-            const denovoSignature = profileMatrix + denovoSigString.slice(-1);
+            const profileMatrix = profile + profileMatrixMap[profile];
 
-            reconstructed = Object.values(
+            const reconstructed = Object.values(
               groupBy(signatureData, (e) => e.mutationType)
-            ).map((data) =>
-              data
-                .filter((e) =>
-                  decomposedSignatureNames.includes(e.signatureName)
-                )
-                .reduce(
-                  (obj, e) => ({
-                    ...obj,
-                    ...e,
-                    mutations:
-                      (obj?.mutations || 0) +
-                      e.mutations * distribution[e.signatureName],
-                    signatureName: `${denovoSignature} (Reconstructed)`,
-                  }),
-                  {}
-                )
-            );
+            )
+              .map((data) =>
+                data
+                  .filter((e) =>
+                    decomposedSignatureNames.includes(e.signatureName)
+                  )
+                  .reduce(
+                    (obj, e) => ({
+                      ...obj,
+                      ...e,
+                      mutations:
+                        (obj?.mutations || 0) +
+                        e.mutations * distribution[e.signatureName],
+                      signatureName: `${denovoSignature} (Reconstructed)`,
+                    }),
+                    {}
+                  )
+              )
+              .filter((e) => Object.entries(e).length);
 
             denovo = allSignatures[denovoSignature].map((e) => ({
               ...e,
@@ -214,12 +209,14 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               );
             });
 
-            denovoPlots = await Promise.all(
-              [
-                { title: 'Denovo Signature', data: denovo },
-                { title: 'Reconstructed Signature', data: reconstructed },
-              ].map((e) => createPlot(profileMatrix, e.data, e.title))
-            );
+            denovoPlots = await Promise.all([
+              createPlot(contextType, denovo, 'Denovo Signature'),
+              createPlot(
+                profileMatrix,
+                reconstructed,
+                'Reconstructed Signature'
+              ),
+            ]);
           }
 
           // parse signature distribution names and proportion
