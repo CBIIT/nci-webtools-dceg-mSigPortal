@@ -19,9 +19,9 @@ export function Footer() {
                     <h5>
                       <b>Division of Cancer Epidemiology and Genetics</b>{' '}
                     </h5>
-                    <div class="h6">
+                    <div className="h6">
                       at the
-                      <a class="text-white" href="https://www.cancer.gov/">
+                      <a className="text-white" href="https://www.cancer.gov/">
                         {' '}
                         National Institutes of Health{' '}
                       </a>

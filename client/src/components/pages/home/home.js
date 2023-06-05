@@ -57,14 +57,14 @@ export default function Home({ links }) {
                   <span>Read More &rarr;</span>
                 </Link>
               </p>
-              <div class="">
+              <div className="">
                 <Link
                   className={`btn btn-2 btn-${name} btn-border-radius-15`}
                   exact={exact}
                   key={index}
                   to={route}
                 >
-                  <span class="">Go to {title} &gt;</span>
+                  <span className="">Go to {title} &gt;</span>
                 </Link>
               </div>
             </Card.Body>
@@ -124,14 +124,14 @@ export default function Home({ links }) {
                   <span>Read More &rarr;</span>
                 </Link>
               </p>
-              <div class="">
+              <div className="">
                 <Link
                   className={`btn btn-2 btn-${name} btn-border-radius-15`}
                   exact={exact}
                   key={index}
                   to={route}
                 >
-                  <span class="">Go to {title} &gt;</span>
+                  <span className="">Go to {title} &gt;</span>
                 </Link>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function Home({ links }) {
               <h5 className={`card-title card-title-homepage text-${name}`}>
                 {cardTitle}
               </h5>
-              <p class="card-text mb-4">
+              <p className="card-text mb-4">
                 {description}
                 <br />
 
@@ -241,7 +241,7 @@ export default function Home({ links }) {
           <div className="row">
             <div className="homepage-title-left text-left">
               <h1 className="msigportal-home-title">mSigPortal</h1>
-              <div class="text-primary-purple msigportal-title">
+              <div className="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
               </div>
@@ -265,7 +265,7 @@ export default function Home({ links }) {
           <div className="row">
             <div className="col-md-12 col-sm-12">
               <h1 className="msigportal-home-title">mSigPortal</h1>
-              <div class="text-primary-purple msigportal-title">
+              <div className="text-primary-purple msigportal-title">
                 Integrative Mutational Signature Portal for Cancer Genomics
                 Study
               </div>

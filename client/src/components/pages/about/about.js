@@ -50,7 +50,7 @@ export default function About() {
           </p>
 
           <div id="catalog">
-            <h5 class="text-catalog">Signature Catalog</h5>
+            <h5 className="text-catalog">Signature Catalog</h5>
             <p>
               Comprehensively exploring curated census of mutational signatures
               from scientific literature, currently including COSMIC mutational
@@ -61,7 +61,7 @@ export default function About() {
             </p>
           </div>
           <div id="visualization">
-            <h5 class="text-visualization">Signature Visualization</h5>
+            <h5 className="text-visualization">Signature Visualization</h5>
             <p>
               Interactively visualizing and analyzing mutational profiles at the
               sample level from both user input (formats supported include VCF,
@@ -79,7 +79,7 @@ export default function About() {
             </p>
           </div>
           <div id="extraction">
-            <h5 class="text-extraction">Signature Extraction</h5>
+            <h5 className="text-extraction">Signature Extraction</h5>
             <p>
               This module allows users to perform both mutational signature de
               novo extraction and decomposition analysis using state-of-the-art
@@ -124,7 +124,7 @@ export default function About() {
             </p>
           </div>
           <div id="exploration">
-            <h5 class="text-exploration">Signature Exploration</h5>
+            <h5 className="text-exploration">Signature Exploration</h5>
             <p>
               Systematically exploring the mutational signature activities and
               performance of the mutational signature decomposition from user
@@ -162,7 +162,7 @@ export default function About() {
             </p>
           </div>
           <div id="association">
-            <h5 class="text-association">Signature Association</h5>
+            <h5 className="text-association">Signature Association</h5>
             <p>
               Statistically analyzing and visualizing associations between
               mutational signature activities (using different measurements) and
@@ -175,7 +175,7 @@ export default function About() {
             </p>
           </div>
           <div id="api">
-            <h5 class="text-api">Signature API Access</h5>
+            <h5 className="text-api">Signature API Access</h5>
             <p>
               The mutational signature-related data in mSigPortal can be
               accessed programmatically through a REST API. The syntax for
