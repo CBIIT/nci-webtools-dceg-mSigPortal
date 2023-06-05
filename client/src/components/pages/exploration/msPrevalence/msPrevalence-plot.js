@@ -27,18 +27,28 @@ export default function MsPrevalancePlot({ form, state }) {
   }, [form, state]);
 
   return (
-    <>
+    <div>
       <LoadingOverlay active={isFetching} />
-      {data && !error ? (
-        <Plotly
-          className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
-        />
-      ) : (
-        <div className="text-center my-4">No data available</div>
+      {error && <p className="p-3 text-danger">Plot is unavailable</p>}
+      {data && (
+        <div>
+          <Plotly
+            className="w-100"
+            data={data.traces}
+            layout={data.layout}
+            config={data.config}
+          />
+          <div className="p-3">
+            <p>
+              The pie chart on the left illustrates the prevalence of each
+              mutational signature by mutations. The bar plot on the right
+              illustrates the prevalence of each mutational signature by
+              samples. The colors represent the mutational signatures in both
+              plots.
+            </p>
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 }

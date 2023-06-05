@@ -49,27 +49,14 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
 
         let profile;
 
-        // console.log('_arg, ', _arg);
-        // console.log(
-        //   ' _arg.params_activity.userId ---- ',
-        //   _arg.params_activity.userId
-        // );
-
         if (_arg.params_activity.userId) {
-          // if (
-          //   res[0].data.length > 0 &&
-          //   res[1].data.length > 0 &&
-          //   res[2].data.length > 0
-          // ) {
           if (res[0].data.length > 0 && res[1].data.length > 0) {
+            console.log(res);
             const exposure_groupBySignature = groupBy(
               res[0].data.filter((o) => o['exposure'] > 0.01),
               'signatureName'
             );
-            // console.log(
-            //   'exposure_groupBySignature ',
-            //   exposure_groupBySignature
-            // );
+
             const signatureNames = Object.keys(exposure_groupBySignature).map(
               (e) => e
             );
