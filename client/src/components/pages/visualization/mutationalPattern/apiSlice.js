@@ -7,9 +7,10 @@ export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
     mpeaScatter: builder.query({
       query: ({ proportion, pattern, ...params }) => ({
         url: 'mutational_spectrum',
-        params,
+        params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
+        console.log('data', data);
         return mutationalPatternScatter(data, arg);
       },
     }),

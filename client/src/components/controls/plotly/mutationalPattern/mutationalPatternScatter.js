@@ -17,6 +17,7 @@ export default function mutationalPatternScatter(inputData, arg) {
       study: `${samples[0].study}`,
       sample: `${samples[0].sample}`,
       type: type,
+      cancer: samples[0].cancer,
       total: samples.reduce((acc, e) => acc + e.mutations, 0),
     };
   });
@@ -24,10 +25,12 @@ export default function mutationalPatternScatter(inputData, arg) {
   const mutationTypeFilter = inputData.filter(
     (e) => e.mutationType.substring(2, 5) === type
   );
+
   const groupByStudySampleType = groupBy(
     mutationTypeFilter,
     (e) => `${e.study}_${e.sample}`
   );
+
   const tmpdata1 = Object.values(groupByStudySampleType).map((samples) => {
     return {
       study: `${samples[0].study}`,
@@ -35,7 +38,6 @@ export default function mutationalPatternScatter(inputData, arg) {
       n0: samples.reduce((acc, e) => acc + e.mutations, 0),
     };
   });
-
   function iupac(base) {
     let result = [];
     if (base === 'T' || base === 'U') {
@@ -118,6 +120,8 @@ export default function mutationalPatternScatter(inputData, arg) {
     })
     .filter((e) => e.total > 200);
 
+  const groupByCancer = groupBy(result, (e) => `${e.cancer}`);
+
   const maxTotal = Math.max(...result.map((o) => o.total));
 
   function format_output(output) {
@@ -199,51 +203,77 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
-  let trace4 = {
-    name:
-      result[0]?.study != 'undefined'
-        ? result[0].study + '@' + result[0].cancer
-        : 'Input',
-    x: result.map((e) => e.n1),
-    y: result.map((e) => e.n2),
-    customdata: result.map((e) => ({ sample: e.sample, total: e.total })),
-    mode: 'markers',
-    type: 'scatter',
-    opacity: 1,
-    marker: {
-      color: 'green',
-      line: {
-        color: 'black',
-        width: 1,
-      },
-      size: result.map((e, i, a) =>
-        e.total < maxMutationFilter / 100
-          ? 5
-          : e.total < maxMutationFilter / 10
-          ? 10
-          : 15
-      ),
-    },
-    hovertemplate:
-      '<b>Sample: ' +
-      '</b>' +
-      '%{customdata.sample} <br>' +
-      '<b>' +
-      pattern2 +
-      ':</b>' +
-      ' %{x} <br>' +
-      '<b>' +
-      pattern1 +
-      ':</b>' +
-      ' %{y}<br>' +
-      '<b>Total:</b> %{customdata.total}<extra></extra>',
-    showlegend: true,
-    legendgrouptitle: {
-      text: 'Study',
-    },
-  };
+  // Create an array to store all the traces
+  let scatterTraces = [];
 
-  const traces = [trace1, trace2, trace3, trace4];
+  // Loop through each group in the groupByCancer result
+  for (let group in groupByCancer) {
+    let result = groupByCancer[group];
+
+    let trace = {
+      name:
+        result[0]?.study !== undefined
+          ? result[0].study + '@' + result[0].cancer
+          : 'Input',
+      x: result.map((e) => e.n1),
+      y: result.map((e) => e.n2),
+      customdata: result.map((e) => ({ sample: e.sample, total: e.total })),
+      mode: 'markers',
+      type: 'scatter',
+      opacity: 1,
+      marker: {
+        color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
+        line: {
+          color: 'black',
+          width: 1,
+        },
+        size: result.map((e, i, a) =>
+          e.total < maxMutationFilter / 100
+            ? 5
+            : e.total < maxMutationFilter / 10
+            ? 10
+            : 15
+        ),
+      },
+      hovertemplate:
+        '<b>Sample: ' +
+        '</b>' +
+        '%{customdata.sample} <br>' +
+        '<b>' +
+        pattern2 +
+        ':</b>' +
+        ' %{x} <br>' +
+        '<b>' +
+        pattern1 +
+        ':</b>' +
+        ' %{y}<br>' +
+        '<b>Total:</b> %{customdata.total}<extra></extra>',
+      showlegend: true,
+      legendgroup: 'cancer',
+      legendgrouptitle: {
+        text: 'Study',
+      },
+    };
+
+    scatterTraces.push(trace);
+  }
+  // Function to generate a random color
+  function getRandomColor() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+  // Set a fixed value for the legend scatter size
+  const legendScatterSize = 10;
+
+  // Modify the size of the legend scatter for all traces
+  scatterTraces.forEach((trace) => {
+    trace.marker.sizeref = 0;
+    trace.marker.sizemode = 'diameter';
+    trace.marker.sizemax = legendScatterSize;
+  });
+
+  const traces = [trace1, trace2, trace3, ...scatterTraces];
+
   let layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
