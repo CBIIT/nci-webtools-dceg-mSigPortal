@@ -87,15 +87,6 @@ export default function ExtractionForm() {
         ]
       : [];
 
-  const contextTypeOptions = signatureOptions
-    ? [
-        { label: 'default', value: 'SBS96' },
-        ...[...new Set(signatureOptions.map((e) => e.profile + e.matrix))]
-          .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
-          .map((e) => ({ label: e, value: e })),
-      ]
-    : [];
-
   const [filteredSignatureSetOptions, setFilteredSignatureSetOptions] =
     useState();
 
@@ -104,7 +95,7 @@ export default function ExtractionForm() {
         .map((e) => ({ label: e, value: e }))
         .sort((a, b) => a.value.localeCompare(b.value))
     : [];
-  //setFilteredSignatureSetOptions(signatureSetOptions);
+
   const handleContextTypeChange = (selectedOption) => {
     setValue('context_type', selectedOption);
     const filteredOptions = signatureSetOptions
@@ -293,6 +284,39 @@ export default function ExtractionForm() {
     signatureSetName,
     input_type,
   } = watch();
+
+  const contextTypeOptions = (() => {
+    if (source === 'user') {
+      return signatureOptions
+        ? [
+            { label: 'default', value: 'SBS96' },
+            ...[...new Set(signatureOptions.map((e) => e.profile + e.matrix))]
+              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+              .map((e) => ({ label: e, value: e })),
+          ]
+        : [];
+    } else {
+      if (signatureOptions && seqmatrixOptions) {
+        const sigProfiles = [
+          ...new Set(signatureOptions.map((e) => e.profile + e.matrix)),
+        ];
+        const seqmatrixProfiles = [
+          ...new Set(seqmatrixOptions.map((e) => e.profile + e.matrix)),
+        ];
+        const commonProfiles = sigProfiles.filter((e) =>
+          seqmatrixProfiles.includes(e)
+        );
+        return [
+          { label: 'default', value: 'SBS96' },
+          ...commonProfiles
+            .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+            .map((e) => ({ label: e, value: e })),
+        ];
+      } else {
+        return [];
+      }
+    }
+  })();
 
   // update url with id
   // useEffect(() => {
@@ -572,10 +596,10 @@ export default function ExtractionForm() {
             name="context_type"
             label="Context Type"
             disabled={submitted || id}
-            defaultValue={contextTypeOptions[0]}
             options={contextTypeOptions}
             control={control}
             onChange={handleContextTypeChange}
+            rules={{ required: true }}
           />
           <SelectForm
             name="signatureSetName"
@@ -981,23 +1005,6 @@ export default function ExtractionForm() {
 
           <hr className="mb-3" />
           <div>
-            {/* <Form.Group controlId="toggleQueue" className="d-flex">
-              <Controller
-                name="useQueue"
-                control={control}
-                render={({ field }) => (
-                  <Form.Check
-                    {...field}
-                    id="useQueue"
-                    type="checkbox"
-                    label="Long Running Job"
-                    checked={true}
-                    onChange={(e) => setValue('useQueue', e.target.checked)}
-                    disabled={submitted || id}
-                  />
-                )}
-              />
-            </Form.Group> */}
             <Form.Group controlId="email">
               <Form.Label>
                 Email <span style={{ color: 'crimson' }}>*</span>
