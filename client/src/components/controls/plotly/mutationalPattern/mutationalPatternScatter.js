@@ -123,7 +123,6 @@ export default function mutationalPatternScatter(inputData, arg) {
   const groupByCancer = groupBy(result, (e) => `${e.cancer}`);
 
   const maxTotal = Math.max(...result.map((o) => o.total));
-  //console.log('maxTotal', maxTotal);
 
   function format_output(output) {
     let n = Math.log(output) / Math.LN10;
@@ -135,7 +134,6 @@ export default function mutationalPatternScatter(inputData, arg) {
   }
 
   const maxMutationFilter = format_output(maxTotal);
-  //console.log('maxMutationFilter', maxMutationFilter);
 
   const data1 = result.filter((o) => o.total < maxMutationFilter / 100);
   const data2 = result.filter(
@@ -235,48 +233,51 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
-  // additionalData.forEach((additionalFilter, index) => {
-  //   console.log('additionalFilter', additionalFilter);
-  //   const additionalDataFiltered = result.filter(
-  //     (o) => o.total > additionalFilter
-  //   );
-  //   const markerSizes = [];
+  additionalData.forEach((additionalFilter, index) => {
+    const additionalDataFiltered = result.filter(
+      (o) => o.total > additionalFilter
+    );
+    const markerSizes = [];
 
-  //   if (additionalData.length === 6) {
-  //     markerSizes.push(5, 7, 9, 11, 13, 15);
-  //   } else if (additionalData.length === 4) {
-  //     markerSizes.push(5, 8, 12, 15);
-  //   } else if (additionalData.length === 3) {
-  //     markerSizes.push(5, 10, 15);
-  //   } else {
-  //     markerSizes.push(10);
-  //   }
+    if (additionalData.length === 6) {
+      markerSizes.push(5, 7, 9, 11, 13, 15);
+    } else if (additionalData.length === 4) {
+      markerSizes.push(5, 8, 12, 15);
+    } else if (additionalData.length === 3) {
+      markerSizes.push(5, 10, 15);
+    } else {
+      markerSizes.push(10);
+    }
 
-  //   const additionalTrace = {
-  //     name: additionalFilter.toLocaleString(undefined),
-  //     x: additionalDataFiltered.map((e) => e.n1),
-  //     y: additionalDataFiltered.map((e) => e.n2),
-  //     mode: 'markers',
-  //     type: 'scatter',
-  //     opacity: 1,
-  //     marker: {
-  //       color: 'white',
-  //       line: {
-  //         color: 'black',
-  //         width: 1,
-  //       },
-  //       size: markerSizes[index],
-  //     },
-  //     showlegend: true,
-  //     legendgroup: 'size',
-  //     legendgrouptitle: {
-  //       text: 'Number of mutations',
-  //     },
-  //   };
-  //   tracesSize.push(additionalTrace);
-  // });
+    const additionalTrace = {
+      name: additionalFilter.toLocaleString(undefined),
+      x: additionalDataFiltered.map((e) => e.n1),
+      y: additionalDataFiltered.map((e) => e.n2),
+      customdata: additionalDataFiltered.map((e) => ({
+        sample: e.sample,
+        total: e.total,
+      })),
+      mode: 'markers',
+      type: 'scatter',
+      opacity: 1,
+      marker: {
+        color: 'white',
+        line: {
+          color: 'black',
+          width: 1,
+        },
+        size: markerSizes[index],
+      },
 
-  // console.log('tracesSize:', tracesSize);
+      hoverinfo: 'skip',
+      showlegend: true,
+      legendgroup: 'size',
+      legendgrouptitle: {
+        text: 'Number of mutations',
+      },
+    };
+    tracesSize.push(additionalTrace);
+  });
 
   // Create an array to store all the traces
   let scatterTraces = [];
@@ -293,7 +294,14 @@ export default function mutationalPatternScatter(inputData, arg) {
           : 'Input',
       x: result.map((e) => e.n1),
       y: result.map((e) => e.n2),
-      customdata: result.map((e) => ({ sample: e.sample, total: e.total })),
+      customdata: result.map((e) => ({
+        sample: e.sample,
+        total: e.total,
+        study:
+          e?.study !== undefined
+            ? result[0].study + '@' + result[0].cancer
+            : 'Input',
+      })),
       mode: 'markers',
       type: 'scatter',
       opacity: 1,
@@ -301,23 +309,25 @@ export default function mutationalPatternScatter(inputData, arg) {
         color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
         line: {
           color: 'black',
-          width: 0.5,
+          width: 1,
         },
-        size: result.map((e, i, a) =>
-          e.total < maxMutationFilter / 100
-            ? 5
-            : e.total < maxMutationFilter / 10
-            ? 10
-            : 15
-        ),
         // size: result.map((e, i, a) =>
-        //   getMarkerSize(additionalData.length, e.total)
+        //   e.total < maxMutationFilter / 100
+        //     ? 5
+        //     : e.total < maxMutationFilter / 10
+        //     ? 10
+        //     : 15
         // ),
+        size: result.map((e, i, a) =>
+          getMarkerSize(additionalData.length, e.total)
+        ),
       },
       hovertemplate:
         '<b>Sample: ' +
         '</b>' +
         '%{customdata.sample} <br>' +
+        '<b>Study: </b>' +
+        '%{customdata.study} <br>' +
         '<b>' +
         pattern2 +
         ':</b>' +
@@ -408,16 +418,14 @@ export default function mutationalPatternScatter(inputData, arg) {
     }
   }
 
-  //console.log('scatterLegdend', scatterLegdend);
   const traces = [
-    trace1,
-    trace2,
-    trace3,
-    //...tracesSize,
+    // trace1,
+    // trace2,
+    // trace3,
+    ...tracesSize,
     ...scatterTraces,
     ...scatterLegdend,
   ];
-
   let layout = {
     height: 700,
     hoverlabel: { bgcolor: '#FFF' },
