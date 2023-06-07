@@ -97,7 +97,17 @@ export default function Status() {
         <i className="bi bi-arrow-clockwise" /> Refresh
       </Button>
       {data && data.length > 0 && (
-        <Table columns={columns} data={data} striped bordered />
+        <Table
+          columns={columns}
+          data={data}
+          options={{
+            initialState: {
+              sortBy: [{ id: 'submittedAt', desc: true }],
+            },
+          }}
+          striped
+          bordered
+        />
       )}
     </Container>
   );
