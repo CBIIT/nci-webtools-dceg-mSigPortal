@@ -427,7 +427,8 @@ export default function mutationalPatternScatter(inputData, arg) {
     ...scatterLegdend,
   ];
   let layout = {
-    height: 700,
+    height: 1000,
+    width: 1000,
     hoverlabel: { bgcolor: '#FFF' },
     legend: {
       x: 1,
