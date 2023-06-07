@@ -9,6 +9,7 @@ export default function MsDecompositionPlot({ state }) {
   const { data, error, isFetching } = useMsDecompositionQuery(params, {
     skip: !params,
   });
+  console.log('error', error);
   const { study, strategy, signatureSetName, cancer, id } = state;
   useEffect(() => {
     if (study) {
@@ -26,6 +27,7 @@ export default function MsDecompositionPlot({ state }) {
   return (
     <>
       <LoadingOverlay active={isFetching} />
+      {error && <p className="p-3 text-danger">Plot is unavailable</p>}
       {data && !error ? (
         <Plotly
           className="w-100"

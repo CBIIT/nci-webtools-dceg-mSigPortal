@@ -93,7 +93,11 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
         // console.log(arg);
         // console.log(data);
         //return false;
-        return MsDecomposition(data.output, arg);
+        try {
+          return MsDecomposition(data.output, arg);
+        } catch (error) {
+          console.log('error', error);
+        }
       },
     }),
   }),

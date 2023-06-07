@@ -13,6 +13,7 @@ export default function MsAssociation(
   signatureName2,
   both = false
 ) {
+  console.log('data msAssociation', data);
   let groupBySample;
   let xValues = [];
   let yValues = [];

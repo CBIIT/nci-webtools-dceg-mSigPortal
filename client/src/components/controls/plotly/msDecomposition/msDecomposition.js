@@ -2,7 +2,8 @@ import { groupBy } from 'lodash';
 import { groupByCustom } from '../../utils/utils.js';
 
 export default function MsDecomposition(data, arg) {
-  // console.log('MS Decomposition data: ', data);
+  console.log('MS Decomposition data: ', data);
+
   const result = Object.values(data)[0];
 
   const grouped = groupByCustom(result, (e) => e.name);
