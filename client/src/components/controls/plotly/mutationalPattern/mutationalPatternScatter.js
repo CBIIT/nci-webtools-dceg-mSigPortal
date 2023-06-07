@@ -123,6 +123,7 @@ export default function mutationalPatternScatter(inputData, arg) {
   const groupByCancer = groupBy(result, (e) => `${e.cancer}`);
 
   const maxTotal = Math.max(...result.map((o) => o.total));
+  console.log('maxTotal', maxTotal);
 
   function format_output(output) {
     let n = Math.log(output) / Math.LN10;
@@ -132,12 +133,40 @@ export default function mutationalPatternScatter(inputData, arg) {
     for (let i = 0; i <= x; i++) out += '0';
     return out / 10;
   }
+
   const maxMutationFilter = format_output(maxTotal);
+  console.log('maxMutationFilter', maxMutationFilter);
+
   const data1 = result.filter((o) => o.total < maxMutationFilter / 100);
   const data2 = result.filter(
     (o) => o.total < maxMutationFilter / 10 && o.total > maxMutationFilter / 100
   );
   const data3 = result.filter((o) => o.total > maxMutationFilter / 10);
+
+  const additionalData = [];
+
+  if (maxMutationFilter >= 100000) {
+    additionalData.push(300);
+    additionalData.push(1000);
+    additionalData.push(3000);
+    additionalData.push(10000);
+    additionalData.push(30000);
+    additionalData.push(100000);
+  } else if (maxMutationFilter >= 10000) {
+    additionalData.push(300);
+    additionalData.push(1000);
+    additionalData.push(3000);
+    additionalData.push(10000);
+  } else if (maxMutationFilter >= 3000) {
+    additionalData.push(300);
+    additionalData.push(1000);
+    additionalData.push(3000);
+  } else {
+    additionalData.push(300);
+    additionalData.push(1000);
+  }
+
+  const tracesSize = [];
 
   let trace1 = {
     name: (maxMutationFilter / 100).toLocaleString(undefined),
@@ -203,8 +232,52 @@ export default function mutationalPatternScatter(inputData, arg) {
     },
   };
 
+  // additionalData.forEach((additionalFilter, index) => {
+  //   console.log('additionalFilter', additionalFilter);
+  //   const additionalDataFiltered = result.filter(
+  //     (o) => o.total > additionalFilter
+  //   );
+  //   const markerSizes = [];
+
+  //   if (additionalData.length === 6) {
+  //     markerSizes.push(5, 7, 9, 11, 13, 15);
+  //   } else if (additionalData.length === 4) {
+  //     markerSizes.push(5, 8, 12, 15);
+  //   } else if (additionalData.length === 3) {
+  //     markerSizes.push(5, 10, 15);
+  //   } else {
+  //     markerSizes.push(10);
+  //   }
+
+  //   const additionalTrace = {
+  //     name: additionalFilter.toLocaleString(undefined),
+  //     x: additionalDataFiltered.map((e) => e.n1),
+  //     y: additionalDataFiltered.map((e) => e.n2),
+  //     mode: 'markers',
+  //     type: 'scatter',
+  //     opacity: 1,
+  //     marker: {
+  //       color: 'white',
+  //       line: {
+  //         color: 'black',
+  //         width: 1,
+  //       },
+  //       size: markerSizes[index],
+  //     },
+  //     showlegend: true,
+  //     legendgroup: 'size',
+  //     legendgrouptitle: {
+  //       text: 'Number of mutations',
+  //     },
+  //   };
+  //   tracesSize.push(additionalTrace);
+  // });
+
+  // console.log('tracesSize:', tracesSize);
+
   // Create an array to store all the traces
   let scatterTraces = [];
+  let scatterLegdend = [];
 
   // Loop through each group in the groupByCancer result
   for (let group in groupByCancer) {
@@ -225,7 +298,7 @@ export default function mutationalPatternScatter(inputData, arg) {
         color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
         line: {
           color: 'black',
-          width: 1,
+          width: 0.5,
         },
         size: result.map((e, i, a) =>
           e.total < maxMutationFilter / 100
@@ -234,6 +307,9 @@ export default function mutationalPatternScatter(inputData, arg) {
             ? 10
             : 15
         ),
+        // size: result.map((e, i, a) =>
+        //   getMarkerSize(additionalData.length, e.total)
+        // ),
       },
       hovertemplate:
         '<b>Sample: ' +
@@ -248,6 +324,32 @@ export default function mutationalPatternScatter(inputData, arg) {
         ':</b>' +
         ' %{y}<br>' +
         '<b>Total:</b> %{customdata.total}<extra></extra>',
+      showlegend: false,
+      legendgroup: 'cancer',
+      legendgrouptitle: {
+        text: 'Study',
+      },
+    };
+
+    let traceLedgend = {
+      name:
+        result[0]?.study !== undefined
+          ? result[0].study + '@' + result[0].cancer
+          : 'Input',
+      x: [null],
+      y: [null],
+      mode: 'markers',
+      type: 'scatter',
+      opacity: 1,
+      marker: {
+        color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
+        line: {
+          color: 'black',
+          width: 1,
+        },
+        size: 12,
+      },
+
       showlegend: true,
       legendgroup: 'cancer',
       legendgrouptitle: {
@@ -256,23 +358,60 @@ export default function mutationalPatternScatter(inputData, arg) {
     };
 
     scatterTraces.push(trace);
+    scatterLegdend.push(traceLedgend);
   }
   // Function to generate a random color
   function getRandomColor() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
   }
 
-  // Set a fixed value for the legend scatter size
-  const legendScatterSize = 10;
+  function getMarkerSize(additionalDataLength, total) {
+    if (additionalDataLength === 6) {
+      if (total < 300) {
+        return 5;
+      } else if (total < 1000) {
+        return 7;
+      } else if (total < 3000) {
+        return 9;
+      } else if (total < 10000) {
+        return 11;
+      } else if (total < 30000) {
+        return 13;
+      } else {
+        return 15;
+      }
+    } else if (additionalDataLength === 4) {
+      if (total < 300) {
+        return 5;
+      } else if (total < 1000) {
+        return 8;
+      } else if (total < 3000) {
+        return 11;
+      } else {
+        return 15;
+      }
+    } else if (additionalDataLength === 3) {
+      if (total < 300) {
+        return 5;
+      } else if (total < 1000) {
+        return 10;
+      } else {
+        return 15;
+      }
+    } else {
+      return 10;
+    }
+  }
 
-  // Modify the size of the legend scatter for all traces
-  scatterTraces.forEach((trace) => {
-    trace.marker.sizeref = 0;
-    trace.marker.sizemode = 'diameter';
-    trace.marker.sizemax = legendScatterSize;
-  });
-
-  const traces = [trace1, trace2, trace3, ...scatterTraces];
+  console.log('scatterLegdend', scatterLegdend);
+  const traces = [
+    trace1,
+    trace2,
+    trace3,
+    //...tracesSize,
+    ...scatterTraces,
+    ...scatterLegdend,
+  ];
 
   let layout = {
     height: 700,
