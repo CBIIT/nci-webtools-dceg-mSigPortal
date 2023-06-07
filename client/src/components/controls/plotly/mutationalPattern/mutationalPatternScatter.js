@@ -123,7 +123,7 @@ export default function mutationalPatternScatter(inputData, arg) {
   const groupByCancer = groupBy(result, (e) => `${e.cancer}`);
 
   const maxTotal = Math.max(...result.map((o) => o.total));
-  console.log('maxTotal', maxTotal);
+  //console.log('maxTotal', maxTotal);
 
   function format_output(output) {
     let n = Math.log(output) / Math.LN10;
@@ -135,7 +135,7 @@ export default function mutationalPatternScatter(inputData, arg) {
   }
 
   const maxMutationFilter = format_output(maxTotal);
-  console.log('maxMutationFilter', maxMutationFilter);
+  //console.log('maxMutationFilter', maxMutationFilter);
 
   const data1 = result.filter((o) => o.total < maxMutationFilter / 100);
   const data2 = result.filter(
@@ -184,7 +184,8 @@ export default function mutationalPatternScatter(inputData, arg) {
       size: 5,
     },
     showlegend: true,
-    legendgroup: 'size',
+    legendrank: 2,
+    legendgroup: 'b',
     legendgrouptitle: {
       text: 'Number of mutations',
     },
@@ -205,7 +206,8 @@ export default function mutationalPatternScatter(inputData, arg) {
       size: 10,
     },
     showlegend: true,
-    legendgroup: 'size',
+    legendrank: 2,
+    legendgroup: 'b',
     legendgrouptitle: {
       text: 'Number of mutations',
     },
@@ -226,7 +228,8 @@ export default function mutationalPatternScatter(inputData, arg) {
       size: 15,
     },
     showlegend: true,
-    legendgroup: 'size',
+    legendrank: 2,
+    legendgroup: 'b',
     legendgrouptitle: {
       text: 'Number of mutations',
     },
@@ -325,7 +328,8 @@ export default function mutationalPatternScatter(inputData, arg) {
         ' %{y}<br>' +
         '<b>Total:</b> %{customdata.total}<extra></extra>',
       showlegend: false,
-      legendgroup: 'cancer',
+      legendrank: 1,
+      legendgroup: 'a',
       legendgrouptitle: {
         text: 'Study',
       },
@@ -351,7 +355,8 @@ export default function mutationalPatternScatter(inputData, arg) {
       },
 
       showlegend: true,
-      legendgroup: 'cancer',
+      legendrank: 1,
+      legendgroup: 'a',
       legendgrouptitle: {
         text: 'Study',
       },
@@ -403,7 +408,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     }
   }
 
-  console.log('scatterLegdend', scatterLegdend);
+  //console.log('scatterLegdend', scatterLegdend);
   const traces = [
     trace1,
     trace2,
