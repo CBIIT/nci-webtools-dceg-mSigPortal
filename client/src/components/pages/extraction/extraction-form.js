@@ -22,6 +22,17 @@ import {
 } from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
+const env = process.env;
+const limits = env.EXTRACTION_FORM_LIMIT
+  ? JSON.parse(env.EXTRACTION_FORM_LIMIT)
+  : {
+      minimum_signatures: [1, 15],
+      maximum_signatures: [1, 15],
+      nmf_replicates: [1, 100],
+      min_nmf_iterations: [1, 10000],
+      max_nmf_iterations: [1, 1000000],
+      nmf_test_conv: [1, 10000],
+    };
 
 export default function ExtractionForm() {
   const { submitted, ...state } = useSelector((state) => state.extraction);
@@ -411,7 +422,7 @@ export default function ExtractionForm() {
     const submitStatus = await submitForm(params).unwrap();
 
     history.push(`/extraction/${submitStatus.id}`);
-    mergeState({ id });
+    mergeState({ id, displayTab: 'status' });
     mergeSuccess(
       `Most Jobs take a long time, you will receive an email when the extraction job is complete. It is safe to close the window now`
     );
@@ -674,8 +685,8 @@ export default function ExtractionForm() {
                   {...register('minimum_signatures')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min="1"
-                  max="20"
+                  min={limits.minimum_signatures[0]}
+                  max={limits.maximum_signatures[1]}
                   defaultValue={1}
                   disabled={submitted || id}
                 />
@@ -686,8 +697,8 @@ export default function ExtractionForm() {
                   {...register('maximum_signatures')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min="1"
-                  max="20"
+                  min={limits.maximum_signatures[0]}
+                  max={limits.maximum_signatures[1]}
                   defaultValue={12}
                   disabled={submitted || id}
                 />
@@ -698,8 +709,8 @@ export default function ExtractionForm() {
                   {...register('nmf_replicates')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min="1"
-                  max="200"
+                  min={limits.nmf_replicates[0]}
+                  max={limits.nmf_replicates[1]}
                   defaultValue={50}
                   disabled={submitted || id}
                 />
@@ -795,8 +806,8 @@ export default function ExtractionForm() {
                   {...register('min_nmf_iterations', {})}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={1}
-                  max={20000}
+                  min={limits.min_nmf_iterations[0]}
+                  max={limits.min_nmf_iterations[1]}
                   defaultValue={1000}
                   disabled={submitted || id}
                 />
@@ -807,8 +818,8 @@ export default function ExtractionForm() {
                   {...register('max_nmf_iterations')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={1}
-                  max={2000000}
+                  min={limits.max_nmf_iterations[0]}
+                  max={limits.max_nmf_iterations[1]}
                   defaultValue={100000}
                   disabled={submitted || id}
                 />
@@ -820,8 +831,8 @@ export default function ExtractionForm() {
                   type="number"
                   onWheel={(e) => e.target.blur()}
                   defaultValue={1000}
-                  min={1}
-                  max={20000}
+                  min={limits.nmf_test_conv[0]}
+                  max={limits.nmf_test_conv[1]}
                   disabled={submitted || id}
                 />
               </Form.Group>
