@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { mutationalPatternColors } from '../../utils/colors';
 
 export default function mutationalPatternScatter(inputData, arg) {
   const { pattern } = arg;
@@ -282,6 +283,7 @@ export default function mutationalPatternScatter(inputData, arg) {
   // Create an array to store all the traces
   let scatterTraces = [];
   let scatterLegdend = [];
+  // Create an array of keys from the originalColorPallet object
 
   // Loop through each group in the groupByCancer result
   for (let group in groupByCancer) {
@@ -306,7 +308,12 @@ export default function mutationalPatternScatter(inputData, arg) {
       type: 'scatter',
       opacity: 1,
       marker: {
-        color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
+        color:
+          scatterTraces.length < mutationalPatternColors.length
+            ? mutationalPatternColors[scatterTraces.length]
+            : mutationalPatternColors[
+                scatterTraces.length % mutationalPatternColors.length
+              ], // Use colors from mutationalPatternColors array in a circular manner
         line: {
           color: 'black',
           width: 1,
@@ -378,6 +385,11 @@ export default function mutationalPatternScatter(inputData, arg) {
   // Function to generate a random color
   function getRandomColor() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+  // Add additional colors to mutationalPatternColors if needed
+  while (mutationalPatternColors.length < scatterTraces.length) {
+    mutationalPatternColors.push(getRandomColor());
   }
 
   function getMarkerSize(additionalDataLength, total) {
