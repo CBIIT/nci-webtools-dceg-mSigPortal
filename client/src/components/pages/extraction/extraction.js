@@ -27,6 +27,17 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const actions = { ...extractionActions, ...modalActions };
 
 export default function Extraction() {
+  const formLimits = process.env?.EXTRACTION_FORM_LIMIT
+    ? JSON.parse(process.env.EXTRACTION_FORM_LIMIT)
+    : {
+        minimum_signatures: [1, 15],
+        maximum_signatures: [1, 15],
+        nmf_replicates: [1, 100],
+        min_nmf_iterations: [1, 10000],
+        max_nmf_iterations: [1, 1000000],
+        nmf_test_conv: [1, 10000],
+      };
+
   const dispatch = useDispatch();
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
   const { displayTab, openSidebar, explorationType, ...state } = useSelector(
@@ -217,7 +228,7 @@ export default function Extraction() {
         onCollapsed={(e) => mergeState({ openSidebar: !e })}
       >
         <SidebarPanel>
-          <ExtractionForm />
+          <ExtractionForm formLimits={formLimits} />
         </SidebarPanel>
         <MainPanel>
           {error && <Alert variant="danger">Results expired</Alert>}
@@ -298,7 +309,7 @@ export default function Extraction() {
           )}
 
           <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
-            <Instructions />
+            <Instructions formLimits={formLimits} />
           </div>
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
             <Status />

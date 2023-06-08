@@ -5,7 +5,7 @@ import { useExampleQuery } from './apiSlice';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
-export default function Instructions({ props, loading }) {
+export default function Instructions({ formLimits }) {
   const examples = [
     {
       label: 'Example results based on SBS96 profiles',
@@ -38,8 +38,8 @@ export default function Instructions({ props, loading }) {
   };
 
   return (
-    <Container fluid className="bg-white border rounded p-3" {...props}>
-      <LoadingOverlay active={loading || isFetching} />
+    <Container fluid className="bg-white border rounded p-3">
+      <LoadingOverlay active={isFetching} />
       <h4>Instructions</h4>
       <p>
         Choose a Data Source and its associated options to submit a query using
@@ -89,10 +89,10 @@ export default function Instructions({ props, loading }) {
             <ol>
               <li>Minimum Signatures: 1</li>
               <li>Maximum Signatures: 12</li>
-              <li>NMF Replicates Size: 100</li>
+              <li>NMF Replicates Size: 50</li>
               <li>Minimum NMF Iterations: 1000</li>
               <li>Maximum NMF Iterations: 100000</li>
-              <li>NMF Test Convergence: 1000</li>
+              <li>NMF Test Convergence: 10000</li>
             </ol>
             <p>
               After completing this step, refer to the "Signature Map" table to
@@ -106,12 +106,32 @@ export default function Instructions({ props, loading }) {
               </b>
             </p>
             <ol>
-              <li>Minimum Signatures: N</li>
-              <li>Maximum Signatures: N</li>
-              <li>NMF Replicates Size: 100</li>
-              <li>Minimum NMF Iterations: 10000</li>
-              <li>Maximum NMF Iterations: 1000000</li>
-              <li>NMF Test Convergence: 10000</li>
+              <li>
+                Minimum Signatures: N ({formLimits.minimum_signatures[0]}-
+                {formLimits.minimum_signatures[1]})
+              </li>
+              <li>
+                Maximum Signatures: N ({formLimits.maximum_signatures[0]}-
+                {formLimits.maximum_signatures[1]})
+              </li>
+              <li>
+                NMF Replicates Size: 100 ({formLimits.nmf_replicates[0]}-
+                {formLimits.nmf_replicates[1]})
+              </li>
+              <li>
+                Minimum NMF Iterations: 10000 (
+                {formLimits.min_nmf_iterations[0]}-
+                {formLimits.min_nmf_iterations[1]})
+              </li>
+              <li>
+                Maximum NMF Iterations: 1000000 (
+                {formLimits.max_nmf_iterations[0]}-
+                {formLimits.max_nmf_iterations[1]})
+              </li>
+              <li>
+                NMF Test Convergence: 10000 ({formLimits.nmf_test_conv[0]}-
+                {formLimits.nmf_test_conv[1]})
+              </li>
             </ol>
             <p>
               Performing these two-step analyses can significantly enhance the
