@@ -9,7 +9,9 @@ export default function MsIndividualPlot({ state, form }) {
   const { data, error, isFetching } = useMsIndividualQuery(params, {
     skip: !params,
   });
-
+  console.log('ms individual data', data);
+  if (data && data.error) console.log('data.error', data.error);
+  console.log('error', error);
   const { sample } = form;
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 
@@ -61,8 +63,9 @@ export default function MsIndividualPlot({ state, form }) {
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {error && <p className="p-3 text-danger">Plot is unavailable</p>}
-      {data && (
+      {error || (data && data.error) ? (
+        <p className="p-3 text-danger">Plot is unavailable</p>
+      ) : data ? (
         <div>
           <Plotly
             className="w-100"
@@ -70,7 +73,7 @@ export default function MsIndividualPlot({ state, form }) {
             layout={data.layout}
             config={data.config}
           />
-          <div className='p-3'>
+          <div className="p-3">
             <p>
               The combination plot shows the original mutational profile, the
               deconstructed mutational profile, and the difference of each
@@ -90,7 +93,7 @@ export default function MsIndividualPlot({ state, form }) {
             </p>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

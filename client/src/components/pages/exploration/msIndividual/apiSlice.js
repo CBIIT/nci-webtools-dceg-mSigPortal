@@ -46,45 +46,48 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
             '/mutational_spectrum?' + new URLSearchParams(_arg.params_spectrum)
           ), //seqmatrix
         ]);
+        try {
+          let profile;
 
-        let profile;
+          if (_arg.params_activity.userId) {
+            if (res[0].data.length > 0 && res[1].data.length > 0) {
+              const exposure_groupBySignature = groupBy(
+                res[0].data.filter((o) => o['exposure'] > 0.01),
+                'signatureName'
+              );
 
-        if (_arg.params_activity.userId) {
-          if (res[0].data.length > 0 && res[1].data.length > 0) {
-            const exposure_groupBySignature = groupBy(
-              res[0].data.filter((o) => o['exposure'] > 0.01),
-              'signatureName'
-            );
+              const signatureNames = Object.keys(exposure_groupBySignature).map(
+                (e) => e
+              );
 
-            const signatureNames = Object.keys(exposure_groupBySignature).map(
-              (e) => e
-            );
-
-            profile = signatureNames[0];
+              profile = signatureNames[0];
+            } else {
+              profile = 'No data/ Data is missing';
+            }
           } else {
-            profile = 'No data/ Data is missing';
+            if (
+              res[0].data.length > 0 &&
+              res[1].data.length > 0 &&
+              res[2].data.length > 0
+            ) {
+              profile = extractLastWord(_arg.params_activity.signatureSetName);
+            } else {
+              profile = 'No data / Data is missing';
+            }
           }
-        } else {
-          if (
-            res[0].data.length > 0 &&
-            res[1].data.length > 0 &&
-            res[2].data.length > 0
-          ) {
-            profile = extractLastWord(_arg.params_activity.signatureSetName);
+          console.log('profile ', profile);
+          if (profile === 'SBS96' || profile.includes('SBS')) {
+            return { data: sbs96(res, _arg, 'msIndividual') };
+          } else if (profile === 'DBS78' || profile.includes('DBS')) {
+            return { data: dbs78(res, _arg, 'msIndividual') };
+          } else if (profile === 'ID83' || profile.includes('ID')) {
+            return { data: id83(res, _arg, 'msIndividual') };
           } else {
-            profile = 'No data / Data is missing';
+            //return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
+            return { data: MsIndividual_Error(res, _arg, profile) };
           }
-        }
-        //console.log('profile ', profile);
-        if (profile === 'SBS96' || profile.includes('SBS')) {
-          return { data: sbs96(res, _arg, 'msIndividual') };
-        } else if (profile === 'DBS78' || profile.includes('DBS')) {
-          return { data: dbs78(res, _arg, 'msIndividual') };
-        } else if (profile === 'ID83' || profile.includes('ID')) {
-          return { data: id83(res, _arg, 'msIndividual') };
-        } else {
-          //return { data: msIndividual_rs32(res, _arg, 'msIndividual') };
-          return { data: MsIndividual_Error(res, _arg, profile) };
+        } catch (error) {
+          return error;
         }
       },
     }),

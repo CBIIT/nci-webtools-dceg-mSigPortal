@@ -91,7 +91,7 @@ export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
       transformResponse: (data, meta, arg) => {
         // console.log('---ms decomposition');
         // console.log(arg);
-        // console.log(data);
+        console.log('data decomposition', data);
         //return false;
         try {
           return MsDecomposition(data.output, arg);
