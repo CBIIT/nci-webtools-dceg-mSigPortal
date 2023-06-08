@@ -22,19 +22,8 @@ import {
 } from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
-const env = process.env;
-const limits = env.EXTRACTION_FORM_LIMIT
-  ? JSON.parse(env.EXTRACTION_FORM_LIMIT)
-  : {
-      minimum_signatures: [1, 15],
-      maximum_signatures: [1, 15],
-      nmf_replicates: [1, 100],
-      min_nmf_iterations: [1, 10000],
-      max_nmf_iterations: [1, 1000000],
-      nmf_test_conv: [1, 10000],
-    };
 
-export default function ExtractionForm() {
+export default function ExtractionForm({ formLimits }) {
   const { submitted, ...state } = useSelector((state) => state.extraction);
   const id = useParams().id || state.id || false;
   const history = useHistory();
@@ -233,6 +222,7 @@ export default function ExtractionForm() {
       value: 'SigProfilerExtractor',
     },
 
+    seeds: 'random',
     matrix_normalization: 'gmm',
     nmf_init: 'random',
     precision: 'single',
@@ -242,7 +232,7 @@ export default function ExtractionForm() {
     nmf_replicates: 50,
     min_nmf_iterations: 1000,
     max_nmf_iterations: 100000,
-    nmf_test_conv: 1000,
+    nmf_test_conv: 10000,
 
     email: '',
     jobName: '',
@@ -685,8 +675,8 @@ export default function ExtractionForm() {
                   {...register('minimum_signatures')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={limits.minimum_signatures[0]}
-                  max={limits.maximum_signatures[1]}
+                  min={formLimits.minimum_signatures[0]}
+                  max={formLimits.maximum_signatures[1]}
                   defaultValue={1}
                   disabled={submitted || id}
                 />
@@ -697,8 +687,8 @@ export default function ExtractionForm() {
                   {...register('maximum_signatures')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={limits.maximum_signatures[0]}
-                  max={limits.maximum_signatures[1]}
+                  min={formLimits.maximum_signatures[0]}
+                  max={formLimits.maximum_signatures[1]}
                   defaultValue={12}
                   disabled={submitted || id}
                 />
@@ -709,8 +699,8 @@ export default function ExtractionForm() {
                   {...register('nmf_replicates')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={limits.nmf_replicates[0]}
-                  max={limits.nmf_replicates[1]}
+                  min={formLimits.nmf_replicates[0]}
+                  max={formLimits.nmf_replicates[1]}
                   defaultValue={50}
                   disabled={submitted || id}
                 />
@@ -806,8 +796,8 @@ export default function ExtractionForm() {
                   {...register('min_nmf_iterations', {})}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={limits.min_nmf_iterations[0]}
-                  max={limits.min_nmf_iterations[1]}
+                  min={formLimits.min_nmf_iterations[0]}
+                  max={formLimits.min_nmf_iterations[1]}
                   defaultValue={1000}
                   disabled={submitted || id}
                 />
@@ -818,8 +808,8 @@ export default function ExtractionForm() {
                   {...register('max_nmf_iterations')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  min={limits.max_nmf_iterations[0]}
-                  max={limits.max_nmf_iterations[1]}
+                  min={formLimits.max_nmf_iterations[0]}
+                  max={formLimits.max_nmf_iterations[1]}
                   defaultValue={100000}
                   disabled={submitted || id}
                 />
@@ -830,9 +820,9 @@ export default function ExtractionForm() {
                   {...register('nmf_test_conv')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={1000}
-                  min={limits.nmf_test_conv[0]}
-                  max={limits.nmf_test_conv[1]}
+                  defaultValue={10000}
+                  min={formLimits.nmf_test_conv[0]}
+                  max={formLimits.nmf_test_conv[1]}
                   disabled={submitted || id}
                 />
               </Form.Group>
