@@ -9,7 +9,18 @@ import { copy } from 'fs-extra';
 import { randomUUID } from 'crypto';
 import { handleValidationErrors } from '../../middleware.js';
 import { check } from 'express-validator';
+
 const env = process.env;
+const EXTRACTION_FORM_LIMIT = env.EXTRACTION_FORM_LIMIT
+  ? JSON.parse(env.EXTRACTION_FORM_LIMIT)
+  : {
+      minimum_signatures: [1, 15],
+      maximum_signatures: [1, 15],
+      nmf_replicates: [1, 100],
+      min_nmf_iterations: [1, 10000],
+      max_nmf_iterations: [1, 1000000],
+      nmf_test_conv: [1, 10000],
+    };
 
 export async function submit(req, res, next) {
   const id = req.params.id;
@@ -131,14 +142,12 @@ const minMaxValidation = (param, min, max) =>
     .withMessage(`${param} must be between ${min} and ${max}`);
 
 const router = Router();
+
 router.post(
   '/submitExtraction/:id?',
-  minMaxValidation('args.minimum_signatures', 1, 20),
-  minMaxValidation('args.maximum_signatures', 1, 20),
-  minMaxValidation('args.nmf_replicates', 1, 200),
-  minMaxValidation('args.min_nmf_iterations', 1, 20000),
-  minMaxValidation('args.max_nmf_iterations', 1, 2000000),
-  minMaxValidation('args.nmf_test_conv', 1, 20000),
+  Object.entries(EXTRACTION_FORM_LIMIT).map(([arg, [min, max]]) =>
+    minMaxValidation(`args.${arg}`, min, max)
+  ),
   handleValidationErrors,
   submit
 );
