@@ -7,13 +7,40 @@ export default function MsDecomposition(data, arg) {
   let annotations;
   let boxes;
   let cancerName;
+  let layout;
   if ('uncaughtError' in data) {
     // "uncaughtError" property exists in the data object
     // Handle the error here
-    traces = [];
-    annotations = [];
-    boxes = [];
-    cancerName = [];
+    const annotation = {
+      xref: 'paper',
+      yref: 'paper',
+
+      x: 0.5,
+      y: 0.5,
+      text: arg.params_activity.signatureSetName
+        ? 'Signature SetName: <b>' +
+          arg.params_activity.signatureSetName +
+          '</b> is not supported in MS Individual'
+        : 'No data found, please try again',
+      font: {
+        size: 15,
+        color: 'red',
+      },
+      showarrow: false,
+      align: 'center',
+    };
+    traces = {};
+    layout = {
+      height: 100,
+      autosize: true,
+      xaxis: {
+        showticklabels: false,
+        showline: false,
+        zeroline: false,
+      },
+      yaxis: { showticklabels: false, zeroline: false },
+      annotations: [annotation],
+    };
   } else {
     const result = Object.values(data)[0];
 
@@ -327,57 +354,58 @@ export default function MsDecomposition(data, arg) {
         },
       },
     ];
+
+    layout = {
+      hoverlabel: { bgcolor: '#FFF' },
+      height: 350,
+
+      autosize: true,
+      title: {
+        text: '<b>Evaluating the Performance of Mutational Signature Decomposition</b>',
+      },
+      showlegend: false,
+      annotations: annotations,
+      shapes: boxes,
+      margin: {
+        l: cancerName.length * 10,
+      },
+      xaxis: { domain: [0, 0.195], zeroline: false, showline: false },
+      yaxis: {
+        anchor: 'x',
+        showticklabels: false,
+        zeroline: false,
+        showline: false,
+      },
+      yaxis2: {
+        anchor: 'x2',
+        showticklabels: false,
+        zeroline: false,
+        showline: false,
+      },
+      xaxis2: { domain: [0.2, 0.395], zeroline: false, showline: false },
+      yaxis3: {
+        anchor: 'x3',
+        showticklabels: false,
+        zeroline: false,
+        showline: false,
+      },
+      xaxis3: { domain: [0.4, 0.595], zeroline: false, showline: false },
+      yaxis4: {
+        anchor: 'x4',
+        showticklabels: false,
+        zeroline: false,
+        showline: false,
+      },
+      xaxis4: { domain: [0.6, 0.795], zeroline: false, showline: false },
+      yaxis5: {
+        anchor: 'x5',
+        showticklabels: false,
+        zeroline: false,
+        showline: false,
+      },
+      xaxis5: { domain: [0.8, 0.995], zeroline: false, showline: false },
+    };
   }
 
-  const layout = {
-    hoverlabel: { bgcolor: '#FFF' },
-    height: 350,
-
-    autosize: true,
-    title: {
-      text: '<b>Evaluating the Performance of Mutational Signature Decomposition</b>',
-    },
-    showlegend: false,
-    annotations: annotations,
-    shapes: boxes,
-    margin: {
-      l: cancerName.length * 10,
-    },
-    xaxis: { domain: [0, 0.195], zeroline: false, showline: false },
-    yaxis: {
-      anchor: 'x',
-      showticklabels: false,
-      zeroline: false,
-      showline: false,
-    },
-    yaxis2: {
-      anchor: 'x2',
-      showticklabels: false,
-      zeroline: false,
-      showline: false,
-    },
-    xaxis2: { domain: [0.2, 0.395], zeroline: false, showline: false },
-    yaxis3: {
-      anchor: 'x3',
-      showticklabels: false,
-      zeroline: false,
-      showline: false,
-    },
-    xaxis3: { domain: [0.4, 0.595], zeroline: false, showline: false },
-    yaxis4: {
-      anchor: 'x4',
-      showticklabels: false,
-      zeroline: false,
-      showline: false,
-    },
-    xaxis4: { domain: [0.6, 0.795], zeroline: false, showline: false },
-    yaxis5: {
-      anchor: 'x5',
-      showticklabels: false,
-      zeroline: false,
-      showline: false,
-    },
-    xaxis5: { domain: [0.8, 0.995], zeroline: false, showline: false },
-  };
   return { traces, layout };
 }
