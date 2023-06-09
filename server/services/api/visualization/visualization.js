@@ -40,18 +40,17 @@ async function querySeqmatrix(req, res, next) {
 // query public seqmatrix data for visualization tab
 async function seqmatrixOptions(req, res, next) {
   try {
-    const { limit, offset, userId, ...query } = req.query;
+    const { limit, offset, userId, columns = '*', ...query } = req.query;
     const connection = userId
       ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
-    const columns = '*';
     const data = await getSeqmatrixOptions(
       connection,
       query,
       columns,
       limit,
       offset
-    );
+    ).distinct();
     res.json(data);
   } catch (error) {
     next(error);

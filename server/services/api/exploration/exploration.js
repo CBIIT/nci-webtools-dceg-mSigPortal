@@ -48,7 +48,7 @@ async function exposureOptions(req, res, next) {
       columns,
       limit,
       offset
-    );
+    ).distinct();
     res.json(data);
   } catch (error) {
     next(error);

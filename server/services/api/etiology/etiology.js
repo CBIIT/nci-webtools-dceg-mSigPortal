@@ -17,7 +17,7 @@ async function queryEtiologyOptions(req, res, next) {
       columns,
       limit,
       offset
-    );
+    ).distinct();
     const records = data.map(pickNonNullValues);
     res.json(records);
   } catch (error) {
