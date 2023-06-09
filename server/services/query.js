@@ -17,7 +17,7 @@ function getData(
   const patterns = pickBy(query, (v) => v && v.includes('%'));
 
   let sqlQuery = connection
-    .select(columns)
+    .select(columns.includes(',') ? columns.split(',') : columns)
     .from(table)
     // .where(conditions)
     .offset(offset, rowMode)

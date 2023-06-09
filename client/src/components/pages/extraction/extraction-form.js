@@ -41,7 +41,9 @@ export default function ExtractionForm({ formLimits }) {
     data: seqmatrixOptions,
     error: seqmatrixError,
     isFetching: fetchingSeqmatrixOptions,
-  } = useSeqmatrixOptionsQuery();
+  } = useSeqmatrixOptionsQuery({
+    columns: ['study', 'strategy', 'cancer', 'profile', 'matrix'],
+  });
   const {
     data: signatureOptions,
     error: signatureError,

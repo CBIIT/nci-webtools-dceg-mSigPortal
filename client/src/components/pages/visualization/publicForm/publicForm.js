@@ -9,7 +9,6 @@ import {
   resetVisualizationApi,
   useSeqmatrixOptionsQuery,
 } from '../../../../services/store/rootApi';
-import { usePublicMatrixMutation } from './apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 
@@ -26,8 +25,9 @@ export default function PublicForm() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { data, error, isFetching } = useSeqmatrixOptionsQuery();
-  const [fetchMatrix, { isLoading }] = usePublicMatrixMutation();
+  const { data, error, isFetching } = useSeqmatrixOptionsQuery({
+    columns: ['study', 'strategy', 'cancer'],
+  });
 
   const defaultValues = {
     study: { label: 'PCAWG', value: 'PCAWG' },
@@ -75,18 +75,6 @@ export default function PublicForm() {
         openSidebar: false,
       });
       mergeState({ ...data, cancers });
-      const params = {
-        study: data.study.value,
-        cancer: data.cancer.value,
-        strategy: data.strategy.value,
-      };
-
-      // let matrixData = [];
-      // for await (const data of paginateQuery(fetchMatrix, params)) {
-      //   matrixData = [...matrixData, ...data];
-      // }
-      // const matrixData = await fetchMatrix(params).unwrap();
-
       mergeMain({ displayTab: 'profilerSummary', submitted: true });
     } catch (error) {
       if (error.originalStatus == 504) {
@@ -223,7 +211,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Button
-            disabled={isFetching || isLoading}
+            disabled={isFetching}
             className="w-100"
             variant="secondary"
             onClick={() => handleReset()}
@@ -233,7 +221,7 @@ export default function PublicForm() {
         </Col>
         <Col>
           <Button
-            disabled={isFetching || isLoading || submitted}
+            disabled={isFetching || submitted}
             className="w-100"
             variant="primary"
             type="submit"
