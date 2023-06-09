@@ -9,8 +9,8 @@ export default function mutationalPatternScatter(inputData, arg) {
   const subtype2 = pattern.split('>')[0].slice(-1);
   // const subtype1 = pattern.substring(0, 1);
   // const subtype2 = pattern.substring(2, 3);
-  const pattern1 = type + ' context';
-  const pattern2 = pattern + ' other context';
+  const pattern1 = type + ' other context';
+  const pattern2 = pattern + ' context';
   const tmpdata0 = Object.values(
     groupBy(inputData, (e) => `${e.study}_${e.sample}`)
   ).map((samples) => {
