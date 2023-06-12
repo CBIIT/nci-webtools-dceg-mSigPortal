@@ -28,10 +28,9 @@ RUN dnf -y update \
 
 RUN mkdir -p /deploy/app /deploy/logs
 
-# install SigProfilerExtractor from local zip
-COPY packages/SigProfilerExtractor/ /deploy/app/SigProfilerExtractor
+# install SigProfilerExtractor
 WORKDIR /deploy/app
-RUN pip3 install -e SigProfilerExtractor/SigProfilerExtractor 
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
 
 # install other python packages
 RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
