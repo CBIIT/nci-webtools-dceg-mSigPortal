@@ -213,6 +213,7 @@ export default function ExtractionForm({ formLimits }) {
     strategy: { label: 'WGS', value: 'WGS' },
     input_type: { label: 'matrix', value: 'matrix' },
     reference_genome: { label: 'GRCh37', value: 'GRCh37' },
+    opportunity_genome: { label: 'GRCh37', value: 'GRCh37' },
     exome: false,
     signatureSetName: {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
@@ -369,6 +370,7 @@ export default function ExtractionForm({ formLimits }) {
       }),
 
       reference_genome: data.reference_genome.value,
+      opportunity_genome: data.opportunity_genome.value,
       exome: data.exome ? 'True' : 'False',
       context_type: data.context_type.value,
       minimum_signatures: data.minimum_signatures,
@@ -577,7 +579,14 @@ export default function ExtractionForm({ formLimits }) {
             disabled={submitted || id}
             options={genomeOptions}
             control={control}
-            rules={{ required: input_type === 'vcf' }}
+            rules={{ required: true }}
+          />
+          <SelectForm
+            name="opportunity_genome"
+            label="Opportunity Genome Build"
+            disabled={submitted || id}
+            options={genomeOptions}
+            control={control}
           />
           <Form.Group>
             <Controller
