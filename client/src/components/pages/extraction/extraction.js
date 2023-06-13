@@ -150,7 +150,11 @@ export default function Extraction() {
     {
       id: 'msIndividual',
       name: 'MS Individual',
-      disabled: explorationId === false,
+      disabled:
+        explorationId === false ||
+        !['SBS96', 'DBS72', 'ID83', 'RS32', 'SBS192'].includes(
+          params?.args.context_type
+        ),
     },
   ];
   function handleExplorationType(e) {
