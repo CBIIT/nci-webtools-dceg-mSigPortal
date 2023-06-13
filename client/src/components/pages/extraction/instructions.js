@@ -75,72 +75,74 @@ export default function Instructions({ formLimits }) {
       <hr />
       <div className="pt-2">
         <h6>SigProfilerExtraction Note</h6>
-        <div>
-          <p>
-            To enhance the performance of mutational signature extraction using
-            SigProfilerExtractor, we recommend a two-step analysis approach with
-            the following parameters:
-          </p>
-          <p>
-            <b>Step 1: Determine the optimal number of detected signatures.</b>
-          </p>
-          <div>
-            <p>Update the Advanced Parameters (default values):</p>
-            <ol>
-              <li>Minimum Signatures: 1</li>
-              <li>Maximum Signatures: 12</li>
-              <li>NMF Replicates Size: 50</li>
-              <li>Minimum NMF Iterations: 1000</li>
-              <li>Maximum NMF Iterations: 100000</li>
-              <li>NMF Test Convergence: 10000</li>
-            </ol>
-            <p>
-              After completing this step, refer to the "Signature Map" table to
-              identify the best number of detected signatures (denoted as N, for
-              example).
-            </p>
-            <p>
-              <b>
-                {' '}
-                Step 2: Refine the results of mutational signature extraction:
-              </b>
-            </p>
-            <ol>
-              <li>
-                Minimum Signatures: N ({formLimits.minimum_signatures[0]}-
-                {formLimits.minimum_signatures[1]})
-              </li>
-              <li>
-                Maximum Signatures: N ({formLimits.maximum_signatures[0]}-
-                {formLimits.maximum_signatures[1]})
-              </li>
-              <li>
-                NMF Replicates Size: 100 ({formLimits.nmf_replicates[0]}-
-                {formLimits.nmf_replicates[1]})
-              </li>
-              <li>
-                Minimum NMF Iterations: 10000 (
-                {formLimits.min_nmf_iterations[0]}-
-                {formLimits.min_nmf_iterations[1]})
-              </li>
-              <li>
-                Maximum NMF Iterations: 1000000 (
-                {formLimits.max_nmf_iterations[0]}-
-                {formLimits.max_nmf_iterations[1]})
-              </li>
-              <li>
-                NMF Test Convergence: 10000 ({formLimits.nmf_test_conv[0]}-
-                {formLimits.nmf_test_conv[1]})
-              </li>
-            </ol>
-            <p>
-              Performing these two-step analyses can significantly enhance the
-              performance of mutational signature analysis using
-              SigProfilerExtractor, particularly for jobs with large sample
-              size.
-            </p>
-          </div>
-        </div>
+        <p>
+          <b>Advanced Parameter Lower and Upper Limits</b>
+        </p>
+        <ol>
+          <li>
+            Minimum Signatures: ({formLimits.minimum_signatures[0]}-
+            {formLimits.minimum_signatures[1]})
+          </li>
+          <li>
+            Maximum Signatures: ({formLimits.maximum_signatures[0]}-
+            {formLimits.maximum_signatures[1]})
+          </li>
+          <li>
+            NMF Replicates Size: ({formLimits.nmf_replicates[0]}-
+            {formLimits.nmf_replicates[1]})
+          </li>
+          <li>
+            Minimum NMF Iterations: ({formLimits.min_nmf_iterations[0]}-
+            {formLimits.min_nmf_iterations[1]})
+          </li>
+          <li>
+            Maximum NMF Iterations: ({formLimits.max_nmf_iterations[0]}-
+            {formLimits.max_nmf_iterations[1]})
+          </li>
+          <li>
+            NMF Test Convergence: ({formLimits.nmf_test_conv[0]}-
+            {formLimits.nmf_test_conv[1]})
+          </li>
+        </ol>
+        <p>
+          To enhance the performance of mutational signature extraction using
+          SigProfilerExtractor, we recommend a two-step analysis approach with
+          the following parameters:
+        </p>
+        <p>
+          <b>Step 1: Determine the optimal number of detected signatures.</b>
+        </p>
+
+        <p>Update the Advanced Parameters (default values):</p>
+        <ol>
+          <li>Minimum Signatures: 1</li>
+          <li>Maximum Signatures: 12</li>
+          <li>NMF Replicates Size: 50</li>
+          <li>Minimum NMF Iterations: 1000</li>
+          <li>Maximum NMF Iterations: 100000</li>
+          <li>NMF Test Convergence: 1000</li>
+        </ol>
+        <p>
+          After completing this step, refer to the "Signature Map" table to
+          identify the best number of detected signatures (denoted as N, for
+          example).
+        </p>
+        <p>
+          <b>Step 2: Refine the results of mutational signature extraction:</b>
+        </p>
+        <ol>
+          <li>Minimum Signatures: N</li>
+          <li>Maximum Signatures: N</li>
+          <li>NMF Replicates Size: 100</li>
+          <li>Minimum NMF Iterations: 10000</li>
+          <li>Maximum NMF Iterations: 1000000</li>
+          <li>NMF Test Convergence: 10000</li>
+        </ol>
+        <p>
+          Performing these two-step analyses can significantly enhance the
+          performance of mutational signature analysis using
+          SigProfilerExtractor, particularly for jobs with large sample size.
+        </p>
       </div>
     </Container>
   );

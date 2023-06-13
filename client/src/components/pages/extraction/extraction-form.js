@@ -831,7 +831,7 @@ export default function ExtractionForm({ formLimits }) {
                   {...register('nmf_test_conv')}
                   type="number"
                   onWheel={(e) => e.target.blur()}
-                  defaultValue={10000}
+                  defaultValue={1000}
                   min={formLimits.nmf_test_conv[0]}
                   max={formLimits.nmf_test_conv[1]}
                   disabled={submitted || id}
