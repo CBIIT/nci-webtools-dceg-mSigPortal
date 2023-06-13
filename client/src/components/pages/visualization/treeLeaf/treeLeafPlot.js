@@ -29,6 +29,7 @@ export default function D3TreeLeaf({
 
   useEffect(() => {
     setLoading(true);
+    // use sessionCache as a temporary cache to allow storing objects with circular references (eg: hierarchy)
     window.sessionCache = window.sessionCache || {};
     const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
     const params = {
@@ -185,7 +186,7 @@ function createForceDirectedTree(
       .append('button')
       .attr('id', 'treeleaf-zoom-reset')
       .attr('class', 'btn btn-outline-secondary btn-sm')
-      .attr('style', 'position: absolute; top: 10px; left: 10px; z-index: 1;')
+      .attr('style', 'position: absolute; top: 10px; left: 10px;')
       .text('Reset Zoom')
       .on('click', () => svg.transition().duration(250).call(zoom.transform,d3.zoomIdentity));
 
