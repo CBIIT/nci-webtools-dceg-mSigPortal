@@ -106,7 +106,7 @@ async function getImageS3Batch(req, res, next) {
 
   const batch = Object.fromEntries(
     await Promise.all(
-      (keys || []).map(async (Key) => {
+      keys.map(async (Key) => {
         const key = decodeURIComponent(Key);
         try {
           const image = await getObjectBuffer(key, env.DATA_BUCKET);
@@ -116,6 +116,7 @@ async function getImageS3Batch(req, res, next) {
           ];
         } catch (error) {
           logger.error(`${key}: ${error.message}`);
+          logger.error(error);
           return [
             [path.parse(key).name],
             'no image available. ' + error.message,
