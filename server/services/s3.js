@@ -27,7 +27,7 @@ export async function getObjectBuffer(
   config = { region: 'us-east-1' }
 ) {
   const s3 = new S3Client(config);
-  const params = { Bucket: bucket, Key: key };
+  const params = { Bucket: bucket, Key: key.replace(/^(\.\.(\/|\\|$))+/, '') };
   const { Body } = await s3.send(new GetObjectCommand(params));
   return await consumers.buffer(Body);
 }
@@ -110,12 +110,12 @@ export function uploadDirectory(directory, key, bucket, config = {}) {
         files.map((file) => {
           const relativePath = file.replace(directory, '');
           // if (statSync(file).isFile()) {
-            return uploadObject(
-              file,
-              path.join(key, relativePath),
-              bucket,
-              config
-            );
+          return uploadObject(
+            file,
+            path.join(key, relativePath),
+            bucket,
+            config
+          );
           // }
         })
       );
