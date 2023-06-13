@@ -99,46 +99,46 @@ async function associationWrapper(req, res, next) {
   }
 }
 
-async function getImageS3Batch(req, res, next) {
-  // serve static images from s3
-  const { logger } = req.app.locals;
-  const { keys } = req.body;
+// async function getImageS3Batch(req, res, next) {
+//   // serve static images from s3
+//   const { logger } = req.app.locals;
+//   const { keys } = req.body;
 
-  const batch = Object.fromEntries(
-    await Promise.all(
-      keys.map(async (Key) => {
-        const key = decodeURIComponent(Key);
-        try {
-          const image = await getObjectBuffer(key, env.DATA_BUCKET);
-          return [
-            [path.parse(key).name],
-            'data:image/svg+xml;base64,' + image.toString('base64'),
-          ];
-        } catch (error) {
-          logger.error(`${key}: ${error.message}`);
-          logger.error(error);
-          return [
-            [path.parse(key).name],
-            'no image available. ' + error.message,
-          ];
-        }
-      })
-    )
-  );
-  res.json(batch);
-}
+//   const batch = Object.fromEntries(
+//     await Promise.all(
+//       keys.map(async (Key) => {
+//         const key = decodeURIComponent(Key);
+//         try {
+//           const image = await getObjectBuffer(key, env.DATA_BUCKET);
+//           return [
+//             [path.parse(key).name],
+//             'data:image/svg+xml;base64,' + image.toString('base64'),
+//           ];
+//         } catch (error) {
+//           logger.error(`${key}: ${error.message}`);
+//           logger.error(error);
+//           return [
+//             [path.parse(key).name],
+//             'no image available. ' + error.message,
+//           ];
+//         }
+//       })
+//     )
+//   );
+//   res.json(batch);
+// }
 
-async function getImageS3(req, res, next) {
-  // serve static images from s3
-  const key = req.body?.path;
-  if (!key) {
-    next('Missing path to image');
-  } else {
-    const image = await getObjectBuffer(key, env.DATA_BUCKET);
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.send(image);
-  }
-}
+// async function getImageS3(req, res, next) {
+//   // serve static images from s3
+//   const key = req.body?.path;
+//   if (!key) {
+//     next('Missing path to image');
+//   } else {
+//     const image = await getObjectBuffer(key, env.DATA_BUCKET);
+//     res.setHeader('Content-Type', 'image/svg+xml');
+//     res.send(image);
+//   }
+// }
 
 async function getFileS3(req, res, next) {
   // serve static files from s3
@@ -156,8 +156,8 @@ async function getFileS3(req, res, next) {
 
 const router = Router();
 router.post('/upload/:id?', upload);
-router.post('/getImageS3Batch', getImageS3Batch);
-router.post('/getImageS3', getImageS3);
+// router.post('/getImageS3Batch', getImageS3Batch);
+// router.post('/getImageS3', getImageS3);
 router.post('/getFileS3', getFileS3);
 router.post('/associationWrapper', associationWrapper);
 
@@ -165,8 +165,6 @@ export {
   router,
   parseCSV,
   upload,
-  getImageS3Batch,
-  getImageS3,
   getFileS3,
   associationWrapper,
 };

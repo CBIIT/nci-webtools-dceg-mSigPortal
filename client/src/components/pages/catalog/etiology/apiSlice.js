@@ -105,13 +105,13 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         };
       },
     }),
-    thumbnails: builder.query({
-      query: (body) => ({
-        url: 'getImageS3Batch',
-        method: 'POST',
-        body,
-      }),
-    }),
+    // thumbnails: builder.query({
+    //   query: (body) => ({
+    //     url: 'getImageS3Batch',
+    //     method: 'POST',
+    //     body,
+    //   }),
+    // }),
   }),
 });
 
@@ -120,5 +120,5 @@ export const {
   useEtiologyDistribtuionQuery,
   useEtiologySignatureQuery,
   useEtiologyOrganTableQuery,
-  useThumbnailsQuery,
+  // useThumbnailsQuery,
 } = etiologyApiSlice;

@@ -2,8 +2,6 @@ import { Row, Col, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '../../../../services/store/catalog';
 import { actions as modalActions } from '../../../../services/store/modal';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { useThumbnailsQuery } from './apiSlice';
 
 const actions = { ...catalogActions, ...modalActions };
 const { Check } = Form;
@@ -21,34 +19,12 @@ export default function SignatureOptions({ data }) {
     referenceSignature,
   } = useSelector((state) => state.catalog.etiology);
 
-  const {
-    data: thumbnails,
-    error,
-    isFetching,
-  } = useThumbnailsQuery(
-    {
-      keys: data.map((e) => getThumbnailKey(e.signature)),
-    },
-    { skip: !data }
-  );
-
-  // for category CancerSpecificSignatures
-  const { data: refSigThumbnails } = useThumbnailsQuery(
-    {
-      keys: data.map((e) => getThumbnailKey(e.json.referenceSignature)),
-    },
-    { skip: !data || category != 'CancerSpecificSignatures' }
-  );
-
-  // creates s3 path key from signature name
-  function getThumbnailKey(signature) {
+  function getThumbnailPath(signature) {
     // replace slashes with colons in filenames
     const file = signature ? signature.replaceAll(/\//g, ':') : '';
-    return encodeURIComponent(
-      category == 'CancerSpecificSignatures_2022'
-        ? `msigportal/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
-        : `msigportal/Database/Etiology/Profile_logo/${file}.svg`
-    );
+    return category == 'CancerSpecificSignatures_2022'
+      ? `web/data/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
+      : `web/data/Database/Etiology/Profile_logo/${file}.svg`;
   }
 
   function naturalSort(a, b) {
@@ -129,92 +105,81 @@ export default function SignatureOptions({ data }) {
         </Col>
       </Row>
 
-      {isFetching && <LoadingOverlay active="true" />}
-      {error && (
-        <p>
-          There was an error retrieving signature options. Please try again at a
-          later time.
-        </p>
-      )}
-      {thumbnails && (
-        <>
-          <Row
-            className={`justify-content-center ${
-              showAllSignatures ? 'd-none' : ''
-            }`}
-          >
-            {unqiueSignatures
-              .filter((e) => e.etiology == etiology)
-              .sort(naturalSort)
-              .sort(profileSort)
-              .map((e, i) => {
-                return (
-                  <Col key={i} md="2" sm="4" className="mb-3">
-                    <div
-                      className={`sigIcon border rounded ${
-                        e.signature == signature ? 'active' : ''
-                      }`}
-                      title={`${etiology} - ${e.signature}`}
-                      onClick={() =>
-                        mergeEtiology({
-                          signature: e.signature,
-                        })
-                      }
-                    >
-                      <img
-                        src={thumbnails[e.signature.replaceAll(/\//g, ':')]}
-                        className="w-100"
-                        // height="110"
-                        alt=""
-                      />
-                      <strong className="sigLabel">{e.signature}</strong>
-                    </div>
-                  </Col>
-                );
-              })}
-          </Row>
-          <Row
-            className={`px-2 justify-content-center ${
-              !showAllSignatures ? 'd-none' : ''
-            }`}
-          >
-            {unqiueSignatures
-              .sort(naturalSort)
-              .sort(profileSort)
-              .map((e, i) => (
-                <Col key={i} lg="1" md="3" sm="4" className="mb-2 px-1">
-                  <div
-                    onClick={() =>
-                      mergeEtiology({
-                        etiology: e.etiology,
-                        signature: e.signature,
-                      })
-                    }
-                    className={`sigIcon border rounded ${
-                      etiology != e.etiology
-                        ? 'inactive'
-                        : signature == e.signature
-                        ? 'active'
-                        : ''
-                    }`}
-                    title={`${e.etiology} - ${e.signature}`}
-                  >
-                    <img
-                      src={thumbnails[e.signature.replaceAll(/\//g, ':')]}
-                      className="w-100"
-                      // height="70"
-                      alt=""
-                    />
-                    <strong className="sigLabel" style={{ fontSize: '0.8rem' }}>
-                      {e.signature}
-                    </strong>
-                  </div>
-                </Col>
-              ))}
-          </Row>
-        </>
-      )}
-      {refSigThumbnails && category == 'CancerSpecificSignatures' && (
+      <Row
+        className={`justify-content-center ${
+          showAllSignatures ? 'd-none' : ''
+        }`}
+      >
+        {unqiueSignatures
+          .filter((e) => e.etiology == etiology)
+          .sort(naturalSort)
+          .sort(profileSort)
+          .map((e, i) => {
+            return (
+              <Col key={i} md="2" sm="4" className="mb-3">
+                <div
+                  className={`sigIcon border rounded ${
+                    e.signature == signature ? 'active' : ''
+                  }`}
+                  title={`${etiology} - ${e.signature}`}
+                  onClick={() =>
+                    mergeEtiology({
+                      signature: e.signature,
+                    })
+                  }
+                >
+                  <img
+                    src={getThumbnailPath(e.signature.replaceAll(/\//g, ':'))}
+                    className="w-100"
+                    // height="110"
+                    alt=""
+                  />
+                  <strong className="sigLabel">{e.signature}</strong>
+                </div>
+              </Col>
+            );
+          })}
+      </Row>
+      <Row
+        className={`px-2 justify-content-center ${
+          !showAllSignatures ? 'd-none' : ''
+        }`}
+      >
+        {unqiueSignatures
+          .sort(naturalSort)
+          .sort(profileSort)
+          .map((e, i) => (
+            <Col key={i} lg="1" md="3" sm="4" className="mb-2 px-1">
+              <div
+                onClick={() =>
+                  mergeEtiology({
+                    etiology: e.etiology,
+                    signature: e.signature,
+                  })
+                }
+                className={`sigIcon border rounded ${
+                  etiology != e.etiology
+                    ? 'inactive'
+                    : signature == e.signature
+                    ? 'active'
+                    : ''
+                }`}
+                title={`${e.etiology} - ${e.signature}`}
+              >
+                <img
+                  src={getThumbnailPath(e.signature.replaceAll(/\//g, ':'))}
+                  className="w-100"
+                  // height="70"
+                  alt=""
+                />
+                <strong className="sigLabel" style={{ fontSize: '0.8rem' }}>
+                  {e.signature}
+                </strong>
+              </div>
+            </Col>
+          ))}
+      </Row>
+      {category == 'CancerSpecificSignatures' && (
         <div className="my-3">
           <h5 className="separator">Reference Signatures</h5>
           {!signature && (
@@ -240,11 +205,9 @@ export default function SignatureOptions({ data }) {
                       }
                     >
                       <img
-                        src={
-                          refSigThumbnails[
-                            e.json.referenceSignature.replaceAll(/\//g, ':')
-                          ]
-                        }
+                        src={getThumbnailPath(
+                          e.json.referenceSignature.replaceAll(/\//g, ':')
+                        )}
                         className="w-100"
                         // height="110"
                         alt=""
