@@ -87,7 +87,7 @@ export default function ID83(apiData, title = '') {
         .slice(0, groupIndex)
         .reduce((lastIndex, b) => lastIndex + b.data.length, 0) +
       (group.data.length - 1) * 0.5,
-    y: 1.01,
+    y: 1.005,
     text: `<b>${
       group.mutation[0] == '1' ? group.mutation.slice(-1) : group.mutation[0]
     }</b>`,
