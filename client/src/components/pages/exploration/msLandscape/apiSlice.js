@@ -9,11 +9,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, params) => {
-        console.log('ms landscape data', data);
         const { cosineData, exposureData, dendrogram } = data.output;
-        console.log('cosineData', cosineData);
-        console.log('exposureData', exposureData);
-        console.log('dendrogram', dendrogram);
         if (cosineData && exposureData) {
           return MsLandscape(
             cosineData,

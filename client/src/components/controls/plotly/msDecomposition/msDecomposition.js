@@ -2,7 +2,6 @@ import { groupBy } from 'lodash';
 import { groupByCustom } from '../../utils/utils.js';
 
 export default function MsDecomposition(data, arg) {
-  console.log('MS Decomposition data: ', data);
   let traces;
   let annotations;
   let boxes;

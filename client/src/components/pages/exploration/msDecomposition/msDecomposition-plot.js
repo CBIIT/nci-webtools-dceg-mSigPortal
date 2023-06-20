@@ -9,7 +9,7 @@ export default function MsDecompositionPlot({ state }) {
   const { data, error, isFetching } = useMsDecompositionQuery(params, {
     skip: !params,
   });
-  console.log('error', error);
+
   const { study, strategy, signatureSetName, cancer, id } = state;
   useEffect(() => {
     if (study) {

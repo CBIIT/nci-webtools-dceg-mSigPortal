@@ -9,9 +9,7 @@ export default function MsIndividualPlot({ state, form }) {
   const { data, error, isFetching } = useMsIndividualQuery(params, {
     skip: !params,
   });
-  console.log('ms individual data', data);
-  if (data && data.error) console.log('data.error', data.error);
-  console.log('error', error);
+
   const { sample } = form;
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
 

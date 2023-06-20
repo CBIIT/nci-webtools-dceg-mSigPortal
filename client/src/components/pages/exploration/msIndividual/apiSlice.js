@@ -75,7 +75,7 @@ export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({
               profile = 'No data / Data is missing';
             }
           }
-          console.log('profile ', profile);
+
           if (profile === 'SBS96' || profile.includes('SBS')) {
             return { data: sbs96(res, _arg, 'msIndividual') };
           } else if (profile === 'DBS78' || profile.includes('DBS')) {
