@@ -55,11 +55,8 @@ async function exposureOptions(req, res, next) {
   }
 }
 async function explorationWrapper(req, res, next) {
-  logger.debug('/explorationWrapper: ' + fn);
-  const { fn, args, id, type = 'calc' } = req.body;
   const { logger } = req.app.locals;
-  const sessionId = id ? id : type == 'calc' ? randomUUID() : false;
-
+  const { fn, args, id = randomUUID() } = req.body;
   // config info for R functions
   const rConfig = {
     prefix: env.DATA_BUCKET_PREFIX,
@@ -67,11 +64,11 @@ async function explorationWrapper(req, res, next) {
     wd: path.resolve(env.DATA_FOLDER),
   };
 
-  // create directory for results if needed
-  const savePath = id ? path.join('output', id, 'results', fn, '/') : null;
-  if (sessionId) await mkdirs(path.join(rConfig.wd, savePath));
-
   try {
+    // create directory for results
+    const savePath = path.join('output', id, 'results', fn, '/');
+    await mkdirs([path.join(rConfig.wd, savePath)]);
+
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
