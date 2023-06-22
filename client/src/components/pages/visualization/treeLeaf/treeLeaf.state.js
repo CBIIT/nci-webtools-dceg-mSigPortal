@@ -32,6 +32,9 @@ export const defaultFormState = {
     value: 'Cosine_similarity',
     continuous: true,
   },
+  signatureSetName: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+  profile: 'SBS',
+  matrix: 96,
 };
 
 export const formState = atom({

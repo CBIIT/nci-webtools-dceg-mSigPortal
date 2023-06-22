@@ -1,9 +1,9 @@
-import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
-import { useSelector, useRes } from 'react-redux';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
-import { formState, graphDataSelector, colorOptions } from './treeLeaf.state';
+import { formState, graphDataSelector, colorOptions, defaultFormState } from './treeLeaf.state';
 import { useEffect } from 'react';
 
 export default function TreeLeafForm() {
@@ -12,16 +12,16 @@ export default function TreeLeafForm() {
   const strategy = store?.publicForm?.strategy?.value || 'WGS';
   const cancers = store?.publicForm?.cancers?.filter(c => c.value !== '*ALL') || [];
   const cancerTypes = [{ label: 'All', value: '' }].concat(cancers);
-  const signatureSetName = 'COSMIC_v3_Signatures_GRCh37_SBS96';
-  const profile = 'SBS';
-  const matrix = 96;
   const [form, setForm] = useRecoilState(formState);
+  const signatureSetName = form?.signatureSetName;
+  const profile = form?.profile;
+  const matrix = form?.matrix;
+  const defaultCancer = cancerTypes.find(c => c.value === store?.publicForm?.cancer.value) || cancerTypes[0];
   const cancer = form?.cancerType?.value;
   const params = { study, strategy,  signatureSetName, profile, matrix, cancer };
   const { attributes } = useRecoilValue(graphDataSelector(params));
-  const resetForm = useResetRecoilState(formState);
   const mergeForm = (state) => setForm({ ...form, ...state });
-  useEffect(() => resetForm(), [study]); // reset form when study changes
+  useEffect(() => setForm({...defaultFormState, cancerType: defaultCancer}), [setForm, study, defaultCancer]); // reset form when study changes
 
   function handleChange(event) {
     let { name, value, checked, type } = event.target;
@@ -57,7 +57,7 @@ export default function TreeLeafForm() {
             <Form.Label>Cancer Type</Form.Label>
             <Select
               name="cancerType"
-              defaultValue={cancerTypes[0]}
+              defaultValue={defaultCancer}
               options={cancerTypes}
               onChange={(e) => mergeForm({ cancerType: e })}
             />
