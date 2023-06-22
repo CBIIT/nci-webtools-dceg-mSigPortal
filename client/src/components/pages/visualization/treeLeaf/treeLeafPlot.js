@@ -416,7 +416,7 @@ function categoricalLegend({
   title,
   x = 10,
   y = 10,
-  size = 15,
+  size = 25,
 } = {}) {
   const keys = color.domain();
 
@@ -450,7 +450,7 @@ function categoricalLegend({
     .attr('fill', 'black')
     .attr('text-anchor', 'end')
     .style('alignment-baseline', 'middle')
-    .style('font-size', '17px')
+    .style('font-size', '15px')
     .text((d) => d ?? 'Unavailable');
 
   // add title
