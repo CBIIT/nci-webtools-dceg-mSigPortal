@@ -109,16 +109,12 @@ export function MsIndividualComparison(
     seqmatrix_groupByMutationType
   ).flat(); //original data for the comparison
 
-  //console.log('seqmatrixDataFilter ', seqmatrixDataFilter);
-
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
     return order.indexOf(a.mutation) - order.indexOf(b.mutation);
   };
 
   const totalMutationsOriginal = getTotalMutations(seqmatrixDataFilter);
-
-  //console.log('totalMutationsOriginal---- ', totalMutationsOriginal);
 
   const normalizedOriginal = seqmatrixDataFilter.map((e) => ({
     ...e,
@@ -130,39 +126,15 @@ export function MsIndividualComparison(
     }),
   }));
 
-  //console.log('normalizedOriginal', normalizedOriginal);
-
   const groupOriginal = groupDataByMutation(
     normalizedOriginal,
     mutationRegex,
     mutationGroupSort
   );
 
-  //console.log('groupOriginal', groupOriginal);
-
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
   );
-
-  // const arraySignatureDataFlat = arraySignatureData.flat();
-  // const destructedData = [];
-  // for (let i = 0; i < percentSignature.length; i++) {
-  //   for (let j = 0; j < arraySignatureDataFlat.length; j++) {
-  //     if (
-  //       arraySignatureDataFlat[j].signatureName ===
-  //       percentSignature[i].signatureName
-  //     ) {
-  //       let n = {
-  //         signatureName: arraySignatureDataFlat[j].signatureName,
-  //         mutationType: arraySignatureDataFlat[j].mutationType,
-  //         mutations:
-  //           arraySignatureDataFlat[j].contribution *
-  //           percentSignature[i].percent,
-  //       };
-  //       destructedData.push(n);
-  //     }
-  //   }
-  // }
 
   const destructedData = arraySignatureData
     .flat()
@@ -178,22 +150,6 @@ export function MsIndividualComparison(
           .percent,
     }));
 
-  // const groupByMutationType_destructed = groupBy(
-  //   destructedData,
-  //   'mutationType'
-  // );
-  // let newDestructedData = [];
-  // const groupByMutationType_destructed_value = Object.values(
-  //   groupByMutationType_destructed
-  // );
-  // for (let i = 0; i < groupByMutationType_destructed_value.length; i++) {
-  //   let n = {
-  //     mutations: getTotalMutations(groupByMutationType_destructed_value[i]),
-  //     mutationType: groupByMutationType_destructed_value[i][0].mutationType,
-  //     signatureName: groupByMutationType_destructed_value[i][0].signatureName,
-  //   };
-  //   newDestructedData.push(n);
-  // }
   const newDestructedData = Object.values(
     destructedData.reduce((acc, curr) => {
       const key = curr.mutationType;
@@ -247,7 +203,7 @@ export function MsIndividualComparison(
 
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
-      name: group.mutations,
+      name: group.mutation,
       type: 'bar',
       marker: { color: colors[group.mutation] },
       x: [...group.data.keys()].map(
@@ -264,7 +220,6 @@ export function MsIndividualComparison(
       yaxis: 'y21',
     })
   );
-  //console.log(sampleTraceDestructed);
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
     y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),
@@ -290,22 +245,39 @@ export function MsIndividualComparison(
 
   //-------- under subplot -----------//
 
-  const contributionGroupSort = (a, b) => {
-    const order = Object.keys(colors);
-    return order.indexOf(a.contribution) - order.indexOf(b.contribution);
-  };
-
-  let groupSamples = [];
+  const groupSamples = [];
   for (let i = 0; i < arraySignatureData.length; i++) {
     groupSamples.push(
       groupDataByMutation(
         arraySignatureData[i],
         mutationRegex,
-        contributionGroupSort
+        mutationGroupSort
       )
     );
   }
-  groupSamples.reverse(); //make the lower subplot has same order as in stage
+
+  // const flattenedSubplotsGroup = groupSamples.map((subArray) =>
+  //   subArray.flatMap((obj) => Object.values(obj.data))
+  // );
+
+  // console.log('flattenedTestGroup:', flattenedSubplotsGroup);
+
+  // const contributionGroupSort = (a, b) => {
+  //   const order = Object.keys(colors);
+  //   return order.indexOf(a.contribution) - order.indexOf(b.contribution);
+  // };
+
+  // let groupSamples = [];
+  // for (let i = 0; i < arraySignatureData.length; i++) {
+  //   groupSamples.push(
+  //     groupDataByMutation(
+  //       arraySignatureData[i],
+  //       mutationRegex,
+  //       contributionGroupSort
+  //     )
+  //   );
+  // }
+  // groupSamples.reverse(); //make the lower subplot has same order as in stage
 
   const tracesArray = [];
   const sampleLabels = [];
