@@ -54,9 +54,9 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
     /** rsProfile-form-plot_1 **/
     rsProfilePlot: builder.query({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        console.log(_arg);
+        //console.log(_arg);
         const params = _arg.params;
-        console.log(params);
+        //console.log(params);
         try {
           const res = await Promise.all(
             params.map((e) =>
@@ -64,9 +64,9 @@ export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
             )
           );
 
-          console.log(res);
+          //console.log(res);
           const plotData = res.map((e, i) => {
-            console.log(params[i].profile + params[i].matrix);
+            //console.log(params[i].profile + params[i].matrix);
 
             if (params[i].profile + params[i].matrix === 'SBS96') {
               return SBS96(res[i].data, params[i].signatureName, 'rsProfile');

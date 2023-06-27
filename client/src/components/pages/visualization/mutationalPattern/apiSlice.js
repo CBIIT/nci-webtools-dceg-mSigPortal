@@ -10,7 +10,6 @@ export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
         params: { ...params, limit: 1000000 },
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('data', data);
         return mutationalPatternScatter(data, arg);
       },
     }),

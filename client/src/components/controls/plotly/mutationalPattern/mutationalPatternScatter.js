@@ -272,9 +272,9 @@ export default function mutationalPatternScatter(inputData, arg) {
 
       hoverinfo: 'skip',
       showlegend: true,
-      legendgroup: 'size',
+      legendgroup: additionalFilter.toLocaleString(undefined),
       legendgrouptitle: {
-        text: 'Number of mutations',
+        text: index === 0 ? 'Number of mutations' : '',
       },
     };
     tracesSize.push(additionalTrace);
@@ -346,9 +346,9 @@ export default function mutationalPatternScatter(inputData, arg) {
         '<b>Total:</b> %{customdata.total}<extra></extra>',
       showlegend: false,
       legendrank: 1,
-      legendgroup: 'a',
+      legendgroup: group,
       legendgrouptitle: {
-        text: 'Study',
+        text: scatterTraces.length === 0 ? 'Study' : '', // Show the title for the first group only
       },
     };
 
@@ -363,7 +363,13 @@ export default function mutationalPatternScatter(inputData, arg) {
       type: 'scatter',
       opacity: 1,
       marker: {
-        color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
+        //color: scatterTraces.length === 0 ? 'green' : getRandomColor(), // Generate a random color for each trace
+        color:
+          scatterTraces.length < mutationalPatternColors.length
+            ? mutationalPatternColors[scatterTraces.length]
+            : mutationalPatternColors[
+                scatterTraces.length % mutationalPatternColors.length
+              ], // Use colors from mutationalPatternColors array in a circular manner
         line: {
           color: 'black',
           width: 1,
@@ -373,9 +379,9 @@ export default function mutationalPatternScatter(inputData, arg) {
 
       showlegend: true,
       legendrank: 1,
-      legendgroup: 'a',
+      legendgroup: group,
       legendgrouptitle: {
-        text: 'Study',
+        text: scatterTraces.length === 0 ? 'Study' : '', // Show the title for the first group only
       },
     };
 

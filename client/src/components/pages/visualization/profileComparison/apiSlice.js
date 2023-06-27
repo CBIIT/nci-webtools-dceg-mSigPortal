@@ -13,7 +13,6 @@ export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, arg) => {
-        console.log('DATA -- ', data);
         // get samples from sample array _arg
         const [sample1, sample2] = arg.sample.split(';');
         // filter api data by samples
