@@ -7,6 +7,7 @@ export default function MsDecomposition(data, arg) {
   let boxes;
   let cancerName;
   let layout;
+  console.log('data', data);
   if ('uncaughtError' in data) {
     // "uncaughtError" property exists in the data object
     // Handle the error here
@@ -277,11 +278,11 @@ export default function MsDecomposition(data, arg) {
         xref: 'paper',
         yref: 'paper',
         xanchor: 'right',
-        x: -0.03,
-        y: -0.1,
-        yanchor: 'right',
+        x: 0,
+        y: 0,
+        yanchor: 'bottom',
         text: cancerName,
-        align: 'center',
+        align: 'right',
         showarrow: false,
       },
     ];
