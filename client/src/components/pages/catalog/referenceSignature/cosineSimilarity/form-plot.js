@@ -55,17 +55,22 @@ export default function CosineSimilarityPlot() {
   // const supportedMatrices = [96, 192, 78, 73];
 
   const profileOptions = data
-    ? [...new Set(data.map((e) => e.profile))].map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(data.map((e) => e.profile))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
     : [];
 
   const matrixOptions = (profile) =>
     data && profile
       ? [
           ...new Set(
-            data.filter((e) => e.profile == profile.value).map((e) => e.matrix)
+            data
+              .filter((e) => e.profile == profile.value)
+              .map((e) => e.matrix)
+              .sort((a, b) => a - b)
           ),
         ].map((e) => ({
           label: e,
@@ -128,7 +133,6 @@ export default function CosineSimilarityPlot() {
               onChange={handleProfile}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              
             />
           </Col>
           <Col lg="auto">
@@ -139,7 +143,6 @@ export default function CosineSimilarityPlot() {
               options={matrixOptions(profile)}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleMatrix(profile, e)}
-              
             />
           </Col>
           <Col lg="auto">
@@ -149,7 +152,6 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              
             />
           </Col>
           <Col lg="auto">
@@ -159,7 +161,6 @@ export default function CosineSimilarityPlot() {
               options={signatureSetOptions(profile, matrix)}
               disabled={fetchingOptions || fetchingPlot}
               control={control}
-              
             />
           </Col>
           <Col lg="auto" className="d-flex justify-content-end">
