@@ -64,10 +64,14 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
     mergeForm({ signatureName2: e });
   }
 
-  const mergedOptions = [...(options || []), ...(options2 || [])].filter(
-    (option, index, self) =>
-      self.findIndex((o) => o.value === option.value) === index
-  );
+  const mergedOptions = [...(options || []), ...(options2 || [])]
+    .filter(
+      (option, index, self) =>
+        self.findIndex((o) => o.value === option.value) === index
+    )
+    .sort((a, b) =>
+      a.label.localeCompare(b.label, undefined, { numeric: true })
+    );
 
   return (
     <Form className="p-3">
