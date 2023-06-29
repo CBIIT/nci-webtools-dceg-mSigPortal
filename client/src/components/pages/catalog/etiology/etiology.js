@@ -58,7 +58,7 @@ export default function Etiology() {
     },
     {
       category: 'Others',
-      name: 'Others',
+      name: 'Other Reported Signature',
       etiologyTitle: 'Proposed Etiologies',
     },
   ];
