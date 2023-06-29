@@ -161,7 +161,7 @@ export default function Visualization() {
                       style={{
                         textDecoration: 'none',
                         fontSize: '12pt',
-                        color: '#42688b',
+                        color: '#3a7867',
                         fontWeight: '500',
                       }}
                       onClick={() => mergeState({ displayTab: id })}
@@ -193,7 +193,7 @@ export default function Visualization() {
                           style={{
                             textDecoration: 'none',
                             fontSize: '12pt',
-                            color: '#837244',
+                            color: '#3a7867',
                             fontWeight: '500',
                           }}
                           onClick={() => mergeState({ displayTab: id })}

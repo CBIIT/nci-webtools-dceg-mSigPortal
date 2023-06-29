@@ -31,18 +31,30 @@ export default function CosineSimilarity({ state }) {
       >
         <Nav variant="tabs">
           <Nav.Item>
-            <Nav.Link eventKey="within" as="button" className="outline-none">
+            <Nav.Link
+              eventKey="within"
+              as="button"
+              className="outline-none visualization"
+            >
               <strong>CS Between Samples</strong>
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="reference" as="button" className="outline-none">
+            <Nav.Link
+              eventKey="reference"
+              as="button"
+              className="outline-none visualization"
+            >
               <strong>CS to Reference Signatures</strong>
             </Nav.Link>
           </Nav.Item>
           {source == 'user' && (
             <Nav.Item>
-              <Nav.Link eventKey="public" as="button" className="outline-none">
+              <Nav.Link
+                eventKey="public"
+                as="button"
+                className="outline-none visualization"
+              >
                 <strong>CS to Public Data</strong>
               </Nav.Link>
             </Nav.Item>

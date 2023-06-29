@@ -26,13 +26,21 @@ export default function PCA({ state }) {
       >
         <Nav variant="tabs">
           <Nav.Item>
-            <Nav.Link eventKey="within" as="button" className="outline-none">
+            <Nav.Link
+              eventKey="within"
+              as="button"
+              className="outline-none visualization"
+            >
               <strong>PCA Between Samples</strong>
             </Nav.Link>
           </Nav.Item>
           {source == 'user' && (
             <Nav.Item>
-              <Nav.Link eventKey="public" as="button" className="outline-none">
+              <Nav.Link
+                eventKey="public"
+                as="button"
+                className="outline-none visualization"
+              >
                 <strong>PCA to Public Data</strong>
               </Nav.Link>
             </Nav.Item>

@@ -340,6 +340,12 @@ a.nav-link.active {
   text-decoration: none;
   border-bottom: none;
 }
+
+.visualization.nav-link.active {
+  color: #3a7867 !important;
+  text-decoration: none;
+  border-bottom: none;
+}
 .nav-tabs .nav-link {
   border-bottom: 0;
 }
