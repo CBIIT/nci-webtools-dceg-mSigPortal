@@ -69,49 +69,6 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
       self.findIndex((o) => o.value === option.value) === index
   );
 
-  // ...
-
-  return (
-    <Form className="p-3">
-      <LoadingOverlay active={isFetching} />
-      <Row>
-        <Col lg="auto">
-          <Select
-            name="signatureName1"
-            label="Signature Name 1"
-            value={form.signatureName1}
-            disabled={!options}
-            options={mergedOptions}
-            onChange={handleSignatureName1}
-            control={control}
-          />
-        </Col>
-        <Col lg="auto">
-          <Select
-            name="signatureName2"
-            label="Signature Name 2"
-            value={form.signatureName2}
-            disabled={id2 ? !options2 : !options}
-            options={mergedOptions}
-            onChange={handleSignatureName2}
-            control={control}
-          />
-        </Col>
-        <Col lg="auto">
-          <Group controlId="both">
-            <Check
-              id="both"
-              type="checkbox"
-              label="Samples Detected Both Signatures"
-              checked={both}
-              onChange={(e) => mergeForm({ both: e.target.checked })}
-            />
-          </Group>
-        </Col>
-      </Row>
-    </Form>
-  );
-
   return (
     <Form className="p-3">
       <LoadingOverlay active={isFetching} />
