@@ -7,7 +7,7 @@ export default function MsDecomposition(data, arg) {
   let boxes;
   let cancerName;
   let layout;
-  console.log('data', data);
+  // console.log('data', data);
   if ('uncaughtError' in data) {
     // "uncaughtError" property exists in the data object
     // Handle the error here
