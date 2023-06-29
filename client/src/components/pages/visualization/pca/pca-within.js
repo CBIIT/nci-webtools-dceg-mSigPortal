@@ -93,7 +93,7 @@ export default function PcaWithin({ state }) {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            id,
+            id: id || crypto.randomUUID(),
             cacheBust,
           };
     setParams(params);

@@ -86,7 +86,7 @@ export default function CsWithin({ state }) {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            id,
+            id: id || crypto.randomUUID(),
             cacheBust,
           };
     setParams(params);

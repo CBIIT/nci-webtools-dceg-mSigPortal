@@ -67,7 +67,7 @@ async function explorationWrapper(req, res, next) {
   try {
     // create directory for results
     const savePath = path.join('output', id, 'results', fn, '/');
-    await mkdirs([path.join(rConfig.wd, savePath)]);
+    await mkdirs([path.resolve(rConfig.wd, savePath)]);
 
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,

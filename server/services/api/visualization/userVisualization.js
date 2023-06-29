@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { randomUUID, sign } from 'crypto';
+import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import archiver from 'archiver';
@@ -189,18 +189,18 @@ async function wrapper(fn, args) {
 // Visualization Calculation functions
 async function visualizationWrapper(req, res, next) {
   const { logger } = req.app.locals;
-  const { fn, args, id } = req.body;
+  const { fn, args, id = randomUUID() } = req.body;
 
   // config info for R functions
   const rConfig = {
-    prefix: path.join(env.DATA_BUCKET_PREFIX),
+    prefix: env.DATA_BUCKET_PREFIX,
     bucket: env.DATA_BUCKET,
     wd: path.resolve(env.DATA_FOLDER),
   };
 
   // create directory for results if needed
-  const savePath = id ? path.join('output', id, 'results', fn, '/') : null;
-  if (id) fs.mkdirSync(path.join(rConfig.wd, savePath), { recursive: true });
+  const savePath = path.join('output', id, 'results', fn, '/');
+  await mkdirs([path.resolve(rConfig.wd, savePath)]);
 
   try {
     const { scriptOutput, ...rest } = await wrapper('wrapper', {
