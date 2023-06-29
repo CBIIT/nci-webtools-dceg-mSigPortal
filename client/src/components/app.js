@@ -61,7 +61,7 @@ export default function App() {
       cardTitle: 'Signature Extraction',
       cardText: 'Extraction mutational profiles',
       description:
-        'Extract and compare muational signatures using state-of-the-art algorithms.',
+        'Extract and compare mutational signatures using state-of-the-art algorithms.',
       image: 'assets/images/Extraction-Icon.svg',
       navIndex: 2,
       color: '#2f4a64',

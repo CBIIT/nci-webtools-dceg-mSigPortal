@@ -32,10 +32,12 @@ export default function PcaPublic({ state }) {
 
   // define options
   const profileOptions = options
-    ? [...new Set(options.map((e) => e.profile))].map((e) => ({
-        label: e,
-        value: e,
-      }))
+    ? [...new Set(options.map((e) => e.profile))]
+        .map((e) => ({
+          label: e,
+          value: e,
+        }))
+        .sort((a, b) => a.localeCompare(b))
     : [];
 
   const matrixOptions = (profile) =>
