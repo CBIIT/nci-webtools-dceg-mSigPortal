@@ -35,7 +35,7 @@ export default function PcWithin({ state }) {
         ...new Set(
           options
             .map((e) => e.profile)
-            .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         ),
       ].map((e) => ({
         label: e,

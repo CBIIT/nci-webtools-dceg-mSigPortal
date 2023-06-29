@@ -80,7 +80,7 @@ export default function MutationalProfilesForm({ state, form, mergeForm }) {
             options
               .filter((e) => e.sample == sample.value)
               .map((e) => e.profile)
-              .sort((a, b) => b.localeCompare(a))
+              .sort((a, b) => a.localeCompare(b))
           ),
         ].map((e) => ({ label: e, value: e }))
       : [];

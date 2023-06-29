@@ -62,7 +62,7 @@ export default function PcReference({ state }) {
         ...new Set(
           seqmatrixOptions
             .map((e) => e.profile)
-            .sort((a, b) => b.localeCompare(a))
+            .sort((a, b) => a.localeCompare(b))
         ),
       ].map((e) => ({
         label: e,
