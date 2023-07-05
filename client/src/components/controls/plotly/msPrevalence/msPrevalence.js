@@ -160,7 +160,7 @@ export default function MSPrevalence(data, minimum) {
       xref: 'paper',
       yref: 'paper',
       showarrow: false,
-      x: 0.0225,
+      x: 0.045,
       y: 1.15,
       xanchor: 'top',
       text: '<b>Prevalence by mutations</b>',
