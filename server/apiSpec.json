@@ -155,7 +155,7 @@
           {
             "name": "matrix",
             "in": "query",
-            "description": "Select a matrix size that coresponds to the profile.",
+            "description": "Select a matrix size that corresponds to the profile.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1262,39 +1262,9 @@
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "study",
+            "name": "category",
             "in": "query",
-            "description": "Select study",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "strategy",
-            "in": "query",
-            "description": "Select strategy (dataset) of the study.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "signatureName",
-            "in": "query",
-            "description": "Select signature name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "cancer",
-            "in": "query",
-            "description": "Select cancer",
+            "description": "Select category",
             "required": false,
             "schema": {
               "type": "string"
@@ -1302,9 +1272,9 @@
             "value": ""
           },
           {
-            "name": "organ",
+            "name": "etiology",
             "in": "query",
-            "description": "Select organ",
+            "description": "Select etiology",
             "required": false,
             "schema": {
               "type": "string"
@@ -1312,79 +1282,9 @@
             "value": ""
           },
           {
-            "name": "sample",
+            "name": "signature",
             "in": "query",
-            "description": "Select sample",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "signatureSetName",
-            "in": "query",
-            "description": "Select signature set name.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "mutations",
-            "in": "query",
-            "description": "Select mutations",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "cosineSimilarity",
-            "in": "query",
-            "description": "Select cosine similarity",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "sampleSize",
-            "in": "query",
-            "description": "Select sample size",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "exposure",
-            "in": "query",
-            "description": "Select exposure",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "burden",
-            "in": "query",
-            "description": "Select burden",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "value": ""
-          },
-          {
-            "name": "signatureSize",
-            "in": "query",
-            "description": "Select signature size",
+            "description": "Select signature",
             "required": false,
             "schema": {
               "type": "string"
