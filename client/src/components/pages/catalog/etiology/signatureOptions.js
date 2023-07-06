@@ -134,7 +134,9 @@ export default function SignatureOptions({ data }) {
                     // height="110"
                     alt=""
                   />
-                  <strong className="sigLabel">{e.signature}</strong>
+                  <div className="sigLabel">
+                    <strong>{e.signature}</strong>
+                  </div>
                 </div>
               </Col>
             );
