@@ -47,6 +47,7 @@ export default function RsComparisonPlot() {
   const supportedMatrices = [96, 192, 78, 83];
   const profileOptions = data
     ? [...new Set(data.map((e) => e.profile))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
         .filter((e) => supportedProfiles.includes(e))
         .map((e) => ({
           label: e,
