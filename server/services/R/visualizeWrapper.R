@@ -19,7 +19,7 @@ wrapper <- function(fn, args, config = list()) {
 
   tryCatch(
     {
-      output <- get(fn)(args, config)
+      output <- get(paste0("msigportal.", fn))(args, config)
     },
     error = function(e) {
       print(e)
@@ -34,7 +34,7 @@ wrapper <- function(fn, args, config = list()) {
 }
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
-getReferenceSignatureSets <- function(args, config) {
+msigportal.getReferenceSignatureSets <- function(args, config) {
   library(stringr)
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
 
@@ -45,7 +45,7 @@ getReferenceSignatureSets <- function(args, config) {
 }
 
 # get list of signatures in the selected signature set
-getSignaturesR <- function(args, config) {
+msigportal.getSignaturesR <- function(args, config) {
   library(stringr)
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
 
@@ -60,7 +60,7 @@ getSignaturesR <- function(args, config) {
 }
 
 # get public svgFiles and load into session
-getPublicData <- function(args, config) {
+msigportal.getPublicData <- function(args, config) {
   infoFile <- ""
   if (args$study == "PCAWG") {
     infoFile <- "PCAWG_WGS_seqmatrix_refdata_info.RData"
@@ -99,7 +99,7 @@ getPublicData <- function(args, config) {
 }
 
 # Tumor Mutation Burden ---------------------------------------------------
-profilerSummary <- function(args, config) {
+msigportal.profilerSummary <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -127,7 +127,7 @@ profilerSummary <- function(args, config) {
   return(list(plotPath = plotPath))
 }
 
-profilerSummaryPublic <- function(args, config) {
+msigportal.profilerSummaryPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -153,7 +153,7 @@ profilerSummaryPublic <- function(args, config) {
 
 ### Cosine Similarity tab ###
 # section 1: Cosine similarity within samples #
-cosineSimilarityWithin <- function(args, config) {
+msigportal.cosineSimilarityWithin <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -176,7 +176,7 @@ cosineSimilarityWithin <- function(args, config) {
   )
 }
 
-cosineSimilarityWithinPublic <- function(args, config) {
+msigportal.cosineSimilarityWithinPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -216,7 +216,7 @@ cosineSimilarityWithinPublic <- function(args, config) {
 # section 2: Cosine similarity  to reference signatures
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-cosineSimilarityRefSig <- function(args, config) {
+msigportal.cosineSimilarityRefSig <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -249,7 +249,7 @@ cosineSimilarityRefSig <- function(args, config) {
   )
 }
 
-cosineSimilarityRefSigPublic <- function(args, config) {
+msigportal.cosineSimilarityRefSigPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -294,7 +294,7 @@ cosineSimilarityRefSigPublic <- function(args, config) {
 
 # section 3: Cosine similarity to Public data -----------------------------
 # find the common profile between data and seqmatrix
-cosineSimilarityPublic <- function(args, config) {
+msigportal.cosineSimilarityPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -339,7 +339,7 @@ cosineSimilarityPublic <- function(args, config) {
 ### Profile Comparison tab ###
 # section 1: Cosine similarity within samples
 # three parameters need: Profile Type, Sample Name1 and Sample Name2
-profileComparisonWithin <- function(args, config) {
+msigportal.profileComparisonWithin <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -371,7 +371,7 @@ profileComparisonWithin <- function(args, config) {
   )
 }
 
-profileComparisonWithinPublic <- function(args, config) {
+msigportal.profileComparisonWithinPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -412,7 +412,7 @@ profileComparisonWithinPublic <- function(args, config) {
 
 # section 2: Comparison to reference signatures #
 # four parameters need: “Profile Type”, “Sample Name”, “Reference Signature Set” and “Compare Single Signature or Combined Signatures” #
-profileComparisonRefSig <- function(args, config) {
+msigportal.profileComparisonRefSig <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -456,7 +456,7 @@ profileComparisonRefSig <- function(args, config) {
   )
 }
 
-profileComparisonRefSigPublic <- function(args, config) {
+msigportal.profileComparisonRefSigPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -504,7 +504,7 @@ profileComparisonRefSigPublic <- function(args, config) {
 }
 
 # section 3: Profile Comparison to Public data ----------------------------
-profileComparisonPublic <- function(args, config) {
+msigportal.profileComparisonPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -543,7 +543,7 @@ profileComparisonPublic <- function(args, config) {
   )
 }
 
-mpeaUser <- function(args, ...) {
+msigportal.mpeaUser <- function(args, ...) {
   source("services/R/Sigvisualfunc.R")
   data_input <- read_delim(args$matrixFile, delim = "\t")
   data_input <- data_input %>%
@@ -565,7 +565,7 @@ mpeaUser <- function(args, ...) {
 
 # Motif analysis ----------------------------------------------------------
 ### parameters:
-mutationalPattern <- function(args, config) {
+msigportal.mutationalPattern <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -611,7 +611,7 @@ mutationalPattern <- function(args, config) {
 
 # Motif analysis ----------------------------------------------------------
 ### parameters:
-mutationalPatternPublic <- function(args, config) {
+msigportal.mutationalPatternPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -665,7 +665,7 @@ mutationalPatternPublic <- function(args, config) {
 ### “Principal Component Analysis” ###
 # Two parameters need: Profile Type, Reference Signature Set
 # Profile Type only support SBS, DBS, ID
-pca <- function(args, config) {
+msigportal.pca <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -765,7 +765,7 @@ pca <- function(args, config) {
   )
 }
 
-pcaPublic <- function(args, config) {
+msigportal.pcaPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
   print(config)
@@ -877,7 +877,7 @@ pcaPublic <- function(args, config) {
 }
 
 #  section 2 PCA together with public data --------------------------------
-pcaWithPublic <- function(args, config) {
+msigportal.pcaWithPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -1023,7 +1023,7 @@ pcaWithPublic <- function(args, config) {
 #   )
 # }
 
-downloadPublicData <- function(args, config) {
+msigportal.downloadPublicData <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
@@ -1040,7 +1040,7 @@ downloadPublicData <- function(args, config) {
   seqmatrix_public_download(seqmatrix_refdata_public, config$savePath)
 }
 
-getHierarchy <- function(args, config) {
+msigportal.getHierarchy <- function(args, config) {
   library(TreeAndLeaf)
   library(igraph)
   library(networkD3)
@@ -1051,7 +1051,7 @@ getHierarchy <- function(args, config) {
   return(list(data = as.radialNetwork(hc, "root")))
 }
 
-getTL <- function(args, config) {
+msigportal.getTL <- function(args, config) {
   library(TreeAndLeaf)
   library(igraph)
   library(networkD3)
@@ -1080,7 +1080,7 @@ getTL <- function(args, config) {
 # - dominant mutation
 # - dominant signature
 # - cancer type
-getTreeLeaf <- function(args, config) {
+msigportal.getTreeLeaf <- function(args, config) {
   library(TreeAndLeaf)
   library(igraph)
   library(networkD3)

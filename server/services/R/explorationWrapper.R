@@ -10,7 +10,7 @@ library(stringr)
 library(aws.s3)
 
 # capture console output for all functions called in wrapper
-wrapper <- function(fn, args, config = list()) {
+wrapper <- function('msigportal.'+fn, args, config = list()) {
   stdout <- vector("character")
   con <- textConnection("stdout", "wr", local = TRUE)
   sink(con, type = "message")
@@ -20,7 +20,7 @@ wrapper <- function(fn, args, config = list()) {
 
   tryCatch(
     {
-      output <- get(fn)(args, config)
+      output <- get(paste0("msigportal.", fn))(args, config)
     },
     error = function(e) {
       print(e)
@@ -55,7 +55,7 @@ wrapper <- function(fn, args, config = list()) {
 # }
 
 # retrieve signature names filtered by cancer type
-getSignatureNames <- function(args, config) {
+msigportal.getSignatureNames <- function(args, config) {
   library(stringr)
   s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
 
@@ -69,7 +69,7 @@ getSignatureNames <- function(args, config) {
 }
 
 # retrieve sample names filtered by cancer type
-getSampleNames <- function(args, config) {
+msigportal.getSampleNames <- function(args, config) {
   library(stringr)
   s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
 
@@ -81,7 +81,7 @@ getSampleNames <- function(args, config) {
   return(sampleNames)
 }
 
-exposureDownload <- function(args, config) {
+msigportal.exposureDownload <- function(args, config) {
   s3load(paste0(config$prefix, "Exposure/exposure_refdata.RData"), config$bucket)
   setwd(config$wd)
 
@@ -101,7 +101,7 @@ exposureDownload <- function(args, config) {
 
 # Catalog - Signature  -------------------------------------------------------
 # section 1: Current reference signatures in mSigPortal -------------------
-referenceSignatures <- function(args, config) {
+msigportal.referenceSignatures <- function(args, config) {
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -128,7 +128,7 @@ referenceSignatures <- function(args, config) {
 }
 
 # section 2: Mutational signature profile  --------------------------------------------------------------
-mutationalProfiles <- function(args, config) {
+msigportal.mutationalProfiles <- function(args, config) {
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
@@ -154,7 +154,7 @@ mutationalProfiles <- function(args, config) {
 }
 
 # section3: Cosine similarities among mutational signatures -------------------------
-rsCosineSimilarity <- function(args, ...) {
+msigportal.rsCosineSimilarity <- function(args, ...) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
   source("services/R/Sigvisualfunc.R")
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
@@ -190,7 +190,7 @@ rsCosineSimilarity <- function(args, ...) {
 # section4: Mutational signatures comparisons
 ## A comparison of two reference signatures
 # There will be five parameters: “Profile Type”,  “Reference Signature Set1”, “Signature Name1”, “Reference Signature Set2”, “Signature Name2”;
-mutationalSignatureComparison <- function(args, config) {
+msigportal.mutationalSignatureComparison <- function(args, config) {
   # The parameters will be “Matrix Size”, “Reference Signature Set1” and “Reference Signature Set2”.
   s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
   source("services/R/Sigvisualfunc.R")
@@ -221,7 +221,7 @@ mutationalSignatureComparison <- function(args, config) {
 }
 
 # Exploration - Exposure  -------------------------------------------------------
-tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
+msigportal.tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
     group_by(Cancer_Type, Sample) %>%
     summarise(Burden = log10(sum(Exposure) / genomesize)) %>%
@@ -230,7 +230,7 @@ tumorMutationalBurden <- function(genomesize, plotPath, exposure_refdata) {
   TMBplot(data_input, output_plot = plotPath)
 }
 
-mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath, exposure_refdata) {
+msigportal.mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
     filter(Cancer_Type == cancerType) %>%
     mutate(Burden = log10((Exposure) / genomesize)) %>%
@@ -241,7 +241,7 @@ mutationalSignatureBurdenSeparated <- function(genomesize, cancerType, plotPath,
   TMBplot(data_input, output_plot = plotPath)
 }
 
-mutationalSignatureBurdenAcrossCancer <- function(signatureName, genomesize, plotPath, exposure_refdata) {
+msigportal.mutationalSignatureBurdenAcrossCancer <- function(signatureName, genomesize, plotPath, exposure_refdata) {
   data_input <- exposure_refdata %>%
     filter(Signature_name == signatureName) %>%
     group_by(Cancer_Type, Sample) %>%
@@ -251,7 +251,7 @@ mutationalSignatureBurdenAcrossCancer <- function(signatureName, genomesize, plo
   TMBplot(data_input, output_plot = plotPath, addnote = signatureName)
 }
 
-mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatureName1, signatureName2, plotPath, exposure_refdata) {
+msigportal.mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatureName1, signatureName2, plotPath, exposure_refdata) {
   ## cancerType: toggle to select specific cancer type or combine all cancer type data (default)
   ## both: toggle to choose samples with both signature detected
   data_input <- left_join(
@@ -272,7 +272,7 @@ mutationalSignatureAssociation <- function(useCancer, cancerType, both, signatur
   signature_association(data = data_input, signature_name_input1 = signatureName1, signature_name_input2 = signatureName2, signature_both = both, output_plot = plotPath)
 }
 
-mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
+msigportal.mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected) {
   exposure_refdata_input <- exposure_refdata_selected %>%
     mutate(Sample = paste0(Cancer_Type, "@", Sample)) %>%
     select(Sample, Signature_name, Exposure) %>%
@@ -300,7 +300,7 @@ mutationalSignatureDecomposition <- function(plotPath, txtPath, exposure_refdata
   }
 }
 
-mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+msigportal.mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
   exposure_refdata_input <- exposure_refdata %>%
     filter(Cancer_Type == cancerType) %>%
     select(Sample, Signature_name, Exposure) %>%
@@ -374,7 +374,7 @@ mutationalSignatureLandscape <- function(cancerType, varDataPath, plotPath, expo
   Exposure_Clustering(sigdata = sigdata, studydata = vardata1_input, studydata_cat = vardata1_cat_input, puritydata = vardata2_input, puritydata_cat = vardata2_cat_input, cosinedata = cosinedata, clustern = 5, output_plot = plotPath)
 }
 
-mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposure_refdata) {
+msigportal.mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposure_refdata) {
   require(janitor)
   require(scales)
   sigdata <- exposure_refdata %>%
@@ -396,7 +396,7 @@ mutationalSignaturePrevalence <- function(mutation, cancerType, plotPath, exposu
   }
 }
 
-mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
+msigportal.mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure_refdata, signature_refsets, seqmatrix_refdata) {
   require(scales)
   exposure_refdata_input <- exposure_refdata %>%
     filter(Sample == sample) %>%
@@ -410,7 +410,7 @@ mutationalSignatureIndividual <- function(sample, cancerType, plotPath, exposure
 }
 
 # exposurePublic <- function(fn, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$prefix, config$localData, config$bucket) {
-exposurePublic <- function(args, config) {
+msigportal.exposurePublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -473,7 +473,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Tumor Mutational Burden")
-        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        msigportal.tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
         output[["tmbPath"]] <- tmbPath
       },
       error = function(e) {
@@ -490,7 +490,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Tumor Mutational Burden Separated by Signatures")
-        mutationalSignatureBurdenSeparated(genomesize, common$cancerType, signaturePath, exposure_refdata_selected)
+        msigportal.mutationalSignatureBurdenSeparated(genomesize, common$cancerType, signaturePath, exposure_refdata_selected)
         output[["signaturePath"]] <- signaturePath
       },
       error = function(e) {
@@ -507,7 +507,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature Burden Across Cancer Types")
-        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        msigportal.mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
         output[["burdenPath"]] <- burdenPath
       },
       error = function(e) {
@@ -525,7 +525,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature Association")
-        mutationalSignatureAssociation(common$useCancerType, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        msigportal.mutationalSignatureAssociation(common$useCancerType, common$cancerType, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[["associationPath"]] <- associationPath
       },
       error = function(e) {
@@ -542,7 +542,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Evaluating the Performance of Mutational Signature Decomposition")
-        mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["decompositionPath"]] <- decompositionPath
         output[["decompositionData"]] <- decompositionData
       },
@@ -564,7 +564,7 @@ exposurePublic <- function(args, config) {
         if (stringi::stri_length(landscape$variableFile) > 0) {
           varDataPath <- paste0(paste0(config$wd, "/", config$id), landscape$variableFile)
         }
-        mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureLandscape(common$cancerType, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath
       },
       error = function(e) {
@@ -581,7 +581,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Prevalence of Mutational Signature")
-        mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
+        msigportal.mutationalSignaturePrevalence(prevalence$mutation, common$cancerType, prevalencePath, exposure_refdata_selected)
         output[["prevalencePath"]] <- prevalencePath
       },
       error = function(e) {
@@ -598,7 +598,7 @@ exposurePublic <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature in Individual Sample")
-        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["individualPath"]] <- individualPath
       },
       error = function(e) {
@@ -615,7 +615,7 @@ exposurePublic <- function(args, config) {
 }
 
 # exposureUser <- function(args$fn, files, common, burden = '{}', association = '{}', landscape = '{}', prevalence = '{}', individual = '{}', id, pythonOutput, rootDir, config$savePath, config$prefix, config$localData, config$bucket) {
-exposureUser <- function(args, config) {
+msigportal.exposureUser <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
@@ -689,7 +689,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Tumor Mutational Burden")
-        tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
+        msigportal.tumorMutationalBurden(genomesize, tmbPath, exposure_refdata_selected)
         output[["tmbPath"]] <- tmbPath
       },
       error = function(e) {
@@ -706,7 +706,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Tumor Mutational Burden Separated by Signatures")
-        mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, signaturePath, exposure_refdata_selected)
+        msigportal.mutationalSignatureBurdenSeparated(genomesize, cancer_type_user, signaturePath, exposure_refdata_selected)
         output[["signaturePath"]] <- signaturePath
       },
       error = function(e) {
@@ -722,7 +722,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature Burden Across Cancer Types")
-        mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
+        msigportal.mutationalSignatureBurdenAcrossCancer(burden$signatureName, genomesize, burdenPath, exposure_refdata_selected)
         output[["burdenPath"]] <- burdenPath
       },
       error = function(e) {
@@ -738,7 +738,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature Association")
-        mutationalSignatureAssociation(common$useCancerType, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
+        msigportal.mutationalSignatureAssociation(common$useCancerType, cancer_type_user, association$both, association$signatureName1, association$signatureName2, associationPath, exposure_refdata_selected)
         output[["associationPath"]] <- associationPath
       },
       error = function(e) {
@@ -754,7 +754,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Evaluating the Performance of Mutational Signature Decomposition")
-        mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureDecomposition(decompositionPath, decompositionData, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["decompositionPath"]] <- decompositionPath
         output[["decompositionData"]] <- decompositionData
       },
@@ -775,7 +775,7 @@ exposureUser <- function(args, config) {
         if (stringi::stri_length(landscape$variableFile) > 0) {
           varDataPath <- paste0(paste0(config$wd, "/", config$id), landscape$variableFile$signatureFile)
         }
-        mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureLandscape(cancer_type_user, varDataPath, landscapePath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["landscapePath"]] <- landscapePath
       },
       error = function(e) {
@@ -791,7 +791,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Prevalence of Mutational Signature")
-        mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
+        msigportal.mutationalSignaturePrevalence(prevalence$mutation, cancer_type_user, prevalencePath, exposure_refdata_selected)
         output[["prevalencePath"]] <- prevalencePath
       },
       error = function(e) {
@@ -808,7 +808,7 @@ exposureUser <- function(args, config) {
     tryCatch(
       {
         print("Mutational Signature in Individual Sample")
-        mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
+        msigportal.mutationalSignatureIndividual(individual$sample, common$cancerType, individualPath, exposure_refdata_selected, signature_refsets_selected, seqmatrix_refdata_selected)
         output[["individualPath"]] <- individualPath
       },
       error = function(e) {
@@ -824,7 +824,7 @@ exposureUser <- function(args, config) {
   return(c(output, errors))
 }
 
-msLandscape <- function(args, ...) {
+msigportal.msLandscape <- function(args, ...) {
   source("services/R/Sigvisualfunc.R")
 
   exposureData <- args$exposureData %>%
@@ -890,7 +890,7 @@ msLandscape <- function(args, ...) {
   return(list(cosineData = cosineData, exposureData = exposureData, dendrogram = dendrogram_json))
 }
 
-msDecomposition <- function(args, ...) {
+msigportal.msDecomposition <- function(args, ...) {
   source("services/R/Sigvisualfunc.R")
 
   exposureData <- args$exposureData %>%
@@ -949,7 +949,7 @@ msDecomposition <- function(args, ...) {
   return(list(data = data, download = decompsite))
 }
 
-cosineSimilarity <- function(args, config) {
+msigportal.cosineSimilarity <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 
   signatureData1 <- args$signatureData1 %>%

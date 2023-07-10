@@ -13,7 +13,7 @@ wrapper <- function(fn, args, config) {
   output = list()
 
   tryCatch({
-    output = get(fn)(args, config)
+    output <- get(paste0("msigportal.", fn))(args, config)
   }, error = function(e) {
     print(e)
     output <<- append(output, list(uncaughtError = e$message))
@@ -24,7 +24,7 @@ wrapper <- function(fn, args, config) {
   })
 }
 
-getAssocVarData <- function(args, config) {
+msigportal.getAssocVarData <- function(args, config) {
   setwd(config$wd)
   fullDataPath = paste0(config$savePath, 'vardata_refdata_selected.txt')
 
@@ -46,7 +46,7 @@ getAssocVarData <- function(args, config) {
   return(list(assocVarData = clist, fullDataPath = fullDataPath))
 }
 
-getExpVarData <- function(args, config) {
+msigportal.getExpVarData <- function(args, config) {
   # load exposure data files
   exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
   association_data_file <- paste0(config$prefix, 'Association/', args$study, '_', args$strategy, '_', args$cancer, '_vardata.RData')
@@ -81,7 +81,7 @@ getExpVarData <- function(args, config) {
 }
 
 
-loadCollapse <- function(args, config) {
+msigportal.loadCollapse <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
   # load exposure data files
   exposure_data_file <- paste0(config$prefix, 'Exposure/', args$study, "_", args$strategy, '_exposure_refdata.RData')
@@ -154,7 +154,7 @@ loadCollapse <- function(args, config) {
   return(list(collapseVar1 = collapse_var1_list)) #, collapseVar2 = collapse_var2_list))
 }
 
-univariable <- function(args, config) {
+msigportal.univariable <- function(args, config) {
   source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
   plotPath = paste0(config$savePath, 'association_result.svg')
@@ -269,7 +269,7 @@ assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signa
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }
 
-loadCollapseMulti <- function(args, config) {
+msigportal.loadCollapseMulti <- function(args, config) {
   require(broom)
   require(purrr)
   source('services/R/Sigvisualfunc.R')
@@ -312,7 +312,7 @@ loadCollapseMulti <- function(args, config) {
   return(collapseOptions)
 }
 
-multivariable <- function(args, config) {
+msigportal.multivariable <- function(args, config) {
   require(broom)
   source('services/R/Sigvisualfunc.R')
   setwd(config$wd)
