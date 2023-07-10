@@ -692,11 +692,13 @@ msigportal.pca <- function(args, config) {
     {
       res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
 
-      xleng <- dim(res.pca$x)[2] * 0.25 + 1
-      xleng <- if_else(xleng > 4, 4, xleng)
-      yleng <- 4
-      pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T)
-      ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+      # xleng <- dim(res.pca$x)[2] * 0.25 + 1
+      # xleng <- if_else(xleng > 4, 4, xleng)
+      # yleng <- 4
+      pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T) +
+        theme(text = element_text(size = 20))
+      # ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+      ggsave(filename = pca1, plot = pcap1)
 
       if ((dim(data_input)[2] - 1) > 35) {
         pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
@@ -805,11 +807,13 @@ msigportal.pcaPublic <- function(args, config) {
     {
       res.pca <- prcomp(t(mdata_input), scale = FALSE, center = FALSE)
 
-      xleng <- dim(res.pca$x)[2] * 0.25 + 1
-      xleng <- if_else(xleng > 4, 4, xleng)
-      yleng <- 4
-      pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T)
-      ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+      # xleng <- dim(res.pca$x)[2] * 0.25 + 1
+      # xleng <- if_else(xleng > 4, 4, xleng)
+      # yleng <- 4
+      pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T) +
+        theme(text = element_text(size = 20))
+      # ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
+      ggsave(filename = pca1, plot = pcap1)
 
       if ((dim(data_input)[2] - 1) > 35) {
         pcap2 <- fviz_pca_ind(res.pca, axes = c(1, 2), geom = "point", col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
