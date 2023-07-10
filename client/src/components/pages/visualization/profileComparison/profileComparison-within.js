@@ -7,6 +7,7 @@ import { useProfileComparisonWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { defaultProfile2 } from '../../../../services/utils';
 
 export default function PcWithin({ state }) {
   const [params, setParams] = useState(null);
@@ -59,8 +60,13 @@ export default function PcWithin({ state }) {
       : [];
 
   // set inital parameters
+  // useEffect(() => {
+  //   if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+  // }, [profileOptions]);
+
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+    if (!profile && profileOptions.length)
+      handleProfile(defaultProfile2(profileOptions));
   }, [profileOptions]);
 
   function onSubmit(data) {
