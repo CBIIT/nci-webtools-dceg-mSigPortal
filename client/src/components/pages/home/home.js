@@ -307,6 +307,64 @@ export default function Home({ links }) {
                 .filter((e) => e.showHomepage)
                 .map((e, i) => CardRow3(e, i))}
             </div>
+            <div className="row">
+              <div class="col-sm-12">
+                <div
+                  class="card"
+                  id="description"
+                  style={{
+                    borderRadius: '2em',
+                    display: 'inline-block',
+                    backgroundColor: 'white',
+                    position: 'relative',
+                  }}
+                >
+                  <div class="card-body">
+                    <p class="card-text">
+                      mSigPortal was developed by{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Dr. Tongwu Zhang{' '}
+                      </a>{' '}
+                      in the lab of{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Dr. Maria Teresa Landi
+                      </a>{' '}
+                      in collaboration with the NCI Center for Biomedical
+                      Informatics and Information Technology (CBIIT). Support
+                      for this project comes from the Division of Cancer
+                      Epidemiology and Genetics Informatics Tool Challenge as
+                      well as the{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Integrative Tumor Epidemiology Branch
+                      </a>
+                      . <br />
+                      mSigPortal’s{' '}
+                      <a
+                        href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        source code
+                      </a>{' '}
+                      is available in Github under MIT license, an Open Source
+                      Initiative approved license.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="container-fluid d-block d-lg-none">
             <div className="row">
@@ -317,7 +375,66 @@ export default function Home({ links }) {
                     .filter((e) => e.showHomepage)
                     .map((e, i) => CardRow3(e, i))}
                 </div>
+                <div className="row">
+                  <div class="col-12">
+                    <div
+                      class="card"
+                      id="description"
+                      style={{
+                        borderRadius: '2em',
+                        display: 'inline-block',
+                        backgroundColor: 'white',
+                        position: 'relative',
+                      }}
+                    >
+                      <div class="card-body">
+                        <p class="card-text">
+                          mSigPortal was developed by{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Dr. Tongwu Zhang{' '}
+                          </a>{' '}
+                          in the lab of{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Dr. Maria Teresa Landi
+                          </a>{' '}
+                          in collaboration with the NCI Center for Biomedical
+                          Informatics and Information Technology (CBIIT).
+                          Support for this project comes from the Division of
+                          Cancer Epidemiology and Genetics Informatics Tool
+                          Challenge as well as the{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Integrative Tumor Epidemiology Branch
+                          </a>
+                          . <br />
+                          mSigPortal’s{' '}
+                          <a
+                            href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            source code
+                          </a>{' '}
+                          is available in Github under MIT license, an Open
+                          Source Initiative approved license.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
             </div>
           </div>
