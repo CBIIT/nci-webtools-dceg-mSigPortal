@@ -166,6 +166,15 @@
   box-shadow: 0px 12px 20px 10px rgba(0, 0, 0, 0.2);
 }
 
+.card#description:hover {
+  text-decoration: none;
+  transform: scale(1.04);
+  // background-color: #b664be !important;
+  // border-color: #b664be !important;
+  transition: all 200ms;
+  box-shadow: 0px 12px 20px 10px rgba(0, 0, 0, 0.2);
+}
+
 .image-blurred-edge {
   position: relative;
   width: 100%;
@@ -248,7 +257,7 @@
 /*** xxx-large devices ***/
 @media (min-width: 6165px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -290,7 +299,7 @@
 
 @media (min-width: 5321px) and (max-width: 6164px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -332,7 +341,7 @@
 
 @media (min-width: 4231px) and (max-width: 5320px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -373,7 +382,7 @@
 }
 @media (min-width: 3591px) and (max-width: 4231px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -415,7 +424,7 @@
 
 @media (min-width: 3226px) and (max-width: 3590px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -457,7 +466,7 @@
 
 @media (min-width: 2828px) and (max-width: 3226px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -499,7 +508,7 @@
 
 @media (min-width: 2615px) and (max-width: 2827px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -541,7 +550,7 @@
 
 @media (min-width: 2401px) and (max-width: 2614px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -583,7 +592,7 @@
 
 @media (min-width: 2256px) and (max-width: 2400px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -625,7 +634,7 @@
 
 @media (min-width: 2001px) and (max-width: 2255px) {
   .banner-container {
-    height: 1100px;
+    height: 1210px;
 
     .homepage-title-left {
       position: absolute;
@@ -667,7 +676,7 @@
 
 @media (min-width: 1866px) and (max-width: 2000px) {
   .banner-container {
-    height: 1100px;
+    height: 1230px;
 
     .homepage-title-left {
       position: absolute;
@@ -709,7 +718,7 @@
 
 @media (min-width: 1449px) and (max-width: 1865px) {
   .banner-container {
-    height: 1100px;
+    height: 1230px;
 
     .homepage-title-left {
       position: absolute;
@@ -751,7 +760,7 @@
 
 @media (min-width: 1401px) and (max-width: 1448px) {
   .banner-container {
-    height: 1100px;
+    height: 1230px;
 
     .homepage-title-left {
       position: absolute;
@@ -806,7 +815,7 @@
 
 @media (min-width: 1200px) and (max-width: 1400px) {
   .banner-container {
-    height: 1080px;
+    height: 1250px;
 
     .homepage-title-left {
       position: absolute;
@@ -858,7 +867,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 1100px;
+    height: 1270px;
     background-color: #f5f5f5;
 
     .homepage-title-left {
@@ -912,7 +921,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 1350px;
+    height: 1580px;
     background-color: #f5f5f5;
 
     .homepage-title-left {
@@ -974,7 +983,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 2350px;
+    height: 2600px;
     background-color: #f5f5f5;
 
     .homepage-title-left {
@@ -1038,7 +1047,7 @@
     overflow: hidden;
     display: block;
     position: relative;
-    height: 2200px;
+    height: 2450px;
     background-color: #f5f5f5;
     padding: 20px;
 
