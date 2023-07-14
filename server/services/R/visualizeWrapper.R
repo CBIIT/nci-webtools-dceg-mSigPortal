@@ -696,7 +696,7 @@ msigportal.pca <- function(args, config) {
       # xleng <- if_else(xleng > 4, 4, xleng)
       # yleng <- 4
       pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T) +
-        theme(text = element_text(size = 20))
+        theme(text = element_text(size = 15))
       # ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
       ggsave(filename = pca1, plot = pcap1)
 
@@ -810,8 +810,8 @@ msigportal.pcaPublic <- function(args, config) {
       # xleng <- dim(res.pca$x)[2] * 0.25 + 1
       # xleng <- if_else(xleng > 4, 4, xleng)
       # yleng <- 4
-      pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T) +
-        theme(text = element_text(size = 20))
+     pcap1 <- fviz_eig(res.pca, ncp = 10, main = "", addlabels = T, ylab = "Percentage of variation explained") + theme(text = element_text(size = 15))
+
       # ggsave(filename = pca1, plot = pcap1, width = xleng, height = yleng)
       ggsave(filename = pca1, plot = pcap1)
 
