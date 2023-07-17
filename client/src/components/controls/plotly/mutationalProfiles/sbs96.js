@@ -61,6 +61,7 @@ export default function SBS96(apiData, title = '') {
     bargap: 0.3,
     height: 450,
     // width: 1080,
+    minWidth: 480, // Set the minimum width for the plot (adjust the value as needed)
     autosize: true,
 
     xaxis: {

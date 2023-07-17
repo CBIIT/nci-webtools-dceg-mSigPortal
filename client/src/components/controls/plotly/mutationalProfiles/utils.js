@@ -81,6 +81,18 @@ export function createMutationShapes(data, colors) {
 }
 
 export function createMutationAnnotations(data, appendedText = '') {
+  function getAnnotationFontSize() {
+    if (window.innerWidth < 768) {
+      return 12;
+    } else if (window.innerWidth >= 768 && window.innerWidth < 1024) {
+      return 14;
+    } else {
+      return 18; // Default font size for larger screens
+    }
+  }
+
+  const fontSize = getAnnotationFontSize();
+
   return data.map((group, groupIndex, array) => ({
     xref: 'x',
     yref: 'paper',
@@ -94,7 +106,8 @@ export function createMutationAnnotations(data, appendedText = '') {
     y: 1.05,
     text: `<b>${group.mutation + appendedText}</b>`,
     showarrow: false,
-    font: { size: 18 },
+    //font: { size: 18 },
+    font: { size: fontSize }, // Use the dynamically determined font size
     align: 'center',
   }));
 }
