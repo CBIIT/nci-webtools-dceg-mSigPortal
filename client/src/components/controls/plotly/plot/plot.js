@@ -87,8 +87,8 @@ export default function Plotly({
         )}
         <Col sm="auto m-1">
           <Button
-            variant="link"
-            className="btn-2 btn-secondary border-12"
+            variant="outline-primary"
+            size="sm"
             onClick={() =>
               saveAs(
                 new Blob([JSON.stringify({ traces: data, layout })], {

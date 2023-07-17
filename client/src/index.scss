@@ -192,6 +192,17 @@ h6 {
   cursor: not-allowed;
 }
 
+.btn-outline-primary {
+  color: #8e4b86;
+  border-color: #8e4b86;
+
+  &:hover,
+  &:active {
+    background-color: #8e4b86;
+    color: #fff;
+  }
+}
+
 .btn-primary {
   color: #fff;
   background-color: #8e4b86;
@@ -707,20 +718,6 @@ select.form-control-sm {
 .btn-gradient:active {
   background-image: linear-gradient(to right, #b83d47 0%, #8e4b86 55%);
   color: white !important;
-}
-
-.btn-secondary {
-  background-color: #f1e4ef;
-  border-color: #8e4b86;
-  color: #8e4b86 !important;
-
-  &:hover,
-  &:focus {
-    background-color: #8e4b86;
-    border-color: #f1e4ef;
-    color: #f1e4ef !important;
-    text-decoration: none;
-  }
 }
 
 .border-12 {

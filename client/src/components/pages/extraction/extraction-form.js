@@ -649,7 +649,7 @@ export default function ExtractionForm({ formLimits }) {
               <div>
                 Extract Tool{' '}
                 <Button
-                  variant="secondary"
+                  variant="outline-secondary"
                   size="sm"
                   href="https://github.com/AlexandrovLab/SigProfilerExtractor"
                   target="_blank"
