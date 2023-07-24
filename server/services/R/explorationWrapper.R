@@ -10,7 +10,7 @@ library(stringr)
 library(aws.s3)
 
 # capture console output for all functions called in wrapper
-wrapper <- function('msigportal.'+fn, args, config = list()) {
+wrapper <- function(fn, args, config = list()) {
   stdout <- vector("character")
   con <- textConnection("stdout", "wr", local = TRUE)
   sink(con, type = "message")
