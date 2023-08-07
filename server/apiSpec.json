@@ -53,7 +53,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["", "SBS", "DBS", "ID"]
+              "value": ""
             },
             "value": ""
           },
@@ -147,8 +147,7 @@
             "description": "Select a profile type to filter data by.",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["SBS", "DBS", "ID"]
+              "type": "string"
             },
             "value": "SBS"
           },
@@ -526,8 +525,7 @@
             "description": "Enter source",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["Reference_signatures", "Published_signatures"]
+              "type": "string"
             },
             "value": "Reference_signatures"
           },
@@ -547,8 +545,7 @@
             "description": "Select profile",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["SBS", "DBS", "ID"]
+              "type": "string"
             },
             "value": "SBS"
           },
@@ -626,8 +623,7 @@
             "description": "Enter source",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["Reference_signatures", "Published_signatures"]
+              "type": "string"
             },
             "value": "Reference_signatures"
           },
@@ -638,7 +634,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["TS", "WES", "WGS"]
+              "value": ""
             },
             "value": "WGS"
           },
@@ -648,8 +644,7 @@
             "description": "Select profile",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["SBS", "DBS", "ID"]
+              "type": "string"
             },
             "value": "SBS"
           },
@@ -659,8 +654,7 @@
             "description": "Select matrix",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["96", "78", "83"]
+              "type": "string"
             },
             "value": "96"
           },
@@ -671,12 +665,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "",
-                "COSMIC_v3_Signatures_GRCh37_SBS96",
-                "COSMIC_v3_Signatures_GRCh37_DBS78",
-                "COSMIC_v3_Signatures_GRCh37_ID83"
-              ]
+              "value": ""
             },
             "value": "COSMIC_v3_Signatures_GRCh37_SBS96"
           },
@@ -949,8 +938,7 @@
             "description": "Select profile",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["PCAWG"]
+              "type": "string"
             },
             "value": "PCAWG"
           },
@@ -960,8 +948,7 @@
             "description": "Select strategy (dataset) of the study.",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["TS", "WES", "WGS"]
+              "type": "string"
             },
             "value": "WGS"
           },
