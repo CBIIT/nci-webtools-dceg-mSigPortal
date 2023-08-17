@@ -55,7 +55,7 @@
               "type": "string",
               "value": ""
             },
-            "value": ""
+            "value": "SBS"
           },
           {
             "name": "matrix",
@@ -785,7 +785,7 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "SBS"
           },
           {
             "name": "matrix",
@@ -795,7 +795,7 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "96"
           },
           {
             "name": "signatureSetName",
