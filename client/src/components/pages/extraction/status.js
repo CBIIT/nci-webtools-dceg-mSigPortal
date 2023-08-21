@@ -57,6 +57,20 @@ export default function Status() {
       },
     },
     {
+      id: 'Download',
+      Header: 'Download',
+      Cell: ({ row }) => (
+        <Button
+          variant="link"
+          href={`web/downloadOutput/${row.original.id}`}
+          target="_blank"
+          disabled={row.original.status != 'COMPLETED'}
+        >
+          Download
+        </Button>
+      ),
+    },
+    {
       Header: 'Remove',
       Cell: (e) => (
         <OverlayTrigger
