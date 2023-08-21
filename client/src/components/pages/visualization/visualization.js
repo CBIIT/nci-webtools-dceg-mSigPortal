@@ -283,9 +283,12 @@ export default function Visualization() {
           {status && status.status === 'FAILED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
-                Your analysis failed with the following error:{' '}
-                {status?.error?.message || 'INTERNAL ERROR'}. Please contact the
-                site administrator for assistance if this issue persists.
+                Your analysis failed with the following error:
+                <br />
+                {status?.error || 'INTERNAL ERROR'}
+                <br />
+                Please contact the site administrator for assistance if this
+                issue persists.
               </p>
             </div>
           )}

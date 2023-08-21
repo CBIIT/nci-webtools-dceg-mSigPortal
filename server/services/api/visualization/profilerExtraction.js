@@ -100,7 +100,7 @@ export async function profilerExtraction(
       .join(' ');
 
     logger.info(`[${id}] Run Profiler Extraction`);
-    await execa(
+    const script = await execa(
       'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', cliArgs],
       { shell: true }
@@ -110,6 +110,15 @@ export async function profilerExtraction(
 
     // parse all matrix files and to json file
     const matrixFiles = path.resolve(profilerExtractionOutput, 'output');
+    if (!fs.existsSync(matrixFiles)) {
+      const { stdout, stderr } = script;
+      if (stdout) logger.error(stdout);
+      if (stderr) logger.error(stderr);
+
+      const message = stdout.split('\n').filter((e) => e.includes('Error'));
+      if (message.length) throw new Error(message[0]);
+      else throw new Error('Error occurred during profiler extraction.');
+    }
     const seqmatrix = await getMatrices(matrixFiles);
     const matricesFile = path.join(outputFolder, 'matrices.json');
     await writeJson(matricesFile, seqmatrix);
@@ -177,6 +186,7 @@ export async function profilerExtraction(
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
       status: 'FAILED',
+      error: error.message,
     });
 
     if (email) {
