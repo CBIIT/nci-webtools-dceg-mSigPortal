@@ -23,8 +23,8 @@ export default function SignatureOptions({ data }) {
     // replace slashes with colons in filenames
     const file = signature ? signature.replaceAll(/\//g, ':') : '';
     return category == 'CancerSpecificSignatures_2022'
-      ? `web/data/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
-      : `web/data/Database/Etiology/Profile_logo/${file}.svg`;
+      ? `api/data/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
+      : `api/data/Database/Etiology/Profile_logo/${file}.svg`;
   }
 
   function naturalSort(a, b) {

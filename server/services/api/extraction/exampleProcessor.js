@@ -358,13 +358,13 @@ export async function exampleProcessor(
 
       try {
         const denovoUpload = await axios.post(
-          `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
+          `${env.API_BASE_URL}/api/upload/${randomUUID()}`,
           denovoFormData,
           { headers: denovoFormData.getHeaders() }
         );
 
         const denovoExploration = await axios.post(
-          `${env.API_BASE_URL}/web/submitExploration/${denovoUpload.data.id}`,
+          `${env.API_BASE_URL}/api/submitExploration/${denovoUpload.data.id}`,
           {
             matrixFile: path.parse(seqmatrixFilePath).base,
 
@@ -403,13 +403,13 @@ export async function exampleProcessor(
       );
 
       const decomposedUpload = await axios.post(
-        `${env.API_BASE_URL}/web/upload/${randomUUID()}`,
+        `${env.API_BASE_URL}/api/upload/${randomUUID()}`,
         decomposedFormData,
         { headers: decomposedFormData.getHeaders() }
       );
 
       const decomposedExploration = await axios.post(
-        `${env.API_BASE_URL}/web/submitExploration/${decomposedUpload.data.id}`,
+        `${env.API_BASE_URL}/api/submitExploration/${decomposedUpload.data.id}`,
         {
           matrixFile: path.parse(seqmatrixFilePath).base,
           exposureFile: path.parse(paths.decomposedExposureInput).base,

@@ -7,6 +7,5 @@ module.exports = function (app) {
       changeOrigin: 'true',
     })
   );
-  app.use(createProxyMiddleware('/web', { target: 'http://localhost:8330' }));
   app.use(createProxyMiddleware('/api', { target: 'http://localhost:8330' }));
 };

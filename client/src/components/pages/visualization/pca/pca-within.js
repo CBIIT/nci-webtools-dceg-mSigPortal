@@ -147,7 +147,7 @@ export default function PcaWithin({ state }) {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca1.split('/').slice(-1)[0]}
-            plotPath={'web/data/' + data.output.pca1}
+            plotPath={'api/data/' + data.output.pca1}
           />
           <p className="p-3">
             The bar plot illustrates each of the principal components on the
@@ -163,8 +163,8 @@ export default function PcaWithin({ state }) {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca2.split('/').slice(-1)[0]}
-            plotPath={'web/data/' + data.output.pca2}
-            txtPath={`web/data/${data.output.pca2Data}`}
+            plotPath={'api/data/' + data.output.pca2}
+            txtPath={`api/data/${data.output.pca2Data}`}
           />
           <p className="p-3">
             The individual PCA plot based on the top two principal components
@@ -182,8 +182,8 @@ export default function PcaWithin({ state }) {
           <SvgContainer
             className="p-3"
             downloadName={data.output.pca3.split('/').slice(-1)[0]}
-            plotPath={'web/data/' + data.output.pca3}
-            txtPath={`web/data/${data.output.pca3Data}`}
+            plotPath={'api/data/' + data.output.pca3}
+            txtPath={`api/data/${data.output.pca3Data}`}
           />
           <p className="p-3">
             The variable PCA plot based on the top two principal components
@@ -201,8 +201,8 @@ export default function PcaWithin({ state }) {
           <SvgContainer
             className="p-3"
             downloadName={data.output.heatmap.split('/').slice(-1)[0]}
-            plotPath={'web/data/' + data.output.heatmap}
-            txtPath={`web/data/${data.output.heatmapData}`}
+            plotPath={'api/data/' + data.output.heatmap}
+            txtPath={`api/data/${data.output.heatmapData}`}
           />
           <p className="p-3">
             The heatmap shows cosine similarity between each principal component

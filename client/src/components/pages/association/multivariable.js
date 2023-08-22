@@ -135,7 +135,7 @@ export default function Multivariable() {
           stdout,
           output: collapseData,
         } = await (
-          await fetch(`web/associationWrapper`, {
+          await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -228,7 +228,7 @@ export default function Multivariable() {
       });
       try {
         const { sessionId, stdout, output } = await (
-          await fetch(`web/associationWrapper`, {
+          await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -689,8 +689,8 @@ export default function Multivariable() {
                 <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`web/data/${plotPath}`}
-                  txtPath={`web/data/${dataPath}`}
+                  plotPath={`api/data/${plotPath}`}
+                  txtPath={`api/data/${dataPath}`}
                   height="800px"
                 />
               )}

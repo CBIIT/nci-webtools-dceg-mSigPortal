@@ -54,7 +54,7 @@ export const graphDataSelector = selectorFamily({
   key: 'treeLeaf.plotData',
   get: (params) => async ({ get }) => {
     try {
-      const response = await axios.post('web/treeLeaf', params);
+      const response = await axios.post('api/treeLeaf', params);
       const data = response.data.output;
       return data;
     } catch (error) {

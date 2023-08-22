@@ -3,7 +3,7 @@ import express from 'express';
 import knex from 'knex';
 import { validateEnvironment } from './services/environment.js';
 import { createLogger } from './services/logger.js';
-import { createWebApi, createPublicApi } from './routes/router.js';
+import { createApi } from './routes/router.js';
 import { isMainModule } from './services/utils.js';
 import { createDatabaseCache } from './services/cache.js';
 
@@ -62,8 +62,7 @@ function createApp(env) {
   app.locals.cache = createDatabaseCache(app.locals.connection, 'cache');
   app.locals.cache.initialize();
 
-  app.use('/web', createWebApi(env));
-  app.use('/api', createPublicApi(env));
+  app.use('/api', createApi(env));
 
   return app;
 }

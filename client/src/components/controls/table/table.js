@@ -146,7 +146,7 @@ export default function Table({
   async function download(path) {
     try {
       const filename = path.split('/')[path.split('/').length - 1];
-      const file = await fetch(`web/data/${path}`);
+      const file = await fetch(`api/data/${path}`);
       if (file.ok) {
         saveAs(await file.blob(), filename);
       } else {

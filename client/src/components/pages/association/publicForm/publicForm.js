@@ -81,7 +81,7 @@ export default function PublicForm() {
     };
     const getAssocVarData = () =>
       axios
-        .post('web/associationWrapper', {
+        .post('api/associationWrapper', {
           fn: 'getAssocVarData',
           args: params,
         })
@@ -89,7 +89,7 @@ export default function PublicForm() {
 
     const getExpVarData = () =>
       axios
-        .post('web/associationWrapper', {
+        .post('api/associationWrapper', {
           fn: 'getExpVarData',
           args: params,
         })

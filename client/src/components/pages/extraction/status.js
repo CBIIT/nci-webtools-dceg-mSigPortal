@@ -62,7 +62,7 @@ export default function Status() {
       Cell: ({ row }) => (
         <Button
           variant="link"
-          href={`web/downloadOutput/${row.original.id}`}
+          href={`api/downloadOutput/${row.original.id}`}
           target="_blank"
           disabled={row.original.status != 'COMPLETED'}
         >

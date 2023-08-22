@@ -175,8 +175,8 @@ export default function CsWithin({ state }) {
             <SvgContainer
               className="p-3"
               downloadName={data.output.plotPath.split('/').slice(-1)[0]}
-              plotPath={'web/data/' + data.output.plotPath}
-              txtPath={`web/data/${data.output.plotPath}`}
+              plotPath={'api/data/' + data.output.plotPath}
+              txtPath={`api/data/${data.output.plotPath}`}
             />
             <div className="p-3">
               <p>

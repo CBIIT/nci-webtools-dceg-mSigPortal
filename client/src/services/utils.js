@@ -99,7 +99,7 @@ export function defaultSignatureName(signatureNameOptions) {
 }
 
 export function getJSON(path) {
-  return fetch(`web/getFileS3`, {
+  return fetch(`api/getFileS3`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -114,7 +114,7 @@ export function getJSON(path) {
 }
 
 export function getBlob(path) {
-  return fetch(`web/getFileS3`, {
+  return fetch(`api/getFileS3`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

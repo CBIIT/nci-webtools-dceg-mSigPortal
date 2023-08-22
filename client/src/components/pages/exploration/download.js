@@ -24,7 +24,7 @@ export default function Download({ exposureDownload }) {
   async function downloadWorkspace() {
     setWorkspace(true);
 
-    const response = await fetch(`web/downloadWorkspace`, {
+    const response = await fetch(`api/downloadWorkspace`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
