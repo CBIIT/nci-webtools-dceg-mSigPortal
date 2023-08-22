@@ -6,6 +6,7 @@ export default function MultiSelect({
   placeholder,
   value,
   onChange,
+  disabled,
   ...rest
 }) {
   const customStyle = {
@@ -25,6 +26,7 @@ export default function MultiSelect({
       onChange={onChange}
       isMulti
       formatCreateLabel={(userInput) => `${placeholder}: ${userInput}`}
+      isDisabled={disabled}
       {...customStyle}
       {...rest}
     />

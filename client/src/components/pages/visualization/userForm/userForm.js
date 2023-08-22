@@ -340,7 +340,8 @@ export default function UserForm() {
         label="Select Reference Genome Build"
         control={control}
         disabled={
-          submitted || ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+          submitted ||
+          ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
         }
         options={genomeOptions}
       />
@@ -358,7 +359,7 @@ export default function UserForm() {
                 checked={strategy == 'WGS'}
                 disabled={
                   submitted ||
-                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
                 }
               />
             )}
@@ -379,7 +380,7 @@ export default function UserForm() {
                 checked={strategy == 'WES'}
                 disabled={
                   submitted ||
-                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
                 }
               />
             )}
@@ -435,7 +436,7 @@ export default function UserForm() {
                   submitted ||
                   filter.length ||
                   bedFile.size ||
-                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
                 }
               />
             )}
@@ -459,7 +460,7 @@ export default function UserForm() {
               disabled={
                 submitted ||
                 mutationSplit ||
-                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
               }
             />
           )}
@@ -480,7 +481,7 @@ export default function UserForm() {
               disabled={
                 submitted ||
                 mutationSplit ||
-                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
               }
               variant="link"
               href={'assets/exampleInput/demo_input_bed.bed'}
@@ -497,7 +498,7 @@ export default function UserForm() {
                 isUploading ||
                 isLoading ||
                 mutationSplit ||
-                ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
               }
               variant="link"
               type="button"
@@ -518,7 +519,9 @@ export default function UserForm() {
                     disabled={
                       submitted ||
                       mutationSplit ||
-                      ['catalog_csv', 'catalog_tsv'].includes(inputFormat) ||
+                      ['catalog_csv', 'catalog_tsv'].includes(
+                        inputFormat.value
+                      ) ||
                       isUploading ||
                       isLoading
                     }
@@ -587,7 +590,7 @@ export default function UserForm() {
                 checked={collapse}
                 disabled={
                   submitted ||
-                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat)
+                  ['catalog_csv', 'catalog_tsv'].includes(inputFormat.value)
                 }
               />
             )}
