@@ -305,7 +305,7 @@ export default function Extraction() {
           {status && status.status === 'FAILED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
-                Your analysis failed with the following error:{' '}
+                An error occurred during calculation:
                 {status?.error?.message || 'INTERNAL ERROR'}. Please contact the
                 site administrator for assistance if this issue persists.
               </p>

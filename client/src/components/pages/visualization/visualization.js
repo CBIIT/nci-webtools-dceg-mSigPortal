@@ -32,9 +32,6 @@ export default function Visualization() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
     dispatch(actions.mergeVisualization({ main: state }));
-  // const mergeError = (msg) =>
-  //   dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
   const { main, publicForm, mutationalProfiles } = useSelector(
     (state) => state.visualization
   );
@@ -57,7 +54,6 @@ export default function Visualization() {
     skip: !id,
   });
   const status = jobInfo?.status;
-  const manifest = jobInfo?.manifest;
   const params = jobInfo?.params;
   const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
   const completed =
@@ -67,6 +63,23 @@ export default function Visualization() {
   const refreshState = useCallback(() => {
     refreshJob();
   }, [refreshJob]);
+
+  // parse py script error message and return a user friendly message
+  function errorMessage() {
+    const error = status?.error;
+    if (error) {
+      if (error.includes('header line')) {
+        return (
+          'Please ensure the column headers of your input file match your selected file format\n' +
+          error
+        );
+      } else {
+        return error;
+      }
+    } else {
+      return 'INTERNAL ERROR';
+    }
+  }
 
   // refresh job status every minute
   useEffect(() => {
@@ -283,9 +296,9 @@ export default function Visualization() {
           {status && status.status === 'FAILED' && (
             <div className="border rounded bg-white mb-3 p-3">
               <p>
-                Your analysis failed with the following error:
+                An error occurred during calculation:
                 <br />
-                {status?.error || 'INTERNAL ERROR'}
+                {errorMessage()}
                 <br />
                 Please contact the site administrator for assistance if this
                 issue persists.
