@@ -68,13 +68,10 @@ export default function Visualization() {
   function errorMessage() {
     const error = status?.error;
     if (error) {
-      if (error.includes('header line')) {
-        return (
-          'Please ensure the column headers of your input file match your selected file format\n' +
-          error
-        );
-      } else {
+      if (error.includes('Error 2727')) {
         return error;
+      } else {
+        return 'An error has occurred. Please review your inputs and try again.';
       }
     } else {
       return 'INTERNAL ERROR';
