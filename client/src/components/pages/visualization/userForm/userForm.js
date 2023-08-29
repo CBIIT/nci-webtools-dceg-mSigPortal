@@ -709,6 +709,7 @@ export default function UserForm() {
                 <Form.Check.Input
                   {...field}
                   type="checkbox"
+                  checked={useQueue}
                   disabled={submitted}
                 />
               )}

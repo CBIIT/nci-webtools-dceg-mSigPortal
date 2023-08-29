@@ -20,6 +20,7 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
+  console.log('data ', data);
   const exposureData = data[0].data;
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
@@ -342,8 +343,8 @@ export function MsIndividualComparison(
   }
 
   const traces = [
-    ...tracesArray,
-    ...differenceTrace,
+    // ...tracesArray,
+    //...differenceTrace,
     ...sampleTraceOriginal,
     ...sampleTraceDestructed,
   ];
