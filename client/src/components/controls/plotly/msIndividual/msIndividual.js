@@ -343,8 +343,8 @@ export function MsIndividualComparison(
   }
 
   const traces = [
-    // ...tracesArray,
-    //...differenceTrace,
+    ...tracesArray,
+    ...differenceTrace,
     ...sampleTraceOriginal,
     ...sampleTraceDestructed,
   ];
