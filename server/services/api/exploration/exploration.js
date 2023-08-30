@@ -85,7 +85,7 @@ async function explorationWrapper(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.error(`/explorationCalc: An error occured with fn: ${fn}`);
+    logger.error(`/explorationCalc: An error occurred with fn: ${fn}`);
     next(err);
   }
 }
@@ -113,7 +113,7 @@ async function msLandscape(req, res, next) {
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      { study, strategy, cancer },
+      { study, strategy, cancer, profile: signatureData[0].profile },
       columns,
       limit
     );
@@ -126,7 +126,7 @@ async function msLandscape(req, res, next) {
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({ userId, stdout, ...rest });
   } catch (err) {
-    logger.error(`/msLandscape: An error occured `);
+    logger.error(`/msLandscape: An error occurred `);
     next(err);
   }
 }
@@ -153,7 +153,7 @@ async function msDecomposition(req, res, next) {
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      { study, strategy, cancer },
+      { study, strategy, cancer, profile: signatureData[0].profile },
       columns,
       limit
     );
@@ -171,7 +171,7 @@ async function msDecomposition(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.error(`/msDecomposition: An error occured `);
+    logger.error(`/msDecomposition: An error occurred `);
     next(err);
   }
 }
@@ -206,7 +206,7 @@ async function cosineSimilarity(req, res, next) {
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({ stdout, ...rest });
   } catch (err) {
-    logger.error(`/msLandscape: An error occured `);
+    logger.error(`/msLandscape: An error occurred `);
     next(err);
   }
 }
