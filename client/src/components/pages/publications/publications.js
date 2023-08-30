@@ -78,7 +78,7 @@ export default function Publications() {
               bordered
               options={{
                 initialState: {
-                  hiddenColumns: ['bioRxivOrPubmedId', 'doi'],
+                  hiddenColumns: ['bioRxivOrPubmedId', 'doi', 'note'],
                 },
               }}
               customOptions={customOptions}

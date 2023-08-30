@@ -4,6 +4,7 @@ import { colorPallet, colorPallet1 } from '../../utils/colors.js';
 
 import {
   groupDataByMutation,
+  groupFilterDataByMutation,
   getTotalMutations,
   getMaxMutations,
   getCosineSimilarity,
@@ -20,7 +21,7 @@ export function MsIndividualComparison(
   formatTickLabels,
   tickAngle = -90
 ) {
-  console.log('data ', data);
+  //console.log('data ', data);
   const exposureData = data[0].data;
   const signatureData = data[1].data;
   const segmatrixData = data[2].data;
@@ -127,7 +128,9 @@ export function MsIndividualComparison(
     }),
   }));
 
-  const groupOriginal = groupDataByMutation(
+  //console.log('normalizedOriginal', normalizedOriginal);
+
+  const groupOriginal = groupFilterDataByMutation(
     normalizedOriginal,
     mutationRegex,
     mutationGroupSort
@@ -171,7 +174,7 @@ export function MsIndividualComparison(
     mutationRegex,
     mutationGroupSort
   );
-
+  //console.log('groupDestructed', groupDestructed);
   // get total mutations per sample
   const totalMutations1 = getTotalMutations(normalizedOriginal);
   const totalMutations2 = getTotalMutations(newDestructedData);
@@ -201,6 +204,7 @@ export function MsIndividualComparison(
     xaxis: 'x2',
     yaxis: 'y22',
   }));
+  //console.log('sampleTraceOriginal', sampleTraceOriginal);
 
   const sampleTraceDestructed = groupDestructed.map(
     (group, groupIndex, array) => ({
@@ -221,12 +225,16 @@ export function MsIndividualComparison(
       yaxis: 'y21',
     })
   );
+
+  //console.log('sampleTraceDestructed', sampleTraceDestructed);
   const differenceTrace = sampleTraceOriginal.map((trace, traceIndex) => ({
     ...trace,
     y: trace.y.map((e, i) => e - sampleTraceDestructed[traceIndex].y[i]),
     yaxis: 'y20',
     axis: 'x2',
   }));
+
+  //console.log('differenceTrace', differenceTrace);
   const differenceTraceMaxYValue = findMaxAbsoluteYValue(differenceTrace);
   const sample1Data = sampleTraceOriginal.reduce(
     (array, trace) => [...array, ...trace.y],
@@ -348,6 +356,7 @@ export function MsIndividualComparison(
     ...sampleTraceOriginal,
     ...sampleTraceDestructed,
   ];
+
   // ----- Shapes -------//
   const sampleBorder1 = groupDestructed.map((group, groupIndex, array) => ({
     type: 'rect',

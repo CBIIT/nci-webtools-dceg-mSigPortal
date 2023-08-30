@@ -20,6 +20,74 @@ export function groupDataByMutation(
   return mutationGroupSort ? groupedData.sort(mutationGroupSort) : groupedData;
 }
 
+export function groupFilterDataByMutation(
+  data,
+  groupRegex,
+  mutationGroupSort = false,
+  mutationTypeSort = false
+) {
+  const groupByMutation = data.reduce((acc, e) => {
+    const mutation = e.mutationType.match(groupRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+
+  const groupedData = Object.entries(groupByMutation).map(
+    ([mutation, data]) => ({
+      mutation,
+      data: mutationTypeSort ? data.sort(mutationTypeSort) : data,
+    })
+  );
+
+  const filteredGroups = groupedData.map((group) => {
+    const seenMutationTypes = {};
+    group.data = group.data.filter((mutation) => {
+      if (!seenMutationTypes[mutation.mutationType]) {
+        seenMutationTypes[mutation.mutationType] = true;
+        return true;
+      }
+      return false;
+    });
+    return group;
+  });
+
+  return mutationGroupSort ? filteredGroups.sort(mutationGroupSort) : filteredGroups;
+}
+
+
+export function groupAndFilterDataByMutation(
+  data,
+  groupRegex,
+  mutationGroupSort = false,
+  mutationTypeSort = false
+) {
+  const groupByMutation = data.reduce((acc, e) => {
+    const mutation = e.mutationType.match(groupRegex)[1];
+    acc[mutation] = acc[mutation] ? [...acc[mutation], e] : [e];
+    return acc;
+  }, {});
+
+  const filteredGroupedData = Object.entries(groupByMutation)
+    .map(([mutation, data]) => ({
+      mutation,
+      data: mutationTypeSort ? data.sort(mutationTypeSort) : data,
+    }))
+    .filter(({ data }) => {
+      // Check if the data in the group are the same
+      const firstData = data[0];
+      return data.every((d) => areObjectsEqual(d, firstData)); // Assuming you have a function to compare objects
+    });
+
+  return mutationGroupSort
+    ? filteredGroupedData.sort(mutationGroupSort)
+    : filteredGroupedData;
+}
+// Function to compare if two objects are equal
+function areObjectsEqual(obj1, obj2) {
+  // Implement your logic here to compare objects
+  // Return true if they are equal, otherwise return false
+}
+
 export function getTotalMutations(data) {
   return data.reduce((total, e) => {
     const mutations = Number(e.mutations) || 0;
