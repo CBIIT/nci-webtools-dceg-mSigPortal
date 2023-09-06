@@ -617,8 +617,8 @@ export default function ExtractionForm({ formLimits }) {
             name="signatureSetName"
             label="Reference Signature Set"
             disabled={submitted || id}
-            //options={signatureSetOptions}
-            options={filteredSignatureSetOptions}
+            options={signatureSetOptions}
+            //options={filteredSignatureSetOptions}
             control={control}
           />
           <SelectForm
