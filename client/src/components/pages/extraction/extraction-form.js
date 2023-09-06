@@ -115,7 +115,7 @@ export default function ExtractionForm({ formLimits }) {
       setValue('signatureSetName', filteredOptions[0]);
     }
   };
-  const dataTypeOptions = ['matrix', 'vcf'].map((e) => ({
+  const dataTypeOptions = ['matrix'].map((e) => ({
     label: e,
     value: e,
   }));
