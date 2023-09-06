@@ -51,6 +51,27 @@ export default function Instructions({ formLimits }) {
         <h4>Data Source</h4>
         <p>Public: Perform analysis using data available on the website</p>
         <p>User: Upload your own data</p>
+        <div>
+          <h6>Download your own Data: </h6>
+          <div>
+            <a
+              href="/assets/extraction_sample_SBS96.all"
+              download
+              className="link-primary-underline"
+            >
+              Download SBS Sample
+            </a>
+          </div>
+          <div>
+            <a
+              href="/assets/extraction_sample_DBS78.all"
+              download
+              className="link-primary-underline"
+            >
+              Download DBS Sample
+            </a>
+          </div>
+        </div>
       </div>
       <hr />
       <div className="mt-2 mb-2">

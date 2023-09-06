@@ -552,7 +552,7 @@ export default function ExtractionForm({ formLimits }) {
                     );
                   }}
                 >
-                  Load SBS Sample
+                  Load SBS Matrix
                 </Button>
                 <Button
                   variant="link"
@@ -567,7 +567,7 @@ export default function ExtractionForm({ formLimits }) {
                     );
                   }}
                 >
-                  Load DBS Sample
+                  Load DBS Matrix
                 </Button>
               </div>
             )}
