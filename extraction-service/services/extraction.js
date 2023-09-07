@@ -233,10 +233,11 @@ export async function extraction(
     await execa(
       'python3',
       ['services/python/mSigPortal-SigProfilerExtractor.py', cliArgs],
-      { shell: true }
+      { shell: true, all: true }
     )
       .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr);
+      .pipeStderr(process.stderr)
+      .pipeAll(path.resolve(outputFolder, 'extraction_log.txt'));
 
     logger.info('Finished Extraction');
 
