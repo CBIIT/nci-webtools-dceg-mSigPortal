@@ -103,10 +103,11 @@ export async function profilerExtraction(
     const script = await execa(
       'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', cliArgs],
-      { shell: true }
+      { shell: true, all: true }
     )
       .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr);
+      .pipeStderr(process.stderr)
+      .pipeAll(path.resolve(outputFolder, 'profiler_extraction_log.txt'));
 
     // parse all matrix files and to json file
     const matrixFiles = path.resolve(profilerExtractionOutput, 'output');

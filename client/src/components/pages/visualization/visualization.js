@@ -296,6 +296,18 @@ export default function Visualization() {
                 An error occurred during calculation:
                 <br />
                 {errorMessage()}
+                {source == 'user' && (
+                  <div>
+                    <Button
+                      download
+                      variant="link"
+                      className="p-0"
+                      href={`api/data/output/${id}/profiler_extraction_log.txt`}
+                    >
+                      Download Job Log
+                    </Button>
+                  </div>
+                )}
                 <br />
                 Please contact the site administrator for assistance if this
                 issue persists.

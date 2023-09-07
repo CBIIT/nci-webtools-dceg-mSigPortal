@@ -62,9 +62,9 @@ export default function Status() {
       Header: 'Download',
       Cell: ({ row, value }) => (
         <Button
+          download
           variant="link"
           href={`api/downloadOutput/${row.original.id}`}
-          target="_blank"
           disabled={!['COMPLETED', 'FAILED'].includes(value)}
         >
           Download
