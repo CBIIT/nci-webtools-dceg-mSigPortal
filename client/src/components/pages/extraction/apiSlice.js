@@ -62,9 +62,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             const { status, params, manifest } = job;
             return {
               jobName: params.jobName,
-              status: status.status,
-              id: status.id,
-              submittedAt: status.submittedAt,
+              ...status,
             };
           });
       },

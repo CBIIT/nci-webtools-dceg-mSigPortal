@@ -6,6 +6,8 @@ import { Container } from 'react-bootstrap';
 import Table from '../../controls/table/table2';
 import { useMultiJobStatusQuery } from './apiSlice';
 import moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
+momentDurationFormatSetup(moment);
 
 export default function Status() {
   const [jobs, setJobs] = useState([]);
@@ -31,29 +33,43 @@ export default function Status() {
     {
       accessor: 'jobName',
       Header: 'Name',
-      Cell: (e) => (
-        <Link exact to={`/extraction/${e.row.original.id}`}>
-          {e.value}
+      Cell: ({ row, value }) => (
+        <Link exact to={`/extraction/${row.original.id}`}>
+          {value}
         </Link>
       ),
     },
     {
       accessor: 'status',
       Header: 'Status',
-      Cell: (e) => {
-        if (e.value === 'SUBMITTED') return 'Submitted';
-        else if (e.value === 'IN_PROGRESS') return 'In Progress';
-        else if (e.value === 'FAILED') return 'Failed';
-        else if (e.value === 'COMPLETED') return 'Completed';
-        else return e.value;
+      Cell: ({ value }) => {
+        if (value === 'SUBMITTED') return 'Submitted';
+        else if (value === 'IN_PROGRESS') return 'In Progress';
+        else if (value === 'FAILED') return 'Failed';
+        else if (value === 'COMPLETED') return 'Completed';
+        else return value;
       },
     },
     {
       accessor: 'submittedAt',
       Header: 'Submitted Time',
-      Cell: (e) => {
-        const time = moment(e.value);
+      Cell: ({ value }) => {
+        const time = moment(value);
         return `${time.format('LLL')} (${time.fromNow()})`;
+      },
+    },
+    {
+      id: 'duration',
+      accessor: 'stopped',
+      Header: 'Duration',
+      Cell: ({ row, value }) => {
+        if (value) {
+          const start = moment(row.original.submittedAt);
+          const end = moment(value);
+          return moment
+            .duration(end.diff(start), 'milliseconds')
+            .format('hh:mm:ss', { trim: false });
+        } else return '';
       },
     },
     {
@@ -62,7 +78,6 @@ export default function Status() {
       Header: 'Download',
       Cell: ({ row, value }) => (
         <Button
-          download
           variant="link"
           href={`api/downloadOutput/${row.original.id}`}
           disabled={!['COMPLETED', 'FAILED'].includes(value)}

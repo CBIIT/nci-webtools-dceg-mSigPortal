@@ -378,6 +378,7 @@ export async function extraction(
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
       status: 'COMPLETED',
+      stopped: new Date(),
     });
 
     // await uploadWorkingDirectory(inputFolder, outputFolder, id, env);
@@ -428,6 +429,7 @@ export async function extraction(
       ...(await readJson(paths.statusFile)),
       status: 'FAILED',
       error: { ...error },
+      stopped: new Date(),
     });
 
     // await uploadWorkingDirectory(
