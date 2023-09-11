@@ -52,14 +52,13 @@ export default function Instructions({ formLimits }) {
         <p>Public: Perform analysis using data available on the website</p>
         <p>User: Upload your own data</p>
         <div>
-          <h6>Download your own Data: </h6>
           <div>
             <a
               href="/assets/extraction_sample_SBS96.all"
               download
               className="link-primary-underline"
             >
-              Download SBS Sample
+              Example of a SBS matrix
             </a>
           </div>
           <div>
@@ -68,7 +67,7 @@ export default function Instructions({ formLimits }) {
               download
               className="link-primary-underline"
             >
-              Download DBS Sample
+              Example of a DBS matrix
             </a>
           </div>
         </div>
