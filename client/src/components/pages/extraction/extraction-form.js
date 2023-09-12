@@ -36,6 +36,8 @@ export default function ExtractionForm({ formLimits }) {
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
+  const [warning, setWarning] = useState('');
+
   // query options to populate form
   const {
     data: seqmatrixOptions,
@@ -621,25 +623,36 @@ export default function ExtractionForm({ formLimits }) {
             //options={filteredSignatureSetOptions}
             control={control}
           />
+          {warning && <div style={{ color: 'red' }}>{warning}</div>}
           <SelectForm
             name="signatureName"
             label="Select Signature Names"
             disabled={submitted || id}
             options={signatureNameOptions(signatureSetName)}
             control={control}
-            onChange={(values, e) => {
-              // remove "all" option if a specific signature is selected
-              // remove other options if "all" is selected
-              if (e.action === 'select-option') {
-                if (e.option.value !== 'all') {
-                  setValue(
-                    'signatureName',
-                    values.filter((e) => e.value !== 'all')
-                  );
-                } else if (e.option.value === 'all') {
-                  setValue('signatureName', [e.option]);
+            onChange={(selectedOptions) => {
+              // Check if the 'all' option is selected
+              const isAllOptionSelected = selectedOptions.some(
+                (option) => option.value === 'all'
+              );
+
+              if (!isAllOptionSelected) {
+                if (selectedOptions.length === 1) {
+                  // Show a warning message if only one option (other than 'all') is selected
+                  setWarning('Please select at least two options.');
+                } else {
+                  // Clear the warning if multiple options are selected
+                  setWarning('');
                 }
-              } else setValue('signatureName', values);
+              } else {
+                // If 'all' is selected, make sure it's the only option in selectedOptions
+                selectedOptions = [{ value: 'all', label: 'All' }];
+                // Clear the warning when 'all' is selected
+                setWarning('');
+              }
+
+              // Update the form values with the modified selectedOptions
+              setValue('signatureName', selectedOptions);
             }}
             isMulti
           />
