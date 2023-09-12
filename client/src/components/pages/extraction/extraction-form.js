@@ -635,25 +635,43 @@ export default function ExtractionForm({ formLimits }) {
               const isAllOptionSelected = selectedOptions.some(
                 (option) => option.value === 'all'
               );
-
               if (!isAllOptionSelected) {
+                // Filter out the 'all' option if it exists in selectedOptions
+                selectedOptions = selectedOptions.filter(
+                  (option) => option.value !== 'all'
+                );
+
                 if (selectedOptions.length === 1) {
                   // Show a warning message if only one option (other than 'all') is selected
-                  setWarning('Please select at least two options.');
+                  setWarning('More than one signature is required as input');
                 } else {
                   // Clear the warning if multiple options are selected
                   setWarning('');
                 }
               } else {
-                // If 'all' is selected, make sure it's the only option in selectedOptions
-                selectedOptions = [{ value: 'all', label: 'All' }];
                 // Clear the warning when 'all' is selected
                 setWarning('');
+                setValue('signatureName', [{ value: 'all', label: 'all' }]);
               }
 
               // Update the form values with the modified selectedOptions
               setValue('signatureName', selectedOptions);
             }}
+            // onChange={(values, e) => {
+            //   // remove "all" option if a specific signature is selected
+            //   // remove other options if "all" is selected
+            //   console.log('e', e);
+            //   if (e.action === 'select-option') {
+            //     if (e.option.value !== 'all') {
+            //       setValue(
+            //         'signatureName',
+            //         values.filter((e) => e.value !== 'all')
+            //       );
+            //     } else if (e.option.value === 'all') {
+            //       setValue('signatureName', [e.option]);
+            //     }
+            //   } else setValue('signatureName', values);
+            // }}
             isMulti
           />
           <SelectForm
