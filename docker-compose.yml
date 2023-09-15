@@ -3,6 +3,8 @@ services:
   backend:
     build:
       context: "."
+      args:
+        R_RENV_CACHE_HOST: ./data/renvCache
       dockerfile: "./docker/backend.dockerfile"
     env_file: "./server/.env"
     volumes:

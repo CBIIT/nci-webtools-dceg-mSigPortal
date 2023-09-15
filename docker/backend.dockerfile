@@ -39,15 +39,8 @@ RUN cd /tmp && \
 # RUN mkdir -p $HOME/.R && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
-# install R packages with renv
-COPY server/renv.lock /deploy/server/
-COPY server/.Rprofile /deploy/server/
-COPY server/renv/activate.R /deploy/server/renv/
-COPY server/renv/settings.dcf /deploy/server/renv/
-COPY server/r-packages /deploy/server/r-packages
 
 WORKDIR /deploy/server
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 # install python packages
 RUN pip3 install pandas==1.5.3 seaborn 
@@ -76,6 +69,19 @@ RUN cd /tmp \
 # genInstall.install('GRCh38', rsync=False, bash=True); \
 # genInstall.install('mm10', rsync=False, bash=True)"
 
+# install R packages with renv
+COPY server/renv.lock /deploy/server/
+COPY server/.Rprofile /deploy/server/
+COPY server/renv/activate.R /deploy/server/renv/
+COPY server/renv/settings.dcf /deploy/server/renv/
+COPY server/r-packages /deploy/server/r-packages
+
+# copy renv cache if available
+RUN mkdir /deploy/server/renv/.cache
+ENV RENV_PATHS_CACHE=/deploy/server/renv/.cache
+ARG R_RENV_CACHE_HOST=/data/renvCach[e]
+COPY ${R_RENV_CACHE_HOST} ${RENV_PATHS_CACHE}
+RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 
 # use build cache for npm packages
