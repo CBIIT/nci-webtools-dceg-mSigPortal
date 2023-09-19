@@ -60,18 +60,6 @@ RUN cd /tmp \
     && mv ./bcftools /usr/local/bin \
     && chmod +x /usr/local/bin/bcftools
 
-# install nlopt
-ENV LD_LIBRARY_PATH=/usr/local/lib64/
-ENV NLOPT_VERSION=2.7.1
-RUN cd /tmp \
-    && curl -L https://github.com/stevengj/nlopt/archive/v${NLOPT_VERSION}.tar.gz | tar xz \
-    && cd nlopt-${NLOPT_VERSION} \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
-    && make \
-    && make install
-
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
 ## sigprofilermatrixgenerator install directory. Verify path with "pip3 list"
