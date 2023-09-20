@@ -304,7 +304,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "cfeb90ecfb31f85596cd451519fd978a"
+      "Hash": "ae48ac9969b38dec895281181ccc6902"
     },
     "DBI": {
       "Package": "DBI",
@@ -3150,13 +3150,13 @@
     },
     "nloptr": {
       "Package": "nloptr",
-      "Version": "2.0.0",
+      "Version": "2.0.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "testthat"
       ],
-      "Hash": "6e45c045fea34a9d0d1ceaa6fb7c4e91"
+      "Hash": "277c67a08f358f42b6a77826e4492f79"
     },
     "nnet": {
       "Package": "nnet",
