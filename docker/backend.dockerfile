@@ -40,8 +40,6 @@ RUN cd /tmp && \
 #     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
 
 
-WORKDIR /deploy/server
-
 # install python packages
 RUN pip3 install pandas==1.5.3 seaborn 
 
@@ -81,6 +79,7 @@ RUN mkdir /deploy/server/renv/.cache
 ENV RENV_PATHS_CACHE=/deploy/server/renv/.cache
 ARG R_RENV_CACHE_HOST=/renvCach[e]
 COPY ${R_RENV_CACHE_HOST} ${RENV_PATHS_CACHE}
+WORKDIR /deploy/server
 RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 
