@@ -49,7 +49,7 @@ RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGener
 
 
 # use build cache for npm packages
-COPY extraction-service/package*.json /deploy/app
+COPY extraction-service/package*.json /deploy/app/
 RUN npm install
 
 # copy the rest of the application
