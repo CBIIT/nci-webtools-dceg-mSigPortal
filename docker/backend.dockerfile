@@ -26,6 +26,18 @@ RUN dnf -y update \
     which \
     && dnf clean all
 
+# install nlopt
+ENV LD_LIBRARY_PATH=/usr/local/lib64/
+ENV NLOPT_VERSION=2.7.1
+RUN cd /tmp \
+    && curl -L https://github.com/stevengj/nlopt/archive/v${NLOPT_VERSION}.tar.gz | tar xz \
+    && cd nlopt-${NLOPT_VERSION} \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install
+
 RUN mkdir -p /deploy/server /deploy/logs
 
 # install system fonts
