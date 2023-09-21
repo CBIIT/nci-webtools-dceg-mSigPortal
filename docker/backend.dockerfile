@@ -107,7 +107,7 @@ COPY server .
 CMD npm start
 
 # ensure symlink exists for /data/genomes
-ENV GENOME_PATH=/deploy/server/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+ENV GENOME_PATH=/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
 RUN mkdir -p /data/genomes ${GENOME_PATH} \
     && rm -rf ${GENOME_PATH} \
     && ln -sf /data/genomes ${GENOME_PATH}
