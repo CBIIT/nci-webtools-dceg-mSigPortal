@@ -36,6 +36,8 @@ export default function ExtractionForm({ formLimits }) {
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
   const [warning, setWarning] = useState('');
 
   // query options to populate form
@@ -426,6 +428,36 @@ export default function ExtractionForm({ formLimits }) {
     localStorage.setItem('jobs', JSON.stringify([...jobs, id]));
   }
 
+  const handleSelectChange = (selectedOptions) => {
+    // Update the selected options
+
+    // Check if the 'all' option is selected
+    const isAllOptionSelected = selectedOptions.some(
+      (option) => option.value === 'all'
+    );
+    if (!isAllOptionSelected) {
+      // Filter out the 'all' option if it exists in selectedOptions
+      selectedOptions = selectedOptions.filter(
+        (option) => option.value !== 'all'
+      );
+
+      if (selectedOptions.length <= 1) {
+        // Show a warning message if only one option (other than 'all') is selected
+        setWarning('More than one signature is required as input');
+      } else {
+        // Clear the warning if multiple options are selected
+        setWarning('');
+      }
+    } else {
+      // Clear the warning when 'all' is selected
+      setWarning('');
+      setValue('signatureName', [{ value: 'all', label: 'all' }]);
+    }
+
+    // Update the form values with the modified selectedOptions
+    setValue('signatureName', selectedOptions);
+  };
+
   return (
     <div className="p-3 bg-white border rounded">
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -630,33 +662,34 @@ export default function ExtractionForm({ formLimits }) {
             disabled={submitted || id}
             options={signatureNameOptions(signatureSetName)}
             control={control}
-            onChange={(selectedOptions) => {
-              // Check if the 'all' option is selected
-              const isAllOptionSelected = selectedOptions.some(
-                (option) => option.value === 'all'
-              );
-              if (!isAllOptionSelected) {
-                // Filter out the 'all' option if it exists in selectedOptions
-                selectedOptions = selectedOptions.filter(
-                  (option) => option.value !== 'all'
-                );
+            onChange={handleSelectChange}
+            // onChange={(selectedOptions) => {
+            //   // Check if the 'all' option is selected
+            //   const isAllOptionSelected = selectedOptions.some(
+            //     (option) => option.value === 'all'
+            //   );
+            //   if (!isAllOptionSelected) {
+            //     // Filter out the 'all' option if it exists in selectedOptions
+            //     selectedOptions = selectedOptions.filter(
+            //       (option) => option.value !== 'all'
+            //     );
 
-                if (selectedOptions.length === 1) {
-                  // Show a warning message if only one option (other than 'all') is selected
-                  setWarning('More than one signature is required as input');
-                } else {
-                  // Clear the warning if multiple options are selected
-                  setWarning('');
-                }
-              } else {
-                // Clear the warning when 'all' is selected
-                setWarning('');
-                setValue('signatureName', [{ value: 'all', label: 'all' }]);
-              }
+            //     if (selectedOptions.length === 1) {
+            //       // Show a warning message if only one option (other than 'all') is selected
+            //       setWarning('More than one signature is required as input');
+            //     } else {
+            //       // Clear the warning if multiple options are selected
+            //       setWarning('');
+            //     }
+            //   } else {
+            //     // Clear the warning when 'all' is selected
+            //     setWarning('');
+            //     setValue('signatureName', [{ value: 'all', label: 'all' }]);
+            //   }
 
-              // Update the form values with the modified selectedOptions
-              setValue('signatureName', selectedOptions);
-            }}
+            //   // Update the form values with the modified selectedOptions
+            //   setValue('signatureName', selectedOptions);
+            // }}
             // onChange={(values, e) => {
             //   // remove "all" option if a specific signature is selected
             //   // remove other options if "all" is selected
@@ -1076,7 +1109,9 @@ export default function ExtractionForm({ formLimits }) {
           </Col>
           <Col>
             <Button
-              disabled={fetchingSeqmatrixOptions || submitted || id}
+              disabled={
+                fetchingSeqmatrixOptions || submitted || id || warning !== ''
+              }
               className="w-100"
               variant="primary"
               type="submit"
