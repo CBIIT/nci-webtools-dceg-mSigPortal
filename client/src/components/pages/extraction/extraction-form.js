@@ -429,13 +429,15 @@ export default function ExtractionForm({ formLimits }) {
   }
 
   const handleSelectChange = (selectedOptions) => {
-    // Update the selected options
-
-    // Check if the 'all' option is selected
     const isAllOptionSelected = selectedOptions.some(
       (option) => option.value === 'all'
     );
-    if (!isAllOptionSelected) {
+
+    if (isAllOptionSelected) {
+      // Clear the warning when 'all' is selected and unselect individual signatures
+      setWarning('');
+      selectedOptions = [{ value: 'all', label: 'all' }];
+    } else {
       // Filter out the 'all' option if it exists in selectedOptions
       selectedOptions = selectedOptions.filter(
         (option) => option.value !== 'all'
@@ -448,10 +450,6 @@ export default function ExtractionForm({ formLimits }) {
         // Clear the warning if multiple options are selected
         setWarning('');
       }
-    } else {
-      // Clear the warning when 'all' is selected
-      setWarning('');
-      setValue('signatureName', [{ value: 'all', label: 'all' }]);
     }
 
     // Update the form values with the modified selectedOptions
