@@ -37,6 +37,7 @@ export default function ExtractionForm({ formLimits }) {
   const { data: params } = useParamsQuery(id, { skip: !id });
 
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const [isDefaultContext, setIsDefaultContext] = useState(true); // Set the default value according to your requirements
 
   const [warning, setWarning] = useState('');
 
@@ -104,10 +105,16 @@ export default function ExtractionForm({ formLimits }) {
 
   const handleContextTypeChange = (selectedOption) => {
     setValue('context_type', selectedOption);
-    const filteredOptions = signatureSetOptions
-      .filter((option) => option.value.includes(selectedOption.value))
-      .sort((a, b) => a.value.localeCompare(b.value));
-
+    let filteredOptions;
+    if (selectedOption.value !== 'default') {
+      setIsDefaultContext(false);
+      filteredOptions = signatureSetOptions
+        .filter((option) => option.value.includes(selectedOption.value))
+        .sort((a, b) => a.value.localeCompare(b.value));
+    } else {
+      setIsDefaultContext(true);
+      filteredOptions = signatureSetOptions;
+    }
     setFilteredSignatureSetOptions(filteredOptions);
 
     if (selectedOption.value === 'SBS96') {
@@ -297,7 +304,7 @@ export default function ExtractionForm({ formLimits }) {
     if (source === 'user') {
       return signatureOptions
         ? [
-            { label: 'default', value: 'SBS96' },
+            { label: 'default', value: 'default' },
             ...[...new Set(signatureOptions.map((e) => e.profile + e.matrix))]
               .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
               .map((e) => ({ label: e, value: e })),
@@ -315,7 +322,7 @@ export default function ExtractionForm({ formLimits }) {
           seqmatrixProfiles.includes(e)
         );
         return [
-          { label: 'default', value: 'SBS96' },
+          { label: 'default', value: 'default' },
           ...commonProfiles
             .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
             .map((e) => ({ label: e, value: e })),
@@ -649,8 +656,13 @@ export default function ExtractionForm({ formLimits }) {
             name="signatureSetName"
             label="Reference Signature Set"
             disabled={submitted || id}
-            options={signatureSetOptions}
+            //options={signatureSetOptions}
             //options={filteredSignatureSetOptions}
+            options={
+              isDefaultContext
+                ? signatureSetOptions
+                : filteredSignatureSetOptions
+            }
             control={control}
           />
           {warning && <div style={{ color: 'red' }}>{warning}</div>}
