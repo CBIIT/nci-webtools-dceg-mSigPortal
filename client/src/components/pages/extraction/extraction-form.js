@@ -398,10 +398,23 @@ export default function ExtractionForm({ formLimits }) {
       allow_stability_drop: data.allow_stability_drop ? 'True' : 'False',
     };
 
+    const signatureSetName = data.signatureSetName.value;
+    const profile =
+      data.context_type.value == 'default'
+        ? signatureOptions.filter(
+            (e) => e.signatureSetName == signatureSetName
+          )[0].profile
+        : data.context_type.value.match(/^\D*/)[0];
+    const matrix =
+      data.context_type.value == 'default'
+        ? signatureOptions.filter(
+            (e) => e.signatureSetName == signatureSetName
+          )[0].matrix + ''
+        : data.context_type.value.match(/\d*$/)[0];
     const signatureQuery = {
-      signatureSetName: data.signatureSetName.value,
-      profile: isDefaultContext ? '' : data.context_type.value.match(/^\D*/)[0],
-      matrix: isDefaultContext ? '' : data.context_type.value.match(/\d*$/)[0],
+      signatureSetName,
+      profile,
+      matrix,
       ...(data.signatureName[0].value != 'all' && {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
@@ -411,8 +424,8 @@ export default function ExtractionForm({ formLimits }) {
       study: data.study?.value,
       cancer: data.cancer?.value,
       strategy: data.strategy?.value,
-      profile: isDefaultContext ? '' : data.context_type.value.match(/^\D*/)[0],
-      matrix: isDefaultContext ? '' : data.context_type.value.match(/\d*$/)[0],
+      profile,
+      matrix,
     };
 
     const params = {
