@@ -69,8 +69,8 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
     }),
 
     signatureMapTable: builder.query({
-      query: ({ id, context_type, signatureMap }) => ({
-        url: `data/output/${id}/${context_type}/Suggested_Solution/COSMIC_${context_type}_Decomposed_Solution/${signatureMap}`,
+      query: ({ id, contextType, signatureMap }) => ({
+        url: `data/output/${id}/${contextType}/Suggested_Solution/COSMIC_${contextType}_Decomposed_Solution/${signatureMap}`,
       }),
       transformResponse: (data) => {
         const columns = Object.keys(data[0]).map((e) => ({
