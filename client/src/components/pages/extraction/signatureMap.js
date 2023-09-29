@@ -17,7 +17,7 @@ export default function SignatureMap({ state }) {
   const { data: table, error: tableError } = useSignatureMapTableQuery(
     {
       id,
-      context_type: params.args.context_type,
+      contextType: manifest.contextType,
       signatureMap: manifest.signatureMapJson,
     },
     { skip: !id }
@@ -25,7 +25,7 @@ export default function SignatureMap({ state }) {
   const { data, error } = useSignatureMapPlotsQuery(
     {
       userId: id,
-      contextType: params.args.context_type,
+      contextType: manifest.contextType,
       denovoSigString,
       decompSigString,
     },

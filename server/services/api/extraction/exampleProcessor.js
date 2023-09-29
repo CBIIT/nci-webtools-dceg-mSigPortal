@@ -623,6 +623,7 @@ async function getPaths(params, exampleId, randomID, env = process.env) {
     signatureMapFile,
     signatureMapJson,
     decomposedSignatureFile,
+    contextType: args.context_type,
   };
 }
 

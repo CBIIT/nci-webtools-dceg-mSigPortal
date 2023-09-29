@@ -1,4 +1,4 @@
-import { readdir, unlinkSync, writeFileSync, createReadStream } from 'fs';
+import { readdirSync, unlinkSync, writeFileSync, createReadStream } from 'fs';
 import path from 'path';
 import { stringify } from 'csv-stringify';
 import { groupBy } from 'lodash-es';
@@ -59,7 +59,7 @@ export async function extraction(
   env = process.env
 ) {
   const { args, signatureQuery, seqmatrixQuery, id, email } = params;
-  const paths = await getPaths(params, env);
+  let paths = await getPaths(params, env);
   const submittedTime = new Date(
     (await readJson(paths.statusFile)).submittedAt
   );
@@ -240,6 +240,9 @@ export async function extraction(
       .pipeAll(path.resolve(outputFolder, 'extraction_log.txt'));
 
     logger.info('Finished Extraction');
+
+    // update paths
+    paths = { ...paths, ...getResultsPaths(params, env) };
 
     // import signatures data to database
     const decomposedSignatures = await parseCSV(paths.decomposedSignatureFile);
@@ -490,23 +493,6 @@ export async function getPaths(params, env = process.env) {
   const manifestFile = path.resolve(outputFolder, 'manifest.json');
   const databaseFile = path.resolve(outputFolder, 'results.db');
 
-  // map files to be used as input for exploration module
-  const solutionsFolder = path.resolve(
-    outputFolder,
-    args.context_type,
-    'Suggested_Solution'
-  );
-
-  const denovoFolder = path.resolve(
-    solutionsFolder,
-    `${args.context_type}_De-Novo_Solution`
-  );
-
-  const decomposedFolder = path.resolve(
-    solutionsFolder,
-    `COSMIC_${args.context_type}_Decomposed_Solution`
-  );
-
   // SigProfilerExtraction log
   const extractionLog = path.resolve(outputFolder, 'JOB_METADATA.txt');
 
@@ -516,45 +502,7 @@ export async function getPaths(params, env = process.env) {
       ? ''
       : path.resolve(inputFolder, args.input_data);
 
-  // files for denovo exploration input
-  const denovoExposureInput = path.resolve(
-    denovoFolder,
-    'Activities',
-    `${args.context_type}_De-Novo_Activities_refit.txt`
-  );
-
-  const denovoSignatureInput = path.resolve(
-    denovoFolder,
-    'Signatures',
-    `${args.context_type}_De-Novo_Signatures.txt`
-  );
-
-  // files for decomposed exploration input
-  const decomposedExposureInput = path.resolve(
-    decomposedFolder,
-    'Activities',
-    `COSMIC_${args.context_type}_Activities.txt`
-  );
-
   const decomposedSignatureInput = path.resolve(outputFolder, 'signature.tsv');
-
-  // signature map file
-  const signatureMapFile = path.resolve(
-    decomposedFolder,
-    `De_Novo_map_to_COSMIC_${args.context_type}.csv`
-  );
-
-  // signature map file
-  const signatureMapJson = path.resolve(
-    decomposedFolder,
-    `De_Novo_map_to_COSMIC_${args.context_type}.json`
-  );
-
-  const decomposedSignatureFile = path.resolve(
-    decomposedFolder,
-    'Signatures',
-    `COSMIC_${args.context_type}_Signatures.txt`
-  );
 
   return {
     inputFolder,
@@ -565,13 +513,90 @@ export async function getPaths(params, env = process.env) {
     databaseFile,
     extractionLog,
     matrixFile,
+    decomposedSignatureInput,
+  };
+}
+
+/**
+ * Dynamically generate paths to results files/folders
+ * @param {any} params
+ * @param {any} env
+ * @returns {any} paths
+ */
+function getResultsPaths(params, env) {
+  const { id } = params;
+  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+
+  const getDirectories = (source) =>
+    readdirSync(source, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
+  // assumes the only folder at /outputFolder is the name of the context type
+  const [contextType] = getDirectories(outputFolder);
+
+  // map files to be used as input for exploration module
+  const solutionsFolder = path.resolve(
+    outputFolder,
+    contextType,
+    'Suggested_Solution'
+  );
+
+  const denovoFolder = path.resolve(
+    solutionsFolder,
+    `${contextType}_De-Novo_Solution`
+  );
+
+  const decomposedFolder = path.resolve(
+    solutionsFolder,
+    `COSMIC_${contextType}_Decomposed_Solution`
+  );
+
+  // files for denovo exploration input
+  const denovoExposureInput = path.resolve(
+    denovoFolder,
+    'Activities',
+    `${contextType}_De-Novo_Activities_refit.txt`
+  );
+
+  const denovoSignatureInput = path.resolve(
+    denovoFolder,
+    'Signatures',
+    `${contextType}_De-Novo_Signatures.txt`
+  );
+
+  // files for decomposed exploration input
+  const decomposedExposureInput = path.resolve(
+    decomposedFolder,
+    'Activities',
+    `COSMIC_${contextType}_Activities.txt`
+  );
+
+  // signature map file
+  const signatureMapFile = path.resolve(
+    decomposedFolder,
+    `De_Novo_map_to_COSMIC_${contextType}.csv`
+  );
+
+  // signature map file
+  const signatureMapJson = path.resolve(
+    decomposedFolder,
+    `De_Novo_map_to_COSMIC_${contextType}.json`
+  );
+
+  const decomposedSignatureFile = path.resolve(
+    decomposedFolder,
+    'Signatures',
+    `COSMIC_${contextType}_Signatures.txt`
+  );
+
+  return {
     denovoExposureInput,
     denovoSignatureInput,
     decomposedExposureInput,
-    decomposedSignatureInput,
     signatureMapFile,
     signatureMapJson,
     decomposedSignatureFile,
+    contextType,
   };
 }
 
