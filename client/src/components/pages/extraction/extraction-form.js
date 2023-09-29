@@ -400,8 +400,8 @@ export default function ExtractionForm({ formLimits }) {
 
     const signatureQuery = {
       signatureSetName: data.signatureSetName.value,
-      profile: data.context_type.value.match(/^\D*/)[0],
-      matrix: data.context_type.value.match(/\d*$/)[0],
+      profile: isDefaultContext ? '' : data.context_type.value.match(/^\D*/)[0],
+      matrix: isDefaultContext ? '' : data.context_type.value.match(/\d*$/)[0],
       ...(data.signatureName[0].value != 'all' && {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
@@ -411,8 +411,8 @@ export default function ExtractionForm({ formLimits }) {
       study: data.study?.value,
       cancer: data.cancer?.value,
       strategy: data.strategy?.value,
-      profile: data.context_type.value.match(/^\D*/)[0],
-      matrix: data.context_type.value.match(/\d*$/)[0],
+      profile: isDefaultContext ? '' : data.context_type.value.match(/^\D*/)[0],
+      matrix: isDefaultContext ? '' : data.context_type.value.match(/\d*$/)[0],
     };
 
     const params = {
@@ -424,6 +424,7 @@ export default function ExtractionForm({ formLimits }) {
       jobName: data.jobName || 'Extraction',
       form: data,
     };
+    //console.log('Params----', params);
     const submitStatus = await submitForm(params).unwrap();
 
     history.push(`/extraction/${submitStatus.id}`);
