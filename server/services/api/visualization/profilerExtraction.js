@@ -121,8 +121,6 @@ export async function profilerExtraction(
       else throw new Error('Error occurred during profiler extraction.');
     }
     const seqmatrix = await getMatrices(matrixFiles);
-    const matricesFile = path.join(outputFolder, 'matrices.json');
-    await writeJson(matricesFile, seqmatrix);
 
     // parse cluster data if option was used
     let cluster = [];
