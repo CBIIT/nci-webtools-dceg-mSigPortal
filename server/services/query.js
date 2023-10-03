@@ -12,7 +12,7 @@ function getData(
 ) {
   const conditions = pickBy(
     query,
-    (v) => v && !v.includes('%') && !v.includes('*ALL')
+    (v) => (v || v === '') && !v.includes('%') && !v.includes('*ALL')
   );
   const patterns = pickBy(query, (v) => v && v.includes('%'));
 
@@ -41,9 +41,7 @@ function getData(
           splitValues.map((e) => e.trim())
         );
       } else {
-        splitValues.forEach((v) => {
-          sqlQuery = sqlQuery.andWhere(column, v.trim());
-        });
+        sqlQuery = sqlQuery.andWhere(column, values.trim());
       }
     });
   }
