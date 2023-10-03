@@ -22,7 +22,7 @@ export default function PcaPublic({ state }) {
     skip: !params,
   });
   const { data: publicOptions, isFetching: fetchingPublicOptions } =
-    useSeqmatrixOptionsQuery();
+    useSeqmatrixOptionsQuery({ columns: ['study', 'cancer'] });
 
   // define form
   const { control, handleSubmit, watch, setValue } = useForm({

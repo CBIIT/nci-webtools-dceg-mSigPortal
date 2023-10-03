@@ -28,7 +28,9 @@ export default function CsPublic({ state }) {
     { skip: !id }
   );
   const { data: matrixList } = useMatrixListQuery(id, { skip: !id });
-  const { data: publicOptions } = useSeqmatrixOptionsQuery();
+  const { data: publicOptions } = useSeqmatrixOptionsQuery({
+    columns: ['study', 'cancer'],
+  });
 
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: { profile: '', matrix: '', study: '', cancer: '' },

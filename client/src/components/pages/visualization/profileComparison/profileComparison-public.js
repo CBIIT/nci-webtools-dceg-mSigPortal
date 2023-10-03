@@ -22,7 +22,7 @@ export default function PcPublic({ state }) {
   });
 
   const { data: publicOptions, isFetching: fetchingPublicOptions } =
-    useSeqmatrixOptionsQuery();
+    useSeqmatrixOptionsQuery({ columns: ['study', 'cancer', 'sample'] });
 
   const studyOptions = publicOptions
     ? [...new Set(publicOptions.map((e) => e.study))].sort().map((e) => ({
