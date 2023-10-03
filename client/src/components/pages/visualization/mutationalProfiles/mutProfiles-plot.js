@@ -24,7 +24,7 @@ export default function MutProfilePlot({ state, form }) {
         sample: sample.value,
         profile: profile.value,
         matrix: matrix.value,
-        ...(filter?.value && { filter: filter.value }),
+        ...(filter?.label && { filter: filter.value }),
       };
       setParams(params);
     }

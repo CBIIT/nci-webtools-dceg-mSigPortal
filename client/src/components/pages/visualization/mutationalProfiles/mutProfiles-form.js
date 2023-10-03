@@ -111,7 +111,7 @@ export default function MutationalProfilesForm({ state, form, mergeForm }) {
                 (e) =>
                   e.sample == sample.value &&
                   e.profile == profile.value &&
-                  supportMatrix[e.profile].includes(matrix.value)
+                  e.matrix == matrix.value
               )
               .map((e) => e.filter)
               .sort((a, b) => a - b)
