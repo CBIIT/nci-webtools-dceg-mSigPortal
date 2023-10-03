@@ -325,7 +325,9 @@ export default function Visualization() {
                   displayTab === 'profilerSummary' ? 'd-block' : 'd-none'
                 }
               >
-                <ProfilerSummary state={{ ...publicForm, ...main, id }} />
+                <ProfilerSummary
+                  state={{ ...publicForm, ...main, id, source }}
+                />
               </div>
               <div
                 className={
@@ -333,47 +335,59 @@ export default function Visualization() {
                 }
               >
                 <MutationalProfiles
-                  state={{ ...publicForm, ...main, mutationalProfiles, id }}
+                  state={{
+                    ...publicForm,
+                    ...main,
+                    mutationalProfiles,
+                    id,
+                    source,
+                  }}
                 />
               </div>
               {displayTab === 'treeAndLeaf' && (
-                <TreeAndLeaf state={{ ...publicForm, ...main, id }} />
+                <TreeAndLeaf state={{ ...publicForm, ...main, id, source }} />
               )}
               <div
                 className={
                   displayTab === 'cosineSimilarity' ? 'd-block' : 'd-none'
                 }
               >
-                <CosineSimilarity state={{ ...publicForm, ...main, id }} />
+                <CosineSimilarity
+                  state={{ ...publicForm, ...main, id, source }}
+                />
               </div>
               <div
                 className={
                   displayTab === 'profileComparison' ? 'd-block' : 'd-none'
                 }
               >
-                <ProfileComparison state={{ ...publicForm, ...main, id }} />
+                <ProfileComparison
+                  state={{ ...publicForm, ...main, id, source }}
+                />
               </div>
               <div className={displayTab === 'pca' ? 'd-block' : 'd-none'}>
-                <PCA state={{ ...publicForm, ...main, id }} />
+                <PCA state={{ ...publicForm, ...main, id, source }} />
               </div>
               <div
                 className={
                   displayTab === 'mutationalPattern' ? 'd-block' : 'd-none'
                 }
               >
-                <MutationalPattern state={{ ...publicForm, ...main, id }} />
+                <MutationalPattern
+                  state={{ ...publicForm, ...main, id, source }}
+                />
               </div>
               {source == 'user' && (
                 <div
                   className={displayTab === 'cluster' ? 'd-block' : 'd-none'}
                 >
                   <ClusteredIdentification
-                    state={{ ...publicForm, ...main, params, id }}
+                    state={{ ...publicForm, ...main, params, id, source }}
                   />
                 </div>
               )}
               <div className={displayTab === 'download' ? 'd-block' : 'd-none'}>
-                <Download state={{ ...publicForm, ...main, id }} />
+                <Download state={{ ...publicForm, ...main, id, source }} />
               </div>
             </>
           )}
