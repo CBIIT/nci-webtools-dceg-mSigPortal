@@ -6,6 +6,7 @@ export function Header() {
 
   return (
     <header className="bg-light">
+      <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
       <div>
         <a
           href="/#/#root"
