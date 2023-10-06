@@ -32,6 +32,7 @@ RUN mkdir -p /deploy/app /deploy/logs
 
 # install SigProfilerExtractor
 WORKDIR /deploy/app
+RUN pip3 install torch==1.13.1
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
 
 # install other python packages
