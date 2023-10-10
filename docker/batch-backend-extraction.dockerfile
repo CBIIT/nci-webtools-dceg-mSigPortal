@@ -29,11 +29,14 @@ RUN dnf -y update \
     && dnf clean all
 
 RUN mkdir -p /deploy/app /deploy/logs
+WORKDIR /deploy/app
+
+# install pytorch
+RUN pip3 install torch
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.9/site-packages/nvidia/cuda_cupti/lib/
 
 # install SigProfilerExtractor
-WORKDIR /deploy/app
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.9/site-packages/nvidia/cuda_cupti/lib/
 
 # install other python packages
 RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
