@@ -24,7 +24,7 @@
     "jstat": "^1.9.6",
     "moment": "^2.29.4",
     "moment-duration-format": "^2.3.2",
-    "papaparse": "^5.4.0",
+    "papaparse": "^5.4.1",
     "plotly.js": "^2.16.1",
     "react": "^17.0.2",
     "react-animated-css": "^1.2.1",
