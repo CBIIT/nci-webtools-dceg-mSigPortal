@@ -4,7 +4,7 @@ import rWrapper from 'r-wrapper';
 import { execa } from 'execa';
 import isUUID from 'validator/lib/isUUID.js';
 import mapValues from 'lodash/mapValues.js';
-import { parseCSV } from '../general.js';
+import { parseCSV, parseTSV } from '../general.js';
 import { schema } from './userSchema.js';
 import { readJson, writeJson, mkdirs, getFiles } from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
@@ -13,7 +13,7 @@ import { formatObject } from '../../logger.js';
 const r = rWrapper.async;
 
 // transform all matrix files into a single json object
-async function getMatrices(matrixFolder) {
+export async function getMatrices(matrixFolder) {
   let files = [];
   const fileRegex = /\.(all|region)$/;
   for await (const f of getFiles(matrixFolder)) {
@@ -27,7 +27,7 @@ async function getMatrices(matrixFolder) {
       files.map(async (file) => {
         const profile = file.match(profileRegex)[1];
         const matrix = file.match(matrixRegex)[1];
-        const data = await parseCSV(file);
+        const { data } = await parseTSV(file);
         return data
           .map((e) => {
             const { MutationType, ...samples } = e;
