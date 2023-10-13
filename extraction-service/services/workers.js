@@ -40,7 +40,14 @@ export async function runLocalWorker(id, app, env = process.env) {
 export async function runFargateWorker(id, env = process.env) {
   const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS, WORKER_TASK_NAME } = env;
   const client = new ECSClient();
-  const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
+  const workerCommand = [
+    'node',
+    '--require',
+    'dotenv/config',
+    '--max-old-space-size=16384',
+    'worker.js',
+    id,
+  ];
   const logger = createLogger(env.EXTRACTION_APP_NAME, env.LOG_LEVEL);
   const taskCommand = new RunTaskCommand({
     cluster: ECS_CLUSTER,

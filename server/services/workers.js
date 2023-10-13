@@ -1,6 +1,10 @@
 import path from 'path';
 import ECS, { ECSClient, RunTaskCommand } from '@aws-sdk/client-ecs';
-import Batch, { BatchClient, CancelJobCommand, SubmitJobCommand } from "@aws-sdk/client-batch";
+import Batch, {
+  BatchClient,
+  CancelJobCommand,
+  SubmitJobCommand,
+} from '@aws-sdk/client-batch';
 import { readJson } from './utils.js';
 import { createLogger } from '../services/logger.js';
 import { profilerExtraction } from './api/visualization/profilerExtraction.js';
@@ -57,7 +61,14 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
     },
   };
   const client = new ECSClient();
-  const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
+  const workerCommand = [
+    'node',
+    '--require',
+    'dotenv/config',
+    '--max-old-space-size=16384',
+    'worker.js',
+    id,
+  ];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   const taskCommand = new RunTaskCommand({
     cluster: ECS_CLUSTER,
@@ -99,7 +110,8 @@ export async function runBatchWorker(id, app, taskName, env = process.env) {
   const client = new BatchClient();
   const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
-  const jobCommand = new SubmitJobCommand({ // SubmitJobRequest
+  const jobCommand = new SubmitJobCommand({
+    // SubmitJobRequest
     jobName: `${taskName}-${id}`,
     jobQueue: BATCH_JOB_QUEUE,
     jobDefinition: BATCH_JOB_DEFINITION,
