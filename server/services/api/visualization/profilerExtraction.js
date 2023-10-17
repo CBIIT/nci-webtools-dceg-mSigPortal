@@ -174,7 +174,7 @@ export async function profilerExtraction(
           submittedAt: submittedTime.toISOString(),
           executionTime:
             (new Date().getTime() - submittedTime.getTime()) / 1000,
-          resultsUrl: path.join(env.APP_BASE_URL, '#', 'visualization', id),
+          resultsUrl: `${env.APP_BASE_URL}/#/visualization/${id}`,
         }
       );
     }
