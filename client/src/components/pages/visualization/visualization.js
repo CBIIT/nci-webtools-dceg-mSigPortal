@@ -113,7 +113,7 @@ export default function Visualization() {
     {
       name: 'Tree and Leaf',
       id: 'treeAndLeaf',
-      disabled: !completed && source != 'public',
+      disabled: !completed && (source === 'user'),
     },
     {
       name: 'Cosine Similarity',
