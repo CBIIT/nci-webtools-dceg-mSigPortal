@@ -345,7 +345,13 @@ export default function Visualization() {
                 />
               </div>
               {displayTab === 'treeAndLeaf' && (
-                <TreeAndLeaf state={{ ...publicForm, ...main, id, source }} />
+                source === 'public' 
+                  ? <TreeAndLeaf state={{ ...publicForm, ...main, id, source }} /> 
+                  : <div className="container-fluid bg-white border rounded p-3 text-center">
+                      <Alert variant="warning">
+                        The Tree and Leaf plot does not currently support user-provided data.
+                      </Alert>
+                    </div>
               )}
               <div
                 className={
