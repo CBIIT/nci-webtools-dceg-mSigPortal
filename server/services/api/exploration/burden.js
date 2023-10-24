@@ -1,6 +1,7 @@
 import { groupBy } from 'lodash-es';
 
 function calculateBurden(exposure, study) {
+  if (!exposure) return 0
   const genome = { PCAWG: 'GRCh37', TCGA: 'GRCh37' };
   const genomeSizeMap = {
     GRCh37: 3101976562 / Math.pow(10, 6),
