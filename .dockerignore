@@ -1,7 +1,7 @@
 .git
 .git
 **/node_modules/
-**/data/
+# **/data/
 **/logs/
 **/apache_logs/
 **/tmp/

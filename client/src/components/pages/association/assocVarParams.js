@@ -9,8 +9,12 @@ import {
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faMinus } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../controls/select/select';
+import {
+  faInfoCircle,
+  faMinus,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
+import CustomSelect from '../../controls/select/select-old';
 
 const { Group, Label, Check, Control } = Form;
 
@@ -20,14 +24,17 @@ export default function AssocVarParams({
   paramState,
   mergeState,
   remove = false,
+  add = false,
+  warnLimit = false,
+
   duplicates = [],
   invalidFilter,
 }) {
   const { loadingData, assocVarData } = useSelector(
-    (state) => state.association.associationState
+    (state) => state.association.main
   );
 
-  const { loadingParams, loadingCalculate } = hostState;
+  const { loadingParams, loadingCalculate, associationVars } = hostState;
 
   const {
     name,
@@ -118,7 +125,7 @@ export default function AssocVarParams({
         }`}
       >
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'source-' + index}
             label="Variable Source"
@@ -128,7 +135,7 @@ export default function AssocVarParams({
           />
         </Col>
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'type-' + index}
             label="Data Type"
@@ -138,7 +145,7 @@ export default function AssocVarParams({
           />
         </Col>
         <Col md="auto">
-          <Select
+          <CustomSelect
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'assocVariable-' + index}
             label="Variable Name"
@@ -254,7 +261,7 @@ export default function AssocVarParams({
                     />
                   </Button>
                 </OverlayTrigger>{' '}
-                <Select
+                <CustomSelect
                   className="d-inline-flex mb-0"
                   disabled={
                     loadingData ||
@@ -278,7 +285,7 @@ export default function AssocVarParams({
           {remove ? (
             <Button
               disabled={name}
-              className="text-danger mb-3 mr-auto"
+              className="text-danger mr-auto"
               variant="link"
               onClick={remove}
               title="Add Plot"
@@ -288,6 +295,38 @@ export default function AssocVarParams({
                 <FontAwesomeIcon icon={faMinus} /> Remove
               </span>
             </Button>
+          ) : (
+            <span style={{ width: '101.867px' }} />
+          )}
+          {add ? (
+            <OverlayTrigger
+              show={warnLimit}
+              placement="bottom"
+              overlay={
+                <Popover>
+                  <Popover.Content className="text-danger">
+                    You may only add up to 10 variables
+                  </Popover.Content>
+                </Popover>
+              }
+            >
+              <Button
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  associationVars[0].name
+                }
+                variant="link"
+                onClick={add}
+                title="Add Plot"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="text-nowrap" title="Add Association Variable">
+                  <FontAwesomeIcon icon={faPlus} /> Add Association Variable
+                </span>
+              </Button>
+            </OverlayTrigger>
           ) : (
             <span style={{ width: '101.867px' }} />
           )}

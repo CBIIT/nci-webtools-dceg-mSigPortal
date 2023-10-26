@@ -1,476 +1,152 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Nav, Button } from 'react-bootstrap';
+import { useCallback, useEffect } from 'react';
+import { Form, Row, Col, Nav, Button, Alert } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
-import UserForm from './userForm';
-import PublicForm from './publicForm';
+import UserForm from './userForm/userForm';
+import PublicForm from './publicForm/publicForm';
 import Instructions from '../visualization/instructions';
-import ProfilerSummary from './profilerSummary';
-import MutationalProfiles from './mutationalProfiles';
-import CosineSimilarity from './cosineSimilarity';
-import MutationalPattern from './mutationalPattern';
-import ProfileComparison from './profileComparison';
-import PCA from './pca';
-import Kataegis from './kataegis';
+import ProfilerSummary from './profilerSummary/profilerSummary';
+import MutationalProfiles from './mutationalProfiles/mutProfiles';
+import TreeAndLeaf from './treeLeaf/treeLeaf';
+import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
+import MutationalPattern from './mutationalPattern/mutationalPattern';
+import ProfileComparison from './profileComparison/profileComparison';
+import PCA from './pca/pca';
+import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/visualization';
 import { actions as modalActions } from '../../../services/store/modal';
-import {
-  defaultProfile,
-  defaultMatrix,
-  defaultFilter,
-} from '../../../services/utils';
 import './visualization.scss';
+import { useRefreshQuery } from './userForm/apiSlice';
 
 const actions = { ...visualizationActions, ...modalActions };
 const { Group, Label, Check } = Form;
 
-export default function Visualization({ match }) {
+export default function Visualization() {
   const dispatch = useDispatch();
-  const visualization = useSelector((state) => state.visualization);
   const mergeState = (state) =>
-    dispatch(actions.mergeVisualization({ state: state }));
-  const mergeMutationalProfiles = (state) =>
-    dispatch(actions.mergeVisualization({ mutationalProfiles: state }));
-  const mergeKataegis = (state) =>
-    dispatch(actions.mergeVisualization({ kataegis: state }));
-  const mergeCosineSimilarity = (state) =>
-    dispatch(actions.mergeVisualization({ cosineSimilarity: state }));
-  const mergeProfileComparison = (state) =>
-    dispatch(actions.mergeVisualization({ profileComparison: state }));
-  const mergePCA = (state) =>
-    dispatch(actions.mergeVisualization({ pca: state }));
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
+    dispatch(actions.mergeVisualization({ main: state }));
+  const { main, publicForm, mutationalProfiles } = useSelector(
+    (state) => state.visualization
+  );
   const {
     openSidebar,
     loading,
     source,
     submitted,
-    queueExpired,
     error,
-    projectID,
     displayTab,
-    svgList,
-    matrixList,
-  } = visualization.state;
-  const mutationalProfiles = visualization.mutationalProfiles;
-  const { signatureSetOptions } = visualization.pca;
+    ...state
+  } = main;
 
-  const { type, id } = match.params;
+  const id = useParams().id || state.id;
+  const {
+    data: jobInfo,
+    error: refreshError,
+    refetch: refreshJob,
+  } = useRefreshQuery(id, {
+    skip: !id,
+  });
+  const status = jobInfo?.status;
+  const params = jobInfo?.params;
+  const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
+  const completed =
+    (source === 'user' && status?.status === 'COMPLETED') ||
+    (source === 'public' && submitted);
 
-  // when retrieving queued result, update id in store
-  useEffect(() => {
-    if (id && !loading.active && !submitted && !projectID) {
-      if (type == 'queue') {
-        loadQueueResult(id);
-      } else if (type == 'example') {
-        loadExample(id);
-      }
-    }
-  }, [id, loading.active]);
+  const refreshState = useCallback(() => {
+    refreshJob();
+  }, [refreshJob]);
 
-  // get mapping of plots after retrieving projectID
-  useEffect(() => {
-    if (source == 'user') {
-      if (projectID && !Object.keys(svgList).length) {
-        getResults();
-      } else if (Object.keys(svgList).length && !signatureSetOptions.length) {
-        loadData();
+  // parse py script error message and return a user friendly message
+  function errorMessage() {
+    const error = status?.error;
+    if (error) {
+      if (error.includes('Error 2727')) {
+        return error;
+      } else {
+        return 'An error has occurred. Please review your inputs and try again.';
       }
     } else {
-      if (
-        Object.keys(svgList).length > 0 &&
-        !mutationalProfiles.filtered.length
-      )
-        mapPublicData();
+      return 'INTERNAL ERROR';
     }
-  }, [svgList, projectID]);
+  }
 
-  // reload summary information
-  async function getResults() {
-    const response = await fetch(`api/getResults`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ projectID: projectID }),
-    });
-
-    if (response.ok) {
-      const { svgList, statistics, matrixList, downloads } =
-        await response.json();
+  // refresh job status every minute
+  useEffect(() => {
+    const interval = setInterval(refreshState, 1000 * 60);
+    if (isDone || refreshError) clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [isDone, refreshError, refreshState]);
+  // switch to first tab when job is complete
+  useEffect(() => {
+    if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
       mergeState({
-        svgList: svgList,
-        statistics: statistics,
-        matrixList: matrixList,
-        downloads: downloads,
+        displayTab: 'profilerSummary',
+        openSidebar: false,
+        source: 'user',
       });
-    } else {
-      mergeError(await response.json());
-    }
-  }
-
-  // retrieve mapping of samples to plots from svgList file
-  async function loadData() {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Putting Data Into Session',
-        // showIndicator: true,
-      },
-    });
-
-    // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((d) => d.Sample_Name))];
-    const selectName = nameOptions[0];
-    const filteredPlots = svgList.filter(
-      (row) => row.Sample_Name == selectName
-    );
-
-    const filteredProfileOptions = [
-      ...new Set(
-        filteredPlots.map((row) => row.Profile_Type).sort((a, b) => a - b)
-      ),
-    ];
-
-    const profile = defaultProfile(filteredProfileOptions);
-
-    const filteredMatrixOptions = [
-      ...new Set(
-        filteredPlots
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
-      ),
-    ].sort((a, b) => a - b);
-
-    const matrix = defaultMatrix(profile, filteredMatrixOptions);
-
-    const filteredFilterOptions = [
-      ...new Set(
-        filteredPlots
-          .filter(
-            (row) => row.Profile_Type == profile && row.Matrix_Size == matrix
-          )
-          .map((row) => row.Filter)
-          .sort((a, b) => a - b)
-      ),
-    ];
-
-    const filter = defaultFilter(filteredFilterOptions);
-
-    const filteredMatrixList = [
-      ...new Set(
-        matrixList
-          .filter((row) => row.Profile_Type == profile)
-          .map((row) => row.Matrix_Size)
-          .sort((a, b) => a - b)
-      ),
-    ];
-
-    mergeMutationalProfiles({
-      filtered: filteredPlots,
-      nameOptions: nameOptions,
-      profileOptions: filteredProfileOptions,
-      matrixOptions: filteredMatrixOptions,
-      filterOptions: filteredFilterOptions,
-      selectName: selectName,
-      selectProfile: profile,
-      selectMatrix: matrix,
-      selectFilter: filter,
-    });
-
-    // Cosine Similarity - Profile Comparison - PCA - Kataegis
-    const sampleNameOptions = [
-      ...new Set(
-        svgList.map((row) => {
-          if (row.Filter != 'NA') return `${row.Sample_Name}@${row.Filter}`;
-          else return row.Sample_Name;
-        })
-      ),
-    ];
-    const profileOptions = [...new Set(svgList.map((row) => row.Profile_Type))];
-
-    const selectProfile = defaultProfile(profileOptions);
-    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
-
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixList,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
-
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: sampleNameOptions[0],
-      withinSampleName2: sampleNameOptions[1],
-      sampleOptions: sampleNameOptions,
-      refProfileType: selectProfile,
-      refSampleName: sampleNameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-      userSampleName: sampleNameOptions[0],
-    });
-
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-      userProfileType: selectProfile,
-      userMatrixSize: selectMatrix,
-      userMatrixOptions: filteredMatrixOptions,
-    });
-
-    mergeKataegis({
-      sample: sampleNameOptions[0],
-      sampleOptions: sampleNameOptions,
-    });
-
-    mergeState({
-      loading: {
-        active: false,
-      },
-      openSidebar: false,
-    });
-  }
-
-  // retrieve mapping of samples to plots from svgList file
-  async function mapPublicData() {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Putting Public Data Into Session',
-        // showIndicator: true,
-      },
-    });
-
-    // Mutational Profiles
-    const nameOptions = [...new Set(svgList.map((row) => row.Sample))];
-    const selectName = mutationalProfiles.selectName || nameOptions[0];
-    const profileOptions = [
-      ...new Set(svgList.map((row) => row.Profile.match(/[a-z]+/gi)[0])),
-    ];
-    const profile = defaultProfile(profileOptions);
-
-    const filteredMatrixOptions = [
-      ...new Set(
-        svgList
-          .filter(
-            (row) =>
-              row.Sample == selectName && row.Profile.indexOf(profile) > -1
-          )
-          .map(({ Profile }) => Profile.match(/\d+/gi)[0])
-      ),
-    ].sort((a, b) => a - b);
-
-    mergeState({ profileOptions: profileOptions });
-    // Cosine Similarity - Profile Comparison - PCA
-    const selectProfile = defaultProfile(profileOptions);
-    const selectMatrix = defaultMatrix(selectProfile, filteredMatrixOptions);
-
-    const { output: refSignatureSetOptions } = await (
-      await getRefSigOptions(selectProfile)
-    ).json();
-
-    mergeCosineSimilarity({
-      withinProfileType: selectProfile,
-      refProfileType: selectProfile,
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-      withinMatrixSize: selectMatrix,
-      withinMatrixOptions: filteredMatrixOptions,
-    });
-
-    mergeProfileComparison({
-      withinProfileType: selectProfile,
-      withinSampleName1: nameOptions[0],
-      withinSampleName2: nameOptions[1],
-      sampleOptions: nameOptions,
-      refProfileType: selectProfile,
-      refSampleName: nameOptions[0],
-      refSignatureSet: refSignatureSetOptions[0],
-      refSignatureSetOptions: refSignatureSetOptions,
-    });
-
-    mergePCA({
-      profileType: selectProfile,
-      signatureSet: refSignatureSetOptions[0],
-      signatureSetOptions: refSignatureSetOptions,
-    });
-
-    mergeState({
-      loading: {
-        active: false,
-      },
-      submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
-    });
-  }
-
-  function submitR(fn, args) {
-    return fetch(`api/visualizationWrapper`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ fn: fn, args: args, projectID: projectID }),
-    });
-  }
-
-  function getRefSigOptions(profileType) {
-    return fetch(`api/visualizationWrapper`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        fn: 'getReferenceSignatureSets',
-        args: { profileType: profileType },
-      }),
-    });
-  }
-
-  async function loadQueueResult(id) {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Loading Queued Result',
-        // showIndicator: true,
-      },
-    });
-    try {
-      const { args, visualization, timestamp } = await (
-        await fetch(`api/getQueueResults/${id}`)
-      ).json();
-      dispatch(actions.mergeVisualization(visualization));
-    } catch (error) {
-      mergeState({
-        queueExpired: true,
-      });
-    }
-    mergeState({
-      loading: { active: false },
-      submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
-    });
-  }
-
-  async function loadExample(id) {
-    mergeState({
-      loading: {
-        active: true,
-        // content: 'Loading Example',
-        // showIndicator: true,
-      },
-    });
-    try {
-      const { projectID, state: visualizationStore } = await (
-        await fetch(`api/getVisExample/${id}`)
-      ).json();
-      dispatch(
-        actions.mergeVisualization({
-          ...visualizationStore,
-          state: { ...visualizationStore.state, projectID: projectID },
-        })
-      );
-    } catch (error) {
-      mergeError(`Example: ${id} does not exist`);
-    }
-    mergeState({
-      loading: { active: false },
-      submitted: true,
-      displayTab: 'profilerSummary',
-      openSidebar: false,
-    });
-  }
+  }, [status]);
 
   const tabs = [
     {
       name: 'Instructions',
       id: 'instructions',
-      component: <Instructions />,
+      disabled: false,
     },
     {
       name: 'Profiler Summary',
       id: 'profilerSummary',
-      component: <ProfilerSummary submitR={(fn, args) => submitR(fn, args)} />,
+      disabled: !completed,
     },
     {
       name: 'Mutational Profiles',
       id: 'mutationalProfiles',
-      component: <MutationalProfiles />,
+      disabled: !completed,
+    },
+    {
+      name: 'Tree and Leaf',
+      id: 'treeAndLeaf',
+      disabled: !completed,
     },
     {
       name: 'Cosine Similarity',
       id: 'cosineSimilarity',
-      component: (
-        <CosineSimilarity
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
-    },
-    {
-      name: 'Mutational Pattern Enrichment Analysis',
-      id: 'mutationalPattern',
-      component: (
-        <MutationalPattern submitR={(fn, args) => submitR(fn, args)} />
-      ),
+      disabled: !completed,
     },
     {
       name: 'Profile Comparison',
       id: 'profileComparison',
-      component: (
-        <ProfileComparison
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      disabled: !completed,
     },
     {
       name: 'PCA',
       id: 'pca',
-      component: (
-        <PCA
-          getRefSigOptions={(profileType) => getRefSigOptions(profileType)}
-          submitR={(fn, args) => submitR(fn, args)}
-        />
-      ),
+      disabled: !completed,
     },
     {
-      name: 'Kataegis Identification',
-      id: 'kataegisIdentification',
-      component: <Kataegis submitR={(fn, args) => submitR(fn, args)} />,
+      name: 'Mutational Pattern Enrichment Analysis',
+      id: 'mutationalPattern',
+      disabled: !completed,
     },
-    {
-      name: 'Download',
-      id: 'download',
-      component: <Download />,
+
+    source == 'user' && {
+      name: 'Clustered Mutations Identification',
+      id: 'cluster',
+      disabled: !completed,
     },
+
+    // {
+    //   name: 'Download',
+    //   id: 'download',
+    //   component: <Download />,
+    // },
   ];
 
   return (
@@ -480,59 +156,69 @@ export default function Visualization({ match }) {
           {/* for desktops and tablets */}
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
-                  <Button
-                    variant="link"
-                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? 'active-secondary-navlinks' : ''
-                    }`}
-                    active={id == displayTab && submitted}
-                    disabled={id != 'instructions' && !submitted}
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: 'black',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
+              {tabs
+                .filter((e) => e)
+                .map(({ name, id, disabled }, i) => (
+                  <div key={name} className="d-inline-block">
+                    <Button
+                      variant="link"
+                      className={`secondary-navlinks px-3 py-1 d-inline-block border-0 text-exploration rounded-0 ${
+                        id === displayTab
+                          ? 'bg-visualization text-white'
+                          : 'text-visualization'
+                      }`}
+                      disabled={disabled}
+                      style={{
+                        textDecoration: 'none',
+                        fontSize: '12pt',
+                        color: '#3a7867',
+                        fontWeight: '500',
+                      }}
+                      onClick={() => mergeState({ displayTab: id })}
+                    >
+                      {name}
+                    </Button>
+                  </div>
+                ))}
             </Nav>
           </div>
+
           {/* for mobile devices */}
-          <div className="row d-md-none">
+          <div className="e d-md-none">
             <Nav defaultActiveKey="summary">
-              {tabs.map(({ name, id }) => (
-                <div key={id} className="col-12 text-center">
-                  <Button
-                    variant="link"
-                    className={
-                      id == displayTab && Object.keys(svgList).length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
-                    }
-                    style={{
-                      textDecoration: 'none',
-                      fontSize: '12pt',
-                      color: 'black',
-                      fontWeight: '500',
-                    }}
-                    onClick={() => mergeState({ displayTab: id })}
-                  >
-                    {name}
-                  </Button>
-                  <div className="d-md-none w-100"></div>
-                </div>
-              ))}
+              {tabs
+                .filter((e) => e)
+                .map(({ name, id, disabled }, i) => {
+                  if (name)
+                    return (
+                      <div key={name} className="col-12 text-center">
+                        <Button
+                          variant="link"
+                          className={
+                            id === displayTab
+                              ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-visualization text-white rounded-0'
+                              : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
+                          }
+                          disabled={disabled}
+                          style={{
+                            textDecoration: 'none',
+                            fontSize: '12pt',
+                            color: '#3a7867',
+                            fontWeight: '500',
+                          }}
+                          onClick={() => mergeState({ displayTab: id })}
+                        >
+                          {name}
+                        </Button>
+                        <div className="d-md-none w-100"></div>
+                      </div>
+                    );
+                })}
             </Nav>
           </div>
         </div>
       </div>
+
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}
@@ -589,21 +275,128 @@ export default function Visualization({ match }) {
           <hr className="d-lg-none" style={{ opacity: 0 }}></hr>
         </SidebarPanel>
         <MainPanel className="col-lg-9 col-md-7">
-          {queueExpired && (
-            <div className="bg-warning mb-3 p-3 border rounded">
-              <span>Queue results have expired</span>
+          {refreshError && <Alert variant="danger">Results expired</Alert>}
+          {status && status.status === 'SUBMITTED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your job has been submitted. You will receive an email once it
+                is complete.
+              </p>
             </div>
           )}
-          <div>
-            <LoadingOverlay
-              active={loading.active}
-              content={loading.content}
-              showIndicator={loading.showIndicator}
-            />
-            <div style={{ minHeight: '500px' }}>
-              {tabs.filter((tab) => tab.id == displayTab)[0].component}
+          {status && status.status === 'IN_PROGRESS' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>Your analysis is currently in progress.</p>
+              <LoadingOverlay active={true} />
             </div>
+          )}
+          {status && status.status === 'FAILED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                An error occurred during calculation:
+                <br />
+                {errorMessage()}
+                {source == 'user' && (
+                  <div>
+                    <Button
+                      download
+                      variant="link"
+                      className="p-0"
+                      href={`api/data/output/${id}/profiler_extraction_log.txt`}
+                    >
+                      Download Job Log
+                    </Button>
+                  </div>
+                )}
+                <br />
+                Please contact the site administrator for assistance if this
+                issue persists.
+              </p>
+            </div>
+          )}
+
+          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+            <Instructions />
           </div>
+          {completed && (
+            <>
+              <div
+                className={
+                  displayTab === 'profilerSummary' ? 'd-block' : 'd-none'
+                }
+              >
+                <ProfilerSummary
+                  state={{ ...publicForm, ...main, id, source }}
+                />
+              </div>
+              <div
+                className={
+                  displayTab === 'mutationalProfiles' ? 'd-block' : 'd-none'
+                }
+              >
+                <MutationalProfiles
+                  state={{
+                    ...publicForm,
+                    ...main,
+                    mutationalProfiles,
+                    id,
+                    source,
+                  }}
+                />
+              </div>
+              {displayTab === 'treeAndLeaf' && (
+                source === 'public' 
+                  ? <TreeAndLeaf state={{ ...publicForm, ...main, id, source }} /> 
+                  : <div className="container-fluid bg-white border rounded p-3 text-center">
+                      <Alert variant="warning">
+                        The Tree and Leaf plot does not currently support user-provided data.
+                      </Alert>
+                    </div>
+              )}
+              <div
+                className={
+                  displayTab === 'cosineSimilarity' ? 'd-block' : 'd-none'
+                }
+              >
+                <CosineSimilarity
+                  state={{ ...publicForm, ...main, id, source }}
+                />
+              </div>
+              <div
+                className={
+                  displayTab === 'profileComparison' ? 'd-block' : 'd-none'
+                }
+              >
+                <ProfileComparison
+                  state={{ ...publicForm, ...main, id, source }}
+                />
+              </div>
+              <div className={displayTab === 'pca' ? 'd-block' : 'd-none'}>
+                <PCA state={{ ...publicForm, ...main, id, source }} />
+              </div>
+              <div
+                className={
+                  displayTab === 'mutationalPattern' ? 'd-block' : 'd-none'
+                }
+              >
+                <MutationalPattern
+                  state={{ ...publicForm, ...main, id, source }}
+                />
+              </div>
+              {source == 'user' && (
+                <div
+                  className={displayTab === 'cluster' ? 'd-block' : 'd-none'}
+                >
+                  <ClusteredIdentification
+                    state={{ ...publicForm, ...main, params, id, source }}
+                  />
+                </div>
+              )}
+              <div className={displayTab === 'download' ? 'd-block' : 'd-none'}>
+                <Download state={{ ...publicForm, ...main, id, source }} />
+              </div>
+            </>
+          )}
         </MainPanel>
       </SidebarContainer>
     </div>

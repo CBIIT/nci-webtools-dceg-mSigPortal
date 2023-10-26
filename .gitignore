@@ -2,6 +2,9 @@
 /apache_logs
 /tmp
 /data
+node_modules
+/packages
+/src
 
 *.meta
 *.vs
@@ -10,6 +13,11 @@
 *-audit.json
 .DS_Store
 .eslintcache
+*.env
 
 mSigPortal_Profiler_Extraction.py
+mSigPortal-SigProfilerExtractor.py
 Sigvisualfunc.R
+config.json
+database/data
+.Rproj.user

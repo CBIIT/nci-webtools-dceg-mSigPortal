@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>mSigPortal Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    Dear mSigPortal User, <br />
+    <p>
+      The job you submitted to mSigPortal could not be processed due to an
+      error. Please ensure that any files or parameters provided are in the
+      correct format and resubmit your job. For further assistance, contact us
+      at NCImSigPortalWebAdmin@mail.nih.gov
+    </p>
+    <b>Job Information</b>
+    <ul style="list-style-type: none">
+      <li>Job Name: <%- jobName %></li>
+      <li>Submitted Time: <%- submittedAt %></li>
+      <li>Execution Time: <%- executionTime %> seconds</li>
+    </ul>
+
+    <b>Error:</b><br />
+    <pre><%= error %></pre>
+
+    <p>
+      Respectfully, <br />
+      mSigPortal Web Tool
+    </p>
+  </body>
+</html>

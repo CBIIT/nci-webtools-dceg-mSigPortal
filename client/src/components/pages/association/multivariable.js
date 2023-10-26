@@ -9,13 +9,13 @@ import {
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import Table from '../../controls/table/table';
 
 const actions = { ...associationActions, ...modalActions };
@@ -38,7 +38,7 @@ export default function Multivariable() {
     rsSet,
     cancer,
     assocTable,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const multivariable = useSelector((state) => state.association.multivariable);
   const {
@@ -46,7 +46,7 @@ export default function Multivariable() {
     loadingCalculate,
     loadingRecalculate,
     error,
-    projectID,
+    id,
     plotPath,
     dataPath,
     assocTablePath,
@@ -130,7 +130,11 @@ export default function Multivariable() {
     if (!dupeIndexes.length && !invalidFilters.length) {
       mergeState({ loadingParams: true, error: false });
       try {
-        const { stdout, output: collapseData } = await (
+        const {
+          sessionId,
+          stdout,
+          output: collapseData,
+        } = await (
           await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -170,6 +174,7 @@ export default function Multivariable() {
             collapseOptions: Array.isArray(collapseData[i + 1])
               ? collapseData[i + 1]
               : [],
+            id: sessionId,
           })),
           // exposureVar: { name: expVarList[0] },
         });
@@ -196,7 +201,7 @@ export default function Multivariable() {
           collapseOptions: [],
         },
       ],
-      projectID: '',
+      id: '',
       plotPath: '',
       dataPath: '',
       assocTablePath: '',
@@ -222,11 +227,7 @@ export default function Multivariable() {
         dataPath: '',
       });
       try {
-        const {
-          projectID: id,
-          stdout,
-          output,
-        } = await (
+        const { sessionId, stdout, output } = await (
           await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -235,14 +236,14 @@ export default function Multivariable() {
             },
             body: JSON.stringify({
               fn: 'multivariable',
-              projectID,
+              id,
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
-                testType,
-                signature,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
+                testType: testType,
+                signature: signature,
                 xlab: xlab || associationVars.name,
                 ylab: ylab || exposureVar.name,
                 associationVars: associationVars.map(
@@ -273,12 +274,21 @@ export default function Multivariable() {
           error,
           uncaughtError,
         } = output;
-
+        if (signatureOptions) {
+          signatureOptions.sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true })
+          );
+        }
         if (error || uncaughtError) {
-          mergeState({ error: error || uncaughtError });
+          mergeState({
+            error:
+              error ||
+              uncaughtError ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
         } else {
           mergeState({
-            projectID: id,
+            id,
             plotPath,
             dataPath,
             assocTablePath,
@@ -353,7 +363,7 @@ export default function Multivariable() {
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}
           downloadName="Download Variable Data"
-          downloadLink={projectID + assocFullDataPath}
+          downloadLink={assocFullDataPath}
           mergeState={(e) =>
             dispatch(
               actions.mergeAssociation({ association: { assocTable: e } })
@@ -377,6 +387,10 @@ export default function Multivariable() {
                 mergeState({ associationVars: newParams });
               }}
               remove={index != 0 ? () => removeParam(index) : false}
+              add={
+                index == associationVars.length - 1 ? () => addParam() : false
+              }
+              warnLimit={warnLimit}
               duplicates={warnDupe}
               invalidFilter={invalidAssocFilter.indexOf(index) >= 0}
             />
@@ -386,38 +400,20 @@ export default function Multivariable() {
             className="mx-auto mt-3 justify-content-between"
             style={{ maxWidth: '1720px' }}
           >
-            <Col md="auto" className="d-flex">
-              <OverlayTrigger
-                show={warnLimit}
-                placement="bottom"
-                overlay={
-                  <Popover>
-                    <Popover.Content className="text-danger">
-                      You may only add up to 10 variables
-                    </Popover.Content>
-                  </Popover>
+            <Col md="auto" lg="auto">
+              <CustomSelect
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  resultsTable.data.length
                 }
-              >
-                <Button
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    associationVars[0].name
-                  }
-                  variant="link"
-                  onClick={() => addParam()}
-                  title="Add Plot"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <span
-                    className="text-nowrap"
-                    title="Add Association Variable"
-                  >
-                    <FontAwesomeIcon icon={faPlus} /> Add Association Variable
-                  </span>
-                </Button>
-              </OverlayTrigger>
+                id="expVariable"
+                label="Signature Exposure Variable"
+                value={exposureVar.name}
+                options={expVarList}
+                onChange={(e) => mergeState({ exposureVar: { name: e } })}
+              />
             </Col>
             <Col md="auto">
               {warnDupe.length > 0 && (
@@ -462,21 +458,6 @@ export default function Multivariable() {
               Select the following filtering and method for analysis
             </p>
             <Row className="justify-content-center">
-              <Col md="auto" lg="auto">
-                <Select
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    resultsTable.data.length
-                  }
-                  id="expVariable"
-                  label="Signature Exposure Variable"
-                  value={exposureVar.name}
-                  options={expVarList}
-                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
-                />
-              </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">
@@ -585,7 +566,7 @@ export default function Multivariable() {
                       </Group>
                     </Col>
                     {/* <Col md="3">
-                      <Select
+                      <CustomSelect
                         disabled={
                           loadingData ||
                           loadingParams ||
@@ -611,7 +592,7 @@ export default function Multivariable() {
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">Method</legend>
-                  <Select
+                  <CustomSelect
                     className="mb-0"
                     disabled={
                       loadingData ||
@@ -682,7 +663,7 @@ export default function Multivariable() {
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
                   downloadName="Download Association Result"
-                  downloadLink={projectID + assocTablePath}
+                  downloadLink={id + assocTablePath}
                   mergeState={async (e) =>
                     await mergeState({ resultsTable: { ...e } })
                   }
@@ -693,7 +674,7 @@ export default function Multivariable() {
               </p>
               <Row className="justify-content-center">
                 <Col md="auto">
-                  <Select
+                  <CustomSelect
                     disabled={loadingData || loadingParams || loadingCalculate}
                     id="signature"
                     label="Signature Name"
@@ -705,11 +686,11 @@ export default function Multivariable() {
               </Row>
               <LoadingOverlay active={loadingRecalculate} />
               {plotPath && (
-                <Plot
+                <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${plotPath}`}
-                  txtPath={`api/results/${dataPath}`}
+                  plotPath={`api/data/${plotPath}`}
+                  txtPath={`api/data/${dataPath}`}
                   height="800px"
                 />
               )}

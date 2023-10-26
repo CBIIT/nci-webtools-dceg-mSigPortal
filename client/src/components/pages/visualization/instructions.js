@@ -1,7 +1,19 @@
-import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { useExampleHeaderQuery } from './userForm/apiSlice';
 
-export default function Instructions({ loading }) {
+export default function Instructions() {
+  const { inputFormat } = useSelector((state) => state.visualization.userForm);
+  const { source } = useSelector((state) => state.visualization.main);
+
+  // get file header from example input files
+  const { data, error } = useExampleHeaderQuery(
+    inputFormat.value.toUpperCase(),
+    {
+      skip: !inputFormat?.value,
+    }
+  );
+
   const examples = [
     { title: 'VCF Example of User Input', path: 'vcfExample' },
     { title: 'Sherlock-Lung-232', path: 'sherlock-lung-232' },
@@ -34,15 +46,16 @@ export default function Instructions({ loading }) {
       <h4>Data Source</h4>
       <p>Public: Perform analysis using data available on the website</p>
       <p>User: Upload your own data</p>
-      <hr />
+      {/* <hr />
       <h4>Example Queries</h4>
       <p>
         Choose an example query to view results for pre-selected parameters. You
         must reset between queries.
       </p>
-      {examples.map(({ title, external, path }, index) => (
+      TBA */}
+      {/* {examples.map(({ title, external, path }, index) => (
         <div key={index}>
-          <Link to={`/visualization/example/${path}`} disabled>
+          <Link to={`/visualization/example/${path}`}>
             <span className="sr-only">{title + ' link'}</span>
             {title}
           </Link>
@@ -55,7 +68,19 @@ export default function Instructions({ loading }) {
             </span>
           )}
         </div>
-      ))}
+      ))} */}
+      {source == 'user' && (
+        <>
+          <hr />
+          <h4>Examples of file header for each supported format</h4>
+          <p>
+            Choose different file formats under <b>Data Source: User</b> to view
+            different examples of file headers
+          </p>
+          <b>{inputFormat.label}</b>
+          <pre className="border rounded bg-light p-3">{data}</pre>
+        </>
+      )}
     </div>
   );
 }

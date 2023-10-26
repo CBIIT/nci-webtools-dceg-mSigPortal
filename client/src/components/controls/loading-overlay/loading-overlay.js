@@ -58,25 +58,24 @@ export const LoadingOverlay = (props) => {
   const loaderNode = useRef(null);
   useNonStaticParent(overlayNode);
   useAbsoluteCenteredPositioning(loaderNode);
-  return (
-    props.active && (
-      <div
-        data-testid="LoadingOverlay"
-        ref={overlayNode}
-        style={{ ...overlayStyle, ...props.overlayStyle }}
-        {...props.overlayProps}
-      >
-        {!props.showIndicator && (
-          <div style={{ visibility: 'hidden' }} ref={loaderNode}>
-            {(props.loader || DefaultLoader)(props)}
-          </div>
-        )}
-        {props.showIndicator && (
-          <div style={{ visibility: 'hidden' }} ref={loaderNode}>
-            {IndicatorLoader(props)}
-          </div>
-        )}
-      </div>
-    )
-  );
+
+  return props.active ? (
+    <div
+      data-testid="LoadingOverlay"
+      ref={overlayNode}
+      style={{ ...overlayStyle, ...props.overlayStyle }}
+      {...props.overlayProps}
+    >
+      {!props.showIndicator && (
+        <div style={{ visibility: 'hidden' }} ref={loaderNode}>
+          {(props.loader || DefaultLoader)(props)}
+        </div>
+      )}
+      {props.showIndicator && (
+        <div style={{ visibility: 'hidden' }} ref={loaderNode}>
+          {IndicatorLoader(props)}
+        </div>
+      )}
+    </div>
+  ) : null;
 };

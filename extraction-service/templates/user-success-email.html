@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>mSigPortal Extraction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    Dear mSigPortal User, <br />
+    <p>The job you submitted to mSigPortal has been processed successfully.</p>
+    <b>Job Information</b>
+    <ul style="list-style-type: none">
+      <li>Job Name: <%- jobName %></li>
+      <li>Submitted Time: <%- submittedAt %></li>
+      <li>Execution Time: <%- executionTime %> seconds</li>
+    </ul>
+
+    <b>Results:</b><br />
+    <a href="<%= resultsUrl %>"><%= resultsUrl %></a>
+
+    <p>Your results will be available for the next two weeks.</p>
+    <p>
+      Please contact us at NCImSigPortalWebAdmin@mail.nih.gov for more information
+      or if you have any questions.
+    </p>
+
+    <p>
+      Respectfully, <br />
+      mSigPortal Web Tool
+    </p>
+  </body>
+</html>

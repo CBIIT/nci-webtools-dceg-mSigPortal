@@ -2,7 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
 export const getInitialState = () => ({
-  associationState: {
+  publicForm: {
+    study: '',
+    strategy: '',
+    signatureSet: '',
+    cancer: '',
+  },
+  userForm: {},
+  main: {
     displayTab: 'instructions',
     openSidebar: true,
     loadingData: false,
@@ -35,7 +42,7 @@ export const getInitialState = () => ({
     submitted: false,
     error: false,
     loadedParameters: false,
-    projectID: '',
+    id: '',
     plotPath: '',
     dataPath: '',
     assocTablePath: '',
@@ -80,7 +87,7 @@ export const getInitialState = () => ({
     submitted: false,
     error: false,
     loadedParameters: false,
-    projectID: '',
+    id: '',
     plotPath: '',
     dataPath: '',
     assocTablePath: '',

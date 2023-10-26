@@ -9,7 +9,7 @@ import Instructions from '../association/instructions';
 import Univariable from './univariable';
 import Multivariable from './multivariable';
 // import UserForm from './userForm';
-import PublicForm from './publicForm';
+import PublicForm from './publicForm/publicForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -21,7 +21,7 @@ const { Group, Label, Check } = Form;
 export default function Association() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ associationState: state }));
+    await dispatch(actions.mergeAssociation({ main: state }));
 
   const {
     displayTab,
@@ -30,7 +30,7 @@ export default function Association() {
     expVarList,
     source,
     loadingData,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const tabs = [
     {
@@ -54,11 +54,11 @@ export default function Association() {
           <div className="d-none d-md-block">
             <Nav defaultActiveKey="profilerSummary">
               {tabs.map(({ name, id }) => (
-                <div key={id} className="d-inline-block">
+                <div key={id} className="d-inline-block ">
                   <Button
                     variant="link"
-                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 ${
-                      id == displayTab ? 'active-secondary-navlinks' : ''
+                    className={`secondary-navlinks px-3 py-1 d-inline-block border-0 association rounded-0 ${
+                      id == displayTab ? 'bg-association text-white' : ''
                     }`}
                     active={id == displayTab && submitted}
                     disabled={
@@ -67,7 +67,7 @@ export default function Association() {
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      color: '#b83d47',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
@@ -78,6 +78,7 @@ export default function Association() {
               ))}
             </Nav>
           </div>
+
           {/* for mobile devices */}
           <div className="row d-md-none">
             <Nav defaultActiveKey="summary">
@@ -87,13 +88,13 @@ export default function Association() {
                     variant="link"
                     className={
                       id == displayTab && Object.keys(expVarList).length
-                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 active-secondary-navlinks'
-                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0'
+                        ? 'secondary-navlinks px-3 py-1 d-inline-block border-0 bg-association text-white rounded-0'
+                        : 'secondary-navlinks px-3 py-1 d-inline-block border-0 rounded-0'
                     }
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: 'black',
+                      color: '#b83d47',
                       fontWeight: '500',
                     }}
                     onClick={() => mergeState({ displayTab: id })}
@@ -107,6 +108,7 @@ export default function Association() {
           </div>
         </div>
       </div>
+
       <SidebarContainer
         className="m-3"
         collapsed={!openSidebar}

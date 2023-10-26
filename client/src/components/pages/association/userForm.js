@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
@@ -13,7 +13,7 @@ const { Group } = Form;
 export default function UserForm() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    await dispatch(actions.mergeAssociation({ associationState: state }));
+    await dispatch(actions.mergeAssociation({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetAssociation = (_) => dispatch(actions.resetAssociation());
@@ -31,7 +31,7 @@ export default function UserForm() {
     strategy,
     cancer,
     rsSet,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   // populate controls on inital render
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function UserForm() {
             .filter((data) => data.Study == study && data.Dataset == strategy)
             .map((data) => data.Cancer_Type)
         ),
-      ];
+      ].sort();
       const cancer = 'Lung-AdenoCA'; // default
 
       mergeState({
@@ -205,9 +205,10 @@ export default function UserForm() {
       ...new Set(
         exposureSignature
           .filter((data) => data.Study == study && data.Dataset == strategy)
+
           .map((data) => data.Cancer_Type)
       ),
-    ];
+    ].sort();
 
     handleSet(rsSet);
 
@@ -240,7 +241,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="expStudyPublic"
               label="Study"
@@ -254,7 +255,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="tumorStrategy"
               label="Experimental Strategy"
@@ -268,7 +269,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               disabled={loadingData || submitted}
               id="expSetPublic"
               label="Reference Signature Set"
@@ -282,7 +283,7 @@ export default function UserForm() {
       <Row>
         <Col>
           <Group>
-            <Select
+            <CustomSelect
               className="mb-4"
               disabled={loadingData || submitted}
               id="prevalenceCancerType"

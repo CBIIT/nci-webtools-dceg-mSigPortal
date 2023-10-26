@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Button, Modal } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Row, Col, Button } from 'react-bootstrap';
+import axios from 'axios';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import { getJSON } from '../../../services/utils';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group } = Form;
@@ -13,7 +13,7 @@ const { Group } = Form;
 export default function PublicForm() {
   const dispatch = useDispatch();
   const mergeState = async (state) =>
-    dispatch(actions.mergeAssociation({ associationState: state }));
+    dispatch(actions.mergeAssociation({ main: state }));
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
   const resetAssociation = (_) => dispatch(actions.resetAssociation());
@@ -31,9 +31,7 @@ export default function PublicForm() {
     strategy,
     cancer,
     rsSet,
-  } = useSelector((state) => state.association.associationState);
-
-  const [missingModal, setMissing] = useState(false);
+  } = useSelector((state) => state.association.main);
 
   // populate controls on inital render
   useEffect(() => {
@@ -45,12 +43,25 @@ export default function PublicForm() {
     mergeState({ loadingData: true });
 
     try {
-      const exposureSignature = await getJSON(
-        'Others/json/Exploring-Exposure.json'
-      );
+      const { data: exposureSignature } = await axios.post('api/getFileS3', {
+        path: 'Others/json/Exploring-Exposure.json',
+      });
+
+      // hide unavailable studies
+      const hideStudies = [
+        'Breast560',
+        'Breast80',
+        'LCM-Normal-Tissues',
+        'Mutographs-ESCC',
+        'non-PCAWG',
+      ];
 
       const studyOptions = [
-        ...new Set(exposureSignature.map((data) => data.Study)),
+        ...new Set(
+          exposureSignature
+            .map((data) => data.Study)
+            .filter((study) => hideStudies.indexOf(study) == -1)
+        ),
       ];
       const study = 'PCAWG'; // default
 
@@ -78,7 +89,7 @@ export default function PublicForm() {
             .filter((data) => data.Study == study && data.Dataset == strategy)
             .map((data) => data.Cancer_Type)
         ),
-      ];
+      ].sort();
       const cancer = 'Panc-AdenoCA'; // default
 
       mergeState({
@@ -105,71 +116,47 @@ export default function PublicForm() {
   }
 
   async function handleLoadData() {
-    // tempoary - display warning for missing or incomplete studies
-    if (study == 'Mutographs-ESCC') {
-      setMissing(true);
-      mergeState({ submitted: true });
-    } else {
-      const getAssocVarData = async () =>
-        (
-          await fetch(`api/associationWrapper`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              fn: 'getAssocVarData',
-              args: { study, cancer },
-            }),
-          })
-        ).json();
-      const getExpVarData = async () =>
-        (
-          await fetch(`api/associationWrapper`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              fn: 'getExpVarData',
-              args: { study, strategy, rsSet, cancer },
-            }),
-          })
-        ).json();
+    const getAssocVarData = () =>
+      axios
+        .post('api/associationWrapper', {
+          fn: 'getAssocVarData',
+          args: { study, strategy, rsSet, cancer },
+        })
+        .then(({ data }) => data);
 
-      mergeState({ loadingData: true });
-      try {
-        const [assocResponse, expResponse] = await Promise.all([
-          getAssocVarData(),
-          getExpVarData(),
-        ]);
+    const getExpVarData = () =>
+      axios
+        .post('api/associationWrapper', {
+          fn: 'getExpVarData',
+          args: { study, strategy, rsSet, cancer },
+        })
+        .then(({ data }) => data);
+    mergeState({ loadingData: true });
+    try {
+      const [assocResponse, expResponse] = await Promise.all([
+        getAssocVarData(),
+        getExpVarData(),
+      ]);
 
-        const {
-          projectID,
-          output: assocOutput,
-          uncaughtError: assocError,
-        } = assocResponse;
-        const { output: expOutput, uncaughtError: expError } = expResponse;
+      const { id, output: assocOutput } = assocResponse;
+      const { output: expOutput } = expResponse;
 
-        if (assocError) throw assocError;
-        if (expError) throw expError;
+      if (assocOutput.uncaughtError) throw assocOutput.uncaughtError;
+      if (expOutput.uncaughtError) throw expOutput.uncaughtError;
 
-        mergeState({
-          submitted: true,
-          assocVarData: assocOutput.assocVarData,
-          assocFullDataPath: assocOutput.fullDataPath,
-          expVarList: expOutput.expVarList,
-          displayTab: 'univariable',
-          openSidebar: false,
-        });
-        dispatch(actions.mergeAssociation({ univariable: { projectID } }));
-      } catch (error) {
-        mergeError(error);
-      }
-      mergeState({ loadingData: false });
+      mergeState({
+        submitted: true,
+        assocVarData: assocOutput.assocVarData,
+        assocFullDataPath: assocOutput.fullDataPath,
+        expVarList: expOutput.expVarList,
+        displayTab: 'univariable',
+        openSidebar: false,
+      });
+      dispatch(actions.mergeAssociation({ univariable: { id } }));
+    } catch (error) {
+      mergeError(error);
     }
+    mergeState({ loadingData: false });
   }
 
   function handleStudy(study) {
@@ -247,34 +234,12 @@ export default function PublicForm() {
 
   return (
     <>
-      <Modal
-        data-testid="missingModal"
-        show={missingModal}
-        onHide={() => setMissing(false)}
-      >
-        <Modal.Body style={{ backgroundColor: '#fafafa' }}>
-          <p>Selected data is currently unavailable.</p>
-          <p>
-            {`${study}-${rsSet}-${cancer} will be added in a future release.`}
-          </p>
-        </Modal.Body>
-
-        <Modal.Footer
-          className="d-flex justify-content-center border-0"
-          style={{ backgroundColor: '#fafafa' }}
-        >
-          <Button variant="outline-secondary" onClick={() => setMissing(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
       <Form>
         <LoadingOverlay active={!studyOptions.length} />
         <Row>
           <Col>
             <Group>
-              <Select
+              <CustomSelect
                 disabled={loadingData || submitted}
                 id="expStudyPublic"
                 label="Study"
@@ -288,7 +253,7 @@ export default function PublicForm() {
         <Row>
           <Col>
             <Group>
-              <Select
+              <CustomSelect
                 disabled={loadingData || submitted}
                 id="tumorStrategy"
                 label="Experimental Strategy"
@@ -302,7 +267,7 @@ export default function PublicForm() {
         <Row>
           <Col>
             <Group>
-              <Select
+              <CustomSelect
                 disabled={loadingData || submitted}
                 id="expSetPublic"
                 label="Reference Signature Set"
@@ -316,7 +281,7 @@ export default function PublicForm() {
         <Row>
           <Col>
             <Group>
-              <Select
+              <CustomSelect
                 className="mb-4"
                 disabled={loadingData || submitted}
                 id="prevalenceCancerType"

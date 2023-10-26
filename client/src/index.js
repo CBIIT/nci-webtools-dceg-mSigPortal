@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import { store } from './services/store';
 import './index.scss';
 import 'font-awesome/css/font-awesome.min.css';
+import '@fontsource/montserrat';
+import '@fontsource/inter';
 
 ReactDOM.render(
   <Provider store={store}>

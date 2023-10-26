@@ -5,6 +5,39 @@ div.sigIcon {
   cursor: pointer;
   margin: auto;
   border-color: steelblue !important;
+  height: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  @media (max-width: 576px) {
+  }
+
+  @media (max-width: 768px) {
+    height: 7rem; /* Adjust this value for smaller screens */
+  }
+
+  @media (max-width: 992px) {
+    height: 8.5rem; /* Adjust this value for larger screens */
+  }
+  @media (min-width: 1200px) {
+    height: 7rem; /* Adjust this value for extra-large screens */
+  }
+
+  @media (min-width: 1440px) {
+    height: 9rem; /* Adjust this value for larger extra-large screens */
+  }
+
+  @media (min-width: 2000px) {
+    height: 10rem; /* Adjust this value for larger extra-large screens */
+  }
+  @media (min-width: 3000px) {
+    height: 14rem; /* Adjust this value for larger extra-large screens */
+  }
+
+  @media (min-width: 4000px) {
+    height: 17rem; /* Adjust this value for larger extra-large screens */
+  }
 
   &:hover {
     border: 1px solid steelblue !important;
@@ -30,6 +63,7 @@ div.sigIcon {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.25rem;
+    margin: 0 auto; /* Center the text horizontally */
   }
 }
 

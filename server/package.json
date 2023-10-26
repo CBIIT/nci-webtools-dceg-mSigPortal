@@ -3,34 +3,54 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node msigportal-server.js",
-    "start-queue-worker": "node queue-worker.js",
+    "start": "pm2-runtime start pm2.config.json --only prod",
+    "start:dev": "pm2-runtime start pm2.config.json --only dev",
+    "start:debug": "node -r dotenv/config server.js",
+    "start-queue-worker": "node  -r dotenv/config  queue-worker.js",
+    "start-extraction-worker": "node  -r dotenv/config extraction-worker.js",
     "build": "npm run format",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --single-quote --write \"**/*.{js,json}\""
+    "format": "prettier --write \"**/*.{js,json}\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1006.0",
+    "@aws-sdk/client-batch": "^3.319.0",
+    "@aws-sdk/client-ecs": "^3.301.0",
+    "@aws-sdk/client-s3": "^3.271.0",
+    "archiver": "^6.0.0",
+    "better-sqlite3": "^8.1.0",
     "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "csv-stringify": "^6.3.4",
+    "dotenv": "^16.0.3",
+    "execa": "^7.1.1",
     "express": "^4.17.1",
-    "formidable": "^1.2.2",
-    "fs-extra": "^10.0.0",
-    "glob": "^7.2.0",
+    "express-promise-router": "^4.1.1",
+    "express-validator": "^7.0.1",
+    "form-data": "^4.0.0",
+    "formidable": "^3.2.5",
+    "fs-extra": "^11.1.1",
+    "knex": "^2.1.0",
+    "lodash-es": "^4.17.21",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.7.0",
-    "papaparse": "^5.3.1",
-    "promisify-child-process": "^4.1.1",
+    "papaparse": "^5.4.1",
+    "pg": "^8.7.3",
+    "pm2": "^5.3.0",
     "r-wrapper": "^1.1.2",
-    "replace-in-file": "^6.2.0",
-    "tar": "^6.1.11",
+    "uninstall": "^0.0.0",
     "uuid": "^8.3.2",
+    "validator": "^13.9.0",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.5",
-    "xlsx": "^0.17.2"
+    "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
     "prettier": "^2.4.1"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }

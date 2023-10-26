@@ -1,0 +1,10 @@
+#!/bin/bash
+set -ex
+
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_cancer_specific_signatures_2022.json' CancerSpecificSignatures_2022 Etiology/Etiology_cancer_specific_signatures_2022.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_cancer_specific_signatures.json' CancerSpecificSignatures Etiology/Etiology_cancer_specific_signatures.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_cosmic.json' Cosmic Etiology/Etiology_cosmic.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_enviromental_mutagenesis.json' EnviromentalMutagenesis Etiology/Etiology_enviromental_mutagenesis.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_gene_edits.json' GeneEdits Etiology/Etiology_gene_edits.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_cancer_therapies.json' CancerTherapies Etiology/Etiology_cancer_therapies.csv
+Rscript exportEtiologyCsvNormalized.R 'Etiology/Etiology_others.json' Others Etiology/Etiology_others.csv

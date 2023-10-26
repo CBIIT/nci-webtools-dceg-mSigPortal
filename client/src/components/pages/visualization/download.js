@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { saveAs } from 'file-saver';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../../services/store/modal';
@@ -15,10 +16,10 @@ export default function Download() {
     study,
     experimentalStrategy,
     cancerType,
-    projectID,
+    id,
     downloads,
     statistics,
-  } = visualization.state;
+  } = visualization.main;
 
   const [downloading, setDownload] = useState([]);
   const [downloadingWorkspace, setWorkspace] = useState(false);
@@ -26,20 +27,13 @@ export default function Download() {
   async function downloadOutput(file) {
     setDownload((downloading) => [...downloading, file]);
     const response = await fetch(
-      `api/visualization/download?id=${projectID}&file=${file}`
+      `api/visualization/download?id=${id}&file=${file}`
     );
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute(
-        'download',
+      saveAs(
+        await response.blob(),
         file.split('/')[file.split('/').length - 1]
       );
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
     } else {
       mergeError(`${file} is not available`);
     }
@@ -57,7 +51,7 @@ export default function Download() {
       body: JSON.stringify({
         fn: 'downloadPublicData',
         args: {
-          id: projectID,
+          id,
           study: study,
           cancerType: cancerType,
           experimentalStrategy: experimentalStrategy,
@@ -66,17 +60,10 @@ export default function Download() {
     });
 
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute(
-        'download',
-        `msigportal-${study}-${cancerType}-${experimentalStrategy}`
+      saveAs(
+        await response.blob(),
+        `msigportal-${study}-${cancerType}-${experimentalStrategy}.tar.gz`
       );
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
     } else {
       mergeError(`public data is not available`);
     }
@@ -95,7 +82,7 @@ export default function Download() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: projectID,
+        id,
         state: {
           visualization: {
             ...rest,
@@ -111,16 +98,11 @@ export default function Download() {
     });
 
     if (response.ok) {
-      const objectURL = URL.createObjectURL(await response.blob());
-      const tempLink = document.createElement('a');
-
-      tempLink.href = `${objectURL}`;
-      tempLink.setAttribute('download', `msigportal-workspace.tgz`);
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
+      saveAs(await response.blob(), 'visualization-workspace.zip');
     } else {
-      mergeError(`error`);
+      mergeError(
+        `error - Please calculate Cosine Similarity tab before attempt to download the workspace`
+      );
     }
     setWorkspace(false);
   }

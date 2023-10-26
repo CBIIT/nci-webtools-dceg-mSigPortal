@@ -1,0 +1,18 @@
+{
+  "apps": [
+    {
+      "name": "prod",
+      "script": "server.js",
+      "node_args": "--require dotenv/config --max-old-space-size=16384",
+      "exec_mode": "cluster",
+      "instances": "max"
+    },
+    {
+      "name": "dev",
+      "script": "server.js",
+      "node_args": "--require dotenv/config --max-old-space-size=2048",
+      "watch": ["."],
+      "ignore_watch": ["node_modules", "tmp", "logs"]
+    }
+  ]
+}

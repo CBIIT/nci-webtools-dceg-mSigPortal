@@ -1,30 +1,29 @@
-FROM ${FRONTEND_BASE_IMAGE:-quay.io/centos/centos:stream8}
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
-    && dnf -y install \
-    dnf-plugins-core \
-    epel-release \
-    glibc-langpack-en \
-    && dnf -y module enable nodejs:14 \
     && dnf -y install \
     gcc-c++ \
     httpd \
     make \
     nodejs \
+    npm \
     && dnf clean all
 
-RUN mkdir /client
+RUN mkdir -p /app/client
 
-WORKDIR /client
+WORKDIR /app/client
 
-COPY client/package*.json /client/
+COPY client/package.json /app/client/
 
 RUN npm install
 
-COPY client /client/
+ARG CACHE_BUST
+COPY client /app/client/
 
-RUN npm run build \
-    && mv /client/build /var/www/html/mutational-signatures
+RUN npm run build
+
+RUN mkdir -p /var/www/html/mutational-signatures \
+    && cp -r /app/client/build/* /var/www/html/mutational-signatures
 
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
@@ -34,8 +33,11 @@ WORKDIR /var/www/html
 EXPOSE 80
 EXPOSE 443
 
+ENV SERVER_TIMEOUT=900
+
 CMD rm -rf /run/httpd/* /tmp/httpd* \
-    && exec /usr/sbin/apachectl -DFOREGROUND
+    && exec /usr/sbin/httpd -DFOREGROUND
+
 
 # docker build -t msigportal-frontend -f frontend.dockerfile ~/Projects/msigportal/
 # docker run -d -p 8331:80 --name msigportal-frontend msigportal-frontend

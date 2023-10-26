@@ -1,19 +1,21 @@
-import React, { useEffect } from 'react';
-import { HashRouter as Router, Route } from 'react-router-dom';
-import { Navbar } from './controls/navbar/navbar';
+import { RecoilRoot } from 'recoil';
+import { HashRouter, Switch, Route } from 'react-router-dom';
+import { NavbarCustom } from './controls/navbar/navbar';
 import Home from './pages/home/home';
 import About from './pages/about/about';
 import Visualization from './pages/visualization/visualization';
 import Catalog from './pages/catalog/catalog';
-import Exposure from './pages/exposure/exposure';
+import Exploration from './pages/exploration/exploration';
 import Refitting from './pages/refitting/refitting';
 import Association from './pages/association/association';
+import Extraction from './pages/extraction/extraction';
 import Publications from './pages/publications/publications';
 import Faq from './pages/faq/faq';
+import APIAccess from './pages/apiAccess/apiAccess';
+import { Header } from './controls/header/header';
+import { Footer } from './controls/footer/footer';
 import { ErrorModal } from './controls/error-modal/error-modal';
 import { SuccessModal } from './controls/success-modal/success-modal';
-import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../services/store/publications';
 
 export default function App() {
   const links = [
@@ -21,38 +23,66 @@ export default function App() {
       route: '/catalog',
       action: 'Catalog',
       title: 'Catalog',
+      cardId: 'Catalog',
+      name: 'catalog',
       cardTitle: 'Signature Catalog',
       cardText: 'Signature Catalog',
       description:
-        'Comprehensively exploring curated census of mutational signatures from scientific literature, currently including COSMIC mutational signatures, environmental mutagenesis, DNA repair gene edits, cancer specific signatures and others. In addition, it allows users to visualize, compare and download  these reference signatures.',
-      image: 'assets/images/catalog.svg',
+        'All existing human and mouse signatures based on different genome builds and algorithm versions.',
+      image: 'assets/images/Catalog-Icon.svg',
       navIndex: 0,
-      color: '#009192', // turquoise
+      color: '#4b833a',
+      showHomepage: true,
+      about: '/about#catalog',
     },
 
     {
       route: '/visualization',
       action: 'Visualization',
       title: 'Visualization',
+      cardId: 'Visualization',
+      name: 'visualization',
       cardTitle: 'Signature Visualization',
       cardText: 'Visualize mutational profiles',
       description:
-        'Interactively visualizing and analyzing mutational profiles at the sample level from both user input (formats supported include VCF, MAF, CSV, TXT, catalog, etc) and collected cancer genomic studies from scientific literature. It allows users to perform a wide range of analyses including cosine similarity, enrichment analysis, mutational profile comparison, and principal components analysis for all different types of mutational profiles including SBS, INDEL, DBS, SV, and CNV. Kataegis identification is also supported for VCF input format. With respect to user input, all visualizations and analyses can be performed across different provided groups of assigned mutations in the same sample (such as clustered mutations vs. non-clustered mutations; nonsynonymous mutations vs. other mutations, etc).',
-      image: 'assets/images/visualize.png',
+        'Allow identification of signature features at sample level and discovery of new signatures.',
+      image: 'assets/images/Visualization-Icon.svg',
       navIndex: 1,
-      color: '#fc8701', // orange
+      color: '#2c5b4e',
+      showHomepage: true,
+      about: '/about#visualization',
+    },
+    {
+      route: '/extraction',
+      action: 'Extraction',
+      title: 'Extraction',
+      cardId: 'Extraction',
+      name: 'extraction',
+      cardTitle: 'Signature Extraction',
+      cardText: 'Extraction mutational profiles',
+      description:
+        'Extract and compare mutational signatures using state-of-the-art algorithms.',
+      image: 'assets/images/Extraction-Icon.svg',
+      navIndex: 2,
+      color: '#2f4a64',
+      showHomepage: true,
+      about: '/about#extraction',
     },
     {
       route: '/exploration',
       action: 'Exploration',
       title: 'Exploration',
+      cardId: 'Exploration',
+      name: 'exploration',
       cardTitle: 'Signature Exploration',
       cardText: 'Signature Exploration',
       description:
-        'Systematically exploring the mutational signature activities and performance of the mutational signature decomposition from user input, or collected public genomic studies (<a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga" target="_blank">TCGA</a>, <a href="https://dcc.icgc.org/pcawg" target="_blank">PCAWG</a>, <a href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study" target="_blank">Sherlock-Lung</a>, etc.). This module allows users to perform analyses with mutational signature patterns and integratively explore the activities of each mutational signature including visualizations of tumor mutational burden, signature decomposition performance, mutational signature associations, sample clustering by mutational signatures, prevalence of single mutational signatures, and decomposition of mutational signatures in individual samples.',
-      image: 'assets/images/explore.png',
-      navIndex: 2,
-      color: '#2c71dd', // blue
+        'Explore etiological factors associated with signature at sample levels.    ',
+      image: 'assets/images/Exploration-Icon.svg',
+      navIndex: 3,
+      color: '#5a4e2e',
+      showHomepage: true,
+      about: '/about#exploration',
     },
     // {
     //   route: '/refitting',
@@ -70,132 +100,83 @@ export default function App() {
       route: '/association',
       action: 'Association',
       title: 'Association',
+      cardId: 'Association',
+      name: 'association',
       cardTitle: 'Signature Association',
       cardText: 'Signature Association',
       description:
-        'Statistically analyzing and visualizing associations between mutational signature activities (using different measurements) and collected sample level variables including genomic features, epigenomic features, mutational status, copy number alterations or clinical variables from different cancer genomic studies. In addition, this module allows users to select different statistical approaches for both univariable and multivariable association analyses.',
-      image: 'assets/images/association.png',
-      navIndex: 3,
-      color: '#84368d', // purple
+        'Analyze signature association with other genomic features and clinical data.',
+      image: 'assets/images/Association-Icon.svg',
+      navIndex: 4,
+      color: '#7f282f',
+      showHomepage: true,
+      about: '/about#association',
+    },
+    {
+      route: '/apiaccess',
+      action: 'API Access',
+      title: 'API Access',
+      cardId: 'APIAccess',
+      name: 'api',
+      cardTitle: 'API Access',
+      cardText: 'API Access',
+      description:
+        'Provide REST API for programmatic access to the mSigPortal data.',
+      image: 'assets/images/API-Icon.svg',
+      navIndex: 5,
+      color: '#84368d',
+      showHomepage: true,
+      about: '/about#api',
     },
     {
       route: '/publications',
       title: 'Publications',
-      navIndex: 4,
+      navIndex: 6,
+      showHomepage: false,
     },
     {
       route: '/faq',
       title: 'FAQ',
-      navIndex: 5,
+      navIndex: 7,
+      showHomepage: false,
     },
     {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
-      navIndex: 6,
+      navIndex: 8,
+      showHomepage: false,
     },
   ];
 
-  // load data for publications tab
-  const dispatch = useDispatch();
-  const publicationsState = useSelector((state) => state.publications);
-  const mergePublications = (state) => dispatch(actions.mergeState(state));
-
-  useEffect(() => {
-    const getData = async () => {
-      const data = await (await fetch(`api/getPublications`)).json();
-
-      const reducer = (acc, column) => [
-        ...acc,
-        {
-          Header: column,
-          accessor: column,
-          id: column,
-          Cell: (e) => {
-            if (
-              column == 'Title' &&
-              e.row.values['DOI'] &&
-              e.row.values['DOI'] != 'NA'
-            ) {
-              return (
-                <a href={e.row.values['DOI']} target="_blank" rel="noreferrer">
-                  {e.value}
-                </a>
-              );
-            } else if (
-              column == 'Name' &&
-              e.row.values['Github'] &&
-              e.row.values['Github'] != 'NA'
-            ) {
-              return (
-                <a
-                  href={e.row.values['Github']}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {e.value}
-                </a>
-              );
-            } else {
-              return e.value || '';
-            }
-          },
-        },
-      ];
-
-      mergePublications({
-        orA: {
-          columns: [
-            ...new Set(
-              ...data['Original Research A'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Original Research A'],
-        },
-        orB: {
-          columns: [
-            ...new Set(
-              ...data['Orignal Research B'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Orignal Research B'],
-        },
-        rp: {
-          columns: [
-            ...new Set(...data['Review Paper'].map((row) => Object.keys(row))),
-          ].reduce(reducer, []),
-          data: data['Review Paper'],
-        },
-        cm: {
-          columns: [
-            ...new Set(
-              ...data['Computational Methods'].map((row) => Object.keys(row))
-            ),
-          ].reduce(reducer, []),
-          data: data['Computational Methods'],
-        },
-      });
-    };
-
-    // get data on inital page load
-    if (!publicationsState.orA.data) getData();
-  }, [publicationsState]);
-
   return (
-    <Router>
-      <ErrorModal />
-      <SuccessModal />
-      <Navbar links={links} />
-      <Route path="/" exact={true} render={(_) => <Home links={links} />} />
-      <Route path="/about" component={About} />
-      <Route path="/visualization/:type?/:id?" component={Visualization} />
-      <Route path="/catalog" component={Catalog} />
-      <Route path="/exploration/:exampleName?" component={Exposure} />
-      <Route path="/refitting" component={Refitting} />
-      <Route path="/association" component={Association} />
-      <Route path="/publications" component={Publications} />
-      <Route path="/faq" component={Faq} />
-    </Router>
+    <>
+      <HashRouter>
+        <Header />
+        <RecoilRoot>
+          <ErrorModal />
+          <SuccessModal />
+          <NavbarCustom links={links} />
+          <Switch>
+            <Route path="/" exact={true} children={<Home links={links} />} />
+            <Route path="/about" children={<About />} />
+            <Route path="/visualization/:id?" children={<Visualization />} />
+            <Route path="/catalog" children={<Catalog />} />
+            <Route
+              path="/exploration/:exampleName?"
+              children={<Exploration />}
+            />
+            <Route path="/refitting" children={<Refitting />} />
+            <Route path="/association" children={<Association />} />
+            <Route path="/extraction/:id?" children={<Extraction />} />
+            <Route path="/publications" children={<Publications />} />
+            <Route path="/faq" children={<Faq />} />
+            <Route path="/apiaccess" children={<APIAccess />} />
+          </Switch>
+        </RecoilRoot>
+        <Footer />
+      </HashRouter>
+    </>
   );
 }

@@ -12,10 +12,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
-import Select from '../../controls/select/select';
+import CustomSelect from '../../controls/select/select-old';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
-import Plot from '../../controls/plot/plot';
+import SvgContainer from '../../controls/svgContainer/svgContainer';
 import Table from '../../controls/table/table';
 
 const actions = { ...associationActions, ...modalActions };
@@ -38,14 +38,15 @@ export default function Univariable() {
     rsSet,
     cancer,
     assocTable,
-  } = useSelector((state) => state.association.associationState);
+  } = useSelector((state) => state.association.main);
 
   const {
     loadingParams,
     loadingCalculate,
     loadingRecalculate,
     error,
-    projectID,
+    loadError,
+    id,
     plotPath,
     dataPath,
     assocTablePath,
@@ -94,7 +95,6 @@ export default function Univariable() {
     });
     return ref.current;
   }
-
   async function handleLoadData() {
     if (associationVar.filter && isNaN(associationVar.filter)) {
       setInvalidAssocFilter(true);
@@ -103,7 +103,11 @@ export default function Univariable() {
 
       mergeState({ loadingParams: true, error: false });
       try {
-        const { stdout, output: collapseData } = await (
+        const {
+          sessionId,
+          stdout,
+          output: collapseData,
+        } = await (
           await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -113,10 +117,10 @@ export default function Univariable() {
             body: JSON.stringify({
               fn: 'loadCollapse',
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
                 source: associationVar.source,
                 type: associationVar.type,
                 assocName: associationVar.tmpName,
@@ -125,26 +129,35 @@ export default function Univariable() {
             }),
           })
         ).json();
+        const { collapseVar1, collapseVar2, error, uncaughtError } =
+          collapseData;
 
-        const { collapseVar1, collapseVar2 } = collapseData;
-
-        mergeState({
-          associationVar: {
-            name: associationVar.tmpName,
-            collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
-          },
-          // exposureVar: {
-          //   name: expVarList[0],
-          //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
-          // },
-        });
+        if (error || uncaughtError) {
+          mergeState({
+            loadError:
+              error ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
+        } else {
+          mergeState({
+            loadError: '',
+            associationVar: {
+              name: associationVar.tmpName,
+              collapseOptions: Array.isArray(collapseVar1) ? collapseVar1 : [],
+              id: sessionId,
+            },
+            // exposureVar: {
+            //   name: expVarList[0],
+            //   collapseOptions: Array.isArray(collapseVar2) ? collapseVar2 : [],
+            // },
+          });
+        }
       } catch (error) {
         mergeError(error);
       }
       mergeState({ loadingParams: false });
     }
   }
-
   function handleReset() {
     setInvalidAssocFilter(false);
     setInvalidExpFilter(false);
@@ -156,7 +169,7 @@ export default function Univariable() {
         collapse: '',
         collapseOptions: [],
       },
-      projectID: '',
+      id: '',
       plotPath: '',
       dataPath: '',
       assocTablePath: '',
@@ -183,11 +196,7 @@ export default function Univariable() {
         dataPath: '',
       });
       try {
-        const {
-          projectID: id,
-          stdout,
-          output,
-        } = await (
+        const { sessionId, stdout, output } = await (
           await fetch(`api/associationWrapper`, {
             method: 'POST',
             headers: {
@@ -196,14 +205,14 @@ export default function Univariable() {
             },
             body: JSON.stringify({
               fn: 'univariable',
-              projectID,
+              id,
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
-                testType,
-                signature,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
+                testType: testType,
+                signature: signature,
                 xlab: xlab || associationVar.name,
                 ylab: ylab || exposureVar.name,
                 associationVar: (() => {
@@ -235,12 +244,22 @@ export default function Univariable() {
           error,
           uncaughtError,
         } = output;
+        if (signatureOptions) {
+          signatureOptions.sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true })
+          );
+        }
 
         if (error || uncaughtError) {
-          mergeState({ error: error || uncaughtError });
+          mergeState({
+            error:
+              error ||
+              uncaughtError ||
+              'An error has occured. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
         } else {
           mergeState({
-            projectID: id,
+            id,
             plotPath,
             dataPath,
             assocTablePath,
@@ -285,7 +304,7 @@ export default function Univariable() {
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}
           downloadName="Download Variable Data"
-          downloadLink={projectID + assocFullDataPath}
+          downloadLink={assocFullDataPath}
           mergeState={(e) =>
             dispatch(
               actions.mergeAssociation({ association: { assocTable: e } })
@@ -305,9 +324,24 @@ export default function Univariable() {
             invalidFilter={invalidAssocFilter}
           />
           <Row
-            className="mx-auto mt-3 justify-content-end"
+            className="mx-auto mt-3 justify-content-between"
             style={{ maxWidth: '1720px' }}
           >
+            <Col md="auto" lg="auto">
+              <CustomSelect
+                disabled={
+                  loadingData ||
+                  loadingParams ||
+                  loadingCalculate ||
+                  resultsTable.data.length
+                }
+                id="expVariable"
+                label="Signature Exposure Variable"
+                value={exposureVar.name}
+                options={expVarList}
+                onChange={(e) => mergeState({ exposureVar: { name: e } })}
+              />
+            </Col>
             <Col md="auto">
               <Button
                 disabled={loadingData || loadingParams || loadingCalculate}
@@ -332,6 +366,11 @@ export default function Univariable() {
               </Button>
             </Col>
           </Row>
+          {loadError && (
+            <p className="p-3 d-flex justify-content-center text-danger">
+              {loadError}
+            </p>
+          )}
         </div>
       </div>
       <div className="mb-3">
@@ -344,21 +383,6 @@ export default function Univariable() {
               Select the following filtering and method for analysis
             </p>
             <Row className="justify-content-center">
-              <Col md="auto" lg="auto">
-                <Select
-                  disabled={
-                    loadingData ||
-                    loadingParams ||
-                    loadingCalculate ||
-                    resultsTable.data.length
-                  }
-                  id="expVariable"
-                  label="Signature Exposure Variable"
-                  value={exposureVar.name}
-                  options={expVarList}
-                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
-                />
-              </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">
@@ -467,7 +491,7 @@ export default function Univariable() {
                       </Group>
                     </Col>
                     {/* <Col md="3">
-                      <Select
+                      <CustomSelect
                         disabled={
                           loadingData ||
                           loadingParams ||
@@ -493,7 +517,7 @@ export default function Univariable() {
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
                   <legend className="font-weight-bold">Method</legend>
-                  <Select
+                  <CustomSelect
                     aria-label="Method"
                     className="mb-0"
                     disabled={
@@ -571,7 +595,7 @@ export default function Univariable() {
                   pagination={resultsTable.pagination}
                   hidden={resultsTable.hidden}
                   downloadName="Download Association Result"
-                  downloadLink={projectID + assocTablePath}
+                  downloadLink={id + assocTablePath}
                   mergeState={async (e) =>
                     await mergeState({ resultsTable: { ...e } })
                   }
@@ -582,7 +606,7 @@ export default function Univariable() {
               </p>
               <Row className="justify-content-center">
                 <Col md="auto">
-                  <Select
+                  <CustomSelect
                     disabled={loadingData || loadingParams || loadingCalculate}
                     id="signature"
                     label="Signature Name"
@@ -622,11 +646,11 @@ export default function Univariable() {
               </Row>
               <LoadingOverlay active={loadingRecalculate} />
               {plotPath && (
-                <Plot
+                <SvgContainer
                   className="p-3 border rounded"
                   downloadName={plotPath.split('/').slice(-1)[0]}
-                  plotPath={`api/results/${plotPath}`}
-                  txtPath={`api/results/${dataPath}`}
+                  plotPath={`api/data/${plotPath}`}
+                  txtPath={`api/data/${dataPath}`}
                   height="800px"
                 />
               )}

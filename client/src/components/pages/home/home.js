@@ -1,195 +1,444 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
-import { CardDeck } from 'react-bootstrap';
+import { Button, CardDeck } from 'react-bootstrap';
 import parse from 'html-react-parser';
 import './home.scss';
-
 export default function Home({ links }) {
-  function cardRow(links) {
+  function CardRow(
+    {
+      exact,
+      route,
+      action,
+      title,
+      name,
+      cardTitle,
+      cardText,
+      description,
+      image,
+      about,
+      color,
+      examples,
+      buttonHomepage,
+    },
+    index
+  ) {
     return (
-      <CardDeck>
-        {links.map(
-          (
-            {
-              exact,
-              route,
-              action,
-              title,
-              cardTitle,
-              cardText,
-              description,
-              image,
-              color,
-            },
-            index
-          ) => (
-            <div
-              className="d-flex bd-highlight w-100 mb-5"
-              key={title}
-              style={{ marginRight: '1%' }}
-            >
-              <Card
-                key={title}
-                id={title}
-                className="align-self-center p-2 bd-highlight"
-                style={{
-                  minWidth: '45%',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  border: '1px solid #DADBE6',
-                  backgroundColor: 'white',
-                  // minHeight: '280px'
-                  // borderRadius: '10px'
-                }}
-              >
+      <div key={index}>
+        <div className="col">
+          <Card
+            key={title}
+            id={title}
+            className="p-3"
+            style={{
+              borderRadius: '2em',
+              display: 'inline-block',
+            }}
+          >
+            <img
+              alt={cardTitle}
+              src={image}
+              className="card-img-top w-25 h-25 ml-3"
+            />
+            <Card.Body>
+              <h4 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h4>
+              <p className="card-text">
+                {description}
+                <br />
+
                 <Link
-                  className="stretched-link"
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div className="">
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
                   exact={exact}
                   key={index}
                   to={route}
                 >
-                  <span className="sr-only">{title + ' link'}</span>
+                  <span className="">Go to {title} &gt;</span>
                 </Link>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
-                <Card.Body>
-                  <div className="d-flex flex-row align-items-center justify-content-left">
-                    <div
-                      className="rounded-circle"
-                      style={{
-                        //marginTop: '-15px',
-                        marginLeft: '-10px',
-                        marginRight: '10px',
-                        width: '120px',
-                        height: '120px',
-                        padding: '10px',
-                        backgroundColor: color,
-                        border: '4px solid white',
-                        fillOpacity: '0.5',
-                      }}
-                    >
-                      <img
-                        alt={cardTitle}
-                        src={image}
-                        height="105"
-                        width="105"
-                        style={{
-                          marginTop: '-13px',
-                          marginLeft: '-7px',
-                        }}
-                      />
-                    </div>
-                    <Card.Title className="text-dark">
-                      <h2 style={{ fontSize: '1.75rem', marginBottom: '-5px' }}>
-                        <b>{cardTitle}</b>
-                      </h2>
-                    </Card.Title>
-                  </div>
-                </Card.Body>
-              </Card>
-              <div className="description d-none d-md-block">
-                <p>{parse(description)}</p>
+  function CardRow2(
+    {
+      exact,
+      route,
+      action,
+      title,
+      name,
+      cardTitle,
+      cardText,
+      description,
+      image,
+      about,
+      color,
+      examples,
+      buttonHomepage,
+    },
+    index
+  ) {
+    return (
+      <div key={index} className="col-sm-12 col-md-6 col-lg-4 mb-3" id={title}>
+        <div
+          style={{
+            borderRadius: '2em',
+            display: 'inline-block',
+            backgroundColor: 'white',
+          }}
+        >
+          <div className="flex-fill">
+            <div className="m-3">
+              <img
+                alt={cardTitle}
+                src={image}
+                className="card-img-top w-25 h-25"
+              />
+              <h4 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h4>
+              <p className="card-text">
+                {description}
+                <br />
+
+                <Link
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div className="">
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                  exact={exact}
+                  key={index}
+                  to={route}
+                >
+                  <span className="">Go to {title} &gt;</span>
+                </Link>
               </div>
             </div>
-          )
-        )}
-      </CardDeck>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function CardRow3(
+    {
+      exact,
+      route,
+      action,
+      title,
+      cardId,
+      name,
+      cardTitle,
+      cardText,
+      description,
+      image,
+      about,
+      color,
+      examples,
+      buttonHomepage,
+    },
+    index
+  ) {
+    return (
+      <div
+        key={index}
+        className="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-3 d-flex align-items-stretch"
+      >
+        <div
+          className="card"
+          id={cardId}
+          style={{
+            borderRadius: '2em',
+            display: 'inline-block',
+            backgroundColor: 'white',
+            position: 'relative',
+          }}
+        >
+          <div className="m-3">
+            <img
+              alt={cardTitle}
+              src={image}
+              className="card-img-top w-40 ml-3 mt-3"
+            />
+            <div className="card-body d-flex flex-column">
+              <h5 className={`card-title card-title-homepage text-${name}`}>
+                {cardTitle}
+              </h5>
+              <p className="card-text mb-4">
+                {description}
+                <br />
+
+                <Link
+                  className="link-primary-underline"
+                  exact={exact}
+                  key={index}
+                  to={about}
+                >
+                  <span>Read More &rarr;</span>
+                </Link>
+              </p>
+              <div
+                className="mb-3"
+                style={{
+                  position: 'absolute',
+                  left: '1',
+                  bottom: '0',
+                }}
+              >
+                <Link
+                  className={`btn btn-2 btn-${name} btn-border-radius-15`}
+                  exact={exact}
+                  key={index}
+                  to={route}
+                >
+                  <span
+                    style={{
+                      fontSize: '13px',
+                    }}
+                  >
+                    Go to {title} &gt;
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
     <>
-      <div className="banner-container text-center d-none d-md-block">
-        <div className="image-blurred-edge">
+      <div className="banner-container">
+        <div className="text-center  d-none d-sm-block">
           <img
-            src="assets/images/msigportal-banner.png"
+            src="assets/images/Hero_Image.png"
             alt="mSigPortal banner"
-            style={{
-              width: '100%',
-              height: '250px',
-              filter: 'contrast(2)',
-            }}
+            className="image-banner"
           ></img>
-        </div>
-        <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
-          <div className="col-12">
-            <img
-              src="assets/images/logo-horizontal.png"
-              alt="mSigPortal title"
-              style={{
-                width: '325px',
-                height: '50px',
-              }}
-            ></img>
+
+          <div className="row">
+            <div className="homepage-title-left text-left">
+              <h1 className="msigportal-home-title">mSigPortal</h1>
+              <div className="text-primary-purple msigportal-title">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
+              </div>
+            </div>
+            <div className="homepage-title-right">
+              <Link
+                className="btn btn-gradient btn-1"
+                to={{
+                  pathname: '/about',
+                }}
+              >
+                <div className="msigportal-home-title-right">
+                  Learn more about mSigportal &gt;
+                </div>
+              </Link>
+            </div>
           </div>
-          <div
-            className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '3px solid', color: 'rgb(200,37,6)' }}
-          ></div>
-          <div
-            className="col-12 text-center mt-2 font-weight-bold"
-            style={{
-              width: '100%',
-              fontSize: '18pt',
-              color: 'black',
-              fontStyle: 'italic',
-            }}
-          >
-            Integrative Mutational Signature Portal for Cancer Genomic Studies
+        </div>
+
+        <div className="container mb-3 d-sm-none">
+          <div className="row">
+            <div className="col-md-12 col-sm-12">
+              <h1 className="msigportal-home-title">mSigPortal</h1>
+              <div className="text-primary-purple msigportal-title">
+                Integrative Mutational Signature Portal for Cancer Genomics
+                Study
+              </div>
+            </div>
+            <div className="col-md-12 col-sm-12">
+              <Link
+                className="text-center"
+                to={{
+                  pathname: '/about',
+                }}
+              >
+                <div className="msigportal-home-title-right">
+                  <Link
+                    className="btn btn-gradient btn-1"
+                    to={{
+                      pathname: '/about',
+                    }}
+                  >
+                    <div className="msigportal-home-title-right">
+                      Learn more about mSigportal &gt;
+                    </div>
+                  </Link>
+                </div>
+              </Link>
+            </div>
           </div>
-          <div
-            className="col-12 text-center mt-5"
-            style={{ width: '100%', fontSize: '14pt' }}
-          ></div>
         </div>
-      </div>
 
-      {/* mobile */}
-      <div className="text-center mt-2 d-md-none">
-        <h1 className="text-dark">
-          <b>mSigPortal</b>
-        </h1>
-        <hr className="w-75"></hr>
-        <div className="px-3 text-center">
-          <b>
-            Integrative mutational signature portal for cancer genomic studies
-          </b>
+        <div
+          className="card-grid"
+          style={{
+            zIndex: '1',
+            position: 'relative',
+          }}
+        >
+          <div className="container  d-none d-lg-block">
+            <div className="row">
+              {links
+                .filter((e) => e.showHomepage)
+                .map((e, i) => CardRow3(e, i))}
+            </div>
+            <div className="row">
+              <div class="col-sm-12">
+                <div
+                  class="card"
+                  id="description"
+                  style={{
+                    borderRadius: '2em',
+                    display: 'inline-block',
+                    backgroundColor: 'white',
+                    position: 'relative',
+                  }}
+                >
+                  <div class="card-body">
+                    <p class="card-text">
+                      mSigPortal was developed by{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Dr. Tongwu Zhang{' '}
+                      </a>{' '}
+                      in the lab of{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Dr. Maria Teresa Landi
+                      </a>{' '}
+                      in collaboration with the NCI Center for Biomedical
+                      Informatics and Information Technology (CBIIT). Support
+                      for this project comes from the Division of Cancer
+                      Epidemiology and Genetics Informatics Tool Challenge as
+                      well as the{' '}
+                      <a
+                        href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Integrative Tumor Epidemiology Branch
+                      </a>
+                      . <br />
+                      mSigPortal’s{' '}
+                      <a
+                        href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        source code
+                      </a>{' '}
+                      is available in Github under MIT license, an Open Source
+                      Initiative approved license.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="container-fluid d-block d-lg-none">
+            <div className="row">
+              <div className="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+              <div className="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                <div className="row">
+                  {links
+                    .filter((e) => e.showHomepage)
+                    .map((e, i) => CardRow3(e, i))}
+                </div>
+                <div className="row">
+                  <div class="col-12">
+                    <div
+                      class="card"
+                      id="description"
+                      style={{
+                        borderRadius: '2em',
+                        display: 'inline-block',
+                        backgroundColor: 'white',
+                        position: 'relative',
+                      }}
+                    >
+                      <div class="card-body">
+                        <p class="card-text">
+                          mSigPortal was developed by{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Dr. Tongwu Zhang{' '}
+                          </a>{' '}
+                          in the lab of{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Dr. Maria Teresa Landi
+                          </a>{' '}
+                          in collaboration with the NCI Center for Biomedical
+                          Informatics and Information Technology (CBIIT).
+                          Support for this project comes from the Division of
+                          Cancer Epidemiology and Genetics Informatics Tool
+                          Challenge as well as the{' '}
+                          <a
+                            href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Integrative Tumor Epidemiology Branch
+                          </a>
+                          . <br />
+                          mSigPortal’s{' '}
+                          <a
+                            href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            source code
+                          </a>{' '}
+                          is available in Github under MIT license, an Open
+                          Source Initiative approved license.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-xl-2 col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div
-        className="container align-middle"
-        style={{
-          textAlign: 'left',
-        }}
-      >
-        Mutational signatures are characteristic combinations of mutation types
-        arising from specific mutagenesis processes such as DNA replication
-        infidelity, defective DNA repair, DNA enzymatic editing and exogenous
-        exposures. Analysis of mutational signatures is becoming routine in
-        cancer genomics, providing a novel opportunity for biomarker discovery,
-        tumor diagnostics, and treatment guidance. As the number of mutational
-        signatures associated with known etiologies has increased from many
-        different cancer genomic studies, there is a critical need for curated
-        census as well as data sharing of mutational signatures for public
-        research. mSigPortal provides a platform that enables users to explore,
-        visualize, and analyze mutational signatures and relevant signature data
-        (such as mutational profile, proposed etiology, tissue specificity,
-        activity, and association) in cancer genomic studies from scientific
-        literature or user input. This portal will greatly facilitate broad
-        investigation of mutational signatures to elucidate different
-        mutagenesis processes involved in tumorigenesis. Currently, mSigPortal
-        includes the following modules:
-      </div>
-
-      <div
-        className="container align-middle text-center"
-        style={{ marginTop: '70px' }}
-      >
-        {cardRow(links.slice(0, 1))}
-        {cardRow(links.slice(1, 2))}
-        {cardRow(links.slice(2, 3))}
-        {cardRow(links.slice(3, 4))}
       </div>
     </>
   );
