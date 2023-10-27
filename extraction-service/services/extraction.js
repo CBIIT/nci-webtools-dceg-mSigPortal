@@ -480,13 +480,7 @@ export async function extraction(
  */
 export async function getPaths(params, env = process.env) {
   const { id, args } = params;
-  let inputFolder;
-  if (params.form.source === 'user' || params.form.source === 'public') {
-    inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  } else {
-    inputFolder = '';
-  }
-
+  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, 'params.json');
   const statusFile = path.resolve(outputFolder, 'status.json');
