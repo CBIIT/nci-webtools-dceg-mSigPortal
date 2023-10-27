@@ -20,6 +20,7 @@ export async function exampleProcessor(
   const params = {
     args: {
       input_type: 'matrix',
+      input_data: 'Samples.txt',
       reference_genome: 'GRCh37',
       exome: 'False',
       context_type: 'DBS78',
@@ -53,11 +54,12 @@ export async function exampleProcessor(
     email: '',
     jobName: exampleOutputFolderName,
     form: {
-      source: 'public',
+      source: 'user',
       study: { label: 'Sherlock-Lung-232', value: 'Sherlock-Lung-232' },
       cancer: { label: 'LCINS', value: 'LCINS' },
       strategy: { label: 'WGS', value: 'WGS' },
       input_type: { label: 'matrix', value: 'matrix' },
+      input_data: 'Samples.txt',
       reference_genome: { label: 'GRCh37', value: 'GRCh37' },
       exome: false,
       signatureSetName: {
@@ -279,6 +281,8 @@ export async function exampleProcessor(
       //logger.info("Result written to signature.tsv");
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
+    } else {
+      seqmatrixFilePath = path.resolve(outputFolder, args.context_type, args.input_data);
     }
 
     // modify and include parameters
@@ -514,14 +518,7 @@ export async function exampleProcessor(
 
 async function getPaths(params, exampleId, randomID, env = process.env) {
   const { id, args } = params;
-
-  let inputFolder;
-  if (params.form.source === 'user' || params.form.source === 'public') {
-    inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  } else {
-    inputFolder = '';
-  }
-
+  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, 'params.json');
   const statusFile = path.resolve(outputFolder, 'status.json');
@@ -554,7 +551,7 @@ async function getPaths(params, exampleId, randomID, env = process.env) {
   const matrixFile =
     params.form.source === 'public'
       ? ''
-      : path.resolve(inputFolder, args.input_data);
+      : path.resolve(outputFolder, args.input_data);
 
   // files for denovo exploration input
   // const denovoExposureInput = path.resolve(
