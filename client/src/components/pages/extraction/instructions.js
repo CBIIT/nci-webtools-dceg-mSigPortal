@@ -54,7 +54,7 @@ export default function Instructions({ formLimits }) {
         <div>
           <div>
             <a
-              href="/assets/extraction_sample_SBS96.all"
+              href="assets/exampleInput/extraction_sample_SBS96.all"
               download
               className="link-primary-underline"
             >
@@ -63,7 +63,7 @@ export default function Instructions({ formLimits }) {
           </div>
           <div>
             <a
-              href="/assets/extraction_sample_DBS78.all"
+              href="assets/exampleInput/extraction_sample_DBS78.all"
               download
               className="link-primary-underline"
             >
