@@ -28,6 +28,10 @@ RUN mkdir -p /var/www/html/mutational-signatures \
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
 
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/httpd/access_log \
+    && ln -sf /dev/stderr /var/log/httpd/error_log
+
 WORKDIR /var/www/html
 
 EXPOSE 80
