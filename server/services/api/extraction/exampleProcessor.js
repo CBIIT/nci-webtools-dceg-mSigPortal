@@ -1,20 +1,15 @@
-import {
-  readdir,
-  unlinkSync,
-  readdirSync,
-  writeFileSync,
-  createReadStream,
-} from 'fs';
+import { unlinkSync, readdirSync, writeFileSync, createReadStream } from 'fs';
 import path from 'path';
 import { stringify } from 'csv-stringify';
 import { groupBy } from 'lodash-es';
 import mapValues from 'lodash/mapValues.js';
 import { randomUUID } from 'crypto';
-import Papa from 'papaparse';
 import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
-import { mkdir, writeFile, readFile } from 'fs/promises';
+import { mkdirs, writeJson, readJson } from '../../utils.js';
+import { getSignatureData, getSeqmatrixData } from '../../query.js';
+import { parseCSV } from '../general.js';
 
 export async function exampleProcessor(
   exampleOutputFolderName,
@@ -25,6 +20,7 @@ export async function exampleProcessor(
   const params = {
     args: {
       input_type: 'matrix',
+      input_data: 'Samples.txt',
       reference_genome: 'GRCh37',
       exome: 'False',
       context_type: 'DBS78',
@@ -58,11 +54,12 @@ export async function exampleProcessor(
     email: '',
     jobName: exampleOutputFolderName,
     form: {
-      source: 'public',
+      source: 'user',
       study: { label: 'Sherlock-Lung-232', value: 'Sherlock-Lung-232' },
       cancer: { label: 'LCINS', value: 'LCINS' },
       strategy: { label: 'WGS', value: 'WGS' },
       input_type: { label: 'matrix', value: 'matrix' },
+      input_data: 'Samples.txt',
       reference_genome: { label: 'GRCh37', value: 'GRCh37' },
       exome: false,
       signatureSetName: {
@@ -155,7 +152,11 @@ export async function exampleProcessor(
     //await copy(exampleFolderPath, outputFolder);
 
     await writeJson(paths.paramsFile, params);
-
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      id,
+      status: 'IN_PROGRESS',
+    });
     await writeJson(
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
@@ -280,6 +281,8 @@ export async function exampleProcessor(
       //logger.info("Result written to signature.tsv");
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
+    } else {
+      seqmatrixFilePath = path.resolve(outputFolder, args.context_type, args.input_data);
     }
 
     // modify and include parameters
@@ -495,11 +498,19 @@ export async function exampleProcessor(
 
     await importUserSession(localDb, { signature: transformSignatures });
 
-    logger.debug(
-      `Execution Time: ${
-        (new Date().getTime() - submittedTime.getTime()) / 1000
-      }`
-    );
+    // logger.debug(
+    //   `Execution Time: ${
+    //     (new Date().getTime() - submittedTime.getTime()) / 1000
+    //   }`
+    // );
+  } catch (error) {
+    console.error(error);
+    await writeJson(paths.statusFile, {
+      ...(await readJson(paths.statusFile)),
+      status: 'FAILED',
+      error: { ...error },
+      stopped: new Date(),
+    });
   } finally {
     return { id: id, status: 'DONE' };
   }
@@ -507,14 +518,7 @@ export async function exampleProcessor(
 
 async function getPaths(params, exampleId, randomID, env = process.env) {
   const { id, args } = params;
-
-  let inputFolder;
-  if (params.form.source === 'user' || params.form.source === 'public') {
-    inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  } else {
-    inputFolder = '';
-  }
-
+  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
   const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
   const paramsFile = path.resolve(inputFolder, 'params.json');
   const statusFile = path.resolve(outputFolder, 'status.json');
@@ -547,7 +551,7 @@ async function getPaths(params, exampleId, randomID, env = process.env) {
   const matrixFile =
     params.form.source === 'public'
       ? ''
-      : path.resolve(inputFolder, args.input_data);
+      : path.resolve(outputFolder, args.input_data);
 
   // files for denovo exploration input
   // const denovoExposureInput = path.resolve(
@@ -627,154 +631,6 @@ async function getPaths(params, exampleId, randomID, env = process.env) {
   };
 }
 
-function parseCSV(filepath) {
-  const file = createReadStream(filepath);
-  return new Promise((resolve, reject) => {
-    Papa.parse(file, {
-      header: true,
-      transformHeader: (e) => e.trim(),
-      transform: (e) => e.trim(),
-      complete(results, file) {
-        resolve(results.data);
-      },
-      error(err, file) {
-        reject(err);
-      },
-    });
-  });
-}
-
-import { pickBy } from 'lodash-es';
-import { profile } from 'console';
-
-function getData(
-  connection,
-  table,
-  query,
-  columns = '*',
-  limit,
-  offset = 0,
-  rowMode = 'object',
-  distinct = false
-) {
-  const conditions = pickBy(
-    query,
-    (v) => v && !v.includes('%') && !v.includes('*ALL')
-  );
-  const patterns = pickBy(query, (v) => v && v.includes('%'));
-
-  let sqlQuery = connection
-    .select(columns)
-    .from(table)
-    // .where(conditions)
-    .offset(offset, rowMode)
-    .options({ rowMode: rowMode });
-
-  if (limit) {
-    sqlQuery = sqlQuery.limit(limit || 100000);
-  }
-  if (distinct) {
-    sqlQuery = sqlQuery.distinct(columns);
-  }
-
-  // apply where conditions to query
-  // use WHERE IN query on conditions delimited by semi-colons (;)
-  if (conditions) {
-    Object.entries(conditions).forEach(([column, values]) => {
-      const splitValues = values.split(';');
-      if (splitValues.length > 1) {
-        sqlQuery.whereIn(
-          column,
-          splitValues.map((e) => e.trim())
-        );
-      } else {
-        splitValues.forEach((v) => {
-          sqlQuery = sqlQuery.andWhere(column, v.trim());
-        });
-      }
-    });
-  }
-
-  if (patterns) {
-    Object.entries(patterns).forEach(([column, values]) => {
-      sqlQuery = sqlQuery.andWhere(column, 'like', values.trim());
-    });
-  }
-
-  return sqlQuery;
-}
-
-export function getSignatureData(
-  connection,
-  query,
-  columns = '*',
-  limit = 200000,
-  offset = 0,
-  rowMode = 'object',
-  distinct = false
-) {
-  return getData(
-    connection,
-    'signature',
-    query,
-    columns,
-    limit,
-    offset,
-    rowMode,
-    distinct
-  );
-}
-
-export function getSeqmatrixData(
-  connection,
-  query,
-  columns = '*',
-  limit = 200000,
-  offset = 0,
-  rowMode = 'object',
-  distinct = false
-) {
-  return getData(
-    connection,
-    'seqmatrix',
-    query,
-    columns,
-    limit,
-    offset,
-    rowMode,
-    distinct
-  );
-}
-
-function getQueryMiddleware(queryFunction) {
-  return async function (req, res, next) {
-    try {
-      const connection = req.app.locals.connection;
-      let {
-        query,
-        columns = '*',
-        limit = 200000,
-        offset = 0,
-        rowMode = 'object',
-        distinct = 'false',
-      } = req.body;
-      const response = await queryFunction(
-        connection,
-        query,
-        columns,
-        limit,
-        offset,
-        rowMode,
-        distinct
-      );
-      console.log(response);
-      res.json(response);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
-
 const signatureSchema = [
   {
     name: 'signature',
@@ -834,56 +690,4 @@ async function importUserSession(connection, data, schema = signatureSchema) {
     await connection.schema.table(name, index);
   }
   return true;
-}
-
-async function parseText(filePath) {
-  const fileData = await fs.promises.readFile(filePath, 'utf8');
-  const lines = fileData.trim().split('\n');
-  const headers = lines.shift().split('\t');
-  return lines.map((line) => {
-    const values = line.split('\t');
-    return headers.reduce((obj, header, index) => {
-      obj[header] = values[index];
-      return obj;
-    }, {});
-  });
-}
-
-async function parseTXT(filePath) {
-  const fileData = await fs.promises.readFile(filePath, 'utf8');
-  const lines = fileData.trim().split('\n');
-  const headers = lines.shift().split('\t');
-  return lines.map((line) => {
-    const values = line.split('\t');
-    return headers.reduce((obj, header, index) => {
-      obj[header] = values[index];
-      return obj;
-    }, {});
-  });
-}
-
-async function mkdirs(dirs) {
-  return await Promise.all(dirs.map((dir) => mkdir(dir, { recursive: true })));
-}
-async function writeJson(filepath, data) {
-  return await writeFile(filepath, JSON.stringify(data), 'utf-8');
-}
-async function readJson(filepath) {
-  try {
-    const data = await readFile(filepath, 'utf8');
-    return JSON.parse(data);
-  } catch (e) {
-    return null;
-  }
-}
-async function* getFiles(filePath) {
-  const dirents = await readdir(filePath, { withFileTypes: true });
-  for (const dirent of dirents) {
-    const res = path.resolve(filePath, dirent.name);
-    if (dirent.isDirectory()) {
-      yield* getFiles(res);
-    } else {
-      yield res;
-    }
-  }
 }

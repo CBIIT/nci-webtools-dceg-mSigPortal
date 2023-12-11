@@ -879,7 +879,8 @@ msigportal.msLandscape <- function(args, ...) {
       arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
       filter(exposure > 0)
     cosineData <- cosineData %>%
-      arrange(factor(sample, levels = cluster$labels[cluster$order]))
+      arrange(factor(sample, levels = cluster$labels[cluster$order])) %>% 
+      replace(is.na(.), 0)
   } else {
     exposureData <- args$exposureData %>%
       filter(exposure > 0)
