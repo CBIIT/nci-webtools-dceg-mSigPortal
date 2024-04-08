@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import path from 'path';
 import {
   getSeqmatrixData,
   getSeqmatrixOptions,
