@@ -57,7 +57,7 @@ export function Footer() {
                       DCEG
                     </a>
                   </div>
-                  <div className="">
+                  {/* <div className="">
                     <a
                       className="footer-link text-light"
                       href="https://prevention.cancer.gov/"
@@ -65,7 +65,7 @@ export function Footer() {
                     >
                       DCP
                     </a>
-                  </div>
+                  </div> */}
                   {/* <!-- <div className="my-2">
                 <a
                   className="footer-link text-light"
