@@ -7,6 +7,20 @@ export function Header() {
   return (
     <header className="bg-light">
       <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
+      <div class="usa-banner" aria-label="Official government website">
+        <div class="container mx-auto">
+          <div class="usa-banner__header">
+            <div class="usa-banner__inner">
+              <div class="container" >
+                <div class="usa-banner__header-text">
+                An official website of the United States government
+              </div>
+            </div>
+              
+            </div>
+          </div>
+        </div>       
+      </div>
       <div>
         <a
           href="/#/#root"
@@ -19,10 +33,12 @@ export function Header() {
           "
         >
           Skip to Main Content
-        </a>
+        </a>        
+        
         <div
           className={`d-none d-md-block ${pathname === '/' ? 'container' : ''}`}
         >
+       
           <div className="d-flex justify-content-between">
             <a href="https://dceg.cancer.gov/" target="_blank">
               <img
