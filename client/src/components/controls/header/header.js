@@ -42,7 +42,7 @@ export function Header() {
           <div className="d-flex justify-content-between">
             <a href="https://dceg.cancer.gov/" target="_blank">
               <img
-                src="assets/images/mSigPortal_Desktop-Logo-COLOR.svg"
+                src="https://analysistools.cancer.gov/common/images/mSigPortal_Desktop-Logo-COLOR.svg"
                 height="100"
                 alt="National Cancer Institute Logo"
               />
@@ -56,7 +56,7 @@ export function Header() {
         <div className="d-block d-sm-block d-md-none">
           <a href="https://dceg.cancer.gov/">
             <img
-              src="assets/images/mSigPortal_Desktop-Logo-COLOR.svg"
+              src="https://analysistools.cancer.gov/common/images/mSigPortal_Desktop-Logo-COLOR.svg"
               height="80"
               width="100%"
               alt="National Cancer Institute Logo"
