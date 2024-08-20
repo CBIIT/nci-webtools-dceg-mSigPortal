@@ -45,7 +45,7 @@
   "scripts": {
     "start": "BROWSER=firefox react-app-rewired start",
     "start:dev": "react-app-rewired start",
-    "build": "npm run format && react-app-rewired --max_old_space_size=4096 build",
+    "build": "npm run format && react-app-rewired --max_old_space_size=8192 build",
     "test": "react-app-rewired test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-app-rewired eject",
     "format": "prettier --write \"src/**/*.{js,json,css,scss}\""
@@ -66,6 +66,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
