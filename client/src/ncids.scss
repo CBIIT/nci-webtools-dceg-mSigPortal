@@ -78,10 +78,11 @@ line-height: 1.6;
     padding-right: 1rem;
   }
   .usa-banner__header-text:before {
-    background-image: url('../../client/public/assets/images/usa_banner.png');
+    background-image: url('../public/assets/images/usa_banner.png');
     background-size: 16px 11px;
     content: "";
     display: block;
     height: 11px;
     max-width: 16px;
   }
+
