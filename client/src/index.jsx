@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './components/app';
 import { Provider } from 'react-redux';
 import { store } from './services/store';
@@ -9,9 +9,8 @@ import 'font-awesome/css/font-awesome.min.css';
 import '@fontsource/montserrat';
 import '@fontsource/inter';
 
-ReactDOM.render(
+createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
 );

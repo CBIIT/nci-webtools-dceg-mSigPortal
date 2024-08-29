@@ -1,15 +1,15 @@
 /** We must specify variables before importing bootstrap in order to customize the generated css */
-@import '~swagger-ui-react/swagger-ui.css';
+@import 'swagger-ui-react/swagger-ui.css';
 
 $enable-shadows: true;
 // $enable-gradients: true;
 // $font-size-base: 0.9rem;
 // $line-height-base: 1;
 
-@import '~bootstrap/scss/bootstrap';
-// @import '~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
-// @import '~react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
-// @import '~react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
+@import 'bootstrap/scss/bootstrap';
+// @import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+// @import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+// @import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 
 // @media (min-width: 1600px) {
 //   .container {
@@ -17,7 +17,7 @@ $enable-shadows: true;
 //   }
 // }
 
-@import '~bootstrap-icons/font/bootstrap-icons.scss';
+@import 'bootstrap-icons/font/bootstrap-icons.scss';
 
 /** Default Overrides **/
 html {
