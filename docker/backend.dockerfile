@@ -92,8 +92,12 @@ ENV RENV_PATHS_CACHE=/deploy/server/renv/.cache
 ARG R_RENV_CACHE_HOST=/renvCach[e]
 COPY ${R_RENV_CACHE_HOST} ${RENV_PATHS_CACHE}
 WORKDIR /deploy/server
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
-
+RUN R -e "\
+    options(\
+    renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
+    Ncpus = parallel::detectCores() \
+    ); \
+    renv::restore();"
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
