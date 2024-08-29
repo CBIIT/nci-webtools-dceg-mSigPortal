@@ -1,4 +1,4 @@
-import { createSampleAnnotation, getTotalMutations } from './utils.js';
+import { createSampleAnnotation, getTotalMutations } from './utils';
 export default function SBS288(data, title = '') {
   const colors = {
     'C>A': '#03BCEE',

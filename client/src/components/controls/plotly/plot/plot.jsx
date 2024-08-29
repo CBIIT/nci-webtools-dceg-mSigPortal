@@ -1,5 +1,4 @@
 import Plot from 'react-plotly.js';
-import { downloadImage } from 'plotly.js';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { saveAs } from 'file-saver';

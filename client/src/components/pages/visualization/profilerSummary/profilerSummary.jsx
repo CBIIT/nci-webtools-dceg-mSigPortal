@@ -5,7 +5,7 @@ import { Container, Form, Row, Col } from 'react-bootstrap';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Description from '../../../controls/description/description';
-import { useProfilerSummaryQuery } from './apiSlice.js';
+import { useProfilerSummaryQuery } from './apiSlice';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 
 export default function ProfilerSummary({ state }) {

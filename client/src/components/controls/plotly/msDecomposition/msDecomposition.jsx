@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { groupByCustom } from '../../utils/utils.js';
+import { groupByCustom } from '../../utils/utils';
 
 export default function MsDecomposition(data, arg) {
   let traces;

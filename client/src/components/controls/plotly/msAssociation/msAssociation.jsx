@@ -3,7 +3,7 @@ import {
   round,
   calculatePearson,
   calculateSpearman,
-} from '../../utils/utils.js';
+} from '../../utils/utils';
 import { groupBy } from 'lodash';
 import pcorrtest from '@stdlib/stats-pcorrtest';
 

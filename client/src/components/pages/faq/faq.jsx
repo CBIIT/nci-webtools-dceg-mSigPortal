@@ -84,8 +84,8 @@ export default function Faq() {
         <p>
           Single Base Substitutions (SBS) are when one base is substituted for
           another in a DNA sequence. In the context of mutational signatures,
-          there are six classes of base substitution: C>A, C>G, C>T, T>A, T>C,
-          and T>G. When also considering the bases to the immediate 5’ and 3’
+          there are six classes of base substitution: C`{'>'}`A, C`{'>'}G, C`{'>'}T, T`{'>'}A, T`{'>'}C,
+          and T`{'>'}G. When also considering the bases to the immediate 5’ and 3’
           positions of the substitution, there are 96 possible mutations in this
           classification. When considering two bases 5’ and two bases 3’ of a
           mutation, the result is a 1536 channel matrix. For more information on
@@ -245,7 +245,7 @@ export default function Faq() {
           </p>
           <p>
             Example: Using the table below, a mutational pattern represented by
-            HCN>HTN is a C>T mutation. The H indicates that the base in this
+            HCN`{'>'}HTN is a C`{'>'}T mutation. The H indicates that the base in this
             position could be A, C, or T. The N indicates that the base in this
             position could be A, T, C, or G.
           </p>
@@ -323,8 +323,8 @@ export default function Faq() {
           different mutational patterns considering the IUPAC codes of the bases
           to the immediate 5’ and 3’ positions of the substitution. For
           enrichment analysis, mSigPortal calculates and visualizes the
-          proportion of specific mutation pattern context (such as HCG>HTG) as
-          compared to other contexts with the same mutation type (such as C>G).
+          proportion of specific mutation pattern context (such as HCG`{'>'}HTG) as
+          compared to other contexts with the same mutation type (such as C`{'>'}G).
           This analysis will help to identify the samples with specific
           mutational context due to the same mutational process.
         </p>
@@ -358,7 +358,7 @@ export default function Faq() {
       component: (
         <p>
           Kataegis is localized substitution hypermutation, often characterized
-          by clusters of C>T and/or C>G mutations, commonly at TpCpN
+          by clusters of C`{'>'}T and/or C`{'>'}G mutations, commonly at TpCpN
           trinucleotides. While it is common to think that mutations would occur
           every million base pairs or so, these localized instances of
           substitution hypermutations occur at much shorter base pair distances.

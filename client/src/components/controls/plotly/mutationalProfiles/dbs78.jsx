@@ -1,16 +1,16 @@
+import { dbs78Color } from '../../utils/colors';
 import {
   createSampleAnnotation,
+  getTotalMutations,
   getMaxMutations,
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
-  getTotalMutations,
-} from './utils.js';
-import { sbsColor } from '../../utils/colors.js';
+} from './utils';
 
-export default function SBS96(apiData, title = '') {
-  const colors = sbsColor;
-  const mutationRegex = /\[(.*)\]/;
+export default function DBS78(apiData, title = '') {
+  const colors = dbs78Color;
+  const mutationRegex = /^(.{2})/;
 
   const mutationGroupSort = (a, b) => {
     const order = Object.keys(colors);
@@ -21,12 +21,7 @@ export default function SBS96(apiData, title = '') {
   const maxMutation = getMaxMutations(apiData);
   const totalMutations = getTotalMutations(apiData);
   const mutationTypeNames = data
-    .map((group) =>
-      group.data.map((e) => ({
-        mutation: group.mutation,
-        mutationType: e.mutationType,
-      }))
-    )
+    .map((group) => group.data.map((e) => e.mutationType.slice(-2)))
     .flat();
 
   const traces = data.map((group, groupIndex, array) => ({
@@ -44,39 +39,28 @@ export default function SBS96(apiData, title = '') {
     hoverinfo: 'x+y',
     showlegend: false,
   }));
-  const sampleAnnotation = createSampleAnnotation(apiData);
-  const mutationAnnotation = createMutationAnnotations(data);
-  const mutationShapes = createMutationShapes(data, colors);
 
-  function formatTickLabel(mutation, mutationType) {
-    const color = colors[mutation];
-    const regex = /^(.)\[(.).{2}\](.)$/;
-    const match = mutationType.match(regex);
-    return `${match[1]}<span style="color:${color}"><b>${match[2]}</b></span>${match[3]}`;
-  }
+  const sampleAnnotation = createSampleAnnotation(apiData);
+  const mutationAnnotation = createMutationAnnotations(data, '>NN');
+  const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
     title: `<b>${title}</b>`,
     hoverlabel: { bgcolor: '#FFF' },
-    bargap: 0.3,
     height: 450,
-    // width: 1080,
-    minWidth: 480, // Set the minimum width for the plot (adjust the value as needed)
+    //width:1080,
     autosize: true,
-
     xaxis: {
       showline: true,
       tickangle: -90,
       tickfont: {
         family: 'Courier New, monospace',
-        color: '#A0A0A0',
+        size: 14,
       },
       tickmode: 'array',
       tickvals: mutationTypeNames.map((_, i) => i),
-      ticktext: mutationTypeNames.map((e) =>
-        formatTickLabel(e.mutation, e.mutationType)
-      ),
-      linecolor: '#E0E0E0',
+      ticktext: mutationTypeNames.map((e) => e),
+      linecolor: 'black',
       linewidth: 1,
       mirror: 'all',
     },
@@ -84,21 +68,21 @@ export default function SBS96(apiData, title = '') {
       title: {
         text:
           parseFloat(totalMutations).toFixed(2) > 1
-            ? '<b>Number of Single Base Substitutions</b>'
-            : '<b>Percentage of Single Base Substitutions</b>',
+            ? '<b>Number of Double Base Substitutions</b>'
+            : '<b>Percentage of Double Base Substitutions</b>',
         font: {
           family: 'Times New Roman',
         },
       },
       autorange: false,
       range: [0, maxMutation * 1.2],
+      linecolor: 'black',
+      linewidth: 1,
+      tickformat: parseFloat(totalMutations).toFixed(2) > 1 ? '~s' : '.1%',
       ticks: 'inside',
       tickcolor: '#D3D3D3',
-      linecolor: '#D3D3D3',
-      linewidth: 1,
-      mirror: 'all',
-      tickformat: parseFloat(totalMutations).toFixed(2) > 1 ? '~s' : '.1%',
       showgrid: true,
+      mirror: 'all',
       gridcolor: '#F5F5F5',
     },
 

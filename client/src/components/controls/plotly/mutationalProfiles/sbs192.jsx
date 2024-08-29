@@ -4,8 +4,8 @@ import {
   groupDataByMutation,
   createMutationShapes,
   createMutationAnnotations,
-} from './utils.js';
-import { sbsColor } from '../../utils/colors.js';
+} from './utils';
+import { sbsColor } from '../../utils/colors';
 
 export default function SBS192(apiData, title = '') {
   const colors = sbsColor;

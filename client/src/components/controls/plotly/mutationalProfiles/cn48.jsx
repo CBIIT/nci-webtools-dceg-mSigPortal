@@ -1,4 +1,4 @@
-import { getMaxMutations, createSampleAnnotation } from './utils.js';
+import { getMaxMutations, createSampleAnnotation } from './utils';
 
 export default function CN48(apiData, title = '') {
   const colors = {

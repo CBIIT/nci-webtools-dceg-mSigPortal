@@ -3,7 +3,7 @@ import {
   getMaxMutations,
   getTotalMutations,
   groupDataByMutation,
-} from './utils.js';
+} from './utils';
 
 import { id83Color } from '../../utils/colors';
 export default function ID83(apiData, title = '') {
