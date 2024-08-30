@@ -23,7 +23,7 @@ COPY client /app/client/
 RUN npm run build
 
 RUN mkdir -p /var/www/html/mutational-signatures \
-    && cp -r /app/client/build/* /var/www/html/mutational-signatures
+    && cp -r /app/client/dist/* /var/www/html/mutational-signatures
 
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
