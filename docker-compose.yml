@@ -3,8 +3,6 @@ services:
   backend:
     build:
       context: "."
-      args:
-        R_RENV_CACHE_HOST: ./data/renvCache
       dockerfile: "./docker/backend.dockerfile"
     env_file: "./server/.env"
     volumes:
@@ -44,13 +42,13 @@ services:
     ports:
       - "3000:80"
 
-  # database:
-  #   image: postgres
-  #   environment:
-  #     POSTGRES_USER: msigportal
-  #     POSTGRES_PASSWORD: msigportal
-  #     POSTGRES_DB: msigportal
-  #   volumes:
-  #     - "./data:/var/lib/postgresql/data"
-  #   ports:
-  #     - "5432:5432"
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: msigportal
+      POSTGRES_PASSWORD: msigportal
+      POSTGRES_DB: msigportal
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"

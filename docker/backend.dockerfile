@@ -86,11 +86,6 @@ COPY server/renv/activate.R /deploy/server/renv/
 COPY server/renv/settings.dcf /deploy/server/renv/
 COPY server/r-packages /deploy/server/r-packages
 
-# copy renv cache if available
-RUN mkdir /deploy/server/renv/.cache
-ENV RENV_PATHS_CACHE=/deploy/server/renv/.cache
-ARG R_RENV_CACHE_HOST=/renvCach[e]
-COPY ${R_RENV_CACHE_HOST} ${RENV_PATHS_CACHE}
 WORKDIR /deploy/server
 RUN R -e "\
     options(\
