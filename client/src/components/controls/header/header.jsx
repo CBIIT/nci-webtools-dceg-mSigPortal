@@ -7,12 +7,12 @@ export function Header() {
   return (
     <header className="bg-light">
       <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
-      <div class="usa-banner" aria-label="Official government website">
-        <div class="container mx-auto">
-          <div class="usa-banner__header">
-            <div class="usa-banner__inner">
-              <div class="container" >
-                <div class="usa-banner__header-text">
+      <div className="usa-banner" aria-label="Official government website">
+        <div className="container mx-auto">
+          <div className="usa-banner__header">
+            <div className="usa-banner__inner">
+              <div className="container" >
+                <div className="usa-banner__header-text">
                 An official website of the United States government
               </div>
             </div>

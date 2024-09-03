@@ -308,9 +308,9 @@ export default function Home({ links }) {
                 .map((e, i) => CardRow3(e, i))}
             </div>
             <div className="row">
-              <div class="col-sm-12">
+              <div className="col-sm-12">
                 <div
-                  class="card"
+                  className="card"
                   id="description"
                   style={{
                     borderRadius: '2em',
@@ -319,8 +319,8 @@ export default function Home({ links }) {
                     position: 'relative',
                   }}
                 >
-                  <div class="card-body">
-                    <p class="card-text">
+                  <div className="card-body">
+                    <p className="card-text">
                       mSigPortal was developed by{' '}
                       <a
                         href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
@@ -376,9 +376,9 @@ export default function Home({ links }) {
                     .map((e, i) => CardRow3(e, i))}
                 </div>
                 <div className="row">
-                  <div class="col-12">
+                  <div className="col-12">
                     <div
-                      class="card"
+                      className="card"
                       id="description"
                       style={{
                         borderRadius: '2em',
@@ -387,8 +387,8 @@ export default function Home({ links }) {
                         position: 'relative',
                       }}
                     >
-                      <div class="card-body">
-                        <p class="card-text">
+                      <div className="card-body">
+                        <p className="card-text">
                           mSigPortal was developed by{' '}
                           <a
                             href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
