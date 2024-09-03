@@ -10,7 +10,7 @@ export default function APIAccess() {
           <h1 className="h2 text-api">API Access</h1>
           <hr />
           <SwaggerUI
-            url={process.env.PUBLIC_URL + '/api'}
+            url={import.meta.env.BASE_URL + '/api'}
             tryItOutEnabled={true}
           />
         </div>
