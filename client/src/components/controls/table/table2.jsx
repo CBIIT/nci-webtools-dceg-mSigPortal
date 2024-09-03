@@ -25,15 +25,18 @@ import {
   useSortBy,
   useRowSelect,
   useExpanded,
-  useAsyncDebounce,
 } from 'react-table';
 import './table.scss';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, title }) {
   const [value, setValue] = useState(globalFilter);
-  const onChange = useAsyncDebounce((value) => {
-    setGlobalFilter(value || '');
-  }, 200);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      handleSetSearchTerm(value);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [value, setValue]);
 
   return (
     <Form.Group className="m-0">
@@ -44,7 +47,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, title }) {
         value={value || ''}
         onChange={(e) => {
           setValue(e.target.value);
-          onChange(e.target.value);
+          // onChange(e.target.value);
         }}
         aria-label={`${title.replace(/\s/g, '')}-search`}
       />

@@ -1,12 +1,11 @@
 // to be replaced by table2
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, setValue } from 'react';
 import BTable from 'react-bootstrap/Table';
 import { Dropdown, Form, Row, Col, Button } from 'react-bootstrap';
 import {
   useTable,
   useGlobalFilter,
   useFilters,
-  useAsyncDebounce,
   useSortBy,
   usePagination,
 } from 'react-table';
@@ -22,10 +21,13 @@ import { actions as modalActions } from '../../../services/store/modal';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
-  const onChange = useAsyncDebounce((value) => {
-    setGlobalFilter(value || '');
-    handleSearch(value || '');
-  }, 200);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      handleSetSearchTerm(value);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [value, setValue]);
 
   return (
     <Form.Group className="m-0">
@@ -36,7 +38,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
         value={value || ''}
         onChange={(e) => {
           setValue(e.target.value);
-          onChange(e.target.value);
+          // onChange(e.target.value);
         }}
         aria-label={`${title.replace(/\s/g, '')}-search`}
       />
