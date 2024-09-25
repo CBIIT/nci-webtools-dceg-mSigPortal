@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'process.env.EXTRACTION_FORM_LIMIT': env.EXTRACTION_FORM_LIMIT,
+      'process.env': env,
     },
   };
 });
