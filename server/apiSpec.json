@@ -1088,7 +1088,7 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "PCAWG"
           },
           {
             "name": "strategy",
@@ -1098,7 +1098,7 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "WGS"
           },
           {
             "name": "signatureName",
@@ -1108,7 +1108,7 @@
             "schema": {
               "type": "string"
             },
-            "value": ""
+            "value": "SBS1"
           },
           {
             "name": "cancer",
