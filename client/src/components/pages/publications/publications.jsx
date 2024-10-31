@@ -99,6 +99,7 @@ export default function Publications() {
                     'programmingLanguage',
                     'firstAuthor',
                     'lastAuthor',
+                    'journal',
                     'bioRxivOrPubmedId',
                     'doi',
                     'sourceUrl',
