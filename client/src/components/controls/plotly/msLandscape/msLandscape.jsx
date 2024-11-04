@@ -186,13 +186,32 @@ export default function MsLandscape(
       hovertemplate:
         '<b>Signature Contribution: </b>%{y}<br><b>Sample: </b>%{x}',
     }));
+   
+  // modify dendrogram trace
+  const dendrogramTrace = dendrogramExists
+  ? {
+      ...dendrogram.data[1],
+      x: dendrogram.data[1].x.map((e) => (typeof e === 'number' ? e - 1 : e)),
+      xaxis: 'x',
+      yaxis: 'y6',
+      text: dendrogram.data[1].x.map((e) =>
+        samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
+      ),
+    }
+  : {};
+
+  // Create a lookup map from cosineData using sample names as keys
+  const cosineDataMap = Object.fromEntries(cosineData.map((entry) => [entry.sample, entry]));
+
+  // Create a new dataset ordered according to `samples` base on the dendrogram
+  const reorderedCosineData = samples.map((sample) => cosineDataMap[sample]);
 
   const cosineSimHeatMap = [
     {
-      z: [cosineData.map((e) => e.similarity)],
-      x: cosineData.map((e) => samples.findIndex((v) => v === e.sample)),
+      z: [reorderedCosineData.map((e) => e.similarity)],
+      x: reorderedCosineData.map((e) => samples.findIndex((v) => v === e.sample)),
       customdata: [
-        cosineData.map((e) => ({
+        reorderedCosineData.map((e) => ({
           sample: e.sample,
         })),
       ],
@@ -216,6 +235,7 @@ export default function MsLandscape(
         '<b>Sample: </b>%{customdata.sample}<br><b>Cosine Similarity: </b>%{z}<extra></extra>',
     },
   ];
+
   const mutationCountTraces = Object.entries(groupBySignatureName_exposure2)
     .reverse()
     .map(([key, value]) => ({
@@ -376,18 +396,6 @@ export default function MsLandscape(
       },
     }));
 
-  // modify dendrogram trace
-  const dendrogramTrace = dendrogramExists
-    ? {
-        ...dendrogram.data[1],
-        x: dendrogram.data[1].x.map((e) => (typeof e === 'number' ? e - 1 : e)),
-        xaxis: 'x',
-        yaxis: 'y6',
-        text: dendrogram.data[1].x.map((e) =>
-          samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
-        ),
-      }
-    : {};
 
   let traces = [];
   if (variableDataSort.length > 0) {
