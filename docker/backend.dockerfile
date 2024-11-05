@@ -92,6 +92,7 @@ RUN R -e "\
     renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
     Ncpus = parallel::detectCores() \
     ); \
+    renv::install('Matrix@1.4-1'); \
     renv::restore();"
 
 # use build cache for npm packages
