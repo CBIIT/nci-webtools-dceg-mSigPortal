@@ -326,6 +326,7 @@ export default function Home({ links }) {
                         href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
                         target="_blank"
                         rel="noreferrer"
+                        className="accessible-link"
                       >
                         Dr. Tongwu Zhang{' '}
                       </a>{' '}
@@ -334,6 +335,7 @@ export default function Home({ links }) {
                         href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
                         target="_blank"
                         rel="noreferrer"
+                        className="accessible-link"
                       >
                         Dr. Maria Teresa Landi
                       </a>{' '}
@@ -346,6 +348,7 @@ export default function Home({ links }) {
                         href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
                         target="_blank"
                         rel="noreferrer"
+                        className="accessible-link"
                       >
                         Integrative Tumor Epidemiology Branch
                       </a>
@@ -355,6 +358,7 @@ export default function Home({ links }) {
                         href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
                         target="_blank"
                         rel="noreferrer"
+                        className="accessible-link"
                       >
                         source code
                       </a>{' '}

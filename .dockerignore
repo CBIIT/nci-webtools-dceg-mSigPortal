@@ -1,8 +1,9 @@
 .git
-.git
 **/node_modules/
 # **/data/
 **/logs/
 **/apache_logs/
 **/tmp/
-
+**/renv/sandbox/
+**/renv/library/
+**/renv/staging/

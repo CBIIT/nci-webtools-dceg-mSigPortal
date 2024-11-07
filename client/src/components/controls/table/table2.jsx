@@ -414,6 +414,7 @@ export default function Table({
                 gotoPage(page);
               }}
               style={paginationInput}
+              aria-label="Page number"
             />
             &nbsp; of {pageOptions.length}
           </div>
