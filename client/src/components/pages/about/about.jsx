@@ -12,6 +12,7 @@ export default function About() {
               href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu"
               target="_blank"
               rel="noreferrer"
+              className="accessible-link"
             >
               Tongwu Zhang
             </a>{' '}
@@ -20,6 +21,7 @@ export default function About() {
               href="https://dceg.cancer.gov/about/staff-directory/landi-maria"
               target="_blank"
               rel="noreferrer"
+              className="accessible-link"
             >
               Maria Teresa Landi
             </a>{' '}
@@ -31,6 +33,7 @@ export default function About() {
               href="https://dceg.cancer.gov/about/organization/tdrp/iteb"
               target="_blank"
               rel="noreferrer"
+              className="accessible-link"
             >
               Integrative Tumor Epidemiology Branch
             </a>
@@ -42,6 +45,7 @@ export default function About() {
               href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
               target="_blank"
               rel="noreferrer"
+              className="accessible-link"
             >
               source code
             </a>{' '}
@@ -88,6 +92,7 @@ export default function About() {
                 href="https://github.com/AlexandrovLab/SigProfilerExtractor"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 SigProfiler
               </a>
@@ -96,6 +101,7 @@ export default function About() {
                 href="https://github.com/Nik-Zainal-Group/signature.tools.lib"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 Signal
               </a>
@@ -104,6 +110,7 @@ export default function About() {
                 href="https://github.com/parklab/MuSiCal"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 MuSiCal
               </a>
@@ -112,6 +119,7 @@ export default function About() {
                 href="https://github.com/getzlab/SignatureAnalyzer"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 SignatureAnalyzer
               </a>
@@ -133,6 +141,7 @@ export default function About() {
                 href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 TCGA
               </a>
@@ -141,6 +150,7 @@ export default function About() {
                 href="https://dcc.icgc.org/pcawg"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 PCAWG
               </a>
@@ -149,6 +159,7 @@ export default function About() {
                 href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 Sherlock-Lung
               </a>
@@ -195,6 +206,7 @@ export default function About() {
                 href="mailto:NCImSigPortalWebAdmin@mail.nih.gov"
                 target="_blank"
                 rel="noreferrer"
+                className="accessible-link"
               >
                 support
               </a>

@@ -820,3 +820,13 @@ select.form-control-sm {
     column-count: 1;
   }
 }
+
+/* Accessible link style with improved contrast */
+.accessible-link {
+  color: #00509e; /* Darker blue to ensure 3:1 contrast */
+  text-decoration: underline; /* Add underline for additional distinction */
+}
+.accessible-link:hover {
+  color: #8E4A86; /* Darker blue to ensure 3:1 contrast */
+  text-decoration: underline; /* Add underline for additional distinction */
+}

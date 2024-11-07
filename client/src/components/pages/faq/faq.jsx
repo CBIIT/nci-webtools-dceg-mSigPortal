@@ -12,17 +12,18 @@ export default function Faq() {
           Collected public data on mSigPortal includes sample level mutational
           profiles, mutational signatures decomposition and associated variables
           collected from the scientific literature, such as{' '}
-          <a href="https://dcc.icgc.org/pcawg" target="_blank">
+          <a href="https://dcc.icgc.org/pcawg" target="_blank" className="accessible-link">
             PCAWG
           </a>
           ,{' '}
-          <a href="https://www.nature.com/articles/nature17676" target="_blank">
+          <a href="https://www.nature.com/articles/nature17676" target="_blank" className="accessible-link">
             Breast560
           </a>
           ,{' '}
           <a
             href="https://dceg.cancer.gov/research/cancer-types/lung/sherlock-lung-study"
             target="_blank"
+            className="accessible-link"
           >
             Sherlock-Lung
           </a>
@@ -30,11 +31,12 @@ export default function Faq() {
           <a
             href="https://www.cancer.gov/news-events/press-releases/2021/genetic-effects-chernobyl-radiation-exposure"
             target="_blank"
+            className="accessible-link"
           >
             ChernobylThyroid
           </a>
           ,{' '}
-          <a href="https://portal.gdc.cancer.gov/" target="_blank">
+          <a href="https://portal.gdc.cancer.gov/" target="_blank" className="accessible-link">
             TCGA
           </a>
           , and many others. Experimental strategies within these public data
@@ -52,27 +54,28 @@ export default function Faq() {
         <p>
           Several reference signature sets are included in mSigPortal. These
           include: Cancer Reference Signatures (SBS and RS),{' '}
-          <a href="https://cancer.sanger.ac.uk/signatures/" target="_blank">
+          <a href="https://cancer.sanger.ac.uk/signatures/" target="_blank" className="accessible-link">
             COSMIC Signature
           </a>
           , (SBS, DBS, ID),{' '}
           <a
             href="https://signal.mutationalsignatures.com/explore/mutagens"
             target="_blank"
+            className="accessible-link"
           >
             Environmental Mutagen Signatures
           </a>{' '}
           (SBS, ID),{' '}
           <a
             href="https://signal.mutationalsignatures.com/explore/study/1"
-            target="_blank"
+            target="_blank" className="accessible-link"
           >
             Organ-specific Cancer Signatures
           </a>{' '}
           (SBS and RS), SignatureAnalyzer PCAWG WGS Signatures (SBS, SBS, DBS,
           ID), SigProfiler PCAWG Strand Signatures (SBS), SigProfiler PCAWG WXS
           Signatures (SBS), and Other Published Signatures (SBS, ID). Click{' '}
-          <a href="/#/catalog/signature">here</a> for additional information
+          <a href="/#/catalog/signature" className="accessible-link">here</a> for additional information
           regarding current reference signatures in mSigPortal.
         </p>
       ),
@@ -93,6 +96,7 @@ export default function Faq() {
           <a
             href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-019-6041-2"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -114,6 +118,7 @@ export default function Faq() {
           <a
             href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-019-6041-2"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -137,6 +142,7 @@ export default function Faq() {
           <a
             href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-019-6041-2"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -172,6 +178,7 @@ export default function Faq() {
           <a
             href="https://www.ncbi.nlm.nih.gov/research/mutagene/help#signatures"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -202,6 +209,7 @@ export default function Faq() {
           <a
             href="https://www.ncbi.nlm.nih.gov/research/mutagene/help#signatures"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -221,6 +229,7 @@ export default function Faq() {
           <a
             href="https://www.kaggle.com/residentmario/l1-norms-versus-l2-norms"
             target="_blank"
+            className="accessible-link"
           >
             here
           </a>
@@ -345,7 +354,7 @@ export default function Faq() {
           principal components generated. In the case of mutational signatures,
           each principal component can also be used to compare known mutational
           signatures{' '}
-          <a href="https://www.nature.com/articles/nbt0308-303" target="_blank">
+          <a href="https://www.nature.com/articles/nbt0308-303" target="_blank" className="accessible-link">
             (Ringnér, 2008)
           </a>
           .
@@ -387,6 +396,7 @@ export default function Faq() {
           <a
             href="https://www.cancer.gov/publications/dictionaries/cancer-terms/def/tumor-mutational-burden"
             target="_blank"
+            className="accessible-link"
           >
             (NCI, 2021)
           </a>
