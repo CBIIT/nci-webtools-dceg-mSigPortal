@@ -1,0 +1,66 @@
+.swagger-ui .opblock.opblock-post .opblock-summary-method { 
+    background-color: #8E4A86 !important; /* Change POST method block color */
+  }
+  
+  .swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background-color: #8E4A86 !important;
+  }
+  .opblock-summary opblock-summary-get {
+    background-color: #8E4A86 !important;
+  }
+
+  .swagger-ui .opblock.opblock-get .opblock-summary, 
+  .swagger-ui table, 
+  .swagger-ui .table-container, 
+  .swagger-ui .execute-wrapper,
+  .opblock-body .responses-wrapper .responses-inner,
+  .opblock-body .btn-group {
+    background-color: #f1e4ef !important;
+  }
+  
+  .opblock-section-header .opblock-title span {
+    color: #d90000 !important; /* Darker red with better contrast */
+  }
+  
+  .swagger-ui .btn.cancel {
+    background-color: #0000;
+    border-color: #B30000 !important;
+    color: #B30000 !important;
+  }
+  
+  .swagger-ui .btn.execute {
+    background-color: #8e4b86 !important;
+    border-color: #8e4b86 !important;
+  }
+  
+  .swagger-ui .opblock.opblock-post {
+    background: #F0F7FF;
+    border-color: #f1e4ef;
+  }
+  .swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: #f1e4ef;
+  }
+  .swagger-ui .opblock.opblock-post .opblock-summary {
+    border-color: #f1e4ef;
+  }
+  .swagger-ui .opblock.opblock-post .tab-header .tab-item.active h4 span:after {
+    background: #8e4b86;
+  }
+  .swagger-ui .opblock.opblock-get .tab-header .tab-item.active h4 span:after {
+    background: #8e4b86;
+  }
+  
+  .swagger-ui .download-contents,
+  .swagger-ui .curl-command .copy-to-clipboard, 
+  .swagger-ui .copy-to-clipboard,
+  .swagger-ui .download-contents{
+    background: #545964 !important;
+  }
+  
+  .swagger-ui .response-col_status .response-undocumented{
+    color:#595959;
+  }
+
+  .swagger-ui .parameter__extension, .swagger-ui .parameter__in{
+    color:#595959;
+  }

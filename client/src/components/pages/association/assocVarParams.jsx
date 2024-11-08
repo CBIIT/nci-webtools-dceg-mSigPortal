@@ -129,6 +129,7 @@ export default function AssocVarParams({
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'source-' + index}
             label="Variable Source"
+            aria-labelledby={`label-source-${index}`}
             value={source}
             options={sourceOptions}
             onChange={(e) => handleSource(e)}
@@ -139,6 +140,7 @@ export default function AssocVarParams({
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'type-' + index}
             label="Data Type"
+            aria-labelledby={`label-type-${index}`}
             value={type}
             options={typeOptions}
             onChange={(e) => handleType(e)}
@@ -149,6 +151,7 @@ export default function AssocVarParams({
             disabled={loadingData || loadingParams || loadingCalculate || name}
             id={'assocVariable-' + index}
             label="Variable Name"
+            aria-labelledby={`label-assocVariable-${index}`}
             value={tmpName}
             options={nameOptions}
             onChange={(e) => mergeState({ tmpName: e })}
