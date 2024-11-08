@@ -87,7 +87,7 @@ export default function MsIndividualPlot({ state, form }) {
               are. For example, two identical mutational profiles will have RSS
               = 0 and Cosine similarity = 1. For additional information about
               RSS and cosine similarity, click{' '}
-              <NavHashLink to="/faq#cosine-similarity">here</NavHashLink>.
+              <NavHashLink to="/faq#cosine-similarity" className="accessible-link">here</NavHashLink>.
             </p>
           </div>
         </div>
