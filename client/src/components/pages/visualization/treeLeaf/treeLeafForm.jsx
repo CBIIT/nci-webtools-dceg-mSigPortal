@@ -60,6 +60,7 @@ export default function TreeLeafForm() {
               defaultValue={defaultCancer}
               options={cancerTypes}
               onChange={(e) => mergeForm({ cancerType: e })}
+              aria-label="Cancer Type Selector"
             />
           </Form.Group>
         </Col>        
@@ -71,6 +72,7 @@ export default function TreeLeafForm() {
               defaultValue={colorOptions[0]}
               options={colorOptions}
               onChange={(e) => mergeForm({ color: e })}
+              aria-label="Leaf Property Selector"
             />
           </Form.Group>
         </Col>
@@ -84,6 +86,7 @@ export default function TreeLeafForm() {
               defaultOptions={filterSampleOptions()}
               loadOptions={handleSearchOptions}
               onChange={handleSearch}
+              aria-label="Sample Search Selector"
             />
           </Form.Group>
         </Col>
