@@ -24,5 +24,13 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env': env,
     },
+    build: {
+      rollupOptions: {
+        input: '/index.html', 
+      },
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom'], 
+    },
   };
 });

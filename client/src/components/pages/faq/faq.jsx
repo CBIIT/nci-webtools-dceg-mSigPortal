@@ -388,6 +388,7 @@ export default function Faq() {
           <a
             href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5461196/"
             target="_blank"
+            className="accessible-link"
           >
             (Zehir et al., 2017)
           </a>
