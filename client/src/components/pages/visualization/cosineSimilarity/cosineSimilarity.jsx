@@ -19,7 +19,7 @@ export default function CosineSimilarity({ state }) {
         profiles from public data (CS to Public Data). Simply use the dropdown
         menus to select a [Profile Type], [Matrix Size], or [Reference Signature
         Set]. Click here to learn more about cosine similarity. Click{' '}
-        <NavHashLink to="/faq#cosine-similarity">here</NavHashLink> to learn
+        <NavHashLink to="/faq#cosine-similarity" className="accessible-link">here</NavHashLink> to learn
         more about cosine similarity.
       </p>
       <Tab.Container

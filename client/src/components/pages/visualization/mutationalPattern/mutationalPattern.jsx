@@ -13,7 +13,7 @@ export default function MutationalPattern({ state }) {
               The aim of the mutational pattern enrichment analysis is to
               determine frequency and enrichment of different types of
               mutational patterns. For more information about mutational pattern
-              enrichment, click <NavHashLink to="/faq#mpea">here</NavHashLink>.
+              enrichment, click <NavHashLink to="/faq#mpea" className="accessible-link">here</NavHashLink>.
             </p>
           }
           more={
