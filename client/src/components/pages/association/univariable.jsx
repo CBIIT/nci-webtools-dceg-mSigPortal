@@ -329,12 +329,12 @@ export default function Univariable() {
           >
             <Col md="auto" lg="auto">
               <CustomSelect
-                disabled={
+                disabled={!!!(
                   loadingData ||
                   loadingParams ||
                   loadingCalculate ||
                   resultsTable.data.length
-                }
+                )}
                 id="expVariable"
                 label="Signature Exposure Variable"
                 value={exposureVar.name}
@@ -520,12 +520,12 @@ export default function Univariable() {
                   <CustomSelect
                     aria-label="Method"
                     className="mb-0"
-                    disabled={
+                    disabled={!!!(
                       loadingData ||
                       loadingParams ||
                       loadingCalculate ||
                       resultsTable.data.length
-                    }
+                    )}
                     id="testType"
                     label=""
                     value={testType}

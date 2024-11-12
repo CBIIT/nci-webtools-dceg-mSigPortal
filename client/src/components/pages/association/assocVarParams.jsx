@@ -126,10 +126,11 @@ export default function AssocVarParams({
       >
         <Col md="auto">
           <CustomSelect
-            disabled={loadingData || loadingParams || loadingCalculate || name}
+            disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
             id={'source-' + index}
             label="Variable Source"
             aria-labelledby={`label-source-${index}`}
+            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
             value={source}
             options={sourceOptions}
             onChange={(e) => handleSource(e)}
@@ -137,10 +138,11 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <CustomSelect
-            disabled={loadingData || loadingParams || loadingCalculate || name}
+            disabled={!!!(loadingData || loadingParams || loadingCalculate || name)}
             id={'type-' + index}
             label="Data Type"
             aria-labelledby={`label-type-${index}`}
+            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
             value={type}
             options={typeOptions}
             onChange={(e) => handleType(e)}
@@ -148,10 +150,11 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <CustomSelect
-            disabled={loadingData || loadingParams || loadingCalculate || name}
+            disabled={!!!(loadingData || loadingParams || loadingCalculate || name)}
             id={'assocVariable-' + index}
             label="Variable Name"
             aria-labelledby={`label-assocVariable-${index}`}
+            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
             value={tmpName}
             options={nameOptions}
             onChange={(e) => mergeState({ tmpName: e })}
