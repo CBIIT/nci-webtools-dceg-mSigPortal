@@ -401,7 +401,7 @@ export default function Table({
               </Pagination.Last>
             </Pagination>
           </div>
-          <div className="d-flex ps-2 pb-1 align-items-center">
+          <div className="d-flex ps-2 pb-1 align-items-center text-primary-blue">
             {/* {rows.length.toLocaleString()} */}
             {/* Page {pageIndex + 1} of {pageOptions.length} */}
             Page &nbsp;
