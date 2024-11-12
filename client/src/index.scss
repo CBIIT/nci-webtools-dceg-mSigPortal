@@ -203,9 +203,16 @@ h6 {
   &:hover,
   &:active {
     background-color: #8e4b86;
-    color: #fff;
+    color: #f8f8ff;
   }
 }
+
+.btn-primary.disabled {
+  color: #2c1e28;
+  background-color: #ffffff;
+}
+
+
 
 .btn-primary {
   color: #fff;
