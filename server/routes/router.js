@@ -8,7 +8,7 @@ import {
   logErrors,
   logFiles,
 } from '../services/middleware.js';
-import apiSpec from '../apiSpec.json' assert { type: 'json' };
+import apiSpec from '../apiSpec.json' with { type: 'json' };
 import { router as general } from '../services/api/general.js';
 import { router as visualizationRoutes } from '../services/api/visualization/visualization.js';
 import { router as userVisualizationRoutes } from '../services/api/visualization/userVisualization.js';
