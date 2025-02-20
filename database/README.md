@@ -12,7 +12,6 @@
  - exportCombinedDatasets.sh
  - exportEtiologyNormalized.sh
  - exportPublications.sh
- - exportQuery.sh
 6. Sync the local Data folder to the s3 Database/ folder
 7. Execute the startDatabaseImport.js script with the following arguments:
  - node startDatabaseImport.js --schema schema.js --sources sources.js --provider s3 s3://bucket-name/msigportal/Database
