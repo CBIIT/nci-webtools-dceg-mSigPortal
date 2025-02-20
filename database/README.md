@@ -8,7 +8,7 @@
  - node createDatabase.js --schema schema.js
 3. Sync the msigportal Database/ folder from the s3 folder to a local folder (eg: data/)
 ```
-aws s3 sync [s3 database] [local folder]
+aws s3 sync s3://bucket-name/Database/ path-to-local-folder/Database/
 ```
 4. Copy over the scripts in the utils/ folder to the data folder
 5. Run the following scripts:
@@ -17,7 +17,7 @@ aws s3 sync [s3 database] [local folder]
  - exportPublications.sh
 6. Sync the local Data folder to the s3 Database/ folder
 ```
-aws s3 sync [local folder] [s3 Database]
+aws s3 sync path-to-local-folder/Database/ s3://bucket-name/Database/
 ```
 7. Execute the startDatabaseImport.js script with the following arguments:
  - node startDatabaseImport.js --schema schema.js --sources sources.js --provider s3 s3://bucket-name/msigportal/Database
