@@ -3,7 +3,7 @@
 ## Getting Started
 
 ### Importing Data
-1. Ensure config.json exists and specifies a Postgres database configuration and s3 bucket/key prefix
+1. Ensure databse/config.json exists and specifies a Postgres database configuration and s3 bucket/key prefix
 2. If starting from a clean database, run the createDatabase.js script
  - node createDatabase.js --schema schema.js
 3. Sync the msigportal Database/ folder from the s3 folder to a local folder (eg: data/)
@@ -23,6 +23,7 @@ aws s3 sync path-to-local-folder/Database/ s3://bucket-name/Database/
  - node startDatabaseImport.js --schema schema.js --sources sources.js --provider s3 s3://bucket-name/msigportal/Database
  - Optionally, we can execute the database import using local files:
  - node startDatabaseImport.js --schema schema.js --sources sources.js --provider local path/to/data/folder
+ 
 
 Notes:
 1. Sequencing Strategy/Dataset are used interchangably (eg: WES, WGS, etc)
