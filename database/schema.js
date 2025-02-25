@@ -339,7 +339,7 @@ export const schema = [
       table.string('bioRxivOrPubmedId');
       table.text('title');
       table.string('doi');
-      table.string('note');
+      table.text('note');
       table.string('diseaseOrPhenotypeOrExposure');
       table.string('cancerType');
       table.string('experimentalStrategy');
