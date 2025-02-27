@@ -1187,6 +1187,21 @@ export const sbsColor = {
   'T>G': '#EBC6C4',
 };
 
+export const rnaSBS192Color = {
+  'C>A': '#03BCEE',
+  'C>G': 'black',
+  'C>T': '#E32926',
+  'T>A': '#CAC9C9',
+  'T>C': '#A1CE63',
+  'T>G': '#EBC6C4',
+  'G>T': '#94D5E9',
+  'G>C': '#5E6264',
+  'G>A': '#E26B13',
+  'A>T': '#ECE7EC',
+  'A>G': '#DBF578',
+  'A>C': '#F5DBDA',
+};
+
 export const id83Color = {
   '1:Del:C': { shape: '#FBBD6F', text: 'black' },
   '1:Del:T': { shape: '#FE8002', text: 'white' },
