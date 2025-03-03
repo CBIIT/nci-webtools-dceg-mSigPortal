@@ -5,6 +5,7 @@ export default function RsInMsigportal(rawData) {
     'ID83',
     'CN48',
     'RS32',
+    'RNA192',
     'SBS96',
     'SBS192',
     'SBS288',
@@ -81,6 +82,7 @@ export default function RsInMsigportal(rawData) {
   );
 
   const groupedHuman_sorted = profile_order_0.map((key) => groupedHuman[key]);
+  console.log("groupedHuman_sorted ", groupedHuman_sorted);
   const groupedMm9_sorted = profile_order_1.map((key) => groupedMm9[key]);
   const tracePies0 = Object.entries(groupedHuman_sorted).map(
     ([key, element], index, array) => ({
@@ -97,23 +99,25 @@ export default function RsInMsigportal(rawData) {
       values: element.map((e) => parseInt(e.count)),
       texttemplate: '%{value}',
       direction: 'clockwise',
+      index: index,
       name: array[index][1][0].profile + array[index][1][0].matrix,
       domain: {
         x: [
-          index < 4
+          index < 5
             ? Math.round(index * (1 / 5) * 10) / 10
-            : Math.round((index - 4) * (1 / 5) * 10) / 10,
-          index < 4
+            : Math.round((index - 5) * (1 / 5) * 10) / 10,
+          index < 5
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
-            : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
+            : Math.round(((index - 5) * (1 / 5) + 0.2) * 10) / 10,
         ],
         // y: [index < 4 ? 0.675 : 0.85, index < 4 ? 0.8 : 0.975],
-        y: [index < 4 ? 0.635 : 0.83, index < 4 ? 0.79 : 0.985],
+        y: [index < 5 ? 0.635 : 0.83, index < 5 ? 0.79 : 0.985],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
+  console.log("tracePies0 ", tracePies0);
   const tracePies1 = Object.entries(groupedMm9_sorted).map(
     ([key, element], index, array) => ({
       type: 'pie',
@@ -222,14 +226,17 @@ export default function RsInMsigportal(rawData) {
     } else if (index === 3) {
       indexPosition = 0.693;
     } else if (index === 4) {
-      indexPosition = 0.095;
+      indexPosition = 0.892;
     } else if (index === 5) {
-      indexPosition = 0.2955;
+      indexPosition = 0.095;
     } else if (index === 6) {
-      indexPosition = 0.498;
+      indexPosition = 0.294;
     } else if (index === 7) {
+      indexPosition = 0.493;
+    } else if (index === 8){
       indexPosition = 0.698;
-    } else {
+    }
+     else {
       indexPosition = 0.892;
     }
     return indexPosition;
@@ -242,6 +249,7 @@ export default function RsInMsigportal(rawData) {
       xanchor: 'center',
       yanchor: 'middle',
       showarrow: false,
+      index: index,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
         8,
         ' '
@@ -249,9 +257,10 @@ export default function RsInMsigportal(rawData) {
       align: 'left',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
-      y: index < 4 ? 0.805 : 0.995,
+      y: index < 5 ? 0.805 : 0.995,
     })
   );
+  console.log("pieTitles0 ", pieTitles0);
   const pieTitles1 = Object.entries(groupedMm9_sorted).map(
     ([key, element], index, array) => ({
       xref: 'paper',
