@@ -24,7 +24,7 @@ export default function Etiology() {
   const categories = [
     {
       category: 'Cosmic',
-      name: 'Cosmic Mutational Signatures (v3.3)',
+      name: 'Cosmic Mutational Signatures (v3.4)',
       author: 'Alexandrov et al., 2021',
       etiologyTitle: 'Proposed Etiologies',
     },
