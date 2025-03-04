@@ -16,7 +16,7 @@ export const getInitialState = () => ({
     category: 'Cosmic',
     etiology: '',
     signature: '',
-    referrenceSignature: '',
+    referenceSignature: '',
     study: '',
     cohort: '',
     showAllSignatures: false,
