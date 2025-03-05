@@ -24,6 +24,7 @@ export default function Publications() {
         {data && data['Original Research A'] && (
           <div className="mb-5">
             <Table
+              tableId="original-research-a"
               title="Original Research Papers Including Specific Mutational Signatures in mSigPortal"
               columns={data['Original Research A'].columns}
               data={data['Original Research A'].data}
@@ -48,6 +49,7 @@ export default function Publications() {
         {data && data['Original Research B'] && (
           <div className="mb-5">
             <Table
+              tableId="original-research-b"
               title="Original Research Papers Involved in Mutational Signature Analyses"
               columns={data['Original Research B'].columns}
               data={data['Original Research B'].data}
@@ -71,6 +73,7 @@ export default function Publications() {
         {data && data['Review Paper'] && (
           <div className="mb-5">
             <Table
+              tableId="review-table"
               title="Review Papers Focused on Mutational Signatures"
               columns={data['Review Paper'].columns}
               data={data['Review Paper'].data}
@@ -88,6 +91,7 @@ export default function Publications() {
         {data && data['Computational Methods'] && (
           <div className="mb-5">
             <Table
+              tableId="computational-methods"
               title="Computational Methods, Tools, Databases or Websites for Mutational Signature Analyses"
               columns={data['Computational Methods'].columns}
               data={data['Computational Methods'].data}

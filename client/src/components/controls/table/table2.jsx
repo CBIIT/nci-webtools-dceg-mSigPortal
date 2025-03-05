@@ -133,6 +133,7 @@ function getCsv(data) {
 }
 
 export default function Table({
+  tableId,
   columns,
   data,
   title = '',
@@ -239,21 +240,26 @@ export default function Table({
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Form>
-                  {allColumns.map((column) => (
-                    <Form.Group
-                      key={`${column.Header}-visible`}
-                      controlId={`${column.Header}-visible`}
-                      className="my-1 px-2"
-                    >
-                      <Form.Check
-                        type="checkbox"
-                        label={column.Header}
-                        {...column.getToggleHiddenProps()}
-                      />
-                    </Form.Group>
-                  ))}
+                  {allColumns.map((column) => {
+                    const checkboxId = `toggle-${tableId}-${column.id}`; // Ensure unique checkbox ID
+
+                    return (
+                      <Form.Group key={checkboxId} controlId={checkboxId} className="my-1 px-2 d-flex align-items-center">
+                        <Form.Check
+                          type="checkbox"
+                          id={checkboxId}
+                          {...column.getToggleHiddenProps()}
+                          className="me-2"
+                        />
+                        <Form.Label htmlFor={checkboxId} className="m-0">
+                          {column.Header} 
+                        </Form.Label>
+                      </Form.Group>
+                    );
+                  })}
                 </Form>
               </Dropdown.Menu>
+
             </Dropdown>
           )}
         </Col>
