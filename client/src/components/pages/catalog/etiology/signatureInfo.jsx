@@ -140,8 +140,14 @@ export default function SignatureInfo({ data }) {
   // return a valid signatureSetName and profile depending on the selected category and signature
   // refer to Database/Etiology/signature_refsets_etiology.RData for what parameters to use
   function getSignatureParams(category, signature) {
-    if (category == 'Cosmic') {
-      return signature.includes('SBS')
+        if (category == 'Cosmic') {
+      return signature.includes('RNA')
+        ? {
+          signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_RNA-SBS192',
+          profile: 'RNA',
+          matrix: '192',
+        } 
+        : signature.includes('SBS')
         ? {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
             profile: 'SBS',
@@ -164,9 +170,10 @@ export default function SignatureInfo({ data }) {
             signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_CN48',
             profile: 'CN',
             matrix: '48',
-          }
+          }        
         : false;
-    } else if (category == 'CancerSpecificSignatures_2022') {
+    }
+     else if (category == 'CancerSpecificSignatures_2022') {
       return signature.includes('SBS')
         ? {
             signatureSetName: 'Cancer_Reference_Signatures_2022_GRCh37_SBS96',
@@ -262,8 +269,8 @@ export default function SignatureInfo({ data }) {
               profile: 'ID',
               matrix: '83',
             }
-          : false;
-    }
+          : false;          
+    }    
   }
 
   // split description string delimited by key:

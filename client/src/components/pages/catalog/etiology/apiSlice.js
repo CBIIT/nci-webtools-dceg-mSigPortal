@@ -8,6 +8,7 @@ import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
 import CN48 from '../../../controls/plotly/mutationalProfiles/cn48';
 import ID29 from '../../../controls/plotly/mutationalProfiles/id29';
 import RS32 from '../../../controls/plotly/mutationalProfiles/rs32';
+import RNASBS192 from '../../../controls/plotly/mutationalProfiles/rnasbs192';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -77,6 +78,7 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
         else if (profileMatrix == 'CN48') return CN48(data);
         else if (profileMatrix == 'ID29') return ID29(data);
         else if (profileMatrix == 'RS32') return RS32(data);
+        else if (profileMatrix == 'RNA192') return RNASBS192(data);
         else return false;
       },
     }),

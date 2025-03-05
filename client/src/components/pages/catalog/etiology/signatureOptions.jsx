@@ -41,7 +41,7 @@ export default function SignatureOptions({ data }) {
   }
 
   function profileSort(a, b) {
-    const sigOrder = [/SBS/g, /DBS/g, /ID/g, /CN/g];
+    const sigOrder = [/SBS/g, /DBS/g, /ID/g, /CN/g, /RNA/g];
     let c = 0,
       d = 0;
 
