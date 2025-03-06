@@ -14,6 +14,7 @@ export default function RsInMsigportal(rawData) {
   ];
   const profile_order_1 = ['SBS96', 'DBS78', 'ID83'];
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
+  console.log("groupBySpecies ", groupBySpecies)
   console.log("rawData in RsInMsigportal: ", rawData);
   const groupByignatureSetName = groupBy(
     rawData,
@@ -40,6 +41,7 @@ export default function RsInMsigportal(rawData) {
   let dataMm9 = [];
   let dataRn6 = [];
   let dataGallus = [];
+  let dataCaenorhabditis = [];
   Object.entries(groupBySpecies).map(([key, val], index) => {
     if (key.includes('(GRCh37/38)')) {
       dataHuman.push(val);
@@ -47,9 +49,10 @@ export default function RsInMsigportal(rawData) {
       dataMm9.push(val);
     } else if (key.includes('(rn6)')) {
       dataRn6.push(val);
-    }    
-     else {
-      dataGallus.push(val);
+    } else if (key.includes('GRCg7b')){  
+       dataGallus.push(val);
+    } else {
+      dataCaenorhabditis.push(val);
     }
   });
 
@@ -63,6 +66,7 @@ export default function RsInMsigportal(rawData) {
   dataMm9 = dataMm9.flat();
   dataRn6 = dataRn6.flat();
   dataGallus = dataGallus.flat();
+  dataCaenorhabditis = dataCaenorhabditis.flat();
 
   const groupedHuman = groupBy(
     dataHuman,
@@ -78,6 +82,10 @@ export default function RsInMsigportal(rawData) {
   );
   const groupedGallus = groupBy(
     dataGallus,
+    (item) => `${item.profile}${item.matrix}`
+  );
+  const groupCaenorhabditis = groupBy(
+    dataCaenorhabditis,
     (item) => `${item.profile}${item.matrix}`
   );
 
@@ -111,7 +119,7 @@ export default function RsInMsigportal(rawData) {
             : Math.round(((index - 5) * (1 / 5) + 0.2) * 10) / 10,
         ],
         // y: [index < 4 ? 0.675 : 0.85, index < 4 ? 0.8 : 0.975],
-        y: [index < 5 ? 0.635 : 0.83, index < 5 ? 0.79 : 0.985],
+        y: [index < 5 ? 0.7 : 0.855, index < 5 ? 0.825 : 0.98],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -144,7 +152,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.42, 0.575],
+        y: [0.525, 0.65],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -177,7 +185,7 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0.205, 0.36],
+        y: [0.35, 0.475],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -209,12 +217,46 @@ export default function RsInMsigportal(rawData) {
             ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
             : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
         ],
-        y: [0, 0.155],
+        y: [0.175, 0.3],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
     })
   );
+
+  const tracePies4 = Object.entries(groupCaenorhabditis).map(
+    ([key, element], index, array) => ({
+      type: 'pie',
+      e: element,
+      marker: {
+        color: element.map((e) => colors[e.signatureSetName]),
+        line: {
+          color: 'black',
+          width: 1,
+        },
+      },
+      textposition: 'inside',
+      labels: element.map((e) => e.signatureSetName),
+      values: element.map((e) => parseInt(e.count)),
+      texttemplate: '%{value}',
+      direction: 'clockwise',
+      name: key,
+      domain: {
+        x: [
+          index < 4
+            ? Math.round(index * (1 / 5) * 10) / 10
+            : Math.round((index - 4) * (1 / 5) * 10) / 10,
+          index < 4
+            ? Math.round((index * (1 / 5) + 0.2) * 10) / 10
+            : Math.round(((index - 4) * (1 / 5) + 0.2) * 10) / 10,
+        ],
+        y: [0, 0.125],
+      },
+      hovertemplate:
+        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
+    })
+  );
+
   function indexPos(index) {
     let indexPosition;
     if (index === 0) {
@@ -257,7 +299,7 @@ export default function RsInMsigportal(rawData) {
       align: 'left',
       //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
       x: indexPos(index),
-      y: index < 5 ? 0.805 : 0.995,
+      y: index < 5 ? 0.84 : 0.995,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -275,7 +317,7 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       x: indexPos(index),
-      y: 0.59,
+      y: 0.665,
     })
   );
 
@@ -290,7 +332,7 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.375,
+      y: 0.49,
     })
   );
 
@@ -305,7 +347,21 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.17,
+      y: 0.315,
+    })
+  );
+  const pieTitles4 = Object.entries(groupCaenorhabditis).map(
+    ([key, element], index, array) => ({
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'center',
+      yanchor: 'middle',
+      showarrow: false,
+      text: key.padStart(7, ' '),
+      align: 'center',
+      //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
+      x: indexPos(index),
+      y: 0.14,
     })
   );
   const annotationTitle0 = {
@@ -316,7 +372,7 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[0],
     font: {
-      size: 16,
+      size: 14,
     },
     x: 0.5,
     y: 1.02,
@@ -330,10 +386,10 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[1],
     font: {
-      size: 16,
+      size: 14,
     },
     x: 0.25,
-    y: 0.60,
+    y: 0.675,
   };
 
   const annotationTitle2 = {
@@ -344,10 +400,10 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[2],
     font: {
-      size: 16,
+      size: 14,
     },
     x: 0.15,
-    y: 0.385,
+    y: 0.5,
   };
 
   const annotationTitle3 = {
@@ -358,10 +414,24 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[3],
     font: {
-      size: 16,
+      size: 14,
     },
     x: 0.15,
-    y: 0.18,
+    y: 0.325,
+  };
+
+  const annotationTitle4 = {
+    xref: 'paper',
+    yref: 'paper',
+    xanchor: 'bottom',
+    yanchor: 'bottom',
+    showarrow: false,
+    text: Object.keys(groupBySpecies)[4],
+    font: {
+      size: 14,
+    },
+    x: 0.15,
+    y: 0.15,
   };
 
   const shapes = [
@@ -396,9 +466,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 0.61,
+      y0: 0.685,
       x1: 0.23,
-      y1: 0.61,
+      y1: 0.685,
       line: {
         color: 'gray',
         width: 3,
@@ -408,10 +478,10 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.5,
-      y0: 0.61,
+      x0: 0.45,
+      y0: 0.685,
       x1: 0.7,
-      y1: 0.61,
+      y1: 0.685,
       line: {
         color: 'gray',
         width: 3,
@@ -422,9 +492,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 0.395,
+      y0: 0.51,
       x1: 0.14,
-      y1: 0.395,
+      y1: 0.51,
       line: {
         color: 'gray',
         width: 3,
@@ -434,10 +504,10 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.38,
-      y0: 0.395,
+      x0: 0.355,
+      y0: 0.51,
       x1: 0.7,
-      y1: 0.395,
+      y1: 0.51,
       line: {
         color: 'gray',
         width: 3,
@@ -448,9 +518,9 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       x0: 0,
-      y0: 0.19,
+      y0: 0.335,
       x1: 0.14,
-      y1: 0.19,
+      y1: 0.335,
       line: {
         color: 'gray',
         width: 3,
@@ -460,10 +530,36 @@ export default function RsInMsigportal(rawData) {
       type: 'line',
       xref: 'paper',
       yref: 'paper',
-      x0: 0.475,
-      y0: 0.19,
+      x0: 0.44,
+      y0: 0.335,
       x1: 0.7,
-      y1: 0.19,
+      y1: 0.335,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0,
+      y0: 0.16,
+      x1: 0.14,
+      y1: 0.16,
+      line: {
+        color: 'gray',
+        width: 3,
+      },
+    },
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.44,
+      y0: 0.16,
+      x1: 0.7,
+      y1: 0.16,
       line: {
         color: 'gray',
         width: 3,
@@ -471,7 +567,7 @@ export default function RsInMsigportal(rawData) {
     },
   ];
 
-  const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3];
+  const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 1080,
@@ -494,10 +590,12 @@ export default function RsInMsigportal(rawData) {
       ...pieTitles1,
       ...pieTitles2,
       ...pieTitles3,
+      ...pieTitles4,
       annotationTitle0,
       annotationTitle1,
       annotationTitle2,
-      annotationTitle3
+      annotationTitle3,
+      annotationTitle4
     ],
     shapes: [...shapes],
   };
