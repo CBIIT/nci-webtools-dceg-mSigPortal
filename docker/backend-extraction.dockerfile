@@ -28,6 +28,9 @@ RUN dnf -y update \
 
 RUN mkdir -p /deploy/app /deploy/logs
 
+# Install NumPy 1.26.4 explicitly before other dependencies
+RUN pip3 install numpy==1.26.4
+
 # install SigProfilerExtractor
 WORKDIR /deploy/app
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
