@@ -28,8 +28,6 @@ RUN dnf -y update \
 
 RUN mkdir -p /deploy/app /deploy/logs
 
-# Install NumPy 1.26.4 explicitly before other dependencies
-RUN pip3 install numpy==1.26.4
 
 # install SigProfilerExtractor
 WORKDIR /deploy/app
@@ -39,6 +37,9 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigP
 RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
+
+# Force reinstall NumPy 1.26.4 after everything is installed
+RUN pip3 uninstall -y numpy && pip3 install --no-cache-dir numpy==1.26.4
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
