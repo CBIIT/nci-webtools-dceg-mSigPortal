@@ -34,12 +34,15 @@ WORKDIR /deploy/app
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
 
 # install other python packages
-RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
+# RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
+RUN pip3 install pandas==1.3.5 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
 
-# Force reinstall NumPy 1.26.4 after everything is installed
-RUN pip3 uninstall -y numpy && pip3 install --no-cache-dir numpy==1.26.4
+# Force reinstall NumPy and Pandas at the end to prevent auto-upgrades
+RUN pip3 uninstall -y numpy pandas \
+    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
+
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
