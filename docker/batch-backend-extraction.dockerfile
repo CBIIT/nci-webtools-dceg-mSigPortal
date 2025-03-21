@@ -28,6 +28,13 @@ RUN dnf -y update \
     # https://us.download.nvidia.com/tesla/470.182.03/nvidia-driver-local-repo-rhel8-470.182.03-1.0-1.x86_64.rpm \
     && dnf clean all
 
+
+# Add CUDA repo and install cuSPARSE Lt to get libcusparseLt.so.0
+RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
+    && dnf clean all \
+    && dnf -y install cuda-cusparse-12-1 cuda-cusparse-devel-12-1
+
+
 RUN mkdir -p /deploy/app /deploy/logs
 WORKDIR /deploy/app
 
