@@ -30,9 +30,9 @@ RUN dnf -y update \
 
 
 # Add CUDA repo and install cuSPARSE Lt to get libcusparseLt.so.0
-RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
-    && dnf clean all \
-    && dnf -y install cuda-cusparse-12-1 cuda-cusparse-devel-12-1
+# RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
+#     && dnf clean all \
+#     && dnf -y install cuda-cusparse-12-1 cuda-cusparse-devel-12-1
 
 
 RUN mkdir -p /deploy/app /deploy/logs
@@ -40,7 +40,7 @@ WORKDIR /deploy/app
 
 
 # install pytorch
-RUN pip3 install torch
+RUN pip3 install torch==2.1.0
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.9/site-packages/nvidia/cuda_cupti/lib/
 
 # install SigProfilerExtractor
