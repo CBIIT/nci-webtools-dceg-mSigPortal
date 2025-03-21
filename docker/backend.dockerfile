@@ -53,7 +53,15 @@ RUN cd /tmp && \
 
 
 # install python packages
-RUN pip3 install pandas==1.5.3 seaborn 
+#RUN pip3 install pandas==1.5.3 seaborn 
+
+# Ensure correct versions of NumPy & Pandas
+RUN pip3 uninstall -y numpy pandas \
+    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
+
+# Install SigProfilerMatrixGenerator AFTER fixing dependencies
+RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
+
 
 # install client python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'

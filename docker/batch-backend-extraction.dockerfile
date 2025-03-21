@@ -31,6 +31,10 @@ RUN dnf -y update \
 RUN mkdir -p /deploy/app /deploy/logs
 WORKDIR /deploy/app
 
+# Force uninstall any existing NumPy/Pandas versions
+RUN pip3 uninstall -y numpy pandas \
+    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
+
 # install pytorch
 RUN pip3 install torch
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.9/site-packages/nvidia/cuda_cupti/lib/
@@ -39,12 +43,10 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvid
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
 
 # install other python packages
-RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
+#RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
+RUN pip3 install --no-cache-dir PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2
 RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 
-# Force uninstall any existing NumPy/Pandas versions
-RUN pip3 uninstall -y numpy pandas \
-    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
