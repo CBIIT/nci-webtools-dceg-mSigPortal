@@ -310,27 +310,39 @@ export default function ExtractionForm({ formLimits }) {
               .map((e) => ({ label: e, value: e })),
           ]
         : [];
+    } if (signatureOptions && seqmatrixOptions && study?.value) {
+      const sigProfiles = [
+        ...new Set(signatureOptions.map((e) => e.profile + e.matrix)),
+      ];
+
+      const seqProfilesForStudy = [
+        ...new Set(
+          seqmatrixOptions
+            .filter((e) => e.study === study.value)
+            .map((e) => e.profile + e.matrix)
+        ),
+      ];
+
+      const commonProfiles = sigProfiles.filter((e) =>
+        seqProfilesForStudy.includes(e)
+      );
+
+      const sortedOptions = commonProfiles
+        .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+        .map((e) => ({ label: e, value: e }));
+      
+        // Only add 'default' if SBS96 is present in common profiles
+      const hasSBS96 = commonProfiles.includes('SBS96');
+      return hasSBS96
+        ? [{ label: 'default', value: 'default' }, ...sortedOptions]
+        : sortedOptions;
+
+      // Optionally include 'default' as a fallback
+      //return [{ label: 'default', value: 'default' }, ...sortedOptions];
     } else {
-      if (signatureOptions && seqmatrixOptions) {
-        const sigProfiles = [
-          ...new Set(signatureOptions.map((e) => e.profile + e.matrix)),
-        ];
-        const seqmatrixProfiles = [
-          ...new Set(seqmatrixOptions.map((e) => e.profile + e.matrix)),
-        ];
-        const commonProfiles = sigProfiles.filter((e) =>
-          seqmatrixProfiles.includes(e)
-        );
-        return [
-          { label: 'default', value: 'default' },
-          ...commonProfiles
-            .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
-            .map((e) => ({ label: e, value: e })),
-        ];
-      } else {
-        return [];
-      }
+      return [];
     }
+  
   })();
 
   // update url with id
@@ -352,10 +364,44 @@ export default function ExtractionForm({ formLimits }) {
       setValue('reference_genome', genomeOptions[0]);
   }, [genomeOptions]);
   // set inital context type option after querying options
+  // useEffect(() => {
+  //   if (!context_type && contextTypeOptions.length)
+  //     setValue('context_type', contextTypeOptions[0]);
+  // }, [contextTypeOptions]);
+
   useEffect(() => {
-    if (!context_type && contextTypeOptions.length)
+    if (study && contextTypeOptions.length > 0) {
+      // Automatically update the context_type based on available options
       setValue('context_type', contextTypeOptions[0]);
-  }, [contextTypeOptions]);
+  
+      // Also update default signatureSetName accordingly
+      const newContext = contextTypeOptions[0].value;
+      let filteredOptions;
+  
+      if (newContext !== 'default') {
+        setIsDefaultContext(false);
+        filteredOptions = signatureSetOptions
+          .filter((option) => option.value.includes(newContext))
+          .sort((a, b) => a.value.localeCompare(b.value));
+      } else {
+        setIsDefaultContext(true);
+        filteredOptions = signatureSetOptions;
+      }
+  
+      setFilteredSignatureSetOptions(filteredOptions);
+  
+      // Set the default signature set depending on context
+      if (newContext === 'SBS96') {
+        const cosmicOption = filteredOptions.find(
+          (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
+        );
+        setValue('signatureSetName', cosmicOption);
+      } else {
+        setValue('signatureSetName', filteredOptions[0]);
+      }
+    }
+  }, [study, contextTypeOptions]);
+  
 
   function handleReset() {
     history.push('/extraction');
