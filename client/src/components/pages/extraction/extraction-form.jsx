@@ -371,36 +371,44 @@ export default function ExtractionForm({ formLimits }) {
 
   useEffect(() => {
     if (study && contextTypeOptions.length > 0) {
-      // Automatically update the context_type based on available options
-      setValue('context_type', contextTypeOptions[0]);
+      const hasDefault = contextTypeOptions[0].value === 'default';
+      const selectedContext = hasDefault
+        ? contextTypeOptions[0]
+        : contextTypeOptions[0]; // fallback to first available even if no 'default'
   
-      // Also update default signatureSetName accordingly
-      const newContext = contextTypeOptions[0].value;
-      let filteredOptions;
+      // Only reset if it's not already set
+      if (!context_type || !contextTypeOptions.find(o => o.value === context_type.value)) {
+        setValue('context_type', selectedContext);
   
-      if (newContext !== 'default') {
-        setIsDefaultContext(false);
-        filteredOptions = signatureSetOptions
-          .filter((option) => option.value.includes(newContext))
-          .sort((a, b) => a.value.localeCompare(b.value));
-      } else {
-        setIsDefaultContext(true);
-        filteredOptions = signatureSetOptions;
-      }
+        let filteredOptions;
+        if (selectedContext.value !== 'default') {
+          setIsDefaultContext(false);
+          filteredOptions = signatureSetOptions
+            .filter((option) =>
+              option.value.includes(selectedContext.value)
+            )
+            .sort((a, b) => a.value.localeCompare(b.value));
+        } else {
+          setIsDefaultContext(true);
+          filteredOptions = signatureSetOptions;
+        }
   
-      setFilteredSignatureSetOptions(filteredOptions);
+        setFilteredSignatureSetOptions(filteredOptions);
   
-      // Set the default signature set depending on context
-      if (newContext === 'SBS96') {
-        const cosmicOption = filteredOptions.find(
-          (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
-        );
-        setValue('signatureSetName', cosmicOption);
-      } else {
-        setValue('signatureSetName', filteredOptions[0]);
+        if (selectedContext.value === 'SBS96') {
+          const cosmicOption = filteredOptions.find(
+            (option) =>
+              option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
+          );
+          setValue('signatureSetName', cosmicOption);
+        } else {
+          setValue('signatureSetName', filteredOptions[0]);
+        }
       }
     }
-  }, [study, contextTypeOptions]);
+  }, [study, contextTypeOptions, context_type]);
+  
+  
   
 
   function handleReset() {
