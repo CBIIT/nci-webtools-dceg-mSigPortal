@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 export function Footer() {
   const location = useLocation();
   return (
-    <footer className="py-2 bg-gray">
+    <div className="py-2 bg-gray">
       <div className={location.pathname === '/' ? '' : 'pl-2 pr-4'}>
         <div className="mt-4 text-light text-center">
           <div
@@ -16,9 +16,9 @@ export function Footer() {
               <div className="mb-4 row justify-content-between">
                 <div className="col-md-auto footer-nav-col">
                   <div className="d-none d-lg-block footer-header text-left ">
-                    <h5>
+                    <h2 class="h5">
                       <b>Division of Cancer Epidemiology and Genetics</b>{' '}
-                    </h5>
+                    </h2>
                     <div className="h6">
                       at the
                       <a className="text-white" href="https://www.cancer.gov/">
@@ -35,7 +35,7 @@ export function Footer() {
               </div>
               <div className="row justify-content-between">
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-1">CONTACT INFORMATION</h6>
+                  <h2 className="h6 mb-1">CONTACT INFORMATION</h2>
                   <div className="my-0">
                     <a
                       className="footer-link text-light"
@@ -47,7 +47,7 @@ export function Footer() {
                   </div>
                 </div>
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-1">MORE INFORMATION</h6>
+                  <h2 className="h6 mb-1">MORE INFORMATION</h2>
                   <div className="my-0">
                     <a
                       className="footer-link text-light"
@@ -76,7 +76,7 @@ export function Footer() {
               </div> --> */}
                 </div>
                 <div className="col-md-auto footer-nav-col">
-                  <h6 className="mb-1">POLICIES</h6>
+                  <h2 className="h6 mb-1">POLICIES</h2>
                   <div className="my-0">
                     <a
                       className="footer-link text-light"
@@ -176,6 +176,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </div>
   );
 }

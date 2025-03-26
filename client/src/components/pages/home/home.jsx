@@ -182,9 +182,9 @@ export default function Home({ links }) {
               className="card-img-top w-40 ml-3 mt-3"
             />
             <div className="card-body d-flex flex-column">
-              <h5 className={`card-title card-title-homepage text-${name}`}>
+              <h2 className={`h5 card-title card-title-homepage text-${name}`}>
                 {cardTitle}
-              </h5>
+              </h2>
               <p className="card-text mb-4">
                 {description}
                 <br />

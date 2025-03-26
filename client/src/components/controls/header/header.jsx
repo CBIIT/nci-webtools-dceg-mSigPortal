@@ -5,7 +5,7 @@ export function Header() {
   const { pathname } = useLocation();
 
   return (
-    <header className="bg-light">
+    <div className="bg-light">
       <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
       <div className="usa-banner" aria-label="Official government website">
         <div className="container mx-auto">
@@ -64,6 +64,6 @@ export function Header() {
           </a>
         </div>
       </div>
-    </header>
+    </div>
   );
 }
