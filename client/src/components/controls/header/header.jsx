@@ -22,7 +22,7 @@ export function Header() {
         </div>       
       </div>
       <div>
-        <a
+        {/* <a
           href="/#/#root"
           className="
             sr-only sr-only-focusable
@@ -33,7 +33,7 @@ export function Header() {
           "
         >
           Skip to Main Content
-        </a>        
+        </a>         */}
         
         <div
           className={`d-none d-md-block ${pathname === '/' ? 'container' : ''}`}
