@@ -19,11 +19,32 @@ RUN dnf -y update \
     python3-pip \
     python3-setuptools \
     python3-wheel \
-    R-4.1.3 \
+    R-4.3.2 \
+    fribidi-devel \
+    libtiff-devel \
     rsync \
     tar \
     wget \ 
     which \
+    && dnf clean all
+
+# add fedora repo to install glpk to support R package igraph binary
+RUN ARCH=$(uname -m) && cat <<EOF > /etc/yum.repos.d/fedora.repo
+[fedora]
+name=Fedora 43 - $ARCH
+#baseurl=http://download.example/pub/fedora/linux/releases/43/Everything/$ARCH/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-43&arch=$ARCH
+enabled=0
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=https://getfedora.org/static/fedora.gpg
+skip_if_unavailable=False
+EOF
+
+RUN dnf --enablerepo=fedora --nobest  -y install glpk-devel \
     && dnf clean all
 
 # install nlopt
@@ -91,13 +112,13 @@ RUN cd /tmp \
 COPY server/renv.lock /deploy/server/
 COPY server/.Rprofile /deploy/server/
 COPY server/renv/activate.R /deploy/server/renv/
-COPY server/renv/settings.dcf /deploy/server/renv/
+COPY server/renv/settings.json /deploy/server/renv/
 COPY server/r-packages /deploy/server/r-packages
 
 WORKDIR /deploy/server
 RUN R -e "\
     options(\
-    # renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
+    renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
     Ncpus = parallel::detectCores() \
     ); \
     renv::restore();"
