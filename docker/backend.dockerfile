@@ -67,22 +67,9 @@ RUN cd /tmp && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
 
-# configure C++ Toolchain for installing dependency RStan - https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
-# ENV MAKEFLAGS='-j2'
-# RUN mkdir -p $HOME/.R && \
-#     echo -e "CXX14FLAGS=-O3 -march=native -mtune=native -fPIC \nCXX14=g++" >> $HOME/.R/Makevars
-
 
 # install python packages
-#RUN pip3 install pandas==1.5.3 seaborn 
-
-# Ensure correct versions of NumPy & Pandas
-RUN pip3 uninstall -y numpy pandas \
-    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
-
-# Install SigProfilerMatrixGenerator AFTER fixing dependencies
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
-
+RUN pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5
 
 # install client python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
@@ -132,7 +119,6 @@ RUN npm install
 ARG CACHE_BUST
 COPY server .
 
-CMD npm start
 
 # ensure symlink exists for /data/genomes
 ENV GENOME_PATH=/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
@@ -140,5 +126,4 @@ RUN mkdir -p /data/genomes ${GENOME_PATH} \
     && rm -rf ${GENOME_PATH} \
     && ln -sf /data/genomes ${GENOME_PATH}
 
-# docker build -t msigportal-backend -f backend.dockerfile ~/Projects/msigportal/
-# docker run -d -p 8330:8330 -v ~/Projects/msigportal/logs/:/deploy/logs -v ~/Projects/msigportal/tmp:/deploy/tmp -v ~/Projects/msigportal/config:/deploy/config -v ~/Projects/sigprofiler/data/genomes:/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb  -v ~/.aws/credentials:/root/.aws/credentials:ro --name msigportal-backend msigportal-backend 
+CMD npm start
