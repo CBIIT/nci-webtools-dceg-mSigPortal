@@ -117,7 +117,7 @@ export default function Status() {
   return (
     <Container fluid className="bg-white border rounded p-3">
       <LoadingOverlay active={isFetching}></LoadingOverlay>
-      <h4>Status</h4>
+      <h1 class="h4">Status</h1>
       <p>The status of your submitted jobs will appear here.</p>
       <p>
         This list is tracked by your browser and will be lost if browser data is
