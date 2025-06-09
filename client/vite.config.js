@@ -11,11 +11,11 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       proxy: {
-        [`/api`]: {
+        [`${BASE_URL}/api`]: {
           target: 'http://localhost:8330',
           rewrite: (path) => path.replace(BASE_URL, ''),
         },
-        [`/extraction`]: {
+        [`${BASE_URL}/extraction`]: {
           target: 'http://localhost:8332',
           rewrite: (path) => path.replace(BASE_URL, ''),
         },
