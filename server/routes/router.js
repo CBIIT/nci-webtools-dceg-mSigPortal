@@ -2,6 +2,7 @@ import express from 'express';
 import Router from 'express-promise-router';
 import compression from 'compression';
 import cors from 'cors';
+import {xss} from 'express-xss-sanitizer';
 import {
   handleValidationErrors,
   logRequests,
@@ -28,7 +29,7 @@ export function createApi(env) {
   router.use(compression());
   router.use(logRequests());
   router.use(cors());
-
+  router.use(xss());
   // serve static files under /data
   router.use('/data', express.static(env.DATA_FOLDER));
 
