@@ -312,10 +312,25 @@ export default function ProfileFormPlot() {
     setValue(`plotForms[${index}].signatureName`, signatureName);
   }
   // set inital source
+  // useEffect(() => {
+  //   if (!plotForms[0].source && signatureSourceOptions.length)
+  //     handleSource(signatureSourceOptions[0], plotForms.length - 1);
+  // }, [signatureSourceOptions]);
   useEffect(() => {
-    if (!plotForms[0].source && signatureSourceOptions.length)
-      handleSource(signatureSourceOptions[0], plotForms.length - 1);
-  }, [signatureSourceOptions]);
+  const firstSource = plotForms?.[0]?.source;
+
+  if ((!firstSource || !firstSource.value) && signatureSourceOptions.length) {
+    const defaultSource = signatureSourceOptions.find(
+      (opt) => opt.value === 'Reference_signatures'
+    );
+    if (defaultSource) {
+      handleSource(defaultSource, 0); // set for index 0
+    } else {
+      handleSource(signatureSourceOptions[0], 0);
+    }
+  }
+}, [plotForms, signatureSourceOptions]);
+
 
   // get data on form change
   useEffect(() => {

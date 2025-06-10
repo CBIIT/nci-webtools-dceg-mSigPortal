@@ -76,10 +76,20 @@ export function defaultSignatureSet(signatureSetOptions) {
 
 export function defaultSignatureSet2(signatureSetOptions) {
   const options = signatureSetOptions.map(({ value }) => value);
-  return options.includes('COSMIC_v3.3_Signatures_GRCh38_SBS96')
+  return options.includes('COSMIC_v3.4_Signatures_GRCh38_SBS96')
     ? {
-        label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
-        value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+        label: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
+        value: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
+      }
+    : signatureSetOptions[0];
+}
+
+export function defaultSignatureSet3_4(signatureSetOptions) {
+  const options = signatureSetOptions.map(({ value }) => value);
+  return options.includes('COSMIC_v3.4_Signatures_GRCh38_SBS96')
+    ? {
+        label: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
+        value: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
       }
     : signatureSetOptions[0];
 }
