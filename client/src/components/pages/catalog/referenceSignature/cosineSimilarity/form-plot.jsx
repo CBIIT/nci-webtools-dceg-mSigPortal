@@ -48,11 +48,46 @@ export default function CosineSimilarityPlot() {
   const { profile, matrix } = watch();
 
   // set inital parameters
-  useEffect(() => {
-    if (!profile && data) handleProfile(profileOptions[0]);
-  }, [profile, data]);
+  // useEffect(() => {
+  //   if (!profile && data) handleProfile(profileOptions[0]);
+  // }, [profile, data]);
   // const supportedProfiles = ['SBS', 'DBS', 'ID'];
   // const supportedMatrices = [96, 192, 78, 73];
+
+  useEffect(() => {
+  if (data && data.length) {
+    const profileOptionsList = [...new Set(data.map((e) => e.profile))]
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      .map((e) => ({ label: e, value: e }));
+
+    // Prefer SBS if available, otherwise fallback to first profile with COSMIC v3.4 set
+    const defaultProfile =
+      profileOptionsList.find((p) => p.value === 'SBS') ||
+      profileOptionsList.find((p) =>
+        data.some((entry) =>
+          entry.signatureSetName?.startsWith(`COSMIC_v3.4_Signatures_GRCh38_${p.value}`)
+        )
+      ) ||
+      profileOptionsList[0];
+
+    // Match corresponding matrix for that profile and signature set
+    const defaultEntry = data.find(
+      (entry) =>
+        entry.profile === defaultProfile.value &&
+        entry.signatureSetName?.startsWith(`COSMIC_v3.4_Signatures_GRCh38_${defaultProfile.value}`)
+    );
+
+    if (defaultProfile && defaultEntry?.matrix) {
+      const matrixOption = {
+        label: defaultEntry.matrix,
+        value: defaultEntry.matrix,
+      };
+      handleProfile(defaultProfile);
+      handleMatrix(defaultProfile, matrixOption);
+    }
+  }
+}, [data]);
+
 
   const profileOptions = data
     ? [...new Set(data.map((e) => e.profile))]
@@ -105,9 +140,24 @@ export default function CosineSimilarityPlot() {
   function handleMatrix(profile, matrix) {
     const signatureSets = signatureSetOptions(profile, matrix);
 
-    setValue('matrix', matrix);
-    setValue('signatureSet1', signatureSets[0]);
-    setValue('signatureSet2', signatureSets[1] || signatureSets[0]);
+    // setValue('matrix', matrix);
+    // setValue('signatureSet1', signatureSets[0]);
+    // setValue('signatureSet2', signatureSets[1] || signatureSets[0]);
+    // Try to find preferred COSMIC v3.4 option
+  const preferredSetName = `COSMIC_v3.4_Signatures_GRCh38_${profile.value}${matrix.value}`;
+
+  const preferredSet = signatureSets.find(
+    (e) => e.value === preferredSetName || e.label === preferredSetName
+  );
+
+  const signatureSet1 = preferredSet || signatureSets[0];
+  const signatureSet2 =
+    signatureSets.find((e) => e.value !== signatureSet1.value) ||
+    signatureSet1;
+
+  setValue('matrix', matrix);
+  setValue('signatureSet1', signatureSet1);
+  setValue('signatureSet2', signatureSet2);
   }
 
   function onSubmit(data) {
