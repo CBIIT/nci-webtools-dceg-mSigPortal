@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
@@ -13,6 +13,7 @@ import { useRsComparisonQuery } from './apiSlice';
 
 const actions = { ...catalogActions, ...modalActions };
 
+
 export default function RsComparisonPlot() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
@@ -23,6 +24,7 @@ export default function RsComparisonPlot() {
   );
 
   const [params, setParams] = useState(false);
+  const initialized = useRef(false);
 
   // query parameter options
   const {
@@ -108,9 +110,49 @@ export default function RsComparisonPlot() {
       : [];
 
   // set inital parameters
+  // useEffect(() => {
+  //   if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
+  // }, [profile, profileOptions]);
   useEffect(() => {
-    if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
-  }, [profile, profileOptions]);
+  if (initialized.current || !data || !data.length) return;
+
+  const supportedProfiles = ['SBS', 'DBS', 'ID'];
+  const profileOptions = [...new Set(data.map((e) => e.profile))]
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .filter((e) => supportedProfiles.includes(e))
+    .map((e) => ({ label: e, value: e }));
+
+  if (profileOptions.length === 0) return;
+
+  const initialProfile = profileOptions.find(p => p.value === 'SBS') || profileOptions[0];
+  const matrices = matrixOptions(initialProfile);
+  const initialMatrix = matrices[0];
+
+  setValue('profile', initialProfile);
+  setValue('matrix', initialMatrix);
+
+  const signatureSets = signatureSetOptions(initialProfile, initialMatrix);
+  const expectedValue = `COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}${initialMatrix.value}`;
+  const preferredSet = signatureSets.find(
+    (e) =>
+      e.value === expectedValue ||
+      e.label === expectedValue ||
+      e.value?.includes(`COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`) ||
+      e.label?.includes(`COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`)
+  );
+
+  const sigSet1 = preferredSet || signatureSets[0];
+  handleSignatureSet(initialProfile, initialMatrix, sigSet1, 1);
+
+  const sigSet2 = signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
+  handleSignatureSet(initialProfile, initialMatrix, sigSet2, 2);
+
+  initialized.current = true; // <- prevent re-initializing on future renders
+}, [data]);
+
+
+
+
 
   function handleProfile(profile) {
     const matrices = matrixOptions(profile);
@@ -121,8 +163,14 @@ export default function RsComparisonPlot() {
 
   function handleMatrix(profile, matrix) {
     const signatureSets = signatureSetOptions(profile, matrix);
-    const sigSet1 = signatureSets[0];
-    const sigSet2 = signatureSets[1] || signatureSets[0];
+    // Prefer COSMIC v3.4 GRCh38 set if available
+    const preferredSet = signatureSets.find(
+      (e) =>
+        e.value?.startsWith('COSMIC_v3.4_Signatures_GRCh38_') ||
+        e.label?.startsWith('COSMIC_v3.4_Signatures_GRCh38_')
+    );
+    const sigSet1 = preferredSet || signatureSets[0];
+    const sigSet2 = signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
 
     setValue('matrix', matrix);
     handleSignatureSet(profile, matrix, sigSet1, 1);
