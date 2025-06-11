@@ -31,9 +31,8 @@ RUN dnf -y update \
 # add fedora repo to install glpk to support R package igraph binary
 RUN ARCH=$(uname -m) && cat <<EOF > /etc/yum.repos.d/fedora.repo
 [fedora]
-name=Fedora 43 - $ARCH
-#baseurl=http://download.example/pub/fedora/linux/releases/43/Everything/$ARCH/os/
-metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-43&arch=$ARCH
+name=Fedora 42 - $ARCH
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-42&arch=$ARCH
 enabled=0
 countme=1
 metadata_expire=7d
@@ -44,7 +43,7 @@ gpgkey=https://getfedora.org/static/fedora.gpg
 skip_if_unavailable=False
 EOF
 
-RUN dnf --enablerepo=fedora --nobest  -y install glpk-devel \
+RUN dnf --enablerepo=fedora --nobest -y install glpk-devel \
     && dnf clean all
 
 # install nlopt
