@@ -1,9 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const baseUrl = 'mutational-signatures/api';
 export const optionsApiSlice = createApi({
   reducerPath: 'optionsApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: (builder) => ({
     seqmatrixOptions: builder.query({
       query: (params) => ({ url: 'mutational_spectrum_options', params }),
@@ -33,31 +32,31 @@ export const {
 
 export const catalogApiSlice = createApi({
   reducerPath: 'catalogApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
 export const visualizationApiSlice = createApi({
   reducerPath: 'visualizationApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
 export const explorationApiSlice = createApi({
   reducerPath: 'explorationApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
 export const associationApiSlice = createApi({
   reducerPath: 'associationApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
 export const extractionApiSlice = createApi({
   reducerPath: 'extractionApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
