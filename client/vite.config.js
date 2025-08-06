@@ -2,9 +2,9 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 
 // https://vitejs.dev/config/
-const BASE_URL = '/mutational-signatures';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const BASE_URL = env.APP_PATH || '';
   return {
     plugins: [react()],
     base: BASE_URL,
@@ -26,11 +26,11 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       rollupOptions: {
-        input: '/index.html', 
+        input: '/index.html',
       },
     },
     optimizeDeps: {
-      include: ['react', 'react-dom'], 
+      include: ['react', 'react-dom'],
     },
   };
 });
