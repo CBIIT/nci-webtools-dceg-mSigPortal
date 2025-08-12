@@ -289,17 +289,16 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       xanchor: 'center',
-      yanchor: 'middle',
+      yanchor: 'bottom',
       showarrow: false,
       index: index,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
         8,
         ' '
       ),
-      align: 'left',
-      //x: index < 4 ? index * (1 / 5) + 0.0975 : (index - 4) * (1 / 5) + 0.0975,
+      align: 'center',
       x: indexPos(index),
-      y: index < 5 ? 0.84 : 0.995,
+      y: index < 5 ? 0.98 : 1.11,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -308,16 +307,15 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       xanchor: 'center',
-      yanchor: 'middle',
+      yanchor: 'bottom',
       showarrow: false,
       text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
         7,
         ' '
       ),
       align: 'center',
-      // x: index < 4 ? index * (1 / 5) + 0.085 : (index - 4) * (1 / 5) + 0.085,
       x: indexPos(index),
-      y: 0.665,
+      y: 0.715,
     })
   );
 
@@ -326,13 +324,13 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       xanchor: 'center',
-      yanchor: 'middle',
+      yanchor: 'bottom',
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.49,
+      y: 0.54,
     })
   );
 
@@ -341,13 +339,13 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       xanchor: 'center',
-      yanchor: 'middle',
+      yanchor: 'bottom',
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.315,
+      y: 0.375,
     })
   );
   const pieTitles4 = Object.entries(groupCaenorhabditis).map(
@@ -355,13 +353,13 @@ export default function RsInMsigportal(rawData) {
       xref: 'paper',
       yref: 'paper',
       xanchor: 'center',
-      yanchor: 'middle',
+      yanchor: 'bottom',
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
       //x: index < 4 ? index * (1 / 5) + 0.08 : (index - 4) * (1 / 5) + 0.08,
       x: indexPos(index),
-      y: 0.14,
+      y: 0.205,
     })
   );
   const annotationTitle0 = {
