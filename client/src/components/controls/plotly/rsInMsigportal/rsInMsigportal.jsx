@@ -111,8 +111,8 @@ export default function RsInMsigportal(rawData) {
       name: array[index][1][0].profile + array[index][1][0].matrix,
       domain: {
         x: [
-          index < 5 ? 0.005 : 0.175,
-          index < 5 ? 0.16 : 0.33,
+          index < 5 ? 0.175 : 0.005,
+          index < 5 ? 0.33 : 0.16,
         ],
         y: [
           index < 5 
@@ -277,7 +277,7 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
-      x: index < 5 ? 0.0825 : 0.2525,
+      x: index < 5 ? 0.2525 : 0.0825,
       y: index < 5 
         ? 1 - (index * 0.2) - 0.02
         : 1 - ((index - 5) * 0.2) - 0.02,
