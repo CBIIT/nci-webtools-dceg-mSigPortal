@@ -279,8 +279,8 @@ export default function RsInMsigportal(rawData) {
       align: 'center',
       x: index < 5 ? 0.0825 : 0.2525,
       y: index < 5 
-        ? 1 - (index * 0.2) + 0.01
-        : 1 - ((index - 5) * 0.2) + 0.01,
+        ? 1 - (index * 0.2) - 0.02
+        : 1 - ((index - 5) * 0.2) - 0.02,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -297,7 +297,7 @@ export default function RsInMsigportal(rawData) {
       ),
       align: 'center',
       x: 0.42, // Center of third column
-      y: 1 - (index * 0.2) + 0.01,
+      y: 1 - (index * 0.2) - 0.02,
     })
   );
 
@@ -311,7 +311,7 @@ export default function RsInMsigportal(rawData) {
       text: key.padStart(7, ' '),
       align: 'center',
       x: 0.59, // Center of fourth column
-      y: 1 - (index * 0.2) + 0.01,
+      y: 1 - (index * 0.2) - 0.02,
     })
   );
 
@@ -325,7 +325,7 @@ export default function RsInMsigportal(rawData) {
       text: key.padStart(7, ' '),
       align: 'center',
       x: 0.76, // Center of fifth column
-      y: 1.01,
+      y: 0.98,
     })
   );
   const pieTitles4 = Object.entries(groupCaenorhabditis).map(
@@ -338,7 +338,7 @@ export default function RsInMsigportal(rawData) {
       text: key.padStart(7, ' '),
       align: 'center',
       x: 0.925, // Center of sixth column
-      y: 1.01,
+      y: 0.98,
     })
   );
   const annotationTitle0 = {
