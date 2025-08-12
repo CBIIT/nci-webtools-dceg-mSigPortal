@@ -38,8 +38,7 @@ countme=1
 metadata_expire=7d
 repo_gpgcheck=0
 type=rpm
-gpgcheck=1
-gpgkey=https://getfedora.org/static/fedora.gpg
+gpgcheck=0
 skip_if_unavailable=False
 EOF
 
