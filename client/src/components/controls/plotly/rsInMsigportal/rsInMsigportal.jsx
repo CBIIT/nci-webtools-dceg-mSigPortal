@@ -352,7 +352,7 @@ export default function RsInMsigportal(rawData) {
       size: 14,
     },
     x: 0.1675, // Center between first two columns
-    y: 1.05,
+    y: 1.02,
   };
 
   const annotationTitle1 = {
@@ -361,12 +361,12 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[1],
+    text: Object.keys(groupBySpecies)[1].replace(' ', '<br>'),
     font: {
-      size: 14,
+      size: 12,
     },
     x: 0.42, // Center of third column
-    y: 1.05,
+    y: 1.02,
   };
 
   const annotationTitle2 = {
@@ -375,12 +375,12 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[2],
+    text: Object.keys(groupBySpecies)[2].replace(' ', '<br>'),
     font: {
-      size: 14,
+      size: 12,
     },
     x: 0.59, // Center of fourth column
-    y: 1.05,
+    y: 1.02,
   };
 
   const annotationTitle3 = {
@@ -389,12 +389,12 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[3],
+    text: Object.keys(groupBySpecies)[3].replace(/\s+/g, '<br>'),
     font: {
-      size: 14,
+      size: 12,
     },
     x: 0.76, // Center of fifth column
-    y: 1.05,
+    y: 1.02,
   };
 
   const annotationTitle4 = {
@@ -403,12 +403,12 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[4],
+    text: Object.keys(groupBySpecies)[4].replace(/\s+/g, '<br>'),
     font: {
-      size: 14,
+      size: 12,
     },
     x: 0.925, // Center of sixth column
-    y: 1.05,
+    y: 1.02,
   };
 
   const shapes = [
