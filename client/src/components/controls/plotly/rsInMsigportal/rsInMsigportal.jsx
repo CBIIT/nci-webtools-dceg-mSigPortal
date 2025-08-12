@@ -111,8 +111,8 @@ export default function RsInMsigportal(rawData) {
       name: array[index][1][0].profile + array[index][1][0].matrix,
       domain: {
         x: [
-          index < 5 ? 0 : 1/6,
-          index < 5 ? 1/6 : 2/6,
+          index < 5 ? 0.005 : 0.175,
+          index < 5 ? 0.16 : 0.33,
         ],
         y: [
           index < 5 
@@ -146,7 +146,7 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [2/6, 3/6],
+        x: [0.345, 0.495],
         y: [
           1 - ((index + 1) * 0.2),
           1 - (index * 0.2),
@@ -175,7 +175,7 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [3/6, 4/6],
+        x: [0.515, 0.665],
         y: [
           1 - ((index + 1) * 0.2),
           1 - (index * 0.2),
@@ -203,7 +203,7 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [4/6, 5/6],
+        x: [0.685, 0.835],
         y: [0.8, 1.0],
       },
       hovertemplate:
@@ -229,7 +229,7 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [5/6, 1.0],
+        x: [0.855, 0.995],
         y: [0.8, 1.0],
       },
       hovertemplate:
@@ -277,7 +277,7 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
-      x: index < 5 ? 1/12 : 3/12,
+      x: index < 5 ? 0.0825 : 0.2525,
       y: index < 5 
         ? 1 - (index * 0.2) + 0.01
         : 1 - ((index - 5) * 0.2) + 0.01,
@@ -296,7 +296,7 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
-      x: 5/12, // Center of third column
+      x: 0.42, // Center of third column
       y: 1 - (index * 0.2) + 0.01,
     })
   );
@@ -310,7 +310,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 7/12, // Center of fourth column
+      x: 0.59, // Center of fourth column
       y: 1 - (index * 0.2) + 0.01,
     })
   );
@@ -324,7 +324,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 9/12, // Center of fifth column
+      x: 0.76, // Center of fifth column
       y: 1.01,
     })
   );
@@ -337,7 +337,7 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 11/12, // Center of sixth column
+      x: 0.925, // Center of sixth column
       y: 1.01,
     })
   );
@@ -351,7 +351,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 2/12, // Center between first two columns
+    x: 0.1675, // Center between first two columns
     y: 1.05,
   };
 
@@ -365,7 +365,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 5/12, // Center of third column
+    x: 0.42, // Center of third column
     y: 1.05,
   };
 
@@ -379,7 +379,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 7/12, // Center of fourth column
+    x: 0.59, // Center of fourth column
     y: 1.05,
   };
 
@@ -393,7 +393,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 9/12, // Center of fifth column
+    x: 0.76, // Center of fifth column
     y: 1.05,
   };
 
@@ -407,77 +407,12 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 11/12, // Center of sixth column
+    x: 0.925, // Center of sixth column
     y: 1.05,
   };
 
   const shapes = [
-    // Vertical divider lines between columns
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 1/6,
-      y0: 0,
-      x1: 1/6,
-      y1: 1,
-      line: {
-        color: 'gray',
-        width: 1,
-      },
-    },
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 2/6,
-      y0: 0,
-      x1: 2/6,
-      y1: 1,
-      line: {
-        color: 'gray',
-        width: 1,
-      },
-    },
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 3/6,
-      y0: 0,
-      x1: 3/6,
-      y1: 1,
-      line: {
-        color: 'gray',
-        width: 1,
-      },
-    },
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 4/6,
-      y0: 0,
-      x1: 4/6,
-      y1: 1,
-      line: {
-        color: 'gray',
-        width: 1,
-      },
-    },
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 5/6,
-      y0: 0,
-      x1: 5/6,
-      y1: 1,
-      line: {
-        color: 'gray',
-        width: 1,
-      },
-    },
+    // No shapes needed with spacing between columns
   ];
 
   const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
