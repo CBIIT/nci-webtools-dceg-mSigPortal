@@ -1,16 +1,16 @@
 import { groupBy } from 'lodash';
 export default function RsInMsigportal(rawData) {
   const profile_order_0 = [
-    'ID29',
-    'ID83',
-    'CN48',
-    'RS32',
-    'RNA192',
     'SBS96',
     'SBS192',
     'SBS288',
     'SBS1536',
     'DBS78',
+    'ID29',
+    'ID83',
+    'CN48',
+    'RS32',
+    'RNA192',
   ];
   const profile_order_1 = ['SBS96', 'DBS78', 'ID83'];
   const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
