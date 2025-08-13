@@ -111,16 +111,20 @@ export default function RsInMsigportal(rawData) {
       name: array[index][1][0].profile + array[index][1][0].matrix,
       domain: {
         x: [
-          index < 5 ? 0.175 : 0.005,
-          index < 5 ? 0.33 : 0.16,
+          index < 4 ? 0.02 : index < 8 ? 0.158 : 0.296,
+          index < 4 ? 0.116 : index < 8 ? 0.254 : 0.392,
         ],
         y: [
-          index < 5 
-            ? 1 - ((index + 1) * 0.2)
-            : 1 - ((index - 4) * 0.2),
-          index < 5 
-            ? 1 - (index * 0.2)
-            : 1 - ((index - 5) * 0.2),
+          index < 4 
+            ? 1 - ((index + 1) * 0.25) + 0.02
+            : index < 8
+            ? 1 - ((index - 3) * 0.25) + 0.02
+            : 1 - ((index - 7) * 0.25) + 0.02,
+          index < 4 
+            ? 1 - (index * 0.25) - 0.02
+            : index < 8
+            ? 1 - ((index - 4) * 0.25) - 0.02
+            : 1 - ((index - 8) * 0.25) - 0.02,
         ],
       },
       hovertemplate:
@@ -146,10 +150,10 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [0.345, 0.495],
+        x: [0.434, 0.53],
         y: [
-          1 - ((index + 1) * 0.2),
-          1 - (index * 0.2),
+          1 - ((index + 1) * 0.25) + 0.02,
+          1 - (index * 0.25) - 0.02,
         ],
       },
       hovertemplate:
@@ -175,10 +179,10 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [0.515, 0.665],
+        x: [0.572, 0.668],
         y: [
-          1 - ((index + 1) * 0.2),
-          1 - (index * 0.2),
+          1 - ((index + 1) * 0.25) + 0.02,
+          1 - (index * 0.25) - 0.02,
         ],
       },
       hovertemplate:
@@ -203,8 +207,11 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [0.685, 0.835],
-        y: [0.8, 1.0],
+        x: [0.710, 0.806],
+        y: [
+          1 - ((index + 1) * 0.25) + 0.02,
+          1 - (index * 0.25) - 0.02,
+        ],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -229,8 +236,11 @@ export default function RsInMsigportal(rawData) {
       direction: 'clockwise',
       name: key,
       domain: {
-        x: [0.855, 0.995],
-        y: [0.8, 1.0],
+        x: [0.848, 0.944],
+        y: [
+          1 - ((index + 1) * 0.25) + 0.02,
+          1 - (index * 0.25) - 0.02,
+        ],
       },
       hovertemplate:
         '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
@@ -277,10 +287,12 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
-      x: index < 5 ? 0.2525 : 0.0825,
-      y: index < 5 
-        ? 1 - (index * 0.2) - 0.02
-        : 1 - ((index - 5) * 0.2) - 0.02,
+      x: index < 4 ? 0.068 : index < 8 ? 0.206 : 0.344,
+      y: index < 4 
+        ? 1 - (index * 0.25) - 0.02
+        : index < 8
+        ? 1 - ((index - 4) * 0.25) - 0.02
+        : 1 - ((index - 8) * 0.25) - 0.02,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -296,8 +308,8 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
-      x: 0.42, // Center of third column
-      y: 1 - (index * 0.2) - 0.02,
+      x: 0.482, // Center of fourth column
+      y: 1 - (index * 0.25) - 0.02,
     })
   );
 
@@ -310,8 +322,8 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 0.59, // Center of fourth column
-      y: 1 - (index * 0.2) - 0.02,
+      x: 0.620, // Center of fifth column
+      y: 1 - (index * 0.25) - 0.02,
     })
   );
 
@@ -324,8 +336,8 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 0.76, // Center of fifth column
-      y: 0.98,
+      x: 0.758, // Center of sixth column
+      y: 1 - (index * 0.25) - 0.02,
     })
   );
   const pieTitles4 = Object.entries(groupCaenorhabditis).map(
@@ -337,8 +349,8 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
-      x: 0.925, // Center of sixth column
-      y: 0.98,
+      x: 0.896, // Center of seventh column
+      y: 1 - (index * 0.25) - 0.02,
     })
   );
   const annotationTitle0 = {
@@ -351,7 +363,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 14,
     },
-    x: 0.1675, // Center between first two columns
+    x: 0.206, // Center of all three columns
     y: 1.02,
   };
 
@@ -365,7 +377,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 12,
     },
-    x: 0.42, // Center of third column
+    x: 0.482, // Center of fourth column
     y: 1.02,
   };
 
@@ -379,7 +391,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 12,
     },
-    x: 0.59, // Center of fourth column
+    x: 0.620, // Center of fifth column
     y: 1.02,
   };
 
@@ -393,7 +405,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 12,
     },
-    x: 0.76, // Center of fifth column
+    x: 0.758, // Center of sixth column
     y: 1.02,
   };
 
@@ -407,7 +419,7 @@ export default function RsInMsigportal(rawData) {
     font: {
       size: 12,
     },
-    x: 0.925, // Center of sixth column
+    x: 0.896, // Center of seventh column
     y: 1.02,
   };
 
@@ -418,9 +430,14 @@ export default function RsInMsigportal(rawData) {
   const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 1080,
-    width: 1080,
+    height: 900,
     autosize: true,
+    margin: {
+      l: 0,
+      r: 50,
+      t: 100,
+      b: 50,
+    },
     legend: {
       title: {
         text: '\t <b>Signature Set Name</b>',
@@ -448,7 +465,8 @@ export default function RsInMsigportal(rawData) {
     shapes: [...shapes],
   };
   const config = {
-    //responsive: true,
+    responsive: true,
+    displayModeBar: true,
   };
   return { traces: traces, layout: layout, config };
 }
