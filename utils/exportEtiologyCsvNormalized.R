@@ -161,6 +161,27 @@ Others <- function(x) {
     select(category, etiology, signature, json)
 }
 
+STS <- function(x) {
+  x %>%
+    mutate(
+      category = processorFunction,
+      etiologyDisplay = "Proposed Etiologies"
+    ) %>%
+    rename(
+      etiology = Etiology,
+      signature = "Signature Name",
+      study = Study,
+      studyUrl = Study_URL,
+      genomeBuild = "Genome Build",
+      signatureSource = "Signature Source",
+      sourceUrl = Source_URL,
+      description = Description,
+      tissueDistribution = Tissue_Distribution
+    ) %>%
+    mutate(json = toJSON(unbox(across()))) %>%
+    select(category, etiology, signature, json)
+}
+
 dataset <- loadJson(inputFile)
 processedDataset <- do.call(processorFunction, list(x = dataset))
 write.csv(processedDataset, file = outputFile, na = "", row.names = F)
