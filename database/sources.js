@@ -133,6 +133,13 @@ export const sources = [
   },
 
   {
+    sourcePath: 'Etiology/Etiology_SATS_TS.csv',
+    table: 'etiologyOptions',
+    description: 'etiology - signatures_from_targeted_sequencing',
+    columns: ['category', 'etiology', 'signature', 'json'],
+  },
+
+  {
     sourcePath: 'Etiology/Etiology_others.csv',
     table: 'etiologyOptions',
     description: 'etiology - others',

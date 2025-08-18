@@ -57,6 +57,12 @@ export default function Etiology() {
       etiologyTitle: 'Therapies',
     },
     {
+      category: 'STS',
+      name: 'Signatures from Targeted Sequencing',
+      author: 'Zhu et al., 2025',
+      etiologyTitle: 'Proposed Etiologies',
+    },
+    {
       category: 'Others',
       name: 'Other Reported Signatures',
       etiologyTitle: 'Proposed Etiologies',

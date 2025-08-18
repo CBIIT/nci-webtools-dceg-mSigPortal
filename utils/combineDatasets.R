@@ -16,7 +16,10 @@ extract <- function(str, separator, index) {
 }
 
 regex_extract <- function(str, pattern) {
-    regmatches(str, regexpr(pattern, str))
+    matches <- regexpr(pattern, str)
+    result <- regmatches(str, matches)
+    # Handle cases where no match is found
+    ifelse(matches == -1, NA_character_, result)
 }
 
 regex_group <- function(str, pattern) {
