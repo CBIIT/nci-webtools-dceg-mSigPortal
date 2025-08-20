@@ -1,6 +1,14 @@
 import { groupBy } from 'lodash';
 
 export default function SATSSignaturePresence(data, options = {}) {
+  console.log('SATS function called with data:', data);
+  console.log('Data type:', typeof data);
+  console.log('Data keys:', data ? Object.keys(data) : 'null/undefined');
+  
+  if (!data) {
+    console.error('SATS: No data provided');
+    return { traces: [], layout: {}, config: {} };
+  }
   // Define signature color mapping based on the R code
   const signatureColors = {
     'SBS1': '#1F77B4',
@@ -34,7 +42,49 @@ export default function SATSSignaturePresence(data, options = {}) {
     'SBS31': '#808080',
     'SBS37': '#808080',
     'SBS39': '#808080',
-    'SBS92': '#808080'
+    'SBS92': '#808080',
+    // Add patterns for complex signature names
+    'Flat': '#AEC7E8',
+    'Artefactes': '#37474F'
+  };
+  
+  // Function to get color for a signature
+  const getSignatureColor = (signature) => {
+    // First try exact match
+    if (signatureColors[signature]) {
+      return signatureColors[signature];
+    }
+    
+    // Extract base signature name from complex descriptions
+    if (signature.includes('SBS1(')) return signatureColors['SBS1'];
+    if (signature.includes('SBS2/13(') || signature.includes('SBS2_13(')) return signatureColors['SBS2/13'];
+    if (signature.includes('SBS4(')) return signatureColors['SBS4'];
+    if (signature.includes('SBS6(')) return signatureColors['SBS6'];
+    if (signature.includes('SBS7a(')) return signatureColors['SBS7a'];
+    if (signature.includes('SBS7b(')) return signatureColors['SBS7b'];
+    if (signature.includes('SBS8(')) return signatureColors['SBS8'];
+    if (signature.includes('SBS10a(')) return signatureColors['SBS10a'];
+    if (signature.includes('SBS10b(')) return signatureColors['SBS10b'];
+    if (signature.includes('SBS10c(')) return signatureColors['SBS10c'];
+    if (signature.includes('SBS11(')) return signatureColors['SBS11'];
+    if (signature.includes('SBS12(')) return signatureColors['SBS12'];
+    if (signature.includes('SBS14(')) return signatureColors['SBS14'];
+    if (signature.includes('SBS15(')) return signatureColors['SBS15'];
+    if (signature.includes('SBS19(')) return signatureColors['SBS19'];
+    if (signature.includes('SBS25(')) return signatureColors['SBS25'];
+    if (signature.includes('SBS30(')) return signatureColors['SBS30'];
+    if (signature.includes('SBS32(')) return signatureColors['SBS32'];
+    if (signature.includes('SBS44(')) return signatureColors['SBS44'];
+    if (signature.includes('SBS84(')) return signatureColors['SBS84'];
+    if (signature.includes('SBS87(')) return signatureColors['SBS87'];
+    if (signature.includes('SBS89(')) return signatureColors['SBS89'];
+    if (signature.includes('SBS94(')) return signatureColors['SBS94'];
+    if (signature.includes('SBS97(')) return signatureColors['SBS97'];
+    if (signature.includes('Flat(')) return signatureColors['SBS_Flat'];
+    if (signature.includes('Artefactes(')) return signatureColors['SBS_Artefactes'];
+    
+    // Default color if no match found
+    return '#808080';
   };
 
   // Define signature annotations
@@ -68,37 +118,94 @@ export default function SATSSignaturePresence(data, options = {}) {
 
   // Expect data in format: 
   // { 
+  //   tmbData: [{ CancerType, SBS, Count, Proportion, N, Presence, TMB_all, Label, CancerType_num }],
+  //   dotData: [{ CancerType, SBS, Count, Proportion, N, Presence, TMB_all, Label, CancerType_num }] 
+  // }
+  // OR legacy format:
+  // { 
   //   tmbData: [{ cancer, signature, tmb, sampleCount }],
   //   dotData: [{ cancer, signature, presence, sampleCount }] 
   // }
   const { tmbData = [], dotData = [] } = data;
 
-  // Sort cancer types by total TMB (descending)  
-  const cancerTMBTotals = {};
-  tmbData.forEach(item => {
-    if (!cancerTMBTotals[item.cancer]) {
-      cancerTMBTotals[item.cancer] = 0;
-    }
-    cancerTMBTotals[item.cancer] += item.tmb || 0;
-  });
+  if (tmbData.length === 0) {
+    return { traces: [], layout: {}, config: {} };
+  }
 
-  const cancerOrder = Object.entries(cancerTMBTotals)
-    .sort((a, b) => b[1] - a[1])
-    .map(([cancer, _]) => cancer);
+  // Handle both new and legacy data formats
+  const isNewFormat = tmbData.length > 0 && tmbData[0].hasOwnProperty('CancerType');
+  
+  let cancerOrder, tmbSignatures, dotSignatures;
+  
+  if (isNewFormat) {
+    // New format with CancerType, SBS, etc.
+    
+    // Sort cancer types by total count (descending)  
+    const cancerTotalCounts = {};
+    tmbData.forEach(item => {
+      if (!cancerTotalCounts[item.CancerType]) {
+        cancerTotalCounts[item.CancerType] = 0;
+      }
+      cancerTotalCounts[item.CancerType] += item.Count || 0;
+    });
 
-  // Get all signatures
-  const tmbSignatures = [...new Set(tmbData.map(item => item.signature))];
-  const dotSignatures = [...new Set(dotData.map(item => item.signature))];
+    cancerOrder = Object.entries(cancerTotalCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cancer, _]) => cancer);
+
+    // Get all signatures
+    tmbSignatures = [...new Set(tmbData.map(item => item.SBS))];
+    dotSignatures = [...new Set(dotData.map(item => item.SBS))];
+  } else {
+    // Legacy format
+    
+    // Sort cancer types by total TMB (descending)  
+    const cancerTMBTotals = {};
+    tmbData.forEach(item => {
+      if (!cancerTMBTotals[item.cancer]) {
+        cancerTMBTotals[item.cancer] = 0;
+      }
+      cancerTMBTotals[item.cancer] += item.tmb || 0;
+    });
+
+    cancerOrder = Object.entries(cancerTMBTotals)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cancer, _]) => cancer);
+
+    // Get all signatures
+    tmbSignatures = [...new Set(tmbData.map(item => item.signature))];
+    dotSignatures = [...new Set(dotData.map(item => item.signature))];
+  }
 
   const traces = [];
 
   // Create TMB bar chart traces (for top subplot)
   tmbSignatures.forEach(signature => {
-    const signatureData = tmbData.filter(item => item.signature === signature);
-    const yValues = cancerOrder.map(cancer => {
-      const item = signatureData.find(d => d.cancer === cancer);
-      return item ? item.tmb || 0 : 0;
-    });
+    let signatureData, yValues, customData;
+    
+    if (isNewFormat) {
+      signatureData = tmbData.filter(item => item.SBS === signature);
+      yValues = cancerOrder.map(cancer => {
+        const item = signatureData.find(d => d.CancerType === cancer);
+        return item ? item.Count || 0 : 0;
+      });
+      customData = cancerOrder.map(cancer => {
+        const item = signatureData.find(d => d.CancerType === cancer);
+        return { 
+          cancer: cancer,
+          count: item ? item.Count || 0 : 0,
+          proportion: item ? item.Proportion || 0 : 0,
+          tmbAll: item ? item.TMB_all || 0 : 0
+        };
+      });
+    } else {
+      signatureData = tmbData.filter(item => item.signature === signature);
+      yValues = cancerOrder.map(cancer => {
+        const item = signatureData.find(d => d.cancer === cancer);
+        return item ? item.tmb || 0 : 0;
+      });
+      customData = cancerOrder.map(cancer => ({ cancer }));
+    }
 
     traces.push({
       type: 'bar',
@@ -108,40 +215,69 @@ export default function SATSSignaturePresence(data, options = {}) {
       xaxis: 'x',
       yaxis: 'y',
       marker: {
-        color: signatureColors[signature] || '#808080'
+        color: getSignatureColor(signature),
+        line: {
+          width: 0.5,
+          color: 'rgba(0,0,0,0.3)'
+        }
       },
-      showlegend: false,
-      hovertemplate: 
+      showlegend: true,
+      hovertemplate: isNewFormat ?
+        '<b>Cancer:</b> %{customdata.cancer}<br>' +
+        '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
+        '<b>Count:</b> %{customdata.count}<br>' +
+        '<b>Proportion:</b> %{customdata.proportion:.3f}<br>' +
+        '<b>TMB All:</b> %{customdata.tmbAll:.3f}<br>' +
+        '<extra></extra>' :
         '<b>Cancer:</b> %{customdata.cancer}<br>' +
         '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
         '<b>TMB:</b> %{y:.3f} mutations/Mb<br>' +
         '<extra></extra>',
-      customdata: cancerOrder.map(cancer => ({ cancer }))
+      customdata: customData
     });
   });
 
   // Create dot plot traces (for bottom subplot) 
   dotSignatures.forEach((signature, sigIndex) => {
-    const signatureData = dotData.filter(item => item.signature === signature);
+    let signatureData;
     const xValues = [];
     const yValues = [];
     const sizes = [];
     const customData = [];
 
-    cancerOrder.forEach((cancer, cancerIndex) => {
-      const item = signatureData.find(d => d.cancer === cancer);
-      if (item && item.presence > 0) {
-        xValues.push(cancerIndex + 1);
-        yValues.push(sigIndex + 1);
-        sizes.push(Math.max(item.presence * 40, 6));
-        customData.push({
-          cancer: cancer,
-          signature: signatureAnnotations[signature] || signature,
-          presence: item.presence,
-          sampleCount: item.sampleCount || 0
-        });
-      }
-    });
+    if (isNewFormat) {
+      signatureData = dotData.filter(item => item.SBS === signature);
+      cancerOrder.forEach((cancer, cancerIndex) => {
+        const item = signatureData.find(d => d.CancerType === cancer);
+        if (item && item.Presence > 0) {
+          xValues.push(cancerIndex + 1);
+          yValues.push(sigIndex + 1);
+          sizes.push(Math.max(item.Presence * 40, 6));
+          customData.push({
+            cancer: cancer,
+            signature: signatureAnnotations[signature] || signature,
+            presence: item.Presence,
+            sampleCount: item.N || 0
+          });
+        }
+      });
+    } else {
+      signatureData = dotData.filter(item => item.signature === signature);
+      cancerOrder.forEach((cancer, cancerIndex) => {
+        const item = signatureData.find(d => d.cancer === cancer);
+        if (item && item.presence > 0) {
+          xValues.push(cancerIndex + 1);
+          yValues.push(sigIndex + 1);
+          sizes.push(Math.max(item.presence * 40, 6));
+          customData.push({
+            cancer: cancer,
+            signature: signatureAnnotations[signature] || signature,
+            presence: item.presence,
+            sampleCount: item.sampleCount || 0
+          });
+        }
+      });
+    }
 
     if (xValues.length > 0) {
       traces.push({
@@ -154,7 +290,7 @@ export default function SATSSignaturePresence(data, options = {}) {
         yaxis: 'y2',
         marker: {
           size: sizes,
-          color: signatureColors[signature] || '#808080',
+          color: getSignatureColor(signature),
           line: {
             width: 1,
             color: 'rgba(0,0,0,0.3)'
@@ -189,13 +325,15 @@ export default function SATSSignaturePresence(data, options = {}) {
       anchor: 'y',
       showticklabels: false,
       showgrid: false,
-      range: [0.5, cancerOrder.length + 0.5]
+      range: [0.5, cancerOrder.length + 0.5],
+      tickmode: 'array',
+      tickvals: cancerOrder.map((_, i) => i + 1)
     },
     yaxis: {
       domain: [0.8, 1],
       anchor: 'x',
       title: {
-        text: '<b>Mutations per Mb</b>',
+        text: '<b>Total Mutation Burden (TMB)</b>',
         font: {
           family: 'Times New Roman',
           size: 12
@@ -250,6 +388,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     
     autosize: true,
     height: 900,
+    barmode: 'stack',
     margin: {
       l: 350,
       r: 50,
