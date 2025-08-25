@@ -444,7 +444,66 @@ export default function RsInMsigportal(rawData) {
   };
 
   const shapes = [
-    // No shapes needed with spacing between columns
+    // Vertical line between Homo sapiens and Mus musculus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.412,
+      y0: 0,
+      x1: 0.412,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Mus musculus and Rattus norvegicus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.550,
+      y0: 0,
+      x1: 0.550,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Rattus norvegicus and Gallus gallus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.688,
+      y0: 0,
+      x1: 0.688,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Gallus gallus and Caenorhabditis elegans
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.826,
+      y0: 0,
+      x1: 0.826,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
   ];
 
   const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
