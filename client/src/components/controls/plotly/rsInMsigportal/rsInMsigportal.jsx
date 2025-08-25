@@ -374,7 +374,7 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[0],
+    text: Object.keys(groupBySpecies)[0].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 14,
       weight: 'bold',
@@ -389,7 +389,7 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[1].replace(' ', '<br>'),
+    text: Object.keys(groupBySpecies)[1].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 12,
       weight: 'bold',
@@ -404,7 +404,7 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[2].replace(' ', '<br>'),
+    text: Object.keys(groupBySpecies)[2].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 12,
       weight: 'bold',
@@ -419,7 +419,7 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[3].replace(/\s+/g, '<br>'),
+    text: Object.keys(groupBySpecies)[3].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 12,
       weight: 'bold',
@@ -434,7 +434,7 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[4].replace(/\s+/g, '<br>'),
+    text: Object.keys(groupBySpecies)[4].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 12,
       weight: 'bold',
