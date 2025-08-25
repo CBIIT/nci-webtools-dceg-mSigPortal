@@ -287,12 +287,15 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: index < 4 ? 0.068 : index < 8 ? 0.206 : 0.344,
       y: index < 4 
-        ? 1 - (index * 0.25) - 0.02
+        ? 1 - (index * 0.25) - 0.015
         : index < 8
-        ? 1 - ((index - 4) * 0.25) - 0.02
-        : 1 - ((index - 8) * 0.25) - 0.02,
+        ? 1 - ((index - 4) * 0.25) - 0.015
+        : 1 - ((index - 8) * 0.25) - 0.015,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -308,8 +311,11 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.482, // Center of fourth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
 
@@ -322,8 +328,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.620, // Center of fifth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
 
@@ -336,8 +345,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.758, // Center of sixth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
   const pieTitles4 = Object.entries(groupCaenorhabditis).map(
@@ -349,8 +361,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.896, // Center of seventh column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.01,
     })
   );
   const annotationTitle0 = {
@@ -362,6 +377,7 @@ export default function RsInMsigportal(rawData) {
     text: Object.keys(groupBySpecies)[0],
     font: {
       size: 14,
+      weight: 'bold',
     },
     x: 0.206, // Center of all three columns
     y: 1.02,
@@ -376,6 +392,7 @@ export default function RsInMsigportal(rawData) {
     text: Object.keys(groupBySpecies)[1].replace(' ', '<br>'),
     font: {
       size: 12,
+      weight: 'bold',
     },
     x: 0.482, // Center of fourth column
     y: 1.02,
@@ -390,6 +407,7 @@ export default function RsInMsigportal(rawData) {
     text: Object.keys(groupBySpecies)[2].replace(' ', '<br>'),
     font: {
       size: 12,
+      weight: 'bold',
     },
     x: 0.620, // Center of fifth column
     y: 1.02,
@@ -404,6 +422,7 @@ export default function RsInMsigportal(rawData) {
     text: Object.keys(groupBySpecies)[3].replace(/\s+/g, '<br>'),
     font: {
       size: 12,
+      weight: 'bold',
     },
     x: 0.758, // Center of sixth column
     y: 1.02,
@@ -418,6 +437,7 @@ export default function RsInMsigportal(rawData) {
     text: Object.keys(groupBySpecies)[4].replace(/\s+/g, '<br>'),
     font: {
       size: 12,
+      weight: 'bold',
     },
     x: 0.896, // Center of seventh column
     y: 1.02,
@@ -430,7 +450,7 @@ export default function RsInMsigportal(rawData) {
   const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 900,
+    height: 920,
     autosize: true,
     margin: {
       l: 0,
