@@ -135,7 +135,7 @@ export const sources = [
   {
     sourcePath: 'Etiology/Etiology_SATS_TS.csv',
     table: 'etiologyOptions',
-    description: 'etiology - signatures_from_targeted_sequencing',
+    description: 'etiology - SATS',
     columns: ['category', 'etiology', 'signature', 'json'],
   },
 

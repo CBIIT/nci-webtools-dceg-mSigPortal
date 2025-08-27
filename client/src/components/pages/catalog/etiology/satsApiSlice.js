@@ -62,47 +62,89 @@ function transformEtiologyDataToSATS(etiologyData) {
   // Group data by cancer type first
   const groupedByCancer = groupBy(etiologyData, 'cancer');
   
-  const satsData = [];
-  let cancerTypeNum = 1;
+  // Step 1: Calculate TMB data (equivalent to R TMB.all creation)
+  const tmbDataMap = new Map();
+  const cancerTMBTotals = new Map();
   
   Object.entries(groupedByCancer).forEach(([cancerType, cancerData]) => {
     // Group by signature for this cancer type
     const groupedBySignature = groupBy(cancerData, 'signatureName');
     
-    // Calculate total mutations across all samples for this cancer type
-    const totalMutations = cancerData.reduce((sum, item) => sum + (item.mutations || 0), 0);
-    const totalSamples = [...new Set(cancerData.map(item => item.sample))].length; // unique samples
+    // Get unique samples for this cancer type
+    const uniqueSamples = [...new Set(cancerData.map(item => item.sample))];
+    const totalSamples = uniqueSamples.length;
     
-    // Calculate TMB_all (total mutational burden for this cancer type)
-    const tmbAll = totalSamples > 0 ? totalMutations / totalSamples : 0;
+    let cancerTotalTMB = 0;
     
     Object.entries(groupedBySignature).forEach(([signatureName, signatureData]) => {
-      // Calculate metrics for this cancer-signature combination
+      // Calculate total exposure for this signature across all samples
+      // This mimics the R code: sum(exp_sig_clinical) / assaySize
       const totalExposure = signatureData.reduce((sum, item) => sum + (item.exposure || 0), 0);
       
-      // Count samples with detectable signature (exposure > 0)
-      const samplesWithSignature = signatureData.filter(item => (item.exposure || 0) > 0).length;
+      // If burden field is available, use it; otherwise calculate from exposure
+      const signatureTMB = signatureData.length > 0 && signatureData[0].burden 
+        ? signatureData.reduce((sum, item) => sum + (item.burden || 0), 0) / signatureData.length
+        : totalExposure / totalSamples; // Normalize by sample count
       
-      // Calculate presence (proportion of samples with this signature)
+      cancerTotalTMB += signatureTMB;
+      
+      // Store TMB data
+      const key = `${cancerType}_${signatureName}`;
+      tmbDataMap.set(key, {
+        CancerType: cancerType,
+        SBS: signatureName,
+        Count: signatureTMB, // TMB per signature (mutations per Mb)
+        N: totalSamples,
+        TMB_all: 0 // Will be filled in next step
+      });
+    });
+    
+    cancerTMBTotals.set(cancerType, cancerTotalTMB);
+  });
+  
+  // Step 2: Update TMB_all for all records and sort cancer types by total TMB
+  const sortedCancers = Array.from(cancerTMBTotals.entries())
+    .sort((a, b) => b[1] - a[1]) // Sort by TMB descending (like R code)
+    .map(([cancer, _]) => cancer);
+    
+  // Step 3: Calculate presence data and assign cancer type numbers
+  const satsData = [];
+  const cancerTypeMapping = new Map();
+  
+  sortedCancers.forEach((cancerType, index) => {
+    cancerTypeMapping.set(cancerType, index + 1);
+  });
+  
+  Object.entries(groupedByCancer).forEach(([cancerType, cancerData]) => {
+    const groupedBySignature = groupBy(cancerData, 'signatureName');
+    const uniqueSamples = [...new Set(cancerData.map(item => item.sample))];
+    const totalSamples = uniqueSamples.length;
+    const tmbAll = cancerTMBTotals.get(cancerType);
+    const cancerTypeNum = cancerTypeMapping.get(cancerType);
+    
+    Object.entries(groupedBySignature).forEach(([signatureName, signatureData]) => {
+      // Count samples with detectable signature (exposure > 0)
+      // This mimics the R presence calculation
+      const samplesWithSignature = signatureData.filter(item => (item.exposure || 0) > 0).length;
       const presence = totalSamples > 0 ? samplesWithSignature / totalSamples : 0;
       
-      // Calculate proportion (signature's contribution to total mutations)
-      const proportion = totalMutations > 0 ? totalExposure / totalMutations : 0;
+      // Calculate proportion (signature's contribution to total TMB)
+      const tmbKey = `${cancerType}_${signatureName}`;
+      const tmbData = tmbDataMap.get(tmbKey);
+      const proportion = tmbAll > 0 ? (tmbData?.Count || 0) / tmbAll : 0;
       
       satsData.push({
         CancerType: cancerType,
         SBS: signatureName,
-        Count: totalExposure,
+        Count: tmbData?.Count || 0, // TMB per signature
         Proportion: proportion,
         N: totalSamples,
         Presence: presence,
         TMB_all: tmbAll,
-        Label: totalSamples,
+        Label: totalSamples.toString(), // String version for display
         CancerType_num: cancerTypeNum
       });
     });
-    
-    cancerTypeNum++;
   });
   
   return {

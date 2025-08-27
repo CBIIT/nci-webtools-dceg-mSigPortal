@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button, Card } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
 import { useSatsDataQuery, useSatsOptionsQuery } from './satsApiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -8,6 +9,9 @@ import Select from '../../../controls/select/selectHookForm';
 
 export default function SATSSection() {
   const [params, setParams] = useState(null);
+
+  // Get current etiology category context
+  const { category } = useSelector((state) => state.catalog.etiology);
 
   // Fetch sample etiology data to get available studies and signature sets
   const { data: options, isFetching: fetchingOptions } = useSatsOptionsQuery();
@@ -40,6 +44,14 @@ export default function SATSSection() {
         .filter(e => e.study === study.value)
         .map(e => e.signatureSetName))]
         .filter(Boolean)
+        .sort((a, b) => {
+          // Prioritize signature sets based on current category
+          if (category === 'Cosmic' && a.includes('COSMIC')) return -1;
+          if (category === 'Cosmic' && b.includes('COSMIC')) return 1;
+          if (category === 'STS' && a.includes('STS')) return -1;
+          if (category === 'STS' && b.includes('STS')) return 1;
+          return a.localeCompare(b);
+        })
         .map(set => ({ label: set, value: set }))
     : [];
 
@@ -60,6 +72,8 @@ export default function SATSSection() {
     const queryParams = {
       study: data.study?.value,
       signatureSetName: data.signatureSetName?.value,
+      strategy: data.strategy?.value || 'WES', // Default to WES to match R analysis
+      limit: 1000000 // Ensure we get all data
     };
     setParams(queryParams);
   }
@@ -69,7 +83,8 @@ export default function SATSSection() {
       <h5 className="separator">SATS - Signature Activity in Tumor Samples</h5>
       <p className="text-muted mb-3">
         Interactive visualization showing tumor mutational burden (TMB) and signature presence 
-        across different cancer types.
+        across different cancer types. This plot reproduces the analysis from your R script, 
+        showing both the TMB contribution per signature and the proportion of samples exhibiting each signature.
       </p>
 
       <Card className="mb-3">
