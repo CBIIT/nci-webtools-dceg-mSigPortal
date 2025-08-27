@@ -3,25 +3,126 @@ import { Form, Row, Col, Button, Card } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import { useSatsDataQuery, useSatsOptionsQuery } from './satsApiSlice';
+import { useSatsDataQuery, useSatsOptionsQuery, useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } from './satsApiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Select from '../../../controls/select/selectHookForm';
 
-export default function SATSSection() {
+export default function SATSSection({ selectedSignature }) {
   const [params, setParams] = useState(null);
 
   // Get current etiology category context
-  const { category } = useSelector((state) => state.catalog.etiology);
+  const { category, signature } = useSelector((state) => state.catalog.etiology);
+
+  // Use the selected signature from props or state
+  const signatureToUse = selectedSignature || signature;
+
+  // Always log that SATSSection is rendering
+  console.log('SATSSection rendering with:', {
+    selectedSignature,
+    signature,
+    signatureToUse,
+    category
+  });
+
+  // Helper function to map signature names for API calls
+  function mapSignatureName(signatureName) {
+    if (!signatureName) return signatureName;
+    
+    // For signatures like SBS2_13, map to SBS2
+    const match = signatureName.match(/^(SBS\d+|DBS\d+|ID\d+)(_\d+)?$/);
+    if (match) {
+      return match[1]; // Return the base signature name without suffix
+    }
+    
+    return signatureName;
+  }
+
+  // Get mapped signature name for API calls
+  const mappedSignatureName = mapSignatureName(signatureToUse);
 
   // Fetch sample etiology data to get available studies and signature sets
   const { data: options, isFetching: fetchingOptions } = useSatsOptionsQuery();
 
-  // Fetch SATS plot data
+  // Query the signature_etiology data to find signatureSetName for the selected signature
+  const { data: etiologyData, error: etiologyError, isLoading: etiologyLoading } = useSatsEtiologyLookupQuery(
+    { limit: 1000 }, 
+    { skip: !signatureToUse }
+  );
+
+  // Log query status
+  console.log('SATSSection etiology query status:', {
+    signatureToUse,
+    skip: !signatureToUse,
+    isLoading: etiologyLoading,
+    hasData: !!etiologyData,
+    dataLength: etiologyData?.length || 0,
+    error: etiologyError
+  });
+
+  // Find the signatureSetName for the selected signature from the etiology data
+  const signatureInfo = etiologyData?.find(item => 
+    item.signatureName === mappedSignatureName || 
+    item.signature === mappedSignatureName ||
+    item.signatureName === signatureToUse ||
+    item.signature === signatureToUse
+  );
+  const autoSignatureSetName = signatureInfo?.signatureSetName;
+
+  // Debug: Log the first few items to see the structure
+  if (etiologyData && etiologyData.length > 0 && signatureToUse) {
+    console.log('Etiology data sample:', etiologyData.slice(0, 3));
+    console.log('Original signature:', signatureToUse);
+    console.log('Mapped signature:', mappedSignatureName);
+    console.log('Found signature info:', signatureInfo);
+    
+    // Log all unique signature names to see what's available
+    const uniqueSignatureNames = [...new Set(etiologyData.map(item => item.signatureName || item.signature).filter(Boolean))].slice(0, 20);
+    console.log('Available signature names (first 20):', uniqueSignatureNames);
+    
+    // Find all unique signatureSetNames for SBS signatures
+    const sbsSignatureSetNames = [...new Set(
+      etiologyData
+        .filter(item => (item.signatureName || item.signature || '').includes('SBS'))
+        .map(item => item.signatureSetName)
+        .filter(Boolean)
+    )];
+    
+    console.log('Available SBS signatureSetNames:', sbsSignatureSetNames);
+    
+    // Find all signatures that start with SBS2
+    const sbs2Signatures = etiologyData.filter(item => 
+      (item.signatureName || item.signature || '').startsWith('SBS2')
+    );
+    
+    console.log('Available SBS2* signatures:', sbs2Signatures.map(item => ({
+      signatureName: item.signatureName || item.signature,
+      signatureSetName: item.signatureSetName
+    })));
+    
+    // Show all unique signatureSetNames in the data
+    const allSignatureSetNames = [...new Set(etiologyData.map(item => item.signatureSetName).filter(Boolean))];
+    console.log('All unique signatureSetNames in etiology data:', allSignatureSetNames);
+    
+    // Look for signatures that contain 'SBS2'
+    const sbs2Related = etiologyData.filter(item => 
+      (item.signatureName && item.signatureName.includes('SBS2')) ||
+      (item.signature && item.signature.includes('SBS2'))
+    );
+    console.log('SBS2-related signatures found:', sbs2Related.map(item => item.signatureName || item.signature));
+  }
+
+  // Automatically fetch SATS data when signature is selected
   const { 
     data: plotConfig, 
     isFetching: fetchingPlot, 
     error: plotError 
-  } = useSatsDataQuery(params, { skip: !params });
+  } = useSatsDataBySignatureQuery(
+    { 
+      signatureName: mappedSignatureName, // Use mapped signature name for API call
+      signatureSetName: autoSignatureSetName 
+    },
+    { skip: !signatureToUse || !autoSignatureSetName }
+  );
 
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
@@ -87,6 +188,20 @@ export default function SATSSection() {
         showing both the TMB contribution per signature and the proportion of samples exhibiting each signature.
       </p>
 
+      {/* Debug information for development */}
+      {signatureToUse && (
+        <div className="mb-3 p-2 bg-light rounded small">
+          <strong>Debug Info:</strong><br/>
+          Original Signature: {signatureToUse}<br/>
+          Mapped Signature: {mappedSignatureName}<br/>
+          Found SignatureSetName: {autoSignatureSetName || 'Not found'}<br/>
+          Available Signatures: {etiologyData?.length || 0} total<br/>
+          API Call: {autoSignatureSetName ? 
+            `mutational_signature?signatureName=${mappedSignatureName}&signatureSetName=${autoSignatureSetName}` : 
+            'Waiting for signatureSetName...'}
+        </div>
+      )}
+
       <Card className="mb-3">
         <Card.Body>
           <LoadingOverlay active={fetchingOptions} />
@@ -151,13 +266,25 @@ export default function SATSSection() {
               config={plotConfig.config}
               style={{ width: '100%', height: '800px' }}
             />
+          ) : signatureToUse && autoSignatureSetName && !fetchingPlot && !plotError ? (
+            <div className="text-center p-5 text-muted">
+              <h6>No Data Available</h6>
+              <p>No signature activity data found for {signatureToUse} in {autoSignatureSetName}.</p>
+              <p>This signature may not have activity data available in the current dataset.</p>
+            </div>
+          ) : signatureToUse && !autoSignatureSetName ? (
+            <div className="text-center p-5 text-muted">
+              <h6>Signature Set Not Found</h6>
+              <p>Could not determine the signature set for {signatureToUse}.</p>
+              <p>Use the form above to manually select a study and signature set.</p>
+            </div>
           ) : params && !fetchingPlot && !plotError ? (
             <div className="text-center p-5 text-muted">
               <h6>No Data Available</h6>
               <p>No signature presence data found for the selected study and signature set.</p>
               <p>Try selecting a different study or signature set.</p>
             </div>
-          ) : !params ? (
+          ) : !params && !signatureToUse ? (
             <div className="text-center p-5 text-muted">
               <h6>Select Data to View Plot</h6>
               <p>Choose a study and signature set above to generate the SATS plot.</p>

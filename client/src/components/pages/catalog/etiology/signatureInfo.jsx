@@ -10,6 +10,7 @@ import {
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
 import Table from '../../../controls/table/table2';
+import SATSSection from './SATSSection';
 
 export default function SignatureInfo({ data }) {
   const dispatch = useDispatch();
@@ -46,6 +47,71 @@ export default function SignatureInfo({ data }) {
     skip: !signatureParams,
   });
 
+  // Log signature params and response data whenever they change
+  useEffect(() => {
+    if (signatureParams) {
+      console.log('📊 First Plot API Call - Signature Params:', signatureParams);
+    }
+  }, [signatureParams]);
+
+  useEffect(() => {
+    if (signaturePlot) {
+      console.log('📊 First Plot API Response - Full Data:', signaturePlot);
+      
+      // Extract and log all signatureSetName values if they exist
+      if (signaturePlot.data && Array.isArray(signaturePlot.data)) {
+        const signatureSetNames = signaturePlot.data
+          .map(item => item.signatureSetName)
+          .filter(name => name); // Remove undefined/null values
+        
+        console.log('📊 First Plot - All SignatureSetName values:', signatureSetNames);
+        console.log('📊 First Plot - Unique SignatureSetName values:', [...new Set(signatureSetNames)]);
+        
+        // Special logging for STS category to understand signatureSetName patterns
+        if (category === 'STS') {
+          console.log('🎯 STS SIGNATURE ANALYSIS:');
+          console.log('   Selected Signature:', signature);
+          console.log('   Category:', category);
+          console.log('   SignatureSetNames found:', [...new Set(signatureSetNames)]);
+          
+          // Analyze the pattern
+          const uniqueSetNames = [...new Set(signatureSetNames)];
+          if (uniqueSetNames.length > 0) {
+            console.log('   🔍 SignatureSetName Pattern Analysis:');
+            uniqueSetNames.forEach((setName, index) => {
+              console.log(`     ${index + 1}. ${setName}`);
+              // Check if it's SBS, DBS, or ID based
+              if (setName.includes('SBS')) {
+                console.log(`        → SBS signature set (likely for SBS signatures)`);
+              } else if (setName.includes('DBS')) {
+                console.log(`        → DBS signature set (likely for DBS signatures)`);
+              } else if (setName.includes('ID')) {
+                console.log(`        → ID signature set (likely for ID signatures)`);
+              }
+            });
+            
+            // Suggest which signatureSetName to use for SATS
+            const preferredSetName = uniqueSetNames.find(name => 
+              signature.includes('SBS') ? name.includes('SBS') :
+              signature.includes('DBS') ? name.includes('DBS') :
+              signature.includes('ID') ? name.includes('ID') : true
+            ) || uniqueSetNames[0];
+            
+            console.log('   💡 Suggested signatureSetName for SATS plot:', preferredSetName);
+          } else {
+            console.log('   ⚠️ No signatureSetName found in response data');
+          }
+        }
+      }
+    }
+  }, [signaturePlot, category, signature]);
+
+  useEffect(() => {
+    if (sigPlotError) {
+      console.error('❌ First Plot API Error:', sigPlotError);
+    }
+  }, [sigPlotError]);
+
   // fetch reference signature plot data
   const {
     data: refSigPlot,
@@ -81,6 +147,22 @@ export default function SignatureInfo({ data }) {
       skip: !metadata || category != 'CancerSpecificSignatures_2022',
     }
   );
+
+  // Helper function to map signature names for API calls
+  function mapSignatureName(signatureName) {
+    if (!signatureName) return signatureName;
+    
+    // For signatures like SBS2_13, map to SBS2 (use the number before underscore)
+    // This is because SBS2_13 represents SBS2 signature (associated with SBS13)
+    const match = signatureName.match(/^(SBS|DBS|ID)(\d+)_(\d+)$/);
+    if (match) {
+      const [, prefix, firstNumber] = match;
+      return `${prefix}${firstNumber}`; // Return prefix + first number (e.g., SBS2_13 → SBS2)
+    }
+    
+    // For signatures without underscore (e.g., SBS1, DBS2), return as-is
+    return signatureName;
+  }
 
   const studyOptions = [
     {
@@ -128,12 +210,38 @@ export default function SignatureInfo({ data }) {
   // get profile plot
   useEffect(() => {
     if (metadata) {
-      const params = getSignatureParams(category, metadata.signature);
-      if (params) {
-        setSignatureParams({
-          signatureName: metadata.signature,
-          ...params,
-        });
+      if (category === 'STS') {
+        // For STS signatures, use the getSignatureParams function with mapped signature name
+        const mappedSignatureName = mapSignatureName(metadata.signature);
+        const params = getSignatureParams(category, metadata.signature);
+        
+        if (params) {
+          setSignatureParams({
+            signatureName: mappedSignatureName, // Use mapped name for API call (e.g., SBS2)
+            ...params,
+          });
+          
+          console.log('🎯 STS Signature params set using getSignatureParams:', {
+            original: metadata.signature,
+            mapped: mappedSignatureName,
+            params: params,
+            finalApiParams: {
+              signatureName: mappedSignatureName,
+              ...params
+            }
+          });
+        } else {
+          console.warn('⚠️ No signatureSetName params found for STS signature:', metadata.signature);
+        }
+      } else {
+        // For other categories, use the original logic
+        const params = getSignatureParams(category, metadata.signature);
+        if (params) {
+          setSignatureParams({
+            signatureName: metadata.signature,
+            ...params,
+          });
+        }
       }
     }
   }, [metadata]);
@@ -270,6 +378,27 @@ export default function SignatureInfo({ data }) {
               matrix: '83',
             }
           : false;          
+    } else if (category == 'STS') {
+      // For STS signatures, use COSMIC v3.4 signatureSetName patterns
+      return signature.includes('SBS')
+        ? {
+            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_SBS96',
+            profile: 'SBS',
+            matrix: '96',
+          }
+        : signature.includes('DBS')
+        ? {
+            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_DBS78', 
+            profile: 'DBS',
+            matrix: '78',
+          }
+        : signature.includes('ID')
+        ? {
+            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_ID83',
+            profile: 'ID', 
+            matrix: '83',
+          }
+        : false;
     }    
   }
 
@@ -431,6 +560,9 @@ export default function SignatureInfo({ data }) {
                 <div className="text-center my-4">No data available</div>
               )}
             </div>
+            {category === 'STS' && signature && (
+              <SATSSection selectedSignature={signature} />
+            )}
           </div>
           {(category == 'Cosmic' ||
             category == 'CancerSpecificSignatures_2022') && (

@@ -50,6 +50,36 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
         return SATSSignaturePresence(transformedData);
       },
     }),
+    satsDataBySignature: builder.query({
+      query: (params) => ({
+        url: 'mutational_signature',
+        params: { 
+          signatureName: params.signatureName,
+          signatureSetName: params.signatureSetName,
+          profile: 'SBS', // Default profile for STS
+          matrix: '96'     // Default matrix for STS
+        },
+      }),
+      transformResponse: (data, meta, args) => {
+        if (!data || data.length === 0) {
+          return { traces: [], layout: {}, config: {} };
+        }
+
+        // Transform the mutational signature data into SATS format
+        const transformedData = transformEtiologyDataToSATS(data);
+        
+        // Generate the SATS plot
+        return SATSSignaturePresence(transformedData);
+      },
+    }),
+    satsEtiologyLookup: builder.query({
+      query: (params) => ({
+        url: 'signature_etiology',
+        params: { ...params, limit: 1000 },
+      }),
+      // Return raw data for signature lookup
+      transformResponse: (data) => data,
+    }),
   }),
 });
 
@@ -208,7 +238,7 @@ function transformSignatureActivityToSATS(activityData) {
   };
 }
 
-export const { useSatsOptionsQuery, useSatsDataQuery } = satsApiSlice;
+export const { useSatsOptionsQuery, useSatsDataQuery, useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } = satsApiSlice;
 
 // Export transformation functions for reuse
 export { transformEtiologyDataToSATS, transformSignatureActivityToSATS };

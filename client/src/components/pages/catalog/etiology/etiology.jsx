@@ -6,7 +6,6 @@ import CategoryOptions from './categoryOptions';
 import EtiologyOptions from './etiologyOptions';
 import SignatureOptions from './signatureOptions';
 import SignatureInfo from './signatureInfo';
-import SATSSection from './SATSSection';
 import { useEtiologyOptionsQuery } from './apiSlice';
 import './etiology.scss';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -92,7 +91,6 @@ export default function Etiology() {
           <EtiologyOptions data={data} />
           <SignatureOptions data={data} />
           <SignatureInfo data={data} />
-          {category === 'STS' && signature && <SATSSection />}
         </>
       ) : (
         <div>
