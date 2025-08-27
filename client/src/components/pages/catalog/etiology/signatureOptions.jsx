@@ -22,9 +22,19 @@ export default function SignatureOptions({ data }) {
   function getThumbnailPath(signature) {
     // replace slashes with colons in filenames
     const file = signature ? signature.replaceAll(/\//g, ':') : '';
-    return category == 'CancerSpecificSignatures_2022'
-      ? `api/data/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`
-      : `api/data/Database/Etiology/Profile_logo/${file}.svg`;
+    
+    if (category === 'CancerSpecificSignatures_2022') {
+      return `api/data/Database/Etiology/Profile_logo/Cancer_Specific_Signature_2022/${file}.svg`;
+    } else if (category === 'STS') {
+      // For STS signatures, determine if it's SBS or DBS based on signature name
+      const isDBS = signature && signature.includes('DBS');
+      const signatureSetFolder = isDBS 
+        ? 'SATS_TS_AACR_GENIE_GRCh37_DBS78' 
+        : 'SATS_TS_AACR_GENIE_GRCh37_SBS96';
+      return `api/data/Database/Etiology/Signature_logo/${signatureSetFolder}/${file}.svg`;
+    } else {
+      return `api/data/Database/Etiology/Profile_logo/${file}.svg`;
+    }
   }
 
   function naturalSort(a, b) {
