@@ -154,11 +154,11 @@ export default function SignatureInfo({ data }) {
     
     // For signatures like SBS2_13, map to SBS2 (use the number before underscore)
     // This is because SBS2_13 represents SBS2 signature (associated with SBS13)
-    const match = signatureName.match(/^(SBS|DBS|ID)(\d+)_(\d+)$/);
-    if (match) {
-      const [, prefix, firstNumber] = match;
-      return `${prefix}${firstNumber}`; // Return prefix + first number (e.g., SBS2_13 → SBS2)
-    }
+    // const match = signatureName.match(/^(SBS|DBS|ID)(\d+)_(\d+)$/);
+    // if (match) {
+    //   const [, prefix, firstNumber] = match;
+    //   return `${prefix}${firstNumber}`; // Return prefix + first number (e.g., SBS2_13 → SBS2)
+    // }
     
     // For signatures without underscore (e.g., SBS1, DBS2), return as-is
     return signatureName;
@@ -382,19 +382,19 @@ export default function SignatureInfo({ data }) {
       // For STS signatures, use COSMIC v3.4 signatureSetName patterns
       return signature.includes('SBS')
         ? {
-            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_SBS96',
+            signatureSetName: 'SATS_TS_AACR_GENIE_GRCh37_SBS96',
             profile: 'SBS',
             matrix: '96',
           }
         : signature.includes('DBS')
         ? {
-            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_DBS78', 
+            signatureSetName: 'SATS_TS_AACR_GENIE_GRCh37_DBS78', 
             profile: 'DBS',
             matrix: '78',
           }
         : signature.includes('ID')
         ? {
-            signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_ID83',
+            signatureSetName: 'SATS_TS_AACR_GENIE_GRCh37_ID83',
             profile: 'ID', 
             matrix: '83',
           }

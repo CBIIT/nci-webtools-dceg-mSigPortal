@@ -25,25 +25,23 @@ export default function SATSSection({ selectedSignature }) {
   function mapSignatureName(signatureName) {
     if (!signatureName) return signatureName;
     
-    // For signatures like SBS2_13, map to SBS2 (use the number before underscore)
-    const match = signatureName.match(/^(SBS|DBS|ID)(\d+)_(\d+)$/);
-    if (match) {
-      const [, prefix, firstNumber] = match;
-      return `${prefix}${firstNumber}`; // Return prefix + first number (e.g., SBS2_13 → SBS2)
-    }
-    
-    // For signatures without underscore (e.g., SBS1, DBS2), return as-is
+    // Keep signature names as they are - no mapping needed
     return signatureName;
   }
 
-  // Function to get the correct signatureSetName for STS signatures
+    // Function to get the correct signatureSetName for STS signatures
   function getSTSSignatureSetName(signatureName) {
     if (!signatureName) return null;
     
     if (signatureName.includes('SBS')) {
+      // For SBS2_13, use the specific SATS signatureSetName
+      if (signatureName === 'SBS2_13') {
+        return 'SATS_TS_AACR_GENIE_GRCh37_SBS96';
+      }
       return 'COSMIC_v3.4_Signatures_GRCh37_SBS96';
     } else if (signatureName.includes('DBS')) {
-      return 'COSMIC_v3.4_Signatures_GRCh37_DBS78';
+      // For DBS signatures, use the DBS78 signatureSetName
+      return 'SATS_TS_AACR_GENIE_GRCh37_DBS78';
     } else if (signatureName.includes('ID')) {
       return 'COSMIC_v3.4_Signatures_GRCh37_ID83';
     }
@@ -144,7 +142,7 @@ export default function SATSSection({ selectedSignature }) {
     data: examplePlotConfig, 
     isFetching: fetchingExample, 
     error: exampleError 
-  } = useSatsExampleDataQuery(undefined, { skip: !useExampleData });
+  } = useSatsExampleDataQuery(signatureToUse, { skip: !useExampleData });
 
   // For non-STS categories, use real API data (skip when using example data)
   const { 

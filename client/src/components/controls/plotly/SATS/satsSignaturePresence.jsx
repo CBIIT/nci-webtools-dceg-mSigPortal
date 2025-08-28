@@ -11,6 +11,7 @@ export default function SATSSignaturePresence(data, options = {}) {
   }
   // Define signature color mapping based on the R code
   const signatureColors = {
+    // SBS colors
     'SBS1': '#1F77B4',
     'SBS_Flat': '#AEC7E8', 
     'SBS_Artefactes': '#37474F',
@@ -38,6 +39,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     'SBS94': '#00FFFF',
     'SBS97': '#FF3D3D',
     'SBS8': '#808080',
+    'SBS17': '#EF4C7D', // Added SBS17 with distinct color
     'SBS21': '#808080',
     'SBS31': '#808080',
     'SBS37': '#808080',
@@ -45,7 +47,29 @@ export default function SATSSignaturePresence(data, options = {}) {
     'SBS92': '#808080',
     // Add patterns for complex signature names
     'Flat': '#AEC7E8',
-    'Artefactes': '#37474F'
+    'Artefactes': '#37474F',
+    // DBS colors - using the exact order from R code DBS_col_12
+    // Each DBS signature gets its corresponding color by position
+    'DBS1': '#E64B35FF',  // 1st color
+    'DBS2': '#4DBBD5FF',  // 2nd color
+    'DBS3': '#00A087FF',  // 3rd color
+    'DBS4': '#3C5488FF',  // 4th color
+    'DBS5': '#F39B7FFF',  // 5th color
+    'DBS6': '#8491B4FF',  // 6th color
+    'DBS7': '#91D1C2FF',  // 7th color
+    'DBS8': '#DC0000FF',  // 8th color
+    'DBS9': '#7E6148FF',  // 9th color
+    'DBS10': '#B09C85FF', // 10th color
+    'DBS11': '#F6E8C3',   // 11th color
+    'DBS12': '#4DBBD5FF',   // 12th color
+    'DBS13': '#E64B35FF', // Cycle back to 1st color
+    'DBS16': '#7E6148FF', // 6th color
+    'DBS17': '#B09C85FF', // 7th color
+    'DBS18': '#F6E8C3',   // 8th color
+    'DBS19': '#808080', // 9th color
+    // Additional DBS colors continue the original cycle
+    'DBS20': '#B09C85FF', // 10th color
+    'DBS21': '#F6E8C3'    // 11th color
   };
   
   // Function to get color for a signature
@@ -70,6 +94,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     if (signature.includes('SBS12(')) return signatureColors['SBS12'];
     if (signature.includes('SBS14(')) return signatureColors['SBS14'];
     if (signature.includes('SBS15(')) return signatureColors['SBS15'];
+    if (signature.includes('SBS17(')) return signatureColors['SBS17'];
     if (signature.includes('SBS19(')) return signatureColors['SBS19'];
     if (signature.includes('SBS25(')) return signatureColors['SBS25'];
     if (signature.includes('SBS30(')) return signatureColors['SBS30'];
@@ -82,6 +107,28 @@ export default function SATSSignaturePresence(data, options = {}) {
     if (signature.includes('SBS97(')) return signatureColors['SBS97'];
     if (signature.includes('Flat(')) return signatureColors['SBS_Flat'];
     if (signature.includes('Artefactes(')) return signatureColors['SBS_Artefactes'];
+    
+    // DBS color mapping
+    if (signature.includes('DBS1(') || signature.startsWith('DBS1')) return signatureColors['DBS1'];
+    if (signature.includes('DBS2(') || signature.startsWith('DBS2')) return signatureColors['DBS2'];
+    if (signature.includes('DBS3(') || signature.startsWith('DBS3')) return signatureColors['DBS3'];
+    if (signature.includes('DBS4(') || signature.startsWith('DBS4')) return signatureColors['DBS4'];
+    if (signature.includes('DBS5(') || signature.startsWith('DBS5')) return signatureColors['DBS5'];
+    if (signature.includes('DBS6(') || signature.startsWith('DBS6')) return signatureColors['DBS6'];
+    if (signature.includes('DBS7(') || signature.startsWith('DBS7')) return signatureColors['DBS7'];
+    if (signature.includes('DBS8(') || signature.startsWith('DBS8')) return signatureColors['DBS8'];
+    if (signature.includes('DBS9(') || signature.startsWith('DBS9')) return signatureColors['DBS9'];
+    if (signature.includes('DBS10(') || signature.startsWith('DBS10')) return signatureColors['DBS10'];
+    if (signature.includes('DBS11(') || signature.startsWith('DBS11')) return signatureColors['DBS11'];
+    if (signature.includes('DBS12(') || signature.startsWith('DBS12')) return signatureColors['DBS12'];
+    if (signature.includes('DBS13(') || signature.startsWith('DBS13')) return signatureColors['DBS13'];
+    if (signature.includes('DBS14(') || signature.startsWith('DBS14')) return signatureColors['DBS14'];
+    if (signature.includes('DBS15(') || signature.startsWith('DBS15')) return signatureColors['DBS15'];
+    if (signature.includes('DBS16(') || signature.startsWith('DBS16')) return signatureColors['DBS16'];
+    if (signature.includes('DBS17(') || signature.startsWith('DBS17')) return signatureColors['DBS17'];
+    if (signature.includes('DBS18(') || signature.startsWith('DBS18')) return signatureColors['DBS18'];
+    if (signature.includes('DBS19(') || signature.startsWith('DBS19')) return signatureColors['DBS19'];
+    if (signature.includes('DBS20(') || signature.startsWith('DBS20')) return signatureColors['DBS20'];
     
     // Default color if no match found
     return '#808080';
@@ -107,13 +154,36 @@ export default function SATSSignaturePresence(data, options = {}) {
     'SBS25': 'SBS25(chemotherapy)',
     'SBS30': 'SBS30(Defective BER)',
     'SBS32': 'SBS32(AZA treatment)',
-    'SBS84': 'SBS84(AID)',
-    'SBS87': 'SBS87(TP treatment)',
+    'SBS44': 'SBS44(Defective MMR)',
+    'SBS84': 'SBS84(AID/APOBEC)',
+    'SBS87': 'SBS87(Thiopurine treatment)',
     'SBS89': 'SBS89(Unknown)',
     'SBS94': 'SBS94(Unknown)',
     'SBS97': 'SBS97(Unknown)',
     'SBS_Flat': 'Flat(SBS3/5/40a/40b)',
-    'SBS_Artefactes': 'Artefactes(SBS50/51/57)'
+    'SBS_Artefactes': 'Artefactes(SBS50/51/57)',
+    // DBS annotations - matching R code
+    'DBS1': 'DBS1(UV exposure)',
+    'DBS2': 'DBS2(Tobacco smoking or other mutagens)',
+    'DBS3': 'DBS3(POLE-exo*)',
+    'DBS4': 'DBS4(Unknown)',
+    'DBS6': 'DBS6(Unknown)',
+    'DBS9': 'DBS9(Unknown)',
+    'DBS11': 'DBS11(Unknown)',
+    'DBS12': 'DBS12(Unknown)',
+    'DBS13': 'DBS13(HR deficiency)',
+    'DBS16': 'DBS16(Unknown)',
+    'DBS17': 'DBS17(Unknown)',
+    'DBS18': 'DBS18(Unknown)',
+    'DBS19': 'DBS19(Unknown)',
+    // Additional DBS signatures
+    'DBS5': 'DBS5(Unknown)',
+    'DBS7': 'DBS7(Unknown)',
+    'DBS8': 'DBS8(Unknown)',
+    'DBS10': 'DBS10(Unknown)',
+    'DBS14': 'DBS14(Unknown)',
+    'DBS15': 'DBS15(Unknown)',
+    'DBS20': 'DBS20(Unknown)'
   };
 
   // Expect data in format: 
@@ -142,10 +212,18 @@ export default function SATSSignaturePresence(data, options = {}) {
     return signatures.sort((a, b) => {
       // Extract signature info for comparison
       const getSignatureInfo = (sig) => {
-        // Handle SBS signatures (extract number for sorting)
+        // Handle SBS signatures with sub-types (e.g., SBS7a, SBS7b, SBS10a, SBS10b, SBS10c)
+        const sbsSubMatch = sig.match(/^SBS(\d+)([abc]?)/);
+        if (sbsSubMatch) {
+          const number = parseInt(sbsSubMatch[1]);
+          const subType = sbsSubMatch[2] || ''; // a, b, c, or empty string
+          return { type: 'SBS', number: number, subType: subType };
+        }
+        
+        // Handle regular SBS signatures
         const sbsMatch = sig.match(/^SBS(\d+)/);
         if (sbsMatch) {
-          return { type: 'SBS', number: parseInt(sbsMatch[1]) };
+          return { type: 'SBS', number: parseInt(sbsMatch[1]), subType: '' };
         }
         
         // Handle DBS signatures
@@ -179,7 +257,21 @@ export default function SATSSignaturePresence(data, options = {}) {
       
       // Within same type, sort by number for SBS/DBS/ID
       if (aInfo.type === bInfo.type && ['SBS', 'DBS', 'ID'].includes(aInfo.type)) {
-        return aInfo.number - bInfo.number;
+        // First sort by number
+        if (aInfo.number !== bInfo.number) {
+          return aInfo.number - bInfo.number;
+        }
+        
+        // If same number, sort by subType (for SBS signatures like SBS7a, SBS7b)
+        if (aInfo.type === 'SBS' && aInfo.subType !== bInfo.subType) {
+          // Empty string (no subtype) comes first, then 'a', 'b', 'c'
+          const subTypeOrder = { '': 0, 'a': 1, 'b': 2, 'c': 3 };
+          const aOrder = subTypeOrder[aInfo.subType] !== undefined ? subTypeOrder[aInfo.subType] : 999;
+          const bOrder = subTypeOrder[bInfo.subType] !== undefined ? subTypeOrder[bInfo.subType] : 999;
+          return aOrder - bOrder;
+        }
+        
+        return 0; // They are the same
       }
       
       // For SPECIAL types, sort by predefined order
@@ -195,18 +287,43 @@ export default function SATSSignaturePresence(data, options = {}) {
   if (isNewFormat) {
     // New format with CancerType, SBS, etc.
     
-    // Sort cancer types by total count (descending)  
-    const cancerTotalCounts = {};
-    tmbData.forEach(item => {
-      if (!cancerTotalCounts[item.CancerType]) {
-        cancerTotalCounts[item.CancerType] = 0;
-      }
-      cancerTotalCounts[item.CancerType] += item.Count || 0;
-    });
+    // Check if data already has CancerType_num (pre-sorted order)
+    const hasCancerTypeNum = tmbData.some(item => item.CancerType_num !== undefined);
+    
+    if (hasCancerTypeNum) {
+      // Use pre-sorted order from CancerType_num
+      const cancerTypeData = {};
+      tmbData.forEach(item => {
+        if (!cancerTypeData[item.CancerType]) {
+          cancerTypeData[item.CancerType] = {
+            num: item.CancerType_num,
+            tmbAll: item.TMB_all || 0
+          };
+        }
+      });
+      
+      cancerOrder = Object.entries(cancerTypeData)
+        .sort((a, b) => a[1].num - b[1].num) // Sort by CancerType_num (ascending)
+        .map(([cancer, _]) => cancer);
+        
+      console.log('🎯 Using pre-sorted cancer order (CancerType_num):', cancerOrder);
+      console.log('🎯 Cancer data:', cancerTypeData);
+    } else {
+      // Fallback: Use TMB_all for sorting
+      const cancerTMBTotals = {};
+      tmbData.forEach(item => {
+        if (!cancerTMBTotals[item.CancerType]) {
+          cancerTMBTotals[item.CancerType] = item.TMB_all || 0;
+        }
+      });
 
-    cancerOrder = Object.entries(cancerTotalCounts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([cancer, _]) => cancer);
+      cancerOrder = Object.entries(cancerTMBTotals)
+        .sort((a, b) => b[1] - a[1]) // Sort by TMB_all descending
+        .map(([cancer, _]) => cancer);
+        
+      console.log('🎯 Cancer order (sorted by TMB_all descending):', cancerOrder);
+      console.log('🎯 Cancer TMB totals:', cancerTMBTotals);
+    }
 
     // Get all signatures and sort them properly
     // For TMB bar chart, reverse the order so higher signatures stack on top

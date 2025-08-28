@@ -3,6 +3,7 @@ import { groupBy } from 'lodash';
 export default function SATSCombinedPlot(data, options = {}) {
   // Define signature color mapping based on the R code
   const signatureColors = {
+    // SBS colors
     'SBS1': '#1F77B4',
     'SBS_Flat': '#AEC7E8', 
     'SBS_Artefactes': '#37474F',
@@ -34,7 +35,29 @@ export default function SATSCombinedPlot(data, options = {}) {
     'SBS31': '#808080',
     'SBS37': '#808080',
     'SBS39': '#808080',
-    'SBS92': '#808080'
+    'SBS92': '#808080',
+    // DBS colors - using the same color scheme as R code (DBS_col_12)
+    'DBS1': '#E64B35FF',
+    'DBS2': '#4DBBD5FF', 
+    'DBS3': '#00A087FF',
+    'DBS4': '#3C5488FF',
+    'DBS6': '#F39B7FFF',
+    'DBS9': '#8491B4FF',
+    'DBS11': '#91D1C2FF',
+    'DBS12': '#DC0000FF',
+    'DBS13': '#7E6148FF',
+    'DBS16': '#B09C85FF',
+    'DBS17': '#F6E8C3',
+    'DBS18': '#808080',
+    'DBS19': '#808080',
+    // Additional DBS colors for completeness
+    'DBS5': '#FF9898',
+    'DBS7': '#FEB065',
+    'DBS8': '#FD8000',
+    'DBS10': '#CB98FD',
+    'DBS14': '#4C0299',
+    'DBS15': '#1F77B4',
+    'DBS20': '#17BECF'
   };
 
   // Define signature annotations

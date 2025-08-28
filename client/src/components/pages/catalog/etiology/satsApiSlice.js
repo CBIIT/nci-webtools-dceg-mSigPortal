@@ -3,6 +3,7 @@ import SATSSignaturePresence from '../../../controls/plotly/SATS/satsSignaturePr
 import SATSDotPlot from '../../../controls/plotly/SATS/satsDotPlot';
 import { groupBy } from 'lodash';
 import satsExampleData_SBS from '../../../controls/plotly/SATS/sats_example_data_SBS.json';
+import satsExampleData_DBS from '../../../controls/plotly/SATS/sats_example_data_DBS.json';
 
 export const satsApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -47,28 +48,93 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
       },
     }),
     satsExampleData: builder.query({
-      queryFn: async () => {
+      queryFn: async (signatureType) => {
         try {
-          console.log('🎯 Creating Complete SATS Plot from example data...');
-          console.log('📊 Example data sample:', satsExampleData_SBS?.slice(0, 3));
+          // Determine which data file to use based on signature type
+          const isDBS = signatureType && signatureType.includes('DBS');
+          const exampleData = isDBS ? satsExampleData_DBS : satsExampleData_SBS;
+          const signatureField = isDBS ? 'DBS' : 'SBS';
           
-          if (!satsExampleData_SBS || satsExampleData_SBS.length === 0) {
+          console.log('🎯 Creating Complete SATS Plot from example data...');
+          console.log('📊 Using data for:', isDBS ? 'DBS' : 'SBS');
+          console.log('📊 Example data sample:', exampleData?.slice(0, 3));
+          
+          if (!exampleData || exampleData.length === 0) {
             throw new Error('Example data not available');
           }
 
-          // Transform the example data to the format expected by SATSSignaturePresence
-          const transformedData = satsExampleData_SBS.map(item => {
-            // Extract base signature name (e.g., "SBS1(Deamination of 5meC)" → "SBS1")
-            const baseSignature = item.SBS.match(/^([^(]+)/)?.[1] || item.SBS;
+          // Check if the example data already has TMB_all and CancerType_num
+          const hasPreSortedData = exampleData.length > 0 && 
+            exampleData[0].TMB_all !== undefined && 
+            exampleData[0].CancerType_num !== undefined;
+
+          let transformedData;
+
+          if (hasPreSortedData) {
+            // Use existing TMB_all and CancerType_num values (data is already sorted)
+            console.log('🎯 Using pre-sorted example data with existing TMB_all and CancerType_num');
             
-            return {
-              cancer: item.CancerType,
-              signature: baseSignature.trim(), // Use extracted base signature
-              presence: item.Presence, // Use Presence (capital P) from the JSON
-              tmb: item.TMB_all || (item.Presence * 10), // Use TMB_all or scale Presence
-              sampleCount: item.N || 100 // Use N (sample count) from data
-            };
-          });
+            transformedData = exampleData.map(item => {
+              const signatureValue = item[signatureField] || item.SBS || item.DBS;
+              const baseSignature = signatureValue.match(/^([^(]+)/)?.[1] || signatureValue;
+              
+              return {
+                CancerType: item.CancerType,
+                SBS: baseSignature.trim(), // Use base signature name (will work for DBS too)
+                Count: item.Count || 0, // Use existing Count value
+                Proportion: item.Proportion || 0,
+                N: item.N || 100,
+                Presence: item.Presence || 0,
+                TMB_all: item.TMB_all || 0,
+                Label: item.Label || (item.N || 100).toString(),
+                CancerType_num: item.CancerType_num || 1
+              };
+            });
+          } else {
+            // Calculate TMB totals and sorting (for data without pre-sorted values)
+            console.log('🎯 Calculating TMB totals and sorting for example data');
+            
+            const cancerTMBTotals = new Map();
+            exampleData.forEach(item => {
+              const cancerType = item.CancerType;
+              const tmb = item.TMB_all || (item.Presence * 10);
+              if (!cancerTMBTotals.has(cancerType)) {
+                cancerTMBTotals.set(cancerType, 0);
+              }
+              cancerTMBTotals.set(cancerType, cancerTMBTotals.get(cancerType) + tmb);
+            });
+
+            // Sort cancer types by total TMB (descending)
+            const sortedCancers = Array.from(cancerTMBTotals.entries())
+              .sort((a, b) => b[1] - a[1])
+              .map(([cancer, _]) => cancer);
+
+            // Create cancer type mapping for numbering
+            const cancerTypeMapping = new Map();
+            sortedCancers.forEach((cancerType, index) => {
+              cancerTypeMapping.set(cancerType, index + 1);
+            });
+
+            // Transform to new format with proper fields
+            transformedData = exampleData.map(item => {
+              const signatureValue = item[signatureField] || item.SBS || item.DBS;
+              const baseSignature = signatureValue.match(/^([^(]+)/)?.[1] || signatureValue;
+              const cancerType = item.CancerType;
+              const tmb = item.TMB_all || (item.Presence * 10);
+              
+              return {
+                CancerType: cancerType,
+                SBS: baseSignature.trim(), // Use base signature name (will work for DBS too)
+                Count: tmb, // TMB value for this signature
+                Proportion: item.Proportion || (tmb / cancerTMBTotals.get(cancerType)), // Calculate proportion
+                N: item.N || 100,
+                Presence: item.Presence,
+                TMB_all: cancerTMBTotals.get(cancerType),
+                Label: (item.N || 100).toString(),
+                CancerType_num: cancerTypeMapping.get(cancerType)
+              };
+            });
+          }
 
           console.log('🔄 Transformed data sample:', transformedData.slice(0, 3));
           console.log('📊 Total records transformed:', transformedData.length);
@@ -106,18 +172,54 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
           // Final fallback: create simple dot plot
           try {
             console.log('🔄 Attempting fallback to dot plot...');
-            const transformedData = satsExampleData.map(item => {
-              const baseSignature = item.SBS.match(/^([^(]+)/)?.[1] || item.SBS;
+            // Use the same logic to determine data file and signature field
+            const isDBS = signatureType && signatureType.includes('DBS');
+            const fallbackData = isDBS ? satsExampleData_DBS : satsExampleData_SBS;
+            const signatureField = isDBS ? 'DBS' : 'SBS';
+            
+            // Apply the same transformation as above
+            const cancerTMBTotals = new Map();
+            fallbackData.forEach(item => {
+              const cancerType = item.CancerType;
+              const tmb = item.TMB_all || (item.Presence * 10);
+              if (!cancerTMBTotals.has(cancerType)) {
+                cancerTMBTotals.set(cancerType, 0);
+              }
+              cancerTMBTotals.set(cancerType, cancerTMBTotals.get(cancerType) + tmb);
+            });
+
+            const sortedCancers = Array.from(cancerTMBTotals.entries())
+              .sort((a, b) => b[1] - a[1])
+              .map(([cancer, _]) => cancer);
+
+            const cancerTypeMapping = new Map();
+            sortedCancers.forEach((cancerType, index) => {
+              cancerTypeMapping.set(cancerType, index + 1);
+            });
+
+            const transformedFallbackData = fallbackData.map(item => {
+              const signatureValue = item[signatureField] || item.SBS || item.DBS;
+              const baseSignature = signatureValue.match(/^([^(]+)/)?.[1] || signatureValue;
+              const cancerType = item.CancerType;
+              const tmb = item.TMB_all || (item.Presence * 10);
+              
               return {
-                cancer: item.CancerType,
-                signature: baseSignature.trim(),
-                presence: item.Presence,
-                tmb: item.TMB_all || (item.Presence * 10),
-                sampleCount: item.N || 100
+                CancerType: cancerType,
+                SBS: baseSignature.trim(),
+                Count: tmb,
+                Proportion: item.Proportion || (tmb / cancerTMBTotals.get(cancerType)),
+                N: item.N || 100,
+                Presence: item.Presence,
+                TMB_all: cancerTMBTotals.get(cancerType),
+                Label: (item.N || 100).toString(),
+                CancerType_num: cancerTypeMapping.get(cancerType)
               };
             });
             
-            const fallbackResult = SATSDotPlot(transformedData);
+            const fallbackResult = SATSDotPlot({ 
+              tmbData: transformedFallbackData, 
+              dotData: transformedFallbackData 
+            });
             return { data: fallbackResult };
           } catch (fallbackError) {
             console.error('❌ Fallback also failed:', fallbackError);
