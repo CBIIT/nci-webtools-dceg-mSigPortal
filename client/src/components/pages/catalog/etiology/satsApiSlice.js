@@ -4,69 +4,38 @@ import { groupBy } from 'lodash';
 
 export const satsApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    satsOptions: builder.query({
-      query: () => ({
-        url: 'signature_etiology',
-        params: { limit: 1000 },
-      }),
-      transformResponse: (data) => {
-        if (!data || data.length === 0) {
-          return [];
-        }
-        
-        // Extract unique combinations of study and signatureSetName
-        const uniqueCombinations = [];
-        const seen = new Set();
-        
-        data.forEach(item => {
-          const key = `${item.study}-${item.signatureSetName}`;
-          if (!seen.has(key) && item.study && item.signatureSetName) {
-            seen.add(key);
-            uniqueCombinations.push({
-              study: item.study,
-              signatureSetName: item.signatureSetName,
-              strategy: item.strategy
-            });
-          }
-        });
-        
-        return uniqueCombinations;
-      },
-    }),
-    satsData: builder.query({
+    satsDataBySignature: builder.query({
       query: (params) => ({
-        url: 'signature_etiology',
-        params: { ...params, limit: 1000000 },
+        url: 'signature_etiology',  // Use signature_etiology for SATS data
+        params: { 
+          signatureName: params.signatureName,
+          signatureSetName: params.signatureSetName,
+          limit: 1000000  // Get all data for comprehensive analysis
+        },
       }),
       transformResponse: (data, meta, args) => {
+        console.log('🎯 SATS API Raw Data:', {
+          endpoint: 'signature_etiology',
+          params: args,
+          dataLength: data?.length || 0,
+          sampleData: data?.slice(0, 3) || [],
+          fields: data?.length > 0 ? Object.keys(data[0]) : []
+        });
+
         if (!data || data.length === 0) {
+          console.warn('⚠️ No data returned from signature_etiology API');
           return { traces: [], layout: {}, config: {} };
         }
 
         // Transform the etiology data into SATS format
         const transformedData = transformEtiologyDataToSATS(data);
         
-        // Generate the SATS plot
-        return SATSSignaturePresence(transformedData);
-      },
-    }),
-    satsDataBySignature: builder.query({
-      query: (params) => ({
-        url: 'mutational_signature',
-        params: { 
-          signatureName: params.signatureName,
-          signatureSetName: params.signatureSetName,
-          profile: 'SBS', // Default profile for STS
-          matrix: '96'     // Default matrix for STS
-        },
-      }),
-      transformResponse: (data, meta, args) => {
-        if (!data || data.length === 0) {
-          return { traces: [], layout: {}, config: {} };
-        }
-
-        // Transform the mutational signature data into SATS format
-        const transformedData = transformEtiologyDataToSATS(data);
+        console.log('🎯 SATS Transformed Data:', {
+          tmbDataLength: transformedData.tmbData?.length || 0,
+          dotDataLength: transformedData.dotData?.length || 0,
+          sampleTmbData: transformedData.tmbData?.slice(0, 3) || [],
+          expectedFields: ['CancerType', 'SBS', 'Count', 'Proportion', 'N', 'Presence', 'TMB_all', 'CancerType_num']
+        });
         
         // Generate the SATS plot
         return SATSSignaturePresence(transformedData);
@@ -238,7 +207,7 @@ function transformSignatureActivityToSATS(activityData) {
   };
 }
 
-export const { useSatsOptionsQuery, useSatsDataQuery, useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } = satsApiSlice;
+export const { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } = satsApiSlice;
 
 // Export transformation functions for reuse
 export { transformEtiologyDataToSATS, transformSignatureActivityToSATS };

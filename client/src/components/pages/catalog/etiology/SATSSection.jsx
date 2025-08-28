@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button, Card } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
+import React from 'react';
+import { Row, Col, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import { useSatsDataQuery, useSatsOptionsQuery, useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } from './satsApiSlice';
+import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } from './satsApiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Select from '../../../controls/select/selectHookForm';
 
 export default function SATSSection({ selectedSignature }) {
-  const [params, setParams] = useState(null);
 
   // Get current etiology category context
   const { category, signature } = useSelector((state) => state.catalog.etiology);
@@ -28,25 +25,39 @@ export default function SATSSection({ selectedSignature }) {
   function mapSignatureName(signatureName) {
     if (!signatureName) return signatureName;
     
-    // For signatures like SBS2_13, map to SBS2
-    const match = signatureName.match(/^(SBS\d+|DBS\d+|ID\d+)(_\d+)?$/);
+    // For signatures like SBS2_13, map to SBS2 (use the number before underscore)
+    const match = signatureName.match(/^(SBS|DBS|ID)(\d+)_(\d+)$/);
     if (match) {
-      return match[1]; // Return the base signature name without suffix
+      const [, prefix, firstNumber] = match;
+      return `${prefix}${firstNumber}`; // Return prefix + first number (e.g., SBS2_13 → SBS2)
     }
     
+    // For signatures without underscore (e.g., SBS1, DBS2), return as-is
     return signatureName;
+  }
+
+  // Function to get the correct signatureSetName for STS signatures
+  function getSTSSignatureSetName(signatureName) {
+    if (!signatureName) return null;
+    
+    if (signatureName.includes('SBS')) {
+      return 'COSMIC_v3.4_Signatures_GRCh37_SBS96';
+    } else if (signatureName.includes('DBS')) {
+      return 'COSMIC_v3.4_Signatures_GRCh37_DBS78';
+    } else if (signatureName.includes('ID')) {
+      return 'COSMIC_v3.4_Signatures_GRCh37_ID83';
+    }
+    
+    return null;
   }
 
   // Get mapped signature name for API calls
   const mappedSignatureName = mapSignatureName(signatureToUse);
 
-  // Fetch sample etiology data to get available studies and signature sets
-  const { data: options, isFetching: fetchingOptions } = useSatsOptionsQuery();
-
-  // Query the signature_etiology data to find signatureSetName for the selected signature
+  // Query the signature_etiology data to find signatureSetName for non-STS categories
   const { data: etiologyData, error: etiologyError, isLoading: etiologyLoading } = useSatsEtiologyLookupQuery(
     { limit: 1000 }, 
-    { skip: !signatureToUse }
+    { skip: !signatureToUse || category === 'STS' } // Skip for STS category
   );
 
   // Log query status
@@ -111,6 +122,20 @@ export default function SATSSection({ selectedSignature }) {
     console.log('SBS2-related signatures found:', sbs2Related.map(item => item.signatureName || item.signature));
   }
 
+  // For STS category, use the hard-coded signatureSetName, otherwise use etiology lookup
+  const signatureSetNameToUse = category === 'STS' 
+    ? getSTSSignatureSetName(signatureToUse)
+    : autoSignatureSetName;
+
+  console.log('🎯 SATSSection signatureSetName resolution:', {
+    category,
+    signatureToUse,
+    mappedSignatureName,
+    autoSignatureSetName,
+    stsSignatureSetName: getSTSSignatureSetName(signatureToUse),
+    finalSignatureSetName: signatureSetNameToUse
+  });
+
   // Automatically fetch SATS data when signature is selected
   const { 
     data: plotConfig, 
@@ -119,134 +144,29 @@ export default function SATSSection({ selectedSignature }) {
   } = useSatsDataBySignatureQuery(
     { 
       signatureName: mappedSignatureName, // Use mapped signature name for API call
-      signatureSetName: autoSignatureSetName 
+      signatureSetName: signatureSetNameToUse 
     },
-    { skip: !signatureToUse || !autoSignatureSetName }
+    { skip: !signatureToUse || !signatureSetNameToUse }
   );
-
-  const { control, handleSubmit, watch, setValue } = useForm({
-    defaultValues: {
-      study: null,
-      signatureSetName: null,
-    }
-  });
-
-  const { study, signatureSetName } = watch();
-
-  // Create form options from etiology data
-  const studyOptions = options
-    ? [...new Set(options.map(e => e.study))]
-        .filter(Boolean)
-        .map(study => ({ label: study, value: study }))
-    : [];
-
-  const signatureSetOptions = options && study
-    ? [...new Set(options
-        .filter(e => e.study === study.value)
-        .map(e => e.signatureSetName))]
-        .filter(Boolean)
-        .sort((a, b) => {
-          // Prioritize signature sets based on current category
-          if (category === 'Cosmic' && a.includes('COSMIC')) return -1;
-          if (category === 'Cosmic' && b.includes('COSMIC')) return 1;
-          if (category === 'STS' && a.includes('STS')) return -1;
-          if (category === 'STS' && b.includes('STS')) return 1;
-          return a.localeCompare(b);
-        })
-        .map(set => ({ label: set, value: set }))
-    : [];
-
-  // Set initial values
-  useEffect(() => {
-    if (studyOptions.length > 0 && !study) {
-      setValue('study', studyOptions[0]);
-    }
-  }, [studyOptions, study, setValue]);
-
-  useEffect(() => {
-    if (signatureSetOptions.length > 0 && !signatureSetName) {
-      setValue('signatureSetName', signatureSetOptions[0]);
-    }
-  }, [signatureSetOptions, signatureSetName, setValue]);
-
-  function onSubmit(data) {
-    const queryParams = {
-      study: data.study?.value,
-      signatureSetName: data.signatureSetName?.value,
-      strategy: data.strategy?.value || 'WES', // Default to WES to match R analysis
-      limit: 1000000 // Ensure we get all data
-    };
-    setParams(queryParams);
-  }
 
   return (
     <div className="mt-4">
       <h5 className="separator">SATS - Signature Activity in Tumor Samples</h5>
       <p className="text-muted mb-3">
         Interactive visualization showing tumor mutational burden (TMB) and signature presence 
-        across different cancer types. This plot reproduces the analysis from your R script, 
-        showing both the TMB contribution per signature and the proportion of samples exhibiting each signature.
+        across different cancer types. The plot automatically displays data for the currently selected signature.
       </p>
 
       {/* Debug information for development */}
       {signatureToUse && (
         <div className="mb-3 p-2 bg-light rounded small">
-          <strong>Debug Info:</strong><br/>
-          Original Signature: {signatureToUse}<br/>
-          Mapped Signature: {mappedSignatureName}<br/>
-          Found SignatureSetName: {autoSignatureSetName || 'Not found'}<br/>
-          Available Signatures: {etiologyData?.length || 0} total<br/>
-          API Call: {autoSignatureSetName ? 
-            `mutational_signature?signatureName=${mappedSignatureName}&signatureSetName=${autoSignatureSetName}` : 
-            'Waiting for signatureSetName...'}
+          <strong>Analysis Info:</strong><br/>
+          Selected Signature: {signatureToUse}<br/>
+          Mapped for API: {mappedSignatureName}<br/>
+          Signature Set: {signatureSetNameToUse || 'Determining...'}<br/>
+          Category: {category}<br/>
         </div>
       )}
-
-      <Card className="mb-3">
-        <Card.Body>
-          <LoadingOverlay active={fetchingOptions} />
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row>
-              <Col md={4}>
-                <Select
-                  name="study"
-                  label="Study"
-                  options={studyOptions}
-                  control={control}
-                  disabled={fetchingOptions}
-                />
-              </Col>
-              <Col md={4}>
-                <Select
-                  name="signatureSetName"
-                  label="Signature Set"
-                  options={signatureSetOptions}
-                  control={control}
-                  disabled={fetchingOptions || !study}
-                />
-              </Col>
-              <Col md={4} className="d-flex">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="mt-auto mb-3"
-                  disabled={fetchingOptions || !study || !signatureSetName}
-                >
-                  Generate SATS Plot
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-
-          {params && (
-            <div className="mt-3 p-2 bg-light rounded">
-              <small>
-                <strong>Current Selection:</strong> {params.study} - {params.signatureSetName}
-              </small>
-            </div>
-          )}
-        </Card.Body>
-      </Card>
 
       <Card>
         <Card.Body>
@@ -266,28 +186,21 @@ export default function SATSSection({ selectedSignature }) {
               config={plotConfig.config}
               style={{ width: '100%', height: '800px' }}
             />
-          ) : signatureToUse && autoSignatureSetName && !fetchingPlot && !plotError ? (
+          ) : signatureToUse && signatureSetNameToUse && !fetchingPlot && !plotError ? (
             <div className="text-center p-5 text-muted">
               <h6>No Data Available</h6>
-              <p>No signature activity data found for {signatureToUse} in {autoSignatureSetName}.</p>
+              <p>No signature activity data found for {signatureToUse} in {signatureSetNameToUse}.</p>
               <p>This signature may not have activity data available in the current dataset.</p>
             </div>
-          ) : signatureToUse && !autoSignatureSetName ? (
+          ) : signatureToUse && !signatureSetNameToUse ? (
             <div className="text-center p-5 text-muted">
-              <h6>Signature Set Not Found</h6>
-              <p>Could not determine the signature set for {signatureToUse}.</p>
-              <p>Use the form above to manually select a study and signature set.</p>
+              <h6>Analyzing Signature...</h6>
+              <p>Determining signature set for {signatureToUse}...</p>
             </div>
-          ) : params && !fetchingPlot && !plotError ? (
+          ) : !signatureToUse ? (
             <div className="text-center p-5 text-muted">
-              <h6>No Data Available</h6>
-              <p>No signature presence data found for the selected study and signature set.</p>
-              <p>Try selecting a different study or signature set.</p>
-            </div>
-          ) : !params && !signatureToUse ? (
-            <div className="text-center p-5 text-muted">
-              <h6>Select Data to View Plot</h6>
-              <p>Choose a study and signature set above to generate the SATS plot.</p>
+              <h6>Select a Signature</h6>
+              <p>Choose a signature from the etiology section above to view the SATS plot.</p>
             </div>
           ) : null}
         </Card.Body>
