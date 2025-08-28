@@ -1,6 +1,8 @@
 import { catalogApiSlice } from '../../../../services/store/rootApi';
 import SATSSignaturePresence from '../../../controls/plotly/SATS/satsSignaturePresence';
+import SATSDotPlot from '../../../controls/plotly/SATS/satsDotPlot';
 import { groupBy } from 'lodash';
+import satsExampleData from '../../../controls/plotly/SATS/sats_example_data.json';
 
 export const satsApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -30,6 +32,9 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
         // Transform the etiology data into SATS format
         const transformedData = transformEtiologyDataToSATS(data);
         
+        // Log the transformed data for debugging
+        logSATSData(transformedData.tmbData);
+        
         console.log('🎯 SATS Transformed Data:', {
           tmbDataLength: transformedData.tmbData?.length || 0,
           dotDataLength: transformedData.dotData?.length || 0,
@@ -39,6 +44,86 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
         
         // Generate the SATS plot
         return SATSSignaturePresence(transformedData);
+      },
+    }),
+    satsExampleData: builder.query({
+      queryFn: async () => {
+        try {
+          console.log('🎯 Creating Complete SATS Plot from example data...');
+          console.log('📊 Example data sample:', satsExampleData?.slice(0, 3));
+          
+          if (!satsExampleData || satsExampleData.length === 0) {
+            throw new Error('Example data not available');
+          }
+
+          // Transform the example data to the format expected by SATSSignaturePresence
+          const transformedData = satsExampleData.map(item => {
+            // Extract base signature name (e.g., "SBS1(Deamination of 5meC)" → "SBS1")
+            const baseSignature = item.SBS.match(/^([^(]+)/)?.[1] || item.SBS;
+            
+            return {
+              cancer: item.CancerType,
+              signature: baseSignature.trim(), // Use extracted base signature
+              presence: item.Presence, // Use Presence (capital P) from the JSON
+              tmb: item.TMB_all || (item.Presence * 10), // Use TMB_all or scale Presence
+              sampleCount: item.N || 100 // Use N (sample count) from data
+            };
+          });
+
+          console.log('🔄 Transformed data sample:', transformedData.slice(0, 3));
+          console.log('📊 Total records transformed:', transformedData.length);
+          console.log('🏥 Unique cancer types:', [...new Set(transformedData.map(d => d.cancer))]);
+          console.log('✍️ Unique signatures:', [...new Set(transformedData.map(d => d.signature))]);
+
+          // Check if any records have presence > 0
+          const validRecords = transformedData.filter(d => d.presence > 0);
+          console.log('✅ Records with presence > 0:', validRecords.length);
+          console.log('📈 Sample valid records:', validRecords.slice(0, 5));
+
+          // Generate the complete SATS plot using SATSSignaturePresence function (TMB + Dot plot)
+          console.log('🎯 Calling SATSSignaturePresence for complete plot...');
+          const plotResult = SATSSignaturePresence({ 
+            tmbData: transformedData, 
+            dotData: transformedData 
+          });
+          
+          console.log('🎯 SATSSignaturePresence result:', plotResult);
+          console.log('📈 Plot traces:', plotResult?.traces);
+          console.log('📊 Plot traces count:', plotResult?.traces?.length);
+          console.log('🎨 Plot layout:', plotResult?.layout);
+          
+          // If SATSSignaturePresence doesn't work, fall back to just the dot plot
+          if (!plotResult?.traces || plotResult.traces.length === 0) {
+            console.log('⚠️ SATSSignaturePresence failed, falling back to dot plot only');
+            const dotPlotResult = SATSDotPlot(transformedData);
+            return { data: dotPlotResult };
+          }
+          
+          return { data: plotResult };
+        } catch (error) {
+          console.error('❌ Error creating complete SATS plot:', error);
+          
+          // Final fallback: create simple dot plot
+          try {
+            console.log('🔄 Attempting fallback to dot plot...');
+            const transformedData = satsExampleData.map(item => {
+              const baseSignature = item.SBS.match(/^([^(]+)/)?.[1] || item.SBS;
+              return {
+                cancer: item.CancerType,
+                signature: baseSignature.trim(),
+                presence: item.Presence,
+                tmb: item.TMB_all || (item.Presence * 10),
+                sampleCount: item.N || 100
+              };
+            });
+            
+            const fallbackResult = SATSDotPlot(transformedData);
+            return { data: fallbackResult };
+          } catch (fallbackError) {
+            console.error('❌ Fallback also failed:', fallbackError);
+            return { error: { message: 'Failed to create SATS plot: ' + error.message } };
+          }
+        }
       },
     }),
     satsEtiologyLookup: builder.query({
@@ -56,6 +141,43 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
 function transformEtiologyDataToSATS(etiologyData) {
   if (!etiologyData || etiologyData.length === 0) {
     return { tmbData: [], dotData: [] };
+  }
+
+  // Signature name to annotation mapping (from R code)
+  const signatureAnnotations = {
+    'SBS1': 'SBS1(Deamination of 5meC)',
+    'SBS2': 'SBS2/13(APOBEC)',
+    'SBS13': 'SBS2/13(APOBEC)',
+    'SBS2_13': 'SBS2/13(APOBEC)',
+    'SBS4': 'SBS4(Tobacco smoking)',
+    'SBS6': 'SBS6(Defective MMR)',
+    'SBS7a': 'SBS7a(UV exposure)',
+    'SBS7b': 'SBS7b(UV exposure)',
+    'SBS8': 'SBS8(Unknown)',
+    'SBS10a': 'SBS10a(POLE-exo*)',
+    'SBS10b': 'SBS10b(POLE-exo*)',
+    'SBS10c': 'SBS10c(POLE-exo*)',
+    'SBS11': 'SBS11(TMZ treatment)',
+    'SBS12': 'SBS12(Unknown)',
+    'SBS14': 'SBS14(Defective MMR)',
+    'SBS15': 'SBS15(Defective MMR)',
+    'SBS19': 'SBS19(Unknown)',
+    'SBS25': 'SBS25(chemotherapy)',
+    'SBS30': 'SBS30(Defective BER)',
+    'SBS32': 'SBS32(AZA treatment)',
+    'SBS44': 'SBS44(Defective MMR)',
+    'SBS84': 'SBS84(AID)',
+    'SBS87': 'SBS87(TP treatment)',
+    'SBS89': 'SBS89(Unknown)',
+    'SBS94': 'SBS94(Unknown)',
+    'SBS97': 'SBS97(Unknown)',
+    'SBS_Flat': 'Flat(SBS3/5/40a/40b)',
+    'SBS_Artefactes': 'Artefactes(SBS50/51/57)'
+  };
+
+  // Function to get annotated signature name
+  function getAnnotatedSignatureName(signatureName) {
+    return signatureAnnotations[signatureName] || signatureName;
   }
 
   // Group data by cancer type first
@@ -134,7 +256,7 @@ function transformEtiologyDataToSATS(etiologyData) {
       
       satsData.push({
         CancerType: cancerType,
-        SBS: signatureName,
+        SBS: getAnnotatedSignatureName(signatureName), // Use annotated signature name
         Count: tmbData?.Count || 0, // TMB per signature
         Proportion: proportion,
         N: totalSamples,
@@ -150,6 +272,25 @@ function transformEtiologyDataToSATS(etiologyData) {
     tmbData: satsData,
     dotData: satsData
   };
+}
+
+// Log the transformed data for debugging
+function logSATSData(satsData) {
+  if (satsData && satsData.length > 0) {
+    console.log('🎯 SATS Data Sample (first 5 rows):');
+    console.table(satsData.slice(0, 5));
+    
+    // Verify expected columns exist
+    const expectedColumns = ['CancerType', 'SBS', 'Count', 'Proportion', 'N', 'Presence', 'TMB_all', 'Label', 'CancerType_num'];
+    const actualColumns = Object.keys(satsData[0] || {});
+    const missingColumns = expectedColumns.filter(col => !actualColumns.includes(col));
+    
+    if (missingColumns.length > 0) {
+      console.warn('⚠️ Missing expected columns:', missingColumns);
+    } else {
+      console.log('✅ All expected columns present:', expectedColumns);
+    }
+  }
 }
 
 // Alternative transformation if you have different data structure
@@ -207,7 +348,7 @@ function transformSignatureActivityToSATS(activityData) {
   };
 }
 
-export const { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } = satsApiSlice;
+export const { useSatsDataBySignatureQuery, useSatsExampleDataQuery, useSatsEtiologyLookupQuery } = satsApiSlice;
 
 // Export transformation functions for reuse
 export { transformEtiologyDataToSATS, transformSignatureActivityToSATS };

@@ -137,6 +137,61 @@ export default function SATSSignaturePresence(data, options = {}) {
   
   let cancerOrder, tmbSignatures, dotSignatures;
   
+  // Function to sort signatures in desired order: SBS1, SBS2, SBS3... then Flat, Artefactes
+  const sortSignatures = (signatures) => {
+    return signatures.sort((a, b) => {
+      // Extract signature info for comparison
+      const getSignatureInfo = (sig) => {
+        // Handle SBS signatures (extract number for sorting)
+        const sbsMatch = sig.match(/^SBS(\d+)/);
+        if (sbsMatch) {
+          return { type: 'SBS', number: parseInt(sbsMatch[1]) };
+        }
+        
+        // Handle DBS signatures
+        const dbsMatch = sig.match(/^DBS(\d+)/);
+        if (dbsMatch) {
+          return { type: 'DBS', number: parseInt(dbsMatch[1]) };
+        }
+        
+        // Handle ID signatures  
+        const idMatch = sig.match(/^ID(\d+)/);
+        if (idMatch) {
+          return { type: 'ID', number: parseInt(idMatch[1]) };
+        }
+        
+        // Handle special signatures
+        if (sig.includes('Flat')) return { type: 'SPECIAL', order: 1, name: 'Flat' };
+        if (sig.includes('Artefactes')) return { type: 'SPECIAL', order: 2, name: 'Artefactes' };
+        
+        // Default for unknown signatures
+        return { type: 'OTHER', name: sig };
+      };
+      
+      const aInfo = getSignatureInfo(a);
+      const bInfo = getSignatureInfo(b);
+      
+      // Sort by type first: SBS < DBS < ID < SPECIAL < OTHER
+      const typeOrder = { 'SBS': 1, 'DBS': 2, 'ID': 3, 'SPECIAL': 4, 'OTHER': 5 };
+      if (typeOrder[aInfo.type] !== typeOrder[bInfo.type]) {
+        return typeOrder[aInfo.type] - typeOrder[bInfo.type];
+      }
+      
+      // Within same type, sort by number for SBS/DBS/ID
+      if (aInfo.type === bInfo.type && ['SBS', 'DBS', 'ID'].includes(aInfo.type)) {
+        return aInfo.number - bInfo.number;
+      }
+      
+      // For SPECIAL types, sort by predefined order
+      if (aInfo.type === 'SPECIAL' && bInfo.type === 'SPECIAL') {
+        return aInfo.order - bInfo.order;
+      }
+      
+      // For OTHER types, sort alphabetically
+      return a.localeCompare(b);
+    });
+  };
+
   if (isNewFormat) {
     // New format with CancerType, SBS, etc.
     
@@ -153,9 +208,14 @@ export default function SATSSignaturePresence(data, options = {}) {
       .sort((a, b) => b[1] - a[1])
       .map(([cancer, _]) => cancer);
 
-    // Get all signatures
-    tmbSignatures = [...new Set(tmbData.map(item => item.SBS))];
-    dotSignatures = [...new Set(dotData.map(item => item.SBS))];
+    // Get all signatures and sort them properly
+    // For TMB bar chart, reverse the order so higher signatures stack on top
+    tmbSignatures = sortSignatures([...new Set(tmbData.map(item => item.SBS))]).reverse();
+    // For dot plot, keep normal order (SBS1 at bottom, higher numbers above)
+    dotSignatures = sortSignatures([...new Set(dotData.map(item => item.SBS))]);
+    
+    console.log('🎯 Sorted TMB signatures (reversed for stacking):', tmbSignatures);
+    console.log('🎯 Sorted dot signatures:', dotSignatures);
   } else {
     // Legacy format
     
@@ -172,9 +232,14 @@ export default function SATSSignaturePresence(data, options = {}) {
       .sort((a, b) => b[1] - a[1])
       .map(([cancer, _]) => cancer);
 
-    // Get all signatures
-    tmbSignatures = [...new Set(tmbData.map(item => item.signature))];
-    dotSignatures = [...new Set(dotData.map(item => item.signature))];
+    // Get all signatures and sort them properly
+    // For TMB bar chart, reverse the order so higher signatures stack on top
+    tmbSignatures = sortSignatures([...new Set(tmbData.map(item => item.signature))]).reverse();
+    // For dot plot, keep normal order (SBS1 at bottom, higher numbers above)
+    dotSignatures = sortSignatures([...new Set(dotData.map(item => item.signature))]);
+    
+    console.log('🎯 Sorted TMB signatures (legacy, reversed for stacking):', tmbSignatures);
+    console.log('🎯 Sorted dot signatures (legacy):', dotSignatures);
   }
 
   const traces = [];
@@ -252,7 +317,7 @@ export default function SATSSignaturePresence(data, options = {}) {
         if (item && item.Presence > 0) {
           xValues.push(cancerIndex + 1);
           yValues.push(sigIndex + 1);
-          sizes.push(Math.max(item.Presence * 40, 6));
+          sizes.push(Math.max(item.Presence * 20, 4));
           customData.push({
             cancer: cancer,
             signature: signatureAnnotations[signature] || signature,
@@ -268,7 +333,7 @@ export default function SATSSignaturePresence(data, options = {}) {
         if (item && item.presence > 0) {
           xValues.push(cancerIndex + 1);
           yValues.push(sigIndex + 1);
-          sizes.push(Math.max(item.presence * 40, 6));
+          sizes.push(Math.max(item.presence * 20, 4));
           customData.push({
             cancer: cancer,
             signature: signatureAnnotations[signature] || signature,
@@ -309,6 +374,37 @@ export default function SATSSignaturePresence(data, options = {}) {
     }
   });
 
+  // Create sample count annotations for display between bar chart and dot plot
+  const sampleCountAnnotations = cancerOrder.map((cancer, index) => {
+    // Get sample count for this cancer type
+    let sampleCount = 0;
+    
+    if (isNewFormat) {
+      // Find any item with this cancer type to get the sample count (N field)
+      const cancerItem = tmbData.find(item => item.CancerType === cancer);
+      sampleCount = cancerItem ? cancerItem.N || 0 : 0;
+    } else {
+      // Legacy format - get from sampleCount field
+      const cancerItem = tmbData.find(item => item.cancer === cancer);
+      sampleCount = cancerItem ? cancerItem.sampleCount || 0 : 0;
+    }
+
+    return {
+      x: index + 1,
+      y: 0.77, // Position between bar chart (0.8-1.0) and dot plot (0-0.75)
+      xref: 'x',
+      yref: 'paper',
+      text: `${sampleCount}`,
+      showarrow: false,
+      font: {
+        size: 10,
+        color: '#666666'
+      },
+      xanchor: 'center',
+      yanchor: 'middle'
+    };
+  });
+
   const layout = {
     title: {
       text: '<b>Mutational Signature Analysis Across Cancer Types</b>',
@@ -347,17 +443,10 @@ export default function SATSSignaturePresence(data, options = {}) {
     xaxis2: {
       domain: [0, 1],
       anchor: 'y2',
-      title: {
-        text: '<b>Cancer Type</b>',
-        font: {
-          family: 'Times New Roman',
-          size: 14
-        }
-      },
       tickmode: 'array',
       tickvals: cancerOrder.map((_, i) => i + 1),
       ticktext: cancerOrder,
-      tickangle: 45,
+      tickangle: -45, // Diagonal to the left
       tickfont: {
         size: 10
       },
@@ -397,21 +486,37 @@ export default function SATSSignaturePresence(data, options = {}) {
     },
     plot_bgcolor: 'white',
     paper_bgcolor: 'white',
-    annotations: [
-      {
-        text: 'Circle size represents proportion of tumors with the signature',
-        showarrow: false,
-        x: 0.5,
-        y: -0.15,
-        xref: 'paper',
-        yref: 'paper',
-        font: {
-          size: 12,
-          color: 'gray'
-        }
-      }
-    ]
+    annotations: sampleCountAnnotations
   };
+
+  // Add size legend traces for "Proportion of tumors with the signature"
+  // Create invisible traces that will show in legend to explain dot sizes
+  const sizeLegendSizes = [10, 20, 30, 40]; // Different sizes
+  const sizeLegendLabels = ['0.3', '0.5', '0.7', '0.9']; // Corresponding decimal proportions
+  
+  sizeLegendSizes.forEach((size, index) => {
+    traces.push({
+      type: 'scatter',
+      mode: 'markers',
+      x: [null], // No actual data points
+      y: [null],
+      marker: {
+        size: size,
+        color: 'rgba(128,128,128,0.7)', // Gray color for legend
+        line: {
+          width: 1,
+          color: 'rgba(0,0,0,0.3)'
+        }
+      },
+      name: sizeLegendLabels[index],
+      legendgroup: 'proportion',
+      legendgrouptitle: {
+        text: 'Proportion of tumors with the signature'
+      },
+      showlegend: true,
+      hoverinfo: 'skip'
+    });
+  });
 
   const config = {
     displayModeBar: true,

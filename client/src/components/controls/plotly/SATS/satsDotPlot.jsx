@@ -203,7 +203,7 @@ export default function SATSCombinedPlot(data, options = {}) {
         text: 'Circle size represents proportion of tumors with the signature',
         showarrow: false,
         x: 0.5,
-        y: -0.25,
+        y: -0.5,
         xref: 'paper',
         yref: 'paper',
         font: {

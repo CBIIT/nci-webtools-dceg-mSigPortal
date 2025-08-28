@@ -560,7 +560,7 @@ export default function SignatureInfo({ data }) {
                 <div className="text-center my-4">No data available</div>
               )}
             </div>
-            {signature && (
+            {category === 'STS' && signature && (
               <SATSSection selectedSignature={signature} />
             )}
           </div>

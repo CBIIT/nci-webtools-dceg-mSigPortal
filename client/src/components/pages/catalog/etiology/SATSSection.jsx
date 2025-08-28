@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery } from './satsApiSlice';
+import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery, useSatsExampleDataQuery } from './satsApiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export default function SATSSection({ selectedSignature }) {
@@ -136,7 +136,17 @@ export default function SATSSection({ selectedSignature }) {
     finalSignatureSetName: signatureSetNameToUse
   });
 
-  // Automatically fetch SATS data when signature is selected
+  // Only use example data for STS category (Signatures from Targeted Sequencing)
+  const useExampleData = category === 'STS' && Boolean(signatureToUse);
+  
+  // Example data query (only run for STS category)
+  const { 
+    data: examplePlotConfig, 
+    isFetching: fetchingExample, 
+    error: exampleError 
+  } = useSatsExampleDataQuery(undefined, { skip: !useExampleData });
+
+  // For non-STS categories, use real API data (skip when using example data)
   const { 
     data: plotConfig, 
     isFetching: fetchingPlot, 
@@ -146,15 +156,33 @@ export default function SATSSection({ selectedSignature }) {
       signatureName: mappedSignatureName, // Use mapped signature name for API call
       signatureSetName: signatureSetNameToUse 
     },
-    { skip: !signatureToUse || !signatureSetNameToUse }
+    { skip: !signatureToUse || !signatureSetNameToUse || useExampleData }
   );
+
+  // Choose which data to use based on category
+  const finalPlotConfig = useExampleData ? examplePlotConfig : plotConfig;
+  const finalFetching = useExampleData ? fetchingExample : fetchingPlot;
+  const finalError = useExampleData ? exampleError : plotError;
+
+  // Debug logging
+  console.log('🎯 SATSSection Debug:', {
+    category,
+    signatureToUse,
+    useExampleData,
+    examplePlotConfig,
+    plotConfig,
+    finalPlotConfig,
+    finalFetching,
+    finalError
+  });
 
   return (
     <div className="mt-4">
       <h5 className="separator">SATS - Signature Activity in Tumor Samples</h5>
       <p className="text-muted mb-3">
         Interactive visualization showing tumor mutational burden (TMB) and signature presence 
-        across different cancer types. The plot automatically displays data for the currently selected signature.
+        across different cancer types for Signatures from Targeted Sequencing (STS). 
+        This plot displays comprehensive signature activity data across all cancer types.
       </p>
 
       {/* Debug information for development */}
@@ -165,28 +193,45 @@ export default function SATSSection({ selectedSignature }) {
           Mapped for API: {mappedSignatureName}<br/>
           Signature Set: {signatureSetNameToUse || 'Determining...'}<br/>
           Category: {category}<br/>
+          Data Source: {useExampleData ? 'Example Data' : 'API Data'}<br/>
         </div>
       )}
 
       <Card>
         <Card.Body>
-          <LoadingOverlay active={fetchingPlot} />
+          <LoadingOverlay active={finalFetching} />
           
-          {plotError && (
+          {finalError && (
             <div className="alert alert-danger">
               <h6>Error loading plot data</h6>
-              <p>{plotError.message || 'An unknown error occurred'}</p>
+              <p>{finalError.message || 'An unknown error occurred'}</p>
             </div>
           )}
 
-          {plotConfig && plotConfig.traces && plotConfig.traces.length > 0 ? (
+          {finalPlotConfig && finalPlotConfig.traces && finalPlotConfig.traces.length > 0 ? (
             <Plot
-              data={plotConfig.traces}
-              layout={plotConfig.layout}
-              config={plotConfig.config}
-              style={{ width: '100%', height: '800px' }}
+              data={JSON.parse(JSON.stringify(finalPlotConfig.traces))} // Deep copy to avoid read-only errors
+              layout={JSON.parse(JSON.stringify(finalPlotConfig.layout))} // Deep copy layout too
+              config={finalPlotConfig.config}
+              style={{ width: '100%', height: '900px' }}
+              useResizeHandler={true}
+              onInitialized={(figure, graphDiv) => console.log('✅ SATS Plot initialized successfully')}
+              onError={(err) => console.error('❌ SATS Plot rendering error:', err)}
             />
-          ) : signatureToUse && signatureSetNameToUse && !fetchingPlot && !plotError ? (
+          ) : useExampleData && finalPlotConfig ? (
+            <div className="text-center p-5">
+              <h6>Plot Data Available But Not Rendering</h6>
+              <p>finalPlotConfig exists but Plot component not showing</p>
+              <pre style={{textAlign: 'left', fontSize: '10px'}}>
+                {JSON.stringify({
+                  hasTraces: !!finalPlotConfig.traces,
+                  tracesLength: finalPlotConfig.traces?.length,
+                  hasLayout: !!finalPlotConfig.layout,
+                  hasConfig: !!finalPlotConfig.config
+                }, null, 2)}
+              </pre>
+            </div>
+          ) : signatureToUse && signatureSetNameToUse && !finalFetching && !finalError ? (
             <div className="text-center p-5 text-muted">
               <h6>No Data Available</h6>
               <p>No signature activity data found for {signatureToUse} in {signatureSetNameToUse}.</p>

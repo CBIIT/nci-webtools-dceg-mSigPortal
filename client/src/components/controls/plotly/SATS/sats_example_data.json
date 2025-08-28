@@ -1,0 +1,125 @@
+[
+  { "CancerType": "Bladder Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 3865.526338, "Proportion": 0.08222075, "N": 3608, "Presence": 0.454268293, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+  { "CancerType": "Bladder Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 21928.02561, "Proportion": 0.466414804, "N": 3608, "Presence": 0.799334812, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+  { "CancerType": "Bladder Cancer", "SBS": "SBS10b(POLE-exo*)", "Count": 3479.498456, "Proportion": 0.074009837, "N": 3608, "Presence": 0.35864745, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+  { "CancerType": "Bladder Cancer", "SBS": "SBS19(Unknown)", "Count": 3537.946032, "Proportion": 0.075253032, "N": 3608, "Presence": 0.547117517, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+  { "CancerType": "Bladder Cancer", "SBS": "SBS94(Unknown)", "Count": 3724.200583, "Proportion": 0.079214714, "N": 3608, "Presence": 0.374445676, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+  { "CancerType": "Bladder Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 10478.80298, "Proportion": 0.222886863, "N": 3608, "Presence": 0.656042129, "TMB_all": 7.985976405, "Label": "3608", "CancerType_num": 3 },
+
+  { "CancerType": "Bowel Cancer-Colorectal", "SBS": "SBS1(Deamination of 5meC)", "Count": 17911.02859, "Proportion": 0.140625347, "N": 10496, "Presence": 0.605564024, "TMB_all": 6.924041699, "Label": "10496", "CancerType_num": 4 },
+  { "CancerType": "Bowel Cancer-Colorectal", "SBS": "SBS6(Defective MMR)", "Count": 24982.97462, "Proportion": 0.19614951, "N": 10496, "Presence": 0.492092226, "TMB_all": 6.924041699, "Label": "10496", "CancerType_num": 4 },
+  { "CancerType": "Bowel Cancer-Colorectal", "SBS": "SBS10a(POLE-exo*)", "Count": 8743.057403, "Proportion": 0.068644605, "N": 10496, "Presence": 0.191977896, "TMB_all": 6.924041699, "Label": "10496", "CancerType_num": 4 },
+  { "CancerType": "Bowel Cancer-Colorectal", "SBS": "SBS10b(POLE-exo*)", "Count": 9665.249368, "Proportion": 0.075885036, "N": 10496, "Presence": 0.338033537, "TMB_all": 6.924041699, "Label": "10496", "CancerType_num": 4 },
+  { "CancerType": "Bowel Cancer-Colorectal", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 66064.69003, "Proportion": 0.518695502, "N": 10496, "Presence": 0.933212652, "TMB_all": 6.924041699, "Label": "10496", "CancerType_num": 4 },
+
+  { "CancerType": "Bowel Cancer-Other", "SBS": "SBS1(Deamination of 5meC)", "Count": 2989.544578, "Proportion": 0.255625872, "N": 1655, "Presence": 0.684592145, "TMB_all": 3.844848767, "Label": "1655", "CancerType_num": 11 },
+  { "CancerType": "Bowel Cancer-Other", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 8705.455422, "Proportion": 0.744374128, "N": 1655, "Presence": 0.959516616, "TMB_all": 3.844848767, "Label": "1655", "CancerType_num": 11 },
+
+  { "CancerType": "Breast Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 7913.104985, "Proportion": 0.126484207, "N": 12144, "Presence": 0.44845191, "TMB_all": 3.332595778, "Label": "12144", "CancerType_num": 13 },
+  { "CancerType": "Breast Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 17607.84292, "Proportion": 0.281446292, "N": 12144, "Presence": 0.470520422, "TMB_all": 3.332595778, "Label": "12144", "CancerType_num": 13 },
+  { "CancerType": "Breast Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 37041.05209, "Proportion": 0.592069501, "N": 12144, "Presence": 0.877470356, "TMB_all": 3.332595778, "Label": "12144", "CancerType_num": 13 },
+
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS1(Deamination of 5meC)", "Count": 3577.107547, "Proportion": 0.074462573, "N": 4207, "Presence": 0.428809128, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS2/13(APOBEC)", "Count": 5554.576225, "Proportion": 0.115626392, "N": 4207, "Presence": 0.406703114, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS4(Tobacco smoking)", "Count": 6355.530529, "Proportion": 0.132299393, "N": 4207, "Presence": 0.441882577, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS6(Defective MMR)", "Count": 3788.975276, "Proportion": 0.078872901, "N": 4207, "Presence": 0.318992156, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS7b(UV exposure)", "Count": 8985.386489, "Proportion": 0.187043579, "N": 4207, "Presence": 0.366294271, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS10a(POLE-exo*)", "Count": 2142.845254, "Proportion": 0.044606367, "N": 4207, "Presence": 0.140004754, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "SBS10b(POLE-exo*)", "Count": 2363.3992, "Proportion": 0.04919751, "N": 4207, "Presence": 0.246493939, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+  { "CancerType": "Cancer of Unknown Primary", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 15271.17948, "Proportion": 0.317891286, "N": 4207, "Presence": 0.757071547, "TMB_all": 5.866808885, "Label": "4207", "CancerType_num": 5 },
+
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS1(Deamination of 5meC)", "Count": 10946.11602, "Proportion": 0.152124467, "N": 7607, "Presence": 0.60851847, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS6(Defective MMR)", "Count": 1555.29931, "Proportion": 0.021614889, "N": 7607, "Presence": 0.11778625, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS11(TMZ treatment)", "Count": 11352.77352, "Proportion": 0.15777602, "N": 7607, "Presence": 0.266070724, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS15(Defective MMR)", "Count": 8971.522242, "Proportion": 0.124682402, "N": 7607, "Presence": 0.23425792, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS19(Unknown)", "Count": 4506.076141, "Proportion": 0.062623531, "N": 7607, "Presence": 0.347574602, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "SBS30(Defective BER)", "Count": 3455.742601, "Proportion": 0.048026442, "N": 7607, "Presence": 0.19048245, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 27279.74941, "Proportion": 0.37912236, "N": 7607, "Presence": 0.751150256, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+  { "CancerType": "CNS or Brain Cancer-Glioma", "SBS": "Artefactes(SBS50/51/57)", "Count": 3887.720749, "Proportion": 0.05402989, "N": 7607, "Presence": 0.27435257, "TMB_all": 3.940939281, "Label": "7607", "CancerType_num": 10 },
+
+  { "CancerType": "CNS or Brain Cancer-Other", "SBS": "SBS1(Deamination of 5meC)", "Count": 2020.349203, "Proportion": 0.186070105, "N": 1888, "Presence": 0.597457627, "TMB_all": 2.225489869, "Label": "1888", "CancerType_num": 23 },
+  { "CancerType": "CNS or Brain Cancer-Other", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 8837.650797, "Proportion": 0.813929895, "N": 1888, "Presence": 0.936440678, "TMB_all": 2.225489869, "Label": "1888", "CancerType_num": 23 },
+
+  { "CancerType": "Esophagogastric Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 4382.202743, "Proportion": 0.146576671, "N": 3717, "Presence": 0.566585956, "TMB_all": 4.599340504, "Label": "3717", "CancerType_num": 7 },
+  { "CancerType": "Esophagogastric Cancer", "SBS": "SBS6(Defective MMR)", "Count": 4486.59669, "Proportion": 0.150068458, "N": 3717, "Presence": 0.405703524, "TMB_all": 4.599340504, "Label": "3717", "CancerType_num": 7 },
+  { "CancerType": "Esophagogastric Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 21028.20057, "Proportion": 0.703354871, "N": 3717, "Presence": 0.938391176, "TMB_all": 4.599340504, "Label": "3717", "CancerType_num": 7 },
+
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS1(Deamination of 5meC)", "Count": 7309.142135, "Proportion": 0.075930461, "N": 4370, "Presence": 0.332036613, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS6(Defective MMR)", "Count": 7218.407301, "Proportion": 0.074987869, "N": 4370, "Presence": 0.19221968, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS10a(POLE-exo*)", "Count": 12921.22347, "Proportion": 0.134231137, "N": 4370, "Presence": 0.150114416, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS10b(POLE-exo*)", "Count": 15088.53034, "Proportion": 0.156746038, "N": 4370, "Presence": 0.32402746, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS14(Defective MMR)", "Count": 8290.818281, "Proportion": 0.086128528, "N": 4370, "Presence": 0.239816934, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS15(Defective MMR)", "Count": 9185.416447, "Proportion": 0.095421993, "N": 4370, "Presence": 0.326315789, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS32(AZA treatment)", "Count": 4809.289604, "Proportion": 0.049960935, "N": 4370, "Presence": 0.387185355, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "SBS87(TP treatment)", "Count": 2995.352196, "Proportion": 0.031116986, "N": 4370, "Presence": 0.344393593, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+  { "CancerType": "Gynecologic Cancer-Endometrial", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 28442.82022, "Proportion": 0.295476052, "N": 4370, "Presence": 0.855148741, "TMB_all": 11.28002111, "Label": "4370", "CancerType_num": 1 },
+
+  { "CancerType": "Gynecologic Cancer-Other", "SBS": "SBS1(Deamination of 5meC)", "Count": 1341.900448, "Proportion": 0.164187012, "N": 1340, "Presence": 0.512686567, "TMB_all": 3.198797047, "Label": "1340", "CancerType_num": 15 },
+  { "CancerType": "Gynecologic Cancer-Other", "SBS": "SBS2/13(APOBEC)", "Count": 2440.536767, "Proportion": 0.298609662, "N": 1340, "Presence": 0.51641791, "TMB_all": 3.198797047, "Label": "1340", "CancerType_num": 15 },
+  { "CancerType": "Gynecologic Cancer-Other", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 4390.562785, "Proportion": 0.537203326, "N": 1340, "Presence": 0.855223881, "TMB_all": 3.198797047, "Label": "1340", "CancerType_num": 15 },
+
+  { "CancerType": "Gynecologic Cancer-Ovarian", "SBS": "SBS1(Deamination of 5meC)", "Count": 4088.45791, "Proportion": 0.114356061, "N": 5061, "Presence": 0.407231772, "TMB_all": 3.147021622, "Label": "5061", "CancerType_num": 16 },
+  { "CancerType": "Gynecologic Cancer-Ovarian", "SBS": "SBS10b(POLE-exo*)", "Count": 2545.411457, "Proportion": 0.071196337, "N": 5061, "Presence": 0.250543371, "TMB_all": 3.147021622, "Label": "5061", "CancerType_num": 16 },
+  { "CancerType": "Gynecologic Cancer-Ovarian", "SBS": "SBS15(Defective MMR)", "Count": 3169.499442, "Proportion": 0.088652367, "N": 5061, "Presence": 0.275242047, "TMB_all": 3.147021622, "Label": "5061", "CancerType_num": 16 },
+  { "CancerType": "Gynecologic Cancer-Ovarian", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 25948.63119, "Proportion": 0.725795234, "N": 5061, "Presence": 0.940130409, "TMB_all": 3.147021622, "Label": "5061", "CancerType_num": 16 },
+
+  { "CancerType": "Head and Neck Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 1685.988749, "Proportion": 0.103619246, "N": 2186, "Presence": 0.3915828, "TMB_all": 4.38545661, "Label": "2186", "CancerType_num": 8 },
+  { "CancerType": "Head and Neck Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 3820.824054, "Proportion": 0.234824169, "N": 2186, "Presence": 0.470722781, "TMB_all": 4.38545661, "Label": "2186", "CancerType_num": 8 },
+  { "CancerType": "Head and Neck Cancer", "SBS": "SBS7b(UV exposure)", "Count": 2969.497733, "Proportion": 0.182502473, "N": 2186, "Presence": 0.4021043, "TMB_all": 4.38545661, "Label": "2186", "CancerType_num": 8 },
+  { "CancerType": "Head and Neck Cancer", "SBS": "SBS87(TP treatment)", "Count": 1016.731286, "Proportion": 0.062487326, "N": 2186, "Presence": 0.277218664, "TMB_all": 4.38545661, "Label": "2186", "CancerType_num": 8 },
+  { "CancerType": "Head and Neck Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 6777.958178, "Proportion": 0.416566786, "N": 2186, "Presence": 0.783165599, "TMB_all": 4.38545661, "Label": "2186", "CancerType_num": 8 },
+
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "SBS1(Deamination of 5meC)", "Count": 2221.814155, "Proportion": 0.069703973, "N": 4886, "Presence": 0.272615637, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "SBS6(Defective MMR)", "Count": 1749.456808, "Proportion": 0.054884919, "N": 4886, "Presence": 0.205485059, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "SBS84(AID)", "Count": 4266.955327, "Proportion": 0.133865265, "N": 4886, "Presence": 0.344453541, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "SBS87(TP treatment)", "Count": 1405.226189, "Proportion": 0.044085527, "N": 4886, "Presence": 0.2003684, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "SBS97(Unknown)", "Count": 2484.62967, "Proportion": 0.077949166, "N": 4886, "Presence": 0.216127712, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+  { "CancerType": "Hematologic Cancer-Lymphoid", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 19746.91785, "Proportion": 0.619511148, "N": 4886, "Presence": 0.831968891, "TMB_all": 4.010240348, "Label": "4886", "CancerType_num": 9 },
+
+  { "CancerType": "Hematologic Cancer-Myeloid", "SBS": "SBS1(Deamination of 5meC)", "Count": 2621.749898, "Proportion": 0.15263142, "N": 5325, "Presence": 0.404319249, "TMB_all": 3.43693005, "Label": "5325", "CancerType_num": 12 },
+  { "CancerType": "Hematologic Cancer-Myeloid", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 11703.08284, "Proportion": 0.681322864, "N": 5325, "Presence": 0.697840376, "TMB_all": 3.43693005, "Label": "5325", "CancerType_num": 12 },
+  { "CancerType": "Hematologic Cancer-Myeloid", "SBS": "Artefactes(SBS50/51/57)", "Count": 2852.16726, "Proportion": 0.166045716, "N": 5325, "Presence": 0.422347418, "TMB_all": 3.43693005, "Label": "5325", "CancerType_num": 12 },
+
+  { "CancerType": "Hepatobiliary Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 2332.727329, "Proportion": 0.159655556, "N": 2599, "Presence": 0.488264717, "TMB_all": 3.244718877, "Label": "2599", "CancerType_num": 14 },
+  { "CancerType": "Hepatobiliary Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 1543.775109, "Proportion": 0.105658416, "N": 2599, "Presence": 0.363986149, "TMB_all": 3.244718877, "Label": "2599", "CancerType_num": 14 },
+  { "CancerType": "Hepatobiliary Cancer", "SBS": "SBS89(Unknown)", "Count": 2826.873565, "Proportion": 0.193475708, "N": 2599, "Presence": 0.471335129, "TMB_all": 3.244718877, "Label": "2599", "CancerType_num": 14 },
+  { "CancerType": "Hepatobiliary Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 7907.623997, "Proportion": 0.541210321, "N": 2599, "Presence": 0.754905733, "TMB_all": 3.244718877, "Label": "2599", "CancerType_num": 14 },
+
+  { "CancerType": "Kidney Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 1460.493428, "Proportion": 0.152166433, "N": 2088, "Presence": 0.411398467, "TMB_all": 2.611663577, "Label": "2088", "CancerType_num": 19 },
+  { "CancerType": "Kidney Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 8137.506572, "Proportion": 0.847833567, "N": 2088, "Presence": 0.96743295, "TMB_all": 2.611663577, "Label": "2088", "CancerType_num": 19 },
+
+  { "CancerType": "Lung Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 11916.07643, "Proportion": 0.084052765, "N": 14983, "Presence": 0.466862444, "TMB_all": 5.437972549, "Label": "14983", "CancerType_num": 6 },
+  { "CancerType": "Lung Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 20937.1536, "Proportion": 0.147684992, "N": 14983, "Presence": 0.483881733, "TMB_all": 5.437972549, "Label": "14983", "CancerType_num": 6 },
+  { "CancerType": "Lung Cancer", "SBS": "SBS4(Tobacco smoking)", "Count": 44485.04869, "Proportion": 0.313785445, "N": 14983, "Presence": 0.604885537, "TMB_all": 5.437972549, "Label": "14983", "CancerType_num": 6 },
+  { "CancerType": "Lung Cancer", "SBS": "SBS89(Unknown)", "Count": 10480.50419, "Proportion": 0.073926628, "N": 14983, "Presence": 0.287392378, "TMB_all": 5.437972549, "Label": "14983", "CancerType_num": 6 },
+  { "CancerType": "Lung Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 53950.2171, "Proportion": 0.38055017, "N": 14983, "Presence": 0.804578522, "TMB_all": 5.437972549, "Label": "14983", "CancerType_num": 6 },
+
+  { "CancerType": "Pancreatic Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 3768.291381, "Proportion": 0.131942976, "N": 5348, "Presence": 0.471952132, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+  { "CancerType": "Pancreatic Cancer", "SBS": "SBS6(Defective MMR)", "Count": 2151.498723, "Proportion": 0.075332588, "N": 5348, "Presence": 0.236350037, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+  { "CancerType": "Pancreatic Cancer", "SBS": "SBS11(TMZ treatment)", "Count": 3481.959526, "Proportion": 0.12191735, "N": 5348, "Presence": 0.299177263, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+  { "CancerType": "Pancreatic Cancer", "SBS": "SBS32(AZA treatment)", "Count": 2388.669359, "Proportion": 0.083636882, "N": 5348, "Presence": 0.319558714, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+  { "CancerType": "Pancreatic Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 13450.50034, "Proportion": 0.470955894, "N": 5348, "Presence": 0.733919222, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+  { "CancerType": "Pancreatic Cancer", "SBS": "Artefactes(SBS50/51/57)", "Count": 3319.080676, "Proportion": 0.116214309, "N": 5348, "Presence": 0.415856395, "TMB_all": 3.051460421, "Label": "5348", "CancerType_num": 17 },
+
+  { "CancerType": "Prostate Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 4792.188054, "Proportion": 0.239681307, "N": 4209, "Presence": 0.472321216, "TMB_all": 2.920277809, "Label": "4209", "CancerType_num": 18 },
+  { "CancerType": "Prostate Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 15201.81195, "Proportion": 0.760318693, "N": 4209, "Presence": 0.928486576, "TMB_all": 2.920277809, "Label": "4209", "CancerType_num": 18 },
+
+  { "CancerType": "Rare Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 2173.177114, "Proportion": 0.157945862, "N": 3248, "Presence": 0.385160099, "TMB_all": 2.336966106, "Label": "3248", "CancerType_num": 22 },
+  { "CancerType": "Rare Cancer", "SBS": "SBS10b(POLE-exo*)", "Count": 965.9717262, "Proportion": 0.070206536, "N": 3248, "Presence": 0.193041872, "TMB_all": 2.336966106, "Label": "3248", "CancerType_num": 22 },
+  { "CancerType": "Rare Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 10619.85116, "Proportion": 0.771847602, "N": 3248, "Presence": 0.92364532, "TMB_all": 2.336966106, "Label": "3248", "CancerType_num": 22 },
+
+  { "CancerType": "Skin Cancer or Melanoma", "SBS": "SBS1(Deamination of 5meC)", "Count": 3392.841739, "Proportion": 0.030099732, "N": 5035, "Presence": 0.367825223, "TMB_all": 11.17981324, "Label": "5035", "CancerType_num": 2 },
+  { "CancerType": "Skin Cancer or Melanoma", "SBS": "SBS7a(UV exposure)", "Count": 36259.63198, "Proportion": 0.321678779, "N": 5035, "Presence": 0.578947368, "TMB_all": 11.17981324, "Label": "5035", "CancerType_num": 2 },
+  { "CancerType": "Skin Cancer or Melanoma", "SBS": "SBS7b(UV exposure)", "Count": 42754.41956, "Proportion": 0.379297548, "N": 5035, "Presence": 0.633167825, "TMB_all": 11.17981324, "Label": "5035", "CancerType_num": 2 },
+  { "CancerType": "Skin Cancer or Melanoma", "SBS": "SBS10b(POLE-exo*)", "Count": 3528.238232, "Proportion": 0.031300907, "N": 5035, "Presence": 0.316385303, "TMB_all": 11.17981324, "Label": "5035", "CancerType_num": 2 },
+  { "CancerType": "Skin Cancer or Melanoma", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 26784.86849, "Proportion": 0.237623035, "N": 5035, "Presence": 0.915590864, "TMB_all": 11.17981324, "Label": "5035", "CancerType_num": 2 },
+
+  { "CancerType": "Soft Tissue Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 2968.872179, "Proportion": 0.163259399, "N": 3991, "Presence": 0.414432473, "TMB_all": 2.501775928, "Label": "3991", "CancerType_num": 20 },
+  { "CancerType": "Soft Tissue Cancer", "SBS": "SBS7a(UV exposure)", "Count": 3242.041526, "Proportion": 0.178281085, "N": 3991, "Presence": 0.316963167, "TMB_all": 2.501775928, "Label": "3991", "CancerType_num": 20 },
+  { "CancerType": "Soft Tissue Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 11974.0863, "Proportion": 0.658459516, "N": 3991, "Presence": 0.878226009, "TMB_all": 2.501775928, "Label": "3991", "CancerType_num": 20 },
+
+  { "CancerType": "Thyroid Cancer", "SBS": "SBS1(Deamination of 5meC)", "Count": 1127.337535, "Proportion": 0.141625318, "N": 1720, "Presence": 0.369186047, "TMB_all": 2.361956383, "Label": "1720", "CancerType_num": 21 },
+  { "CancerType": "Thyroid Cancer", "SBS": "SBS2/13(APOBEC)", "Count": 926.3312704, "Proportion": 0.116373275, "N": 1720, "Presence": 0.29127907, "TMB_all": 2.361956383, "Label": "1720", "CancerType_num": 21 },
+  { "CancerType": "Thyroid Cancer", "SBS": "SBS19(Unknown)", "Count": 944.4411194, "Proportion": 0.118648382, "N": 1720, "Presence": 0.409302326, "TMB_all": 2.361956383, "Label": "1720", "CancerType_num": 21 },
+  { "CancerType": "Thyroid Cancer", "SBS": "Flat(SBS3/5/40a/40b)", "Count": 4961.890075, "Proportion": 0.623353025, "N": 1720, "Presence": 0.922093023, "TMB_all": 2.361956383, "Label": "1720", "CancerType_num": 21 }
+]
