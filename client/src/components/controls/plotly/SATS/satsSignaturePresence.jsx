@@ -458,7 +458,11 @@ export default function SATSSignaturePresence(data, options = {}) {
         if (item && item.Presence > 0) {
           xValues.push(cancerIndex + 1);
           yValues.push(sigIndex + 1);
-          sizes.push(Math.max(item.Presence * 20, 4));
+          // Improved size scaling: use exponential scaling to make differences more visible
+          // Scale from 4 (min) to 18 (max) with exponential curve
+          const normalizedPresence = Math.min(Math.max(item.Presence, 0), 1); // Clamp to 0-1
+          const scaledSize = 4 + (18 - 4) * Math.pow(normalizedPresence, 0.5); // Square root scaling
+          sizes.push(scaledSize);
           customData.push({
             cancer: cancer,
             signature: signatureAnnotations[signature] || signature,
@@ -468,13 +472,16 @@ export default function SATSSignaturePresence(data, options = {}) {
         }
       });
     } else {
-      signatureData = dotData.filter(item => item.signature === signature);
       cancerOrder.forEach((cancer, cancerIndex) => {
         const item = signatureData.find(d => d.cancer === cancer);
         if (item && item.presence > 0) {
           xValues.push(cancerIndex + 1);
           yValues.push(sigIndex + 1);
-          sizes.push(Math.max(item.presence * 20, 4));
+          // Improved size scaling: use exponential scaling to make differences more visible
+          // Scale from 4 (min) to 18 (max) with exponential curve
+          const normalizedPresence = Math.min(Math.max(item.presence, 0), 1); // Clamp to 0-1
+          const scaledSize = 4 + (18 - 4) * Math.pow(normalizedPresence, 0.5); // Square root scaling
+          sizes.push(scaledSize);
           customData.push({
             cancer: cancer,
             signature: signatureAnnotations[signature] || signature,
