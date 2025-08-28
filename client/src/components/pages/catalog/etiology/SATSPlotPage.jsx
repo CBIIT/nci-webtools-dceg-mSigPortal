@@ -158,31 +158,7 @@ export default function SATSPlotPage() {
         </Card.Body>
       </Card>
 
-      <Card className="mt-4">
-        <Card.Header>
-          <h5>About SATS Plot</h5>
-        </Card.Header>
-        <Card.Body>
-          <Row>
-            <Col md={6}>
-              <h6>Plot Components:</h6>
-              <ul>
-                <li><strong>Top Panel:</strong> Stacked bar chart showing tumor mutational burden (TMB) per megabase for each cancer type, broken down by mutational signature</li>
-                <li><strong>Bottom Panel:</strong> Dot plot showing the proportion of samples in each cancer type that exhibit each signature</li>
-              </ul>
-            </Col>
-            <Col md={6}>
-              <h6>Interpretation:</h6>
-              <ul>
-                <li><strong>Bar Height:</strong> TMB contribution of each signature</li>
-                <li><strong>Dot Size:</strong> Proportion of samples with the signature</li>
-                <li><strong>Colors:</strong> Each signature has a specific color based on its biological etiology</li>
-                <li><strong>Sorting:</strong> Cancer types are ordered by total TMB (highest to lowest)</li>
-              </ul>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+      
     </div>
   );
 }

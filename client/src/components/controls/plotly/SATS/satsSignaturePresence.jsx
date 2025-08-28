@@ -48,6 +48,10 @@ export default function SATSSignaturePresence(data, options = {}) {
     // Add patterns for complex signature names
     'Flat': '#AEC7E8',
     'Artefactes': '#37474F',
+    'flat': '#AEC7E8',
+    'artefactes': '#37474F',
+    'FLAT': '#AEC7E8',
+    'ARTEFACTES': '#37474F',
     // DBS colors - using the exact order from R code DBS_col_12
     // Each DBS signature gets its corresponding color by position
     'DBS1': '#E64B35FF',  // 1st color
@@ -105,8 +109,8 @@ export default function SATSSignaturePresence(data, options = {}) {
     if (signature.includes('SBS89(')) return signatureColors['SBS89'];
     if (signature.includes('SBS94(')) return signatureColors['SBS94'];
     if (signature.includes('SBS97(')) return signatureColors['SBS97'];
-    if (signature.includes('Flat(')) return signatureColors['SBS_Flat'];
-    if (signature.includes('Artefactes(')) return signatureColors['SBS_Artefactes'];
+    if (signature.includes('Flat(') || signature.toLowerCase().includes('flat')) return signatureColors['SBS_Flat'];
+    if (signature.includes('Artefactes(') || signature.toLowerCase().includes('artefact')) return signatureColors['SBS_Artefactes'];
     
     // DBS color mapping
     if (signature.includes('DBS1(') || signature.startsWith('DBS1')) return signatureColors['DBS1'];
@@ -162,6 +166,13 @@ export default function SATSSignaturePresence(data, options = {}) {
     'SBS97': 'SBS97(Unknown)',
     'SBS_Flat': 'Flat(SBS3/5/40a/40b)',
     'SBS_Artefactes': 'Artefactes(SBS50/51/57)',
+    // Add direct mappings for when the signature name is just "Flat" or "Artefactes"
+    'Flat': 'Flat(SBS3/5/40a/40b)',
+    'Artefactes': 'Artefactes(SBS50/51/57)',
+    'flat': 'Flat(SBS3/5/40a/40b)',
+    'artefactes': 'Artefactes(SBS50/51/57)',
+    'FLAT': 'Flat(SBS3/5/40a/40b)',
+    'ARTEFACTES': 'Artefactes(SBS50/51/57)',
     // DBS annotations - matching R code
     'DBS1': 'DBS1(UV exposure)',
     'DBS2': 'DBS2(Tobacco smoking or other mutagens)',
@@ -184,6 +195,26 @@ export default function SATSSignaturePresence(data, options = {}) {
     'DBS14': 'DBS14(Unknown)',
     'DBS15': 'DBS15(Unknown)',
     'DBS20': 'DBS20(Unknown)'
+  };
+
+  // Helper function to get signature annotation with fallback
+  const getSignatureAnnotation = (signature) => {
+    // First try exact match
+    if (signatureAnnotations[signature]) {
+      return signatureAnnotations[signature];
+    }
+    
+    // Try case-insensitive match for flat/artefactes
+    const lowerSig = signature.toLowerCase();
+    if (lowerSig.includes('flat')) {
+      return 'Flat(SBS3/5/40a/40b)';
+    }
+    if (lowerSig.includes('artefact')) {
+      return 'Artefactes(SBS50/51/57)';
+    }
+    
+    // Default fallback
+    return signature;
   };
 
   // Expect data in format: 
@@ -415,7 +446,7 @@ export default function SATSSignaturePresence(data, options = {}) {
 
     traces.push({
       type: 'bar',
-      name: signatureAnnotations[signature] || signature,
+      name: getSignatureAnnotation(signature),
       x: cancerOrder.map((_, i) => i + 1),
       y: yValues,
       xaxis: 'x',
@@ -430,13 +461,13 @@ export default function SATSSignaturePresence(data, options = {}) {
       showlegend: true,
       hovertemplate: isNewFormat ?
         '<b>Cancer:</b> %{customdata.cancer}<br>' +
-        '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
+        '<b>Signature:</b> ' + getSignatureAnnotation(signature) + '<br>' +
         '<b>TMB:</b> %{customdata.tmb:.3f} mutations/Mb<br>' +
         '<b>Count:</b> %{customdata.count}<br>' +
         '<b>Proportion:</b> %{customdata.proportion:.3f}<br>' +
         '<extra></extra>' :
         '<b>Cancer:</b> %{customdata.cancer}<br>' +
-        '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
+        '<b>Signature:</b> ' + getSignatureAnnotation(signature) + '<br>' +
         '<b>TMB:</b> %{y:.3f} mutations/Mb<br>' +
         '<extra></extra>',
       customdata: customData
@@ -465,7 +496,7 @@ export default function SATSSignaturePresence(data, options = {}) {
           sizes.push(scaledSize);
           customData.push({
             cancer: cancer,
-            signature: signatureAnnotations[signature] || signature,
+            signature: getSignatureAnnotation(signature),
             presence: item.Presence,
             sampleCount: item.N || 0
           });
@@ -484,7 +515,7 @@ export default function SATSSignaturePresence(data, options = {}) {
           sizes.push(scaledSize);
           customData.push({
             cancer: cancer,
-            signature: signatureAnnotations[signature] || signature,
+            signature: getSignatureAnnotation(signature),
             presence: item.presence,
             sampleCount: item.sampleCount || 0
           });
@@ -496,7 +527,7 @@ export default function SATSSignaturePresence(data, options = {}) {
       traces.push({
         type: 'scatter',
         mode: 'markers',
-        name: signatureAnnotations[signature] || signature,
+        name: getSignatureAnnotation(signature),
         x: xValues,
         y: yValues,
         xaxis: 'x2',
@@ -575,14 +606,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     },
     yaxis: {
       domain: [0.8, 1],
-      anchor: 'x',
-      title: {
-        text: '<b>Total Mutation Burden (TMB)</b>',
-        font: {
-          family: 'Times New Roman',
-          size: 12
-        }
-      },
+      anchor: 'x',      
       showgrid: true,
       gridcolor: 'rgba(128,128,128,0.2)'
     },
@@ -605,29 +629,23 @@ export default function SATSSignaturePresence(data, options = {}) {
     yaxis2: {
       domain: [0, 0.75],
       anchor: 'x2',
-      title: {
-        text: '<b>Mutational Signature</b>',
-        font: {
-          family: 'Times New Roman',
-          size: 14
-        }
-      },
       tickmode: 'array',
       tickvals: dotSignatures.map((_, i) => i + 1),
-      ticktext: dotSignatures.map(sig => signatureAnnotations[sig] || sig),
+      ticktext: dotSignatures.map(sig => getSignatureAnnotation(sig)),
       tickfont: {
         size: 9
       },
       showgrid: true,
       gridcolor: 'rgba(128,128,128,0.2)',
-      autorange: 'reversed'
+      autorange: 'reversed',
+      automargin: true
     },
     
     autosize: true,
     height: 900,
     barmode: 'stack',
     margin: {
-      l: 350,
+      l: 50,
       r: 50,
       t: 80,
       b: 200

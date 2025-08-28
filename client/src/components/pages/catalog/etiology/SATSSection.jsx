@@ -196,7 +196,7 @@ export default function SATSSection({ selectedSignature }) {
       )}
 
       <Card>
-        <Card.Body>
+        <Card.Body style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <LoadingOverlay active={finalFetching} />
           
           {finalError && (
@@ -207,15 +207,17 @@ export default function SATSSection({ selectedSignature }) {
           )}
 
           {finalPlotConfig && finalPlotConfig.traces && finalPlotConfig.traces.length > 0 ? (
-            <Plot
-              data={JSON.parse(JSON.stringify(finalPlotConfig.traces))} // Deep copy to avoid read-only errors
-              layout={JSON.parse(JSON.stringify(finalPlotConfig.layout))} // Deep copy layout too
-              config={finalPlotConfig.config}
-              style={{ width: '100%', height: '900px' }}
-              useResizeHandler={true}
-              onInitialized={(figure, graphDiv) => console.log('✅ SATS Plot initialized successfully')}
-              onError={(err) => console.error('❌ SATS Plot rendering error:', err)}
-            />
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
+              <Plot
+                data={JSON.parse(JSON.stringify(finalPlotConfig.traces))} // Deep copy to avoid read-only errors
+                layout={JSON.parse(JSON.stringify(finalPlotConfig.layout))} // Deep copy layout too
+                config={finalPlotConfig.config}
+                style={{ width: '100%', height: '900px', maxWidth: '1400px' }}
+                useResizeHandler={true}
+                onInitialized={(figure, graphDiv) => console.log('✅ SATS Plot initialized successfully')}
+                onError={(err) => console.error('❌ SATS Plot rendering error:', err)}
+              />
+            </div>
           ) : useExampleData && finalPlotConfig ? (
             <div className="text-center p-5">
               <h6>Plot Data Available But Not Rendering</h6>
@@ -249,28 +251,7 @@ export default function SATSSection({ selectedSignature }) {
         </Card.Body>
       </Card>
 
-      {/* Info section */}
-      <Card className="mt-3">
-        <Card.Body>
-          <Row>
-            <Col md={6}>
-              <h6>Plot Components:</h6>
-              <ul>
-                <li><strong>Top Panel:</strong> Stacked bar chart showing tumor mutational burden (TMB) per megabase for each cancer type</li>
-                <li><strong>Bottom Panel:</strong> Dot plot showing the proportion of samples in each cancer type that exhibit each signature</li>
-              </ul>
-            </Col>
-            <Col md={6}>
-              <h6>Interpretation:</h6>
-              <ul>
-                <li><strong>Bar Height:</strong> TMB contribution of each signature</li>
-                <li><strong>Dot Size:</strong> Proportion of samples with the signature</li>
-                <li><strong>Colors:</strong> Each signature has a specific color based on its biological etiology</li>
-              </ul>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+      
     </div>
   );
 }

@@ -86,7 +86,10 @@ export default function SATSCombinedPlot(data, options = {}) {
     'SBS94': 'SBS94(Unknown)',
     'SBS97': 'SBS97(Unknown)',
     'SBS_Flat': 'Flat(SBS3/5/40a/40b)',
-    'SBS_Artefactes': 'Artefactes(SBS50/51/57)'
+    'SBS_Artefactes': 'Artefactes(SBS50/51/57)',
+    // Add direct mappings for when the signature name is just "Flat" or "Artefactes"
+    'Flat': 'Flat(SBS3/5/40a/40b)',
+    'Artefactes': 'Artefactes(SBS50/51/57)'
   };
 
   // Process the data
@@ -135,6 +138,7 @@ export default function SATSCombinedPlot(data, options = {}) {
         textLabels.push(cancer);
       }
     });
+    console.log("Text labels:", textLabels);
 
     if (xValues.length > 0) {
       traces.push({
@@ -194,13 +198,7 @@ export default function SATSCombinedPlot(data, options = {}) {
       range: [0.5, cancerOrder.length + 0.5]
     },
     yaxis: {
-      title: {
-        text: '<b>Mutational Signature</b>',
-        font: {
-          family: 'Times New Roman',
-          size: 14
-        }
-      },
+      
       tickmode: 'array',
       tickvals: signatures.map((_, i) => i + 1),
       ticktext: signatures.map(sig => signatureAnnotations[sig] || sig).reverse(),
