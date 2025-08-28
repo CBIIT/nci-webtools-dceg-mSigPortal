@@ -648,41 +648,35 @@ export default function SATSSignaturePresence(data, options = {}) {
       l: 50,
       r: 50,
       t: 80,
-      b: 200
+      b: 240
     },
     plot_bgcolor: 'white',
     paper_bgcolor: 'white',
-    annotations: sampleCountAnnotations
+    annotations: [
+      ...sampleCountAnnotations,
+      // Add dot size legend annotation at the bottom
+      {
+        x: 0.5,
+        y: -0.25,
+        xref: 'paper',
+        yref: 'paper',
+        text: '<span style="font-size: 14px;">Proportion of tumors with the signature</span> ' +
+              '<span style="font-size: 20px; display: inline-block; line-height: 1; vertical-align: middle;">●</span> <span style="display: inline-block; line-height: 2; vertical-align: middle;">0.3</span>   ' +
+              '<span style="font-size: 24px; display: inline-block; line-height: 1; vertical-align: middle;">●</span> <span style="display: inline-block; line-height: 2; vertical-align: middle;">0.5</span>   ' +
+              '<span style="font-size: 29px; display: inline-block; line-height: 1; vertical-align: middle;">●</span> <span style="display: inline-block; line-height: 2; vertical-align: middle;">0.7</span>   ' +
+              '<span style="font-size: 33px; display: inline-block; line-height: 1; vertical-align: bottom;">●</span> <span style="display: inline-block; line-height: 2; vertical-align: middle;">0.9</span>',
+        showarrow: false,
+        font: {
+          size: 12,
+          color: '#333333',
+          family: 'Arial, sans-serif'
+        },
+        xanchor: 'center',
+        yanchor: 'top',
+        
+      }
+    ]
   };
-
-  // Add size legend traces for "Proportion of tumors with the signature"
-  // Create invisible traces that will show in legend to explain dot sizes
-  const sizeLegendSizes = [10, 20, 30, 40]; // Different sizes
-  const sizeLegendLabels = ['0.3', '0.5', '0.7', '0.9']; // Corresponding decimal proportions
-  
-  sizeLegendSizes.forEach((size, index) => {
-    traces.push({
-      type: 'scatter',
-      mode: 'markers',
-      x: [null], // No actual data points
-      y: [null],
-      marker: {
-        size: size,
-        color: 'rgba(128,128,128,0.7)', // Gray color for legend
-        line: {
-          width: 1,
-          color: 'rgba(0,0,0,0.3)'
-        }
-      },
-      name: sizeLegendLabels[index],
-      legendgroup: 'proportion',
-      legendgrouptitle: {
-        text: 'Proportion of tumors with the signature'
-      },
-      showlegend: true,
-      hoverinfo: 'skip'
-    });
-  });
 
   const config = {
     displayModeBar: true,
