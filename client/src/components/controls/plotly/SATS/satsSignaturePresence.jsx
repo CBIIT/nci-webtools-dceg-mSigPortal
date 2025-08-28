@@ -369,15 +369,39 @@ export default function SATSSignaturePresence(data, options = {}) {
       signatureData = tmbData.filter(item => item.SBS === signature);
       yValues = cancerOrder.map(cancer => {
         const item = signatureData.find(d => d.CancerType === cancer);
-        return item ? item.Count || 0 : 0;
+        if (!item) return 0;
+        
+        // Calculate TMB per signature: need to convert Count to mutations per Mb
+        // Based on R code: TMB = Count / assaySize (where assaySize is in Mb)
+        // Since we don't have assaySize directly, we can estimate it from Count and TMB_all
+        // TMB_all = sum(all signature counts) / assaySize
+        // So assaySize ≈ sum(all signature counts) / TMB_all
+        
+        // Get all signature counts for this cancer type to calculate total
+        const allSignaturesForCancer = tmbData.filter(d => d.CancerType === cancer);
+        const totalCount = allSignaturesForCancer.reduce((sum, d) => sum + (d.Count || 0), 0);
+        const estimatedAssaySize = totalCount / (item.TMB_all || 1); // Mb
+        
+        // Calculate TMB for this signature
+        const tmb = (item.Count || 0) / estimatedAssaySize;
+        return tmb;
       });
       customData = cancerOrder.map(cancer => {
         const item = signatureData.find(d => d.CancerType === cancer);
+        if (!item) return { cancer, count: 0, tmb: 0, proportion: 0, tmbAll: 0 };
+        
+        // Calculate TMB as above
+        const allSignaturesForCancer = tmbData.filter(d => d.CancerType === cancer);
+        const totalCount = allSignaturesForCancer.reduce((sum, d) => sum + (d.Count || 0), 0);
+        const estimatedAssaySize = totalCount / (item.TMB_all || 1);
+        const tmb = (item.Count || 0) / estimatedAssaySize;
+        
         return { 
           cancer: cancer,
-          count: item ? item.Count || 0 : 0,
-          proportion: item ? item.Proportion || 0 : 0,
-          tmbAll: item ? item.TMB_all || 0 : 0
+          count: item.Count || 0,
+          tmb: tmb,
+          proportion: item.Proportion || 0,
+          tmbAll: item.TMB_all || 0
         };
       });
     } else {
@@ -407,9 +431,9 @@ export default function SATSSignaturePresence(data, options = {}) {
       hovertemplate: isNewFormat ?
         '<b>Cancer:</b> %{customdata.cancer}<br>' +
         '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
+        '<b>TMB:</b> %{customdata.tmb:.3f} mutations/Mb<br>' +
         '<b>Count:</b> %{customdata.count}<br>' +
         '<b>Proportion:</b> %{customdata.proportion:.3f}<br>' +
-        '<b>TMB All:</b> %{customdata.tmbAll:.3f}<br>' +
         '<extra></extra>' :
         '<b>Cancer:</b> %{customdata.cancer}<br>' +
         '<b>Signature:</b> ' + (signatureAnnotations[signature] || signature) + '<br>' +
