@@ -2,7 +2,7 @@ import { catalogApiSlice } from '../../../../services/store/rootApi';
 import SATSSignaturePresence from '../../../controls/plotly/SATS/satsSignaturePresence';
 import SATSDotPlot from '../../../controls/plotly/SATS/satsDotPlot';
 import { groupBy } from 'lodash';
-import satsExampleData from '../../../controls/plotly/SATS/sats_example_data.json';
+import satsExampleData_SBS from '../../../controls/plotly/SATS/sats_example_data_SBS.json';
 
 export const satsApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -50,14 +50,14 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
       queryFn: async () => {
         try {
           console.log('🎯 Creating Complete SATS Plot from example data...');
-          console.log('📊 Example data sample:', satsExampleData?.slice(0, 3));
+          console.log('📊 Example data sample:', satsExampleData_SBS?.slice(0, 3));
           
-          if (!satsExampleData || satsExampleData.length === 0) {
+          if (!satsExampleData_SBS || satsExampleData_SBS.length === 0) {
             throw new Error('Example data not available');
           }
 
           // Transform the example data to the format expected by SATSSignaturePresence
-          const transformedData = satsExampleData.map(item => {
+          const transformedData = satsExampleData_SBS.map(item => {
             // Extract base signature name (e.g., "SBS1(Deamination of 5meC)" → "SBS1")
             const baseSignature = item.SBS.match(/^([^(]+)/)?.[1] || item.SBS;
             
