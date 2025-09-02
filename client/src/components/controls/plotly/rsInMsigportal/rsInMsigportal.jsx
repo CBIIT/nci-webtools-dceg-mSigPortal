@@ -391,7 +391,7 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[1].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
       weight: 'bold',
     },
     x: 0.482, // Center of fourth column
@@ -406,7 +406,7 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[2].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
       weight: 'bold',
     },
     x: 0.620, // Center of fifth column
@@ -421,7 +421,7 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[3].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
       weight: 'bold',
     },
     x: 0.758, // Center of sixth column
@@ -436,7 +436,7 @@ export default function RsInMsigportal(rawData) {
     showarrow: false,
     text: Object.keys(groupBySpecies)[4].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
       weight: 'bold',
     },
     x: 0.896, // Center of seventh column
