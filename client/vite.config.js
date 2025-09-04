@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env': env,
+      __APP_VERSION__: JSON.stringify(env.VITE_APP_VERSION || 'dev'),
+      __APP_LAST_UPDATE__: JSON.stringify(env.VITE_APP_LAST_UPDATE || 'Unknown'),
     },
     build: {
       rollupOptions: {
