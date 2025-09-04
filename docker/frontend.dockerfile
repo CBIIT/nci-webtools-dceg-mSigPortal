@@ -18,7 +18,14 @@ COPY client/package.json /app/client/
 RUN npm install
 
 ARG CACHE_BUST
+ARG RELEASE_VERSION
+ARG LAST_UPDATED
+
 COPY client /app/client/
+
+# Set environment variables for the build
+ENV VITE_APP_VERSION=${RELEASE_VERSION:-1.0.0}
+ENV VITE_APP_LAST_UPDATE=${LAST_UPDATED:-"2025-09-04"}
 
 RUN npm run build
 
