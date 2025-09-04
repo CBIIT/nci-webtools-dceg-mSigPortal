@@ -45,6 +45,16 @@ export function Footer() {
                       Contact Us
                     </a>
                   </div>
+                  <div className="my-0">
+                    <span className="text-light">
+                      <b>Version </b>{__APP_VERSION__}
+                    </span>
+                  </div>
+                  <div className="my-0">
+                    <span className="text-light">
+                      <b>Last Update: </b>{__APP_LAST_UPDATE__}
+                    </span>
+                  </div>
                 </div>
                 <div className="col-md-auto footer-nav-col">
                   <h2 className="h6 mb-1">MORE INFORMATION</h2>
