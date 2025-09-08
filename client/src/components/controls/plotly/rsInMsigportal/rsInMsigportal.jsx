@@ -287,12 +287,15 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: index < 4 ? 0.068 : index < 8 ? 0.206 : 0.344,
       y: index < 4 
-        ? 1 - (index * 0.25) - 0.02
+        ? 1 - (index * 0.25) - 0.015
         : index < 8
-        ? 1 - ((index - 4) * 0.25) - 0.02
-        : 1 - ((index - 8) * 0.25) - 0.02,
+        ? 1 - ((index - 4) * 0.25) - 0.015
+        : 1 - ((index - 8) * 0.25) - 0.015,
     })
   );
   console.log("pieTitles0 ", pieTitles0);
@@ -308,8 +311,11 @@ export default function RsInMsigportal(rawData) {
         ' '
       ),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.482, // Center of fourth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
 
@@ -322,8 +328,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.620, // Center of fifth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
 
@@ -336,8 +345,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.758, // Center of sixth column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.015,
     })
   );
   const pieTitles4 = Object.entries(groupCaenorhabditis).map(
@@ -349,8 +361,11 @@ export default function RsInMsigportal(rawData) {
       showarrow: false,
       text: key.padStart(7, ' '),
       align: 'center',
+      font: {
+        weight: 'bold',
+      },
       x: 0.896, // Center of seventh column
-      y: 1 - (index * 0.25) - 0.02,
+      y: 1 - (index * 0.25) - 0.01,
     })
   );
   const annotationTitle0 = {
@@ -359,9 +374,10 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[0],
+    text: Object.keys(groupBySpecies)[0].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
       size: 14,
+      weight: 'bold',
     },
     x: 0.206, // Center of all three columns
     y: 1.02,
@@ -373,9 +389,10 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[1].replace(' ', '<br>'),
+    text: Object.keys(groupBySpecies)[1].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
+      weight: 'bold',
     },
     x: 0.482, // Center of fourth column
     y: 1.02,
@@ -387,9 +404,10 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[2].replace(' ', '<br>'),
+    text: Object.keys(groupBySpecies)[2].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
+      weight: 'bold',
     },
     x: 0.620, // Center of fifth column
     y: 1.02,
@@ -401,9 +419,10 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[3].replace(/\s+/g, '<br>'),
+    text: Object.keys(groupBySpecies)[3].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
+      weight: 'bold',
     },
     x: 0.758, // Center of sixth column
     y: 1.02,
@@ -415,22 +434,82 @@ export default function RsInMsigportal(rawData) {
     xanchor: 'center',
     yanchor: 'bottom',
     showarrow: false,
-    text: Object.keys(groupBySpecies)[4].replace(/\s+/g, '<br>'),
+    text: Object.keys(groupBySpecies)[4].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
     font: {
-      size: 12,
+      size: 14,
+      weight: 'bold',
     },
     x: 0.896, // Center of seventh column
     y: 1.02,
   };
 
   const shapes = [
-    // No shapes needed with spacing between columns
+    // Vertical line between Homo sapiens and Mus musculus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.412,
+      y0: 0,
+      x1: 0.412,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Mus musculus and Rattus norvegicus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.550,
+      y0: 0,
+      x1: 0.550,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Rattus norvegicus and Gallus gallus
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.688,
+      y0: 0,
+      x1: 0.688,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
+    // Vertical line between Gallus gallus and Caenorhabditis elegans
+    {
+      type: 'line',
+      xref: 'paper',
+      yref: 'paper',
+      x0: 0.826,
+      y0: 0,
+      x1: 0.826,
+      y1: 1,
+      line: {
+        color: 'lightgray',
+        width: 2,
+        dash: 'solid',
+      },
+    },
   ];
 
   const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
-    height: 900,
+    height: 920,
     autosize: true,
     margin: {
       l: 0,
