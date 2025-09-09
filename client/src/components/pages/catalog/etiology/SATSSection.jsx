@@ -125,7 +125,7 @@ export default function SATSSection({ selectedSignature }) {
     ? getSTSSignatureSetName(signatureToUse)
     : autoSignatureSetName;
 
-  console.log('🎯 SATSSection signatureSetName resolution:', {
+  console.log('SATSSection signatureSetName resolution:', {
     category,
     signatureToUse,
     mappedSignatureName,
@@ -176,12 +176,8 @@ export default function SATSSection({ selectedSignature }) {
 
   return (
     <div className="mt-4">
-      <h5 className="separator">SATS - Signature Activity in Tumor Samples</h5>
-      <p className="text-muted mb-3">
-        Interactive visualization showing tumor mutational burden (TMB) and signature presence 
-        across different cancer types for Signatures from Targeted Sequencing (STS). 
-        This plot displays comprehensive signature activity data across all cancer types.
-      </p>
+      <h5 className="separator">Tissue Distribution</h5>
+      
 
       {/* Debug information for development */}
       {signatureToUse && (

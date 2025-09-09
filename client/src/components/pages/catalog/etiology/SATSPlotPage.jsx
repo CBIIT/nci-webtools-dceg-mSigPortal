@@ -67,7 +67,7 @@ export default function SATSPlotPage() {
 
   return (
     <div className="p-3">
-      <h2>SATS - Signature Activity in Tumor Samples</h2>
+      <h2>Tissue Distribution</h2>
       <p className="lead">
         Interactive visualization showing tumor mutational burden (TMB) and signature presence 
         across different cancer types.
