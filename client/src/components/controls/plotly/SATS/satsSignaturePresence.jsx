@@ -645,10 +645,23 @@ export default function SATSSignaturePresence(data, options = {}) {
     height: 900,
     barmode: 'stack',
     margin: {
-      l: 50,
-      r: 50,
+      l: 60,
+      r: 30,
       t: 80,
       b: 240
+    },
+    legend: {
+      orientation: 'v',
+      x: 1.02,
+      y: 0,
+      xanchor: 'left',
+      yanchor: 'bottom',
+      bgcolor: 'rgba(255,255,255,0.8)',
+      bordercolor: 'rgba(128,128,128,0.3)',
+      borderwidth: 1,
+      font: {
+        size: 10
+      }
     },
     plot_bgcolor: 'white',
     paper_bgcolor: 'white',
@@ -685,7 +698,6 @@ export default function SATSSignaturePresence(data, options = {}) {
     toImageButtonOptions: {
       format: 'svg',
       filename: 'SATS_Combined_Plot',
-      width: 1600,
       height: 900
     },
     modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']

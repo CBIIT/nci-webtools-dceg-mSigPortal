@@ -180,7 +180,7 @@ export default function SATSSection({ selectedSignature }) {
       
 
       {/* Debug information for development */}
-      {signatureToUse && (
+      {/* {signatureToUse && (
         <div className="mb-3 p-2 bg-light rounded small">
           <strong>Analysis Info:</strong><br/>
           Selected Signature: {signatureToUse}<br/>
@@ -189,7 +189,7 @@ export default function SATSSection({ selectedSignature }) {
           Category: {category}<br/>
           Data Source: {useExampleData ? 'Example Data' : 'API Data'}<br/>
         </div>
-      )}
+      )} */}
 
       <Card>
         <Card.Body style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -208,7 +208,7 @@ export default function SATSSection({ selectedSignature }) {
                 data={JSON.parse(JSON.stringify(finalPlotConfig.traces))} // Deep copy to avoid read-only errors
                 layout={JSON.parse(JSON.stringify(finalPlotConfig.layout))} // Deep copy layout too
                 config={finalPlotConfig.config}
-                style={{ width: '100%', height: '900px', maxWidth: '1400px' }}
+                style={{ width: '100%', height: '900px' }}
                 useResizeHandler={true}
                 onInitialized={(figure, graphDiv) => console.log('✅ SATS Plot initialized successfully')}
                 onError={(err) => console.error('❌ SATS Plot rendering error:', err)}
