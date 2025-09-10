@@ -608,7 +608,10 @@ export default function SATSSignaturePresence(data, options = {}) {
       domain: [0.8, 1],
       anchor: 'x',      
       showgrid: true,
-      gridcolor: 'rgba(128,128,128,0.2)'
+      gridcolor: 'rgba(128,128,128,0.2)',
+      tickfont: {
+        size: 12
+      }
     },
     
     // Dot plot (bottom)
@@ -620,7 +623,7 @@ export default function SATSSignaturePresence(data, options = {}) {
       ticktext: cancerOrder,
       tickangle: -45, // Diagonal to the left
       tickfont: {
-        size: 10
+        size: 12
       },
       range: [0.5, cancerOrder.length + 0.5],
       showgrid: true,
@@ -633,7 +636,7 @@ export default function SATSSignaturePresence(data, options = {}) {
       tickvals: dotSignatures.map((_, i) => i + 1),
       ticktext: dotSignatures.map(sig => getSignatureAnnotation(sig)),
       tickfont: {
-        size: 9
+        size: 12
       },
       showgrid: true,
       gridcolor: 'rgba(128,128,128,0.2)',
