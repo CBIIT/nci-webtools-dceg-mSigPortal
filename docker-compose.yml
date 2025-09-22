@@ -17,7 +17,7 @@ services:
   extraction:
     build:
       context: "."
-      dockerfile: "./docker/backend-extraction.dockerfile"
+      dockerfile: "./docker/extraction.dockerfile"
     env_file: "./extraction-service/.env"
     volumes:
       - "./data:/data"
