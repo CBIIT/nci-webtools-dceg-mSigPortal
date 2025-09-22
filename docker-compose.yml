@@ -28,6 +28,20 @@ services:
     ports:
       - "8332:8332"
 
+  refitting:
+    build:
+      context: "."
+      dockerfile: "./docker/refitting.dockerfile"
+    env_file: "./refitting-service/.env"
+    volumes:
+      - "./data:/data"
+    environment:
+      DATA_FOLDER: /data
+      INPUT_FOLDER: /data/input
+      OUTPUT_FOLDER: /data/output
+    ports:
+      - "8334:8334"
+
   frontend:
     build:
       context: "."

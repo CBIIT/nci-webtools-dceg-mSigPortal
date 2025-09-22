@@ -1,0 +1,19 @@
+{
+  "name": "refitting-service",
+  "version": "1.0.0",
+  "description": "SATS",
+  "main": "app.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "r-wrapper": "^1.1.2",
+    "winston": "^3.17.0"
+  }
+}
