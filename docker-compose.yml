@@ -14,6 +14,7 @@ services:
     ports:
       - "8330:8330"
 
+
   extraction:
     build:
       context: "."
@@ -56,6 +57,7 @@ services:
     ports:
       - "3000:80"
 
+  
   database:
     image: postgres
     environment:
