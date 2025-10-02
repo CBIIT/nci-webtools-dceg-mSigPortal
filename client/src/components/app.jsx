@@ -79,7 +79,7 @@ export default function App() {
       description:
         'Explore etiological factors associated with signature at sample levels.    ',
       image: 'assets/images/Exploration-Icon.svg',
-      navIndex: 3,
+      navIndex: 4,
       color: '#5a4e2e',
       showHomepage: true,
       about: '/about#exploration',
@@ -93,7 +93,7 @@ export default function App() {
       description:
         'Comprehensively evaluate the accuracy of mutational signature based on different statistical variables (Cosine similarity, BIC, L2 norms etc) and re-decompsite signatures using different algorithms (SigProfiler, deconstructsig, bootstrapping method).',
       image: 'assets/images/refitting.png',
-      navIndex: 2,
+      navIndex: 3,
       color: '#689f39', // green
     },
     {
@@ -107,7 +107,7 @@ export default function App() {
       description:
         'Analyze signature association with other genomic features and clinical data.',
       image: 'assets/images/Association-Icon.svg',
-      navIndex: 4,
+      navIndex: 5,
       color: '#7f282f',
       showHomepage: true,
       about: '/about#association',
@@ -123,7 +123,7 @@ export default function App() {
       description:
         'Provide REST API for programmatic access to the mSigPortal data.',
       image: 'assets/images/API-Icon.svg',
-      navIndex: 5,
+      navIndex: 6,
       color: '#84368d',
       showHomepage: true,
       about: '/about#api',
@@ -131,13 +131,13 @@ export default function App() {
     {
       route: '/publications',
       title: 'Publications',
-      navIndex: 6,
+      navIndex: 7,
       showHomepage: false,
     },
     {
       route: '/faq',
       title: 'FAQ',
-      navIndex: 7,
+      navIndex: 8,
       showHomepage: false,
     },
     {
@@ -145,7 +145,7 @@ export default function App() {
       title: 'About',
       // cardTitle: 'About',
       image: 'assets/images/gwas.svg',
-      navIndex: 8,
+      navIndex: 9,
       showHomepage: false,
     },
   ];
