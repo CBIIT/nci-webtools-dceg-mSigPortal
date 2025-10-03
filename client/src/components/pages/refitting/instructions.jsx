@@ -1,42 +1,126 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { Container } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 export default function Instructions() {
+  const examples = [
+    {
+      label: 'Example results based on SBS96 targeted sequencing',
+      path: 'Example_SBS96_Refitting',
+    },
+    {
+      label: 'Example results based on DBS78 targeted sequencing',
+      path: 'Example_DBS78_Refitting',
+    },
+  ];
+  const history = useHistory();
+  const [id, setId] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const handleExampleClick = (exampleFolder) => {
+    setIsFetching(true);
+    setId(exampleFolder);
+    // Simulate loading for example data
+    setTimeout(() => {
+      setIsFetching(false);
+      // Navigate to refitting with example data loaded
+    }, 1000);
+  };
+
   return (
-    <div className="bg-white border rounded p-3">
-      <h4>Refitting Instructions</h4>
+    <Container fluid className="bg-white border rounded p-3">
+      <LoadingOverlay active={isFetching} />
+      <h4>How to Submit a Query</h4>
       <p>
-        Welcome to the Signature Refitting module. This tool allows you to 
-        comprehensively evaluate the accuracy of mutational signatures based on 
-        different statistical variables (Cosine similarity, BIC, L2 norms etc) 
-        and re-decompose signatures using different algorithms (SigProfiler, 
-        deconstructsig, bootstrapping method).
+        Use the panel on the left to select a Data Source and configure the required options.
       </p>
-      
-      <h5>How to Use:</h5>
-      <ol>
-        <li>Upload your mutation data or select from example datasets</li>
-        <li>Choose the reference signatures to refit against</li>
-        <li>Select the statistical metrics you want to evaluate</li>
-        <li>Configure the refitting parameters</li>
-        <li>Submit your analysis</li>
-        <li>Monitor progress in the Status tab</li>
-        <li>View results in the Targeted Sequencing tab</li>
-      </ol>
 
-      <h5>Supported File Formats:</h5>
-      <ul>
-        <li>VCF files</li>
-        <li>MAF files</li>
-        <li>TSV/CSV mutation matrices</li>
-      </ul>
-
-      <h5>Statistical Metrics:</h5>
-      <ul>
-        <li><strong>Cosine Similarity:</strong> Measures the similarity between original and refitted signatures</li>
-        <li><strong>BIC (Bayesian Information Criterion):</strong> Model selection criterion</li>
-        <li><strong>L2 Norms:</strong> Euclidean distance measure</li>
-        <li><strong>Reconstruction Error:</strong> Difference between original and reconstructed data</li>
-      </ul>
+      <hr />
+      <div className="mt-2">
+        <h4>Data Source</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Public:</strong> Analyze data available directly from the website.
+          </li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>User:</strong> Upload and analyze your own data.
+          </li>
+        </ul>
     </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Signature Type</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>SBS:</strong> Single Base Substitutions</li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>DBS:</strong> Double Base Substitutions</li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Reference Genome</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg19 (GRCh37):</strong> Genome Reference Consortium Human Build 37</li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg38 (GRCh38):</strong> Genome Reference Consortium Human Build 38</li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Input Files</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>MAF file:</strong> Contains SBS or DBS information for samples. <em>(Example provided)</em>
+            <div>
+            <a
+              href="/assets/examples/refitting/SBS_MAF_two_samples.txt"
+              download
+              className="link-primary-underline"
+            >
+              Example of a MAF file
+            </a>
+          </div>
+          </li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Genomic file:</strong> Defines the genomic regions targeted by sequencing panels. <em>(Example provided)</em>
+          <div>
+            <a
+              href="/assets/examples/refitting/Genomic_information_sample.txt"
+              download
+              className="link-primary-underline"
+            >
+              Example of a genomic file
+            </a>
+          </div>
+          </li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Clinical file:</strong> Specifies sample ID, sequencing panel ID, and cancer type.
+            <ul style={{ padding: 0, paddingLeft: '20px', marginTop: '4px', columnCount: 'unset', columns: 'unset' }}>
+              <li style={{ display: 'list-item' }}>Cancer type must match one from the cancer type dictionary file.</li>
+            </ul>
+            <div>
+            <a
+              href="/assets/examples/refitting/Clinical_sample.txt"
+              download
+              className="link-primary-underline"
+            >
+              Clinical sample file
+            </a>
+          </div>
+          </li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Output File</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Signature activity and burden:</strong> Provides both the estimated activity of each signature 
+            and the estimated number of mutations caused by each signature for each subject.
+          </li>
+        </ul>
+      </div>
+      
+    </Container>
   );
 }

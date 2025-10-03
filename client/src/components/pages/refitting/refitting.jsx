@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { Button, Nav } from 'react-bootstrap';
+import {
+  SidebarContainer,
+  SidebarPanel,
+  MainPanel,
+} from '../../controls/sidebar-container/sidebar-container';
 import Instructions from './instructions';
 import Status from './status';
 import TargetedSequencing from './targetedSequencing';
+import RefittingForm from './refitting-form';
 
 export default function Refitting() {
   const [displayTab, setDisplayTab] = useState('instructions');
+  const [openSidebar, setOpenSidebar] = useState(true);
 
   const tabs = [
     {
@@ -91,17 +98,26 @@ export default function Refitting() {
         </div>
       </div>
 
-      <div className="m-3">
-        <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
-          <Instructions />
-        </div>
-        <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
-          <Status />
-        </div>
-        <div className={displayTab === 'targetedSequencing' ? 'd-block' : 'd-none'}>
-          <TargetedSequencing />
-        </div>
-      </div>
+      <SidebarContainer
+        className="m-3"
+        collapsed={!openSidebar}
+        onCollapsed={(e) => setOpenSidebar(!e)}
+      >
+        <SidebarPanel>
+          <RefittingForm />
+        </SidebarPanel>
+        <MainPanel>
+          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+            <Instructions />
+          </div>
+          <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
+            <Status />
+          </div>
+          <div className={displayTab === 'targetedSequencing' ? 'd-block' : 'd-none'}>
+            <TargetedSequencing />
+          </div>
+        </MainPanel>
+      </SidebarContainer>
     </div>
   );
 }
