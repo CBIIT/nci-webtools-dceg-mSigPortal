@@ -34,21 +34,11 @@ export default function Instructions() {
       <LoadingOverlay active={isFetching} />
       <h4>How to Submit a Query</h4>
       <p>
-        Use the panel on the left to select a Data Source and configure the required options.
+        Use the panel on the left to configure the required options.
       </p>
 
       <hr />
-      <div className="mt-2">
-        <h4>Data Source</h4>
-        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
-          <li style={{ display: 'list-item', marginBottom: '8px' }}>
-            <strong>Public:</strong> Analyze data available directly from the website.
-          </li>
-          <li style={{ display: 'list-item', marginBottom: '8px' }}>
-            <strong>User:</strong> Upload and analyze your own data.
-          </li>
-        </ul>
-    </div>
+      
       <hr />
       <div className="mt-2">
         <h4>Signature Type</h4>

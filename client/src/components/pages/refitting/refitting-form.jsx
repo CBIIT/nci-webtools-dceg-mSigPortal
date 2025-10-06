@@ -12,9 +12,8 @@ export default function RefittingForm() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const defaultValues = {
-    source: 'public',
-    signatureType: { label: 'SBS', value: 'SBS' },
-    referenceGenome: { label: 'hg38 (GRCh38)', value: 'hg38' },
+    signatureType: 'SBS',
+    referenceGenome: 'hg38',
     mafFile: null,
     genomicFile: null,
     clinicalFile: null,
@@ -33,7 +32,6 @@ export default function RefittingForm() {
   } = useForm({ defaultValues: defaultValues });
 
   const {
-    source,
     signatureType,
     referenceGenome,
     mafFile,
@@ -72,19 +70,6 @@ export default function RefittingForm() {
     setSubmitted(false);
   };
 
-  const handleFileUpload = async (file, fieldName) => {
-    setLoadingUpload(true);
-    try {
-      // Simulate file upload
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setValue(fieldName, file);
-    } catch (error) {
-      console.error('File upload error:', error);
-    } finally {
-      setLoadingUpload(false);
-    }
-  };
-
   return (
     <div className="p-3 bg-white border rounded">
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -92,108 +77,238 @@ export default function RefittingForm() {
         
         <div style={{ maxHeight: '900px', overflow: 'hidden auto' }}>
           <div className="border rounded p-2 mb-3">
-            <Form.Group>
-              <Form.Label className="mr-4">Data Source</Form.Label>
+            <Form.Group className="mb-3">
+              <Form.Label className="required mr-4">Signature Type</Form.Label>
               <Controller
-                name="source"
+                name="signatureType"
                 control={control}
+                rules={{ required: 'Signature type is required' }}
                 render={({ field }) => (
-                  <Form.Check
-                    {...field}
-                    inline
-                    id="radioPublic"
-                    type="radio"
-                    label={<span className="font-weight-normal">Public</span>}
-                    value={'public'}
-                    checked={field.value === 'public'}
-                    disabled={submitted}
-                  />
+                  <div>
+                    {signatureTypeOptions.map((option) => (
+                      <Form.Check
+                        key={option.value}
+                        type="radio"
+                        id={`signatureType-${option.value}`}
+                        label={<span className="font-weight-normal">{option.label}</span>}
+                        value={option.value}
+                        checked={field.value === option.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        disabled={submitted}
+                        inline
+                      />
+                    ))}
+                  </div>
                 )}
               />
+              {errors.signatureType && (
+                <Form.Text className="text-danger">
+                  {errors.signatureType.message}
+                </Form.Text>
+              )}
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+              <Form.Label className="required mr-4">Reference Genome</Form.Label>
               <Controller
-                name="source"
+                name="referenceGenome"
                 control={control}
+                rules={{ required: 'Reference genome is required' }}
                 render={({ field }) => (
-                  <Form.Check
-                    {...field}
-                    inline
-                    id="radioUser"
-                    type="radio"
-                    label={<span className="font-weight-normal">User</span>}
-                    value={'user'}
-                    checked={field.value === 'user'}
-                    disabled={submitted}
-                  />
+                  <div>
+                    {referenceGenomeOptions.map((option) => (
+                      <Form.Check
+                        key={option.value}
+                        type="radio"
+                        id={`referenceGenome-${option.value}`}
+                        label={<span className="font-weight-normal">{option.label}</span>}
+                        value={option.value}
+                        checked={field.value === option.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        disabled={submitted}
+                        inline
+                      />
+                    ))}
+                  </div>
                 )}
               />
+              {errors.referenceGenome && (
+                <Form.Text className="text-danger">
+                  {errors.referenceGenome.message}
+                </Form.Text>
+              )}
             </Form.Group>
 
-            {source === 'public' ? (
-              <div key="public">
-                <p className="text-muted">
-                  Use pre-loaded datasets available on the website for analysis.
-                </p>
-              </div>
-            ) : (
-              <div key="user">
-                <SelectForm
-                  className="mb-2"
-                  name="signatureType"
-                  label="Signature Type"
-                  disabled={submitted}
-                  options={signatureTypeOptions}
-                  control={control}
-                />
-                
-                <SelectForm
-                  className="mb-2"
-                  name="referenceGenome"
-                  label="Reference Genome"
-                  disabled={submitted}
-                  options={referenceGenomeOptions}
-                  control={control}
-                />
-
-                <Form.Group className="mb-2">
-                  <Form.Label>Upload MAF File</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept=".maf,.txt,.tsv"
+            <Form.Group className="mb-2">
+              <Form.Label>Upload MAF File <span style={{ color: 'crimson' }}>*</span></Form.Label>
+              <Controller
+                name="mafFile"
+                control={control}
+                rules={{ required: 'MAF file is required' }}
+                render={({ field }) => (
+                  <Form.File
+                    {...field}
+                    value={''} // set dummy value for file input
                     disabled={submitted}
-                    onChange={(e) => handleFileUpload(e.target.files[0], 'mafFile')}
+                    id="mafFile"
+                    label={
+                      mafFile?.name || 'Upload MAF File...'
+                    }
+                    isInvalid={errors.mafFile}
+                    feedback="Please upload a MAF file"
+                    onChange={(e) => {
+                      if (e.target.files.length) {
+                        setValue('mafFile', e.target.files[0]);
+                      }
+                    }}
+                    custom
                   />
-                  <Form.Text className="text-muted">
-                    Contains SBS or DBS information for samples
-                  </Form.Text>
-                </Form.Group>
+                )}
+              />
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={async () => {
+                  const file = 'SBS_MAF_two_samples.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  setValue(
+                    'mafFile',
+                    new File([await (await fetch(path)).blob()], file)
+                  );
+                }}
+              >
+                Load Example MAF File
+              </Button>
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={() => {
+                  const file = 'SBS_MAF_two_samples.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  const link = document.createElement('a');
+                  link.href = path;
+                  link.download = file;
+                  link.click();
+                }}
+              >
+                Download Example MAF File
+              </Button>
+             
+            </Form.Group>
 
-                <Form.Group className="mb-2">
-                  <Form.Label>UploadGenomic File</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept=".bed,.txt,.tsv"
+            <Form.Group className="mb-2">
+              <Form.Label>Upload Genomic File <span style={{ color: 'crimson' }}>*</span></Form.Label>
+              <Controller
+                name="genomicFile"
+                control={control}
+                rules={{ required: 'Genomic file is required' }}
+                render={({ field }) => (
+                  <Form.File
+                    {...field}
+                    value={''} // set dummy value for file input
                     disabled={submitted}
-                    onChange={(e) => handleFileUpload(e.target.files[0], 'genomicFile')}
+                    id="genomicFile"
+                    label={
+                      genomicFile?.name || 'Upload Genomic File...'
+                    }
+                    isInvalid={errors.genomicFile}
+                    feedback="Please upload a genomic file"
+                    onChange={(e) => {
+                      if (e.target.files.length) {
+                        setValue('genomicFile', e.target.files[0]);
+                      }
+                    }}
+                    custom
                   />
-                  <Form.Text className="text-muted">
-                    Defines genomic regions targeted by sequencing panels
-                  </Form.Text>
-                </Form.Group>
+                )}
+              />
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={async () => {
+                  const file = 'Genomic_information_sample.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  setValue(
+                    'genomicFile',
+                    new File([await (await fetch(path)).blob()], file)
+                  );
+                }}
+              >
+                Load Example Genomic File
+              </Button>
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={() => {
+                  const file = 'Genomic_information_sample.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  const link = document.createElement('a');
+                  link.href = path;
+                  link.download = file;
+                  link.click();
+                }}
+              >
+                Download Example Genomic File
+              </Button>
+              
+            </Form.Group>
 
-                <Form.Group className="mb-2">
-                  <Form.Label>UploadClinical File</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept=".txt,.tsv,.csv"
+            <Form.Group className="mb-2">
+              <Form.Label>Upload Clinical File <span style={{ color: 'crimson' }}>*</span></Form.Label>
+              <Controller
+                name="clinicalFile"
+                control={control}
+                rules={{ required: 'Clinical file is required' }}
+                render={({ field }) => (
+                  <Form.File
+                    {...field}
+                    value={''} // set dummy value for file input
                     disabled={submitted}
-                    onChange={(e) => handleFileUpload(e.target.files[0], 'clinicalFile')}
+                    id="clinicalFile"
+                    label={
+                      clinicalFile?.name || 'Upload Clinical File...'
+                    }
+                    isInvalid={errors.clinicalFile}
+                    feedback="Please upload a clinical file"
+                    onChange={(e) => {
+                      if (e.target.files.length) {
+                        setValue('clinicalFile', e.target.files[0]);
+                      }
+                    }}
+                    custom
                   />
-                  <Form.Text className="text-muted">
-                    Sample ID, sequencing panel ID, and cancer type
-                  </Form.Text>
-                </Form.Group>
-              </div>
-            )}
+                )}
+              />
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={async () => {
+                  const file = 'Clinical_sample.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  setValue(
+                    'clinicalFile',
+                    new File([await (await fetch(path)).blob()], file)
+                  );
+                }}
+              >
+                Load Example Clinical File
+              </Button>
+              <Button
+                variant="link"
+                disabled={submitted}
+                onClick={() => {
+                  const file = 'Clinical_sample.txt';
+                  const path = 'assets/examples/refitting/' + file;
+                  const link = document.createElement('a');
+                  link.href = path;
+                  link.download = file;
+                  link.click();
+                }}
+              >
+                Download Example Clinical File
+              </Button>
+              
+            </Form.Group>
           </div>
 
           <div className="border rounded p-2 mb-3">
