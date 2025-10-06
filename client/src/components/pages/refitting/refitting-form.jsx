@@ -155,7 +155,7 @@ export default function RefittingForm() {
                 />
 
                 <Form.Group className="mb-2">
-                  <Form.Label>MAF File</Form.Label>
+                  <Form.Label>Upload MAF File</Form.Label>
                   <Form.Control
                     type="file"
                     accept=".maf,.txt,.tsv"
@@ -168,7 +168,7 @@ export default function RefittingForm() {
                 </Form.Group>
 
                 <Form.Group className="mb-2">
-                  <Form.Label>Genomic File</Form.Label>
+                  <Form.Label>UploadGenomic File</Form.Label>
                   <Form.Control
                     type="file"
                     accept=".bed,.txt,.tsv"
@@ -181,7 +181,7 @@ export default function RefittingForm() {
                 </Form.Group>
 
                 <Form.Group className="mb-2">
-                  <Form.Label>Clinical File</Form.Label>
+                  <Form.Label>UploadClinical File</Form.Label>
                   <Form.Control
                     type="file"
                     accept=".txt,.tsv,.csv"
@@ -197,15 +197,7 @@ export default function RefittingForm() {
           </div>
 
           <div className="border rounded p-2 mb-3">
-            <Form.Group className="mb-2">
-              <Form.Label>Job Name</Form.Label>
-              <Form.Control
-                {...register('jobName')}
-                type="text"
-                placeholder="Enter a descriptive name for your analysis"
-                disabled={submitted}
-              />
-            </Form.Group>
+            
 
             <Form.Group className="mb-2">
               <Form.Label className="required">Email</Form.Label>
@@ -228,6 +220,16 @@ export default function RefittingForm() {
               <Form.Text className="text-muted">
                 You will receive an email when the analysis is complete
               </Form.Text>
+            </Form.Group>
+
+            <Form.Group className="mb-2">
+              <Form.Label>Job Name</Form.Label>
+              <Form.Control
+                {...register('jobName')}
+                type="text"
+                placeholder="Enter a descriptive name for your analysis"
+                disabled={submitted}
+              />
             </Form.Group>
           </div>
 
