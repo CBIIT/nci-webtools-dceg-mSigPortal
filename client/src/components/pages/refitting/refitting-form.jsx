@@ -13,7 +13,7 @@ export default function RefittingForm() {
 
   const defaultValues = {
     signatureType: 'SBS',
-    referenceGenome: 'hg38',
+    referenceGenome: 'hg19',
     mafFile: null,
     genomicFile: null,
     clinicalFile: null,

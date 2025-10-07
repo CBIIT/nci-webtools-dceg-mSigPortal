@@ -346,6 +346,12 @@ a.nav-link.active {
   background-color: #07648d !important;
 }
 
+/* Override for refitting pages - use green instead of blue */
+.refitting-page a.nav-link.active,
+.refitting-page .nav-link.active {
+  background-color: #689f39 !important;
+}
+
 .nav-tabs > .nav-item {
   // font-weight: 600;
   color: black;

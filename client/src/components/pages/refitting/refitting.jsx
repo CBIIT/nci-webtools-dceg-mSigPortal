@@ -33,7 +33,7 @@ export default function Refitting() {
   ];
 
   return (
-    <div className="position-relative">
+    <div className="position-relative refitting-page">
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
