@@ -359,11 +359,6 @@ export default function TargetedSequencing() {
         <Card.Body>
           {selectedMetric === 'h_est' && (
             <>
-              <p>
-                <strong>SBS Refitting Results:</strong> This table shows the output from the <code>run_sbs_refitting()</code> R function. 
-                Each row represents a sample-signature combination with Activity (signature contribution strength) and Burden (estimated mutation count).
-                Results are saved as "H_Burden_est.csv" and show significant signatures with non-zero activity values.
-              </p>
               {renderHEstResults()}
             </>
           )}
