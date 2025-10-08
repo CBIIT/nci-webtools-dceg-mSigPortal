@@ -1,3 +1,12 @@
+# Load required libraries
+library(tidyverse)
+library(GenomicRanges)
+library(Biostrings)
+library(SATS)
+library(BSgenome)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(BSgenome.Hsapiens.UCSC.hg38)
+
 sum <- function(a,b) {
    return(a + b)
  
@@ -12,17 +21,10 @@ run_sbs_refitting <- function(path,
   genome <- match.arg(genome)
   stopifnot(dir.exists(path))
 
-  # --- dependencies (no library() side effects) ---
-  for (p in c("tidyverse","GenomicRanges","Biostrings","SATS","BSgenome")) {
-    if (!requireNamespace(p, quietly = TRUE)) stop("Install package: ", p)
-  }
+  # Get appropriate genome reference
   if (genome == "hg19") {
-    if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE))
-      stop('Install BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")')
     Hsapiens <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
   } else {
-    if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE))
-      stop('Install BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")')
     Hsapiens <- BSgenome.Hsapiens.UCSC.hg38::Hsapiens
   }
 
