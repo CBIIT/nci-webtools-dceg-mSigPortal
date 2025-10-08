@@ -1,55 +1,67 @@
+# Load required libraries
+library(tidyverse)
+library(GenomicRanges)
+library(Biostrings)
+library(SATS)
+library(BSgenome)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(BSgenome.Hsapiens.UCSC.hg38)
+
 sum <- function(a,b) {
    return(a + b)
  
  }
 
-run_sbs_refitting <- function(path,
+run_sbs_refitting <- function(maf_file,
+                              genomic_file,
+                              clinical_file,
+                              output_dir,
+                              common_files_dir = "/app/client/public/assets/exampleInput",
                               genome = c("hg19","hg38"),
                               save_csv = TRUE,
                               out_file = "H_Burden_est.csv",
                               match_on_oncotree = FALSE) {
 
   genome <- match.arg(genome)
-  stopifnot(dir.exists(path))
+  
+  # Define paths to common reference files
+  ref_signature_file <- file.path(common_files_dir, "Alex_Sigs_TMB_check_V3.4_SBS2_13 together.csv")
+  cancer_dictionary_file <- file.path(common_files_dir, "0 Cancer_Dictionary_BZ.csv")
+  
+  # Check that user-uploaded files exist
+  user_files <- c(maf_file, genomic_file, clinical_file)
+  missing_user_files <- user_files[!file.exists(user_files)]
+  if (length(missing_user_files)) stop("Missing user files: ", paste(missing_user_files, collapse = ", "))
+  
+  # Check that common reference files exist
+  common_files <- c(ref_signature_file, cancer_dictionary_file)
+  missing_common_files <- common_files[!file.exists(common_files)]
+  if (length(missing_common_files)) stop("Missing common reference files: ", paste(missing_common_files, collapse = ", "))
+  
+  # Check that output directory exists
+  if (!dir.exists(output_dir)) stop("Output directory does not exist: ", output_dir)
 
-  # --- dependencies (no library() side effects) ---
-  for (p in c("tidyverse","GenomicRanges","Biostrings","SATS","BSgenome")) {
-    if (!requireNamespace(p, quietly = TRUE)) stop("Install package: ", p)
-  }
+  # Get appropriate genome reference
   if (genome == "hg19") {
-    if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE))
-      stop('Install BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")')
     Hsapiens <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
   } else {
-    if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE))
-      stop('Install BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")')
     Hsapiens <- BSgenome.Hsapiens.UCSC.hg38::Hsapiens
   }
 
   utils::data("RefTMB", package = "SATS", envir = environment())
 
-  # --- file presence ---
-  req <- c("Alex_Sigs_TMB_check_V3.4_SBS2_13 together.csv",
-           "SBS_MAF_two_samples.txt",
-           "Genomic_information_sample.txt",
-           "Clinical_sample.txt",
-           "0 Cancer_Dictionary_BZ.csv")
-  miss <- req[!file.exists(file.path(path, req))]
-  if (length(miss)) stop("Missing files: ", paste(miss, collapse = ", "))
-
   # --- read inputs ---
-  ref_file <- file.path(path, req[1])
-  SBS_TMBv3.4 <- utils::read.csv(ref_file, row.names = 1, check.names = FALSE)
+  SBS_TMBv3.4 <- utils::read.csv(ref_signature_file, row.names = 1, check.names = FALSE)
   Mut_category_order <- row.names(SBS_TMBv3.4)
   if (length(Mut_category_order) != 96) stop("Expected 96 SBS categories in reference.")
 
-  mutations2 <- utils::read.table(file.path(path, req[2]), header = TRUE, sep = "\t",
+  mutations2 <- utils::read.table(maf_file, header = TRUE, sep = "\t",
                                   quote = "", stringsAsFactors = FALSE, check.names = FALSE)
-  genomic_information <- utils::read.table(file.path(path, req[3]), header = TRUE, sep = "\t",
+  genomic_information <- utils::read.table(genomic_file, header = TRUE, sep = "\t",
                                            quote = "", stringsAsFactors = FALSE, check.names = FALSE)
-  clinical_sample <- utils::read.table(file.path(path, req[4]), header = TRUE, sep = "\t",
+  clinical_sample <- utils::read.table(clinical_file, header = TRUE, sep = "\t",
                                        quote = "", stringsAsFactors = FALSE, check.names = FALSE)
-  annoFile <- utils::read.csv(file.path(path, req[5]), check.names = FALSE)
+  annoFile <- utils::read.csv(cancer_dictionary_file, check.names = FALSE)
 
   # --- column checks ---
   need_mut <- c("Chromosome","Start_Position","Variant_Type","Reference_Allele","Tumor_Seq_Allele2","Tumor_Sample_Barcode")
@@ -160,8 +172,8 @@ run_sbs_refitting <- function(path,
   }
 
   if (save_csv) {
-    utils::write.csv(out, file.path(path, out_file), row.names = FALSE)
-    message("Wrote: ", file.path(path, out_file))
+    utils::write.csv(out, file.path(output_dir, out_file), row.names = FALSE)
+    message("Wrote: ", file.path(output_dir, out_file))
   }
 
   # return intermediates too
