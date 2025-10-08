@@ -11,15 +11,15 @@ RUN dnf -y update \
     && dnf clean all
 
 RUN ln -s -f /usr/bin/node-20 /usr/bin/node; ln -s -f /usr/bin/npm-20 /usr/bin/npm;
-RUN mkdir -p /refitting
+RUN mkdir -p /refitting-service
 
-WORKDIR /refitting
+WORKDIR /refitting-service
 
 # install R packages with renv
-COPY refitting-service /refitting/
-COPY refitting-service/.Rprofile /refitting/
-COPY refitting-service/renv/activate.R /refitting/renv/
-COPY refitting-service/renv/settings.json /refitting/renv/
+COPY refitting-service /refitting-service/
+COPY refitting-service/.Rprofile /refitting-service/
+COPY refitting-service/renv/activate.R /refitting-service/renv/
+COPY refitting-service/renv/settings.json /refitting-service/renv/
 
 RUN R -e "\
     options(\
