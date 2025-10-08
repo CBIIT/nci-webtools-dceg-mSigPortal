@@ -12,12 +12,11 @@ sum <- function(a,b) {
  
  }
 
-run_sbs_refitting <- function(ref_signature_file,
-                              maf_file,
+run_sbs_refitting <- function(maf_file,
                               genomic_file,
                               clinical_file,
-                              cancer_dictionary_file,
                               output_dir,
+                              common_files_dir = "/app/client/public/assets/exampleInput",
                               genome = c("hg19","hg38"),
                               save_csv = TRUE,
                               out_file = "H_Burden_est.csv",
@@ -25,10 +24,19 @@ run_sbs_refitting <- function(ref_signature_file,
 
   genome <- match.arg(genome)
   
-  # Check that all input files exist
-  input_files <- c(ref_signature_file, maf_file, genomic_file, clinical_file, cancer_dictionary_file)
-  missing_files <- input_files[!file.exists(input_files)]
-  if (length(missing_files)) stop("Missing files: ", paste(missing_files, collapse = ", "))
+  # Define paths to common reference files
+  ref_signature_file <- file.path(common_files_dir, "Alex_Sigs_TMB_check_V3.4_SBS2_13 together.csv")
+  cancer_dictionary_file <- file.path(common_files_dir, "0 Cancer_Dictionary_BZ.csv")
+  
+  # Check that user-uploaded files exist
+  user_files <- c(maf_file, genomic_file, clinical_file)
+  missing_user_files <- user_files[!file.exists(user_files)]
+  if (length(missing_user_files)) stop("Missing user files: ", paste(missing_user_files, collapse = ", "))
+  
+  # Check that common reference files exist
+  common_files <- c(ref_signature_file, cancer_dictionary_file)
+  missing_common_files <- common_files[!file.exists(common_files)]
+  if (length(missing_common_files)) stop("Missing common reference files: ", paste(missing_common_files, collapse = ", "))
   
   # Check that output directory exists
   if (!dir.exists(output_dir)) stop("Output directory does not exist: ", output_dir)
