@@ -1,6 +1,11 @@
 # refitting.R
 # Run SBS refitting end-to-end given three input files + shared reference files.
 
+# ---- Simple test function for r-wrapper ----
+sum <- function(a, b) {
+  return(a + b)
+}
+
 # ---- libraries used by the function ----
 suppressPackageStartupMessages({
   library(tidyverse)

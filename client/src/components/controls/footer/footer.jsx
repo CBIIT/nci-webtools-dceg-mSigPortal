@@ -16,7 +16,7 @@ export function Footer() {
               <div className="mb-4 row justify-content-between">
                 <div className="col-md-auto footer-nav-col">
                   <div className="d-none d-lg-block footer-header text-left ">
-                    <h2 class="h5">
+                    <h2 className="h5">
                       <b>Division of Cancer Epidemiology and Genetics</b>{' '}
                     </h2>
                     <div className="h6">

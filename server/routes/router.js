@@ -21,6 +21,7 @@ import { router as etiologyRoutes } from '../services/api/etiology/etiology.js';
 import { router as publicationsRoutes } from '../services/api/publications/publications.js';
 import { router as patternRoutes } from '../services/api/pattern/pattern.js';
 import { router as extractionRoutes } from '../services/api/extraction/extraction.js';
+import { router as refittingRoutes } from '../services/api/refitting/refitting.js';
 
 export function createApi(env) {
   // register middleware
@@ -53,6 +54,7 @@ export function createApi(env) {
   router.use(publicationsRoutes);
   router.use(patternRoutes);
   router.use(extractionRoutes);
+  router.use(refittingRoutes);
 
   router.use(logErrors());
   return router;
