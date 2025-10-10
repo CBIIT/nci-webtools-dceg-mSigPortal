@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import SelectForm from '../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSubmitRefittingMutation, useRefittingStatusQuery } from './apiSlice';
 
 export default function RefittingForm() {
   const [submitted, setSubmitted] = useState(false);
-  const [loadingUpload, setLoadingUpload] = useState(false);
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [jobId, setJobId] = useState(null);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // API hooks
+  const [submitRefitting, { isLoading: loadingSubmit }] = useSubmitRefittingMutation();
+  const { data: statusData, refetch: refetchStatus } = useRefittingStatusQuery(jobId, {
+    skip: !jobId,
+    pollingInterval: jobId ? 5000 : 0, // Poll every 5 seconds when we have a jobId
+  });
 
   const defaultValues = {
     signatureType: 'SBS',
@@ -41,6 +50,17 @@ export default function RefittingForm() {
     jobName,
   } = watch();
 
+  // Handle status updates
+  useEffect(() => {
+    if (statusData) {
+      if (statusData.status === 'completed') {
+        setSuccess(`Analysis completed successfully! ${statusData.downloadUrl ? 'Download link available.' : ''}`);
+      } else if (statusData.status === 'failed') {
+        setError(`Analysis failed: ${statusData.error || 'Unknown error'}`);
+      }
+    }
+  }, [statusData]);
+
   const signatureTypeOptions = [
     { label: 'SBS', value: 'SBS' },
     { label: 'DBS', value: 'DBS' },
@@ -52,28 +72,79 @@ export default function RefittingForm() {
   ];
 
   const onSubmit = async (data) => {
-    setLoadingSubmit(true);
     try {
-      console.log('Refitting form submitted:', data);
-      // Here you would implement the actual submission logic
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      setSubmitted(true);
+      setError(null);
+      setSuccess(null);
+      
+      // Validate required files
+      if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
+        setError('Please upload all required files (MAF, Genomic, and Clinical files)');
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('mafFile', data.mafFile);
+      formData.append('genomicFile', data.genomicFile);
+      formData.append('clinicalFile', data.clinicalFile);
+      formData.append('genome', data.referenceGenome);
+
+      // Submit the refitting job
+      const result = await submitRefitting(formData).unwrap();
+      
+      if (result.success) {
+        setJobId(result.jobId);
+        setSubmitted(true);
+        setSuccess(`Job submitted successfully! Job ID: ${result.jobId}. Please check your email for updates.`);
+      } else {
+        setError(result.error || 'Failed to submit job');
+      }
     } catch (error) {
       console.error('Submission error:', error);
-    } finally {
-      setLoadingSubmit(false);
+      setError(error.data?.error || error.message || 'An error occurred while submitting the job');
     }
   };
 
   const handleReset = () => {
     resetForm(defaultValues);
     setSubmitted(false);
+    setJobId(null);
+    setError(null);
+    setSuccess(null);
   };
 
   return (
     <div className="p-3 bg-white border rounded">
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <LoadingOverlay active={loadingUpload || loadingSubmit} />
+        <LoadingOverlay active={loadingSubmit} />
+        
+        {/* Status Messages */}
+        {error && (
+          <Alert variant="danger" dismissible onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+        
+        {success && (
+          <Alert variant="success" dismissible onClose={() => setSuccess(null)}>
+            {success}
+          </Alert>
+        )}
+
+        {/* Job Status Display */}
+        {jobId && statusData && (
+          <Alert variant={statusData.status === 'completed' ? 'success' : statusData.status === 'failed' ? 'danger' : 'info'}>
+            <Alert.Heading>Job Status: {statusData.status.toUpperCase()}</Alert.Heading>
+            <p>Job ID: {jobId}</p>
+            {statusData.startTime && <p>Started: {new Date(statusData.startTime).toLocaleString()}</p>}
+            {statusData.endTime && <p>Completed: {new Date(statusData.endTime).toLocaleString()}</p>}
+            {statusData.status === 'completed' && statusData.downloadUrl && (
+              <Button variant="primary" onClick={downloadResults}>
+                Download Results
+              </Button>
+            )}
+          </Alert>
+        )}
         
         <div style={{ maxHeight: '900px', overflow: 'hidden auto' }}>
           <div className="border rounded p-2 mb-3">

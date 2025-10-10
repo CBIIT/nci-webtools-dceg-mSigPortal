@@ -3,6 +3,7 @@ import { reducer as visualizationReducer } from './visualization';
 import { reducer as explorationReducer } from './exploration';
 import { reducer as associationReducer } from './association';
 import { reducer as extractionReducer } from './extraction';
+import { reducer as refittingReducer } from './refitting';
 import { reducer as modalReducer } from './modal';
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -14,6 +15,7 @@ import {
   catalogApiSlice,
   associationApiSlice,
   extractionApiSlice,
+  refittingApiSlice,
 } from './rootApi';
 
 // provide rootReducer as an object of slice reducers
@@ -24,6 +26,7 @@ export const store = configureStore({
     exploration: explorationReducer,
     association: associationReducer,
     extraction: extractionReducer,
+    refitting: refittingReducer,
     modal: modalReducer,
 
     [optionsApiSlice.reducerPath]: optionsApiSlice.reducer,
@@ -32,6 +35,7 @@ export const store = configureStore({
     [catalogApiSlice.reducerPath]: catalogApiSlice.reducer,
     [associationApiSlice.reducerPath]: associationApiSlice.reducer,
     [extractionApiSlice.reducerPath]: extractionApiSlice.reducer,
+    [refittingApiSlice.reducerPath]: refittingApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
@@ -40,7 +44,8 @@ export const store = configureStore({
       explorationApiSlice.middleware,
       catalogApiSlice.middleware,
       associationApiSlice.middleware,
-      extractionApiSlice.middleware
+      extractionApiSlice.middleware,
+      refittingApiSlice.middleware
     ),
 });
 

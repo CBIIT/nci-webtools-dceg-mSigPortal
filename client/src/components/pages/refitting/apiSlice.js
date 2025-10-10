@@ -2,6 +2,30 @@ import { refittingApiSlice } from '../../../services/store/rootApi';
 
 export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // New SBS refitting endpoint
+    submitRefitting: builder.mutation({
+      query: (formData) => ({
+        url: `refitting/sbs`,
+        method: 'POST',
+        body: formData,
+      }),
+    }),
+
+    // Check job status
+    refittingStatus: builder.query({
+      query: (jobId) => ({
+        url: `refitting/status/${jobId}`,
+      }),
+    }),
+
+    // Download results
+    downloadResults: builder.query({
+      query: ({ jobId, filename }) => ({
+        url: `refitting/download/${jobId}/${filename}`,
+      }),
+    }),
+
+    // Legacy endpoints (keeping for backward compatibility)
     upload: builder.mutation({
       query: (body) => ({
         url: `uploadRefitting/${crypto.randomUUID()}`,
@@ -76,6 +100,9 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
 });
 
 export const {
+  useSubmitRefittingMutation,
+  useRefittingStatusQuery,
+  useDownloadResultsQuery,
   useUploadMutation,
   useSubmitMutation,
   useRefreshQuery,
