@@ -98,9 +98,22 @@ router.post('/refitting/sbs',
       };
 
       logger.info(`Starting refitting job ${jobId} with files:`, {
-        mafFile: files.mafFile[0].originalname,
-        genomicFile: files.genomicFile[0].originalname,
-        clinicalFile: files.clinicalFile[0].originalname,
+        mafFile: {
+          originalname: files.mafFile[0].originalname,
+          path: files.mafFile[0].path,
+          size: files.mafFile[0].size
+        },
+        genomicFile: {
+          originalname: files.genomicFile[0].originalname,
+          path: files.genomicFile[0].path,
+          size: files.genomicFile[0].size
+        },
+        clinicalFile: {
+          originalname: files.clinicalFile[0].originalname,
+          path: files.clinicalFile[0].path,
+          size: files.clinicalFile[0].size
+        },
+        uploadPath,
         params
       });
 
