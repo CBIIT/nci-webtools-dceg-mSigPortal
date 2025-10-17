@@ -176,6 +176,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
                 Load Example MAF File
               </Button>
@@ -190,6 +191,7 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
                 Download Example MAF File
               </Button>
@@ -233,6 +235,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
                 Load Example Genomic File
               </Button>
@@ -247,6 +250,7 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
                 Download Example Genomic File
               </Button>
@@ -290,6 +294,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
                 Load Example Clinical File
               </Button>
@@ -304,6 +309,7 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
                 Download Example Clinical File
               </Button>
