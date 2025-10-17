@@ -5,11 +5,16 @@ import { useHistory, useParams } from 'react-router-dom';
 import SelectForm from '../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
+import { actions as modalActions } from '../../../services/store/modal';
 
 export default function RefittingForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const dispatch = useDispatch();
+  const mergeSuccess = (msg) =>
+    dispatch(modalActions.mergeModal({ success: { visible: true, message: msg } }));
 
   const defaultValues = {
     signatureType: 'SBS',
@@ -58,6 +63,9 @@ export default function RefittingForm() {
       // Here you would implement the actual submission logic
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
       setSubmitted(true);
+      mergeSuccess(
+        'Your refitting job has been successfully submitted. You will receive an email when the job is complete. It is safe to close the window now.'
+      );
     } catch (error) {
       console.error('Submission error:', error);
     } finally {
