@@ -178,7 +178,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Load Example MAF File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -193,7 +193,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Download Example MAF File
+                Download MAF Example
               </Button>
              
             </Form.Group>
@@ -237,7 +237,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Load Example Genomic File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -252,7 +252,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Download Example Genomic File
+                Download Genomic Example
               </Button>
               
             </Form.Group>
@@ -296,7 +296,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Load Example Clinical File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -311,7 +311,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Download Example Clinical File
+                Download Clinical Example
               </Button>
               
             </Form.Group>
