@@ -88,6 +88,7 @@ export default function RefittingForm() {
       formData.append('genomicFile', data.genomicFile);
       formData.append('clinicalFile', data.clinicalFile);
       formData.append('genome', data.referenceGenome);
+      console.log("formData === ", formData);
 
       // Submit the refitting job
       const result = await submitRefitting(formData).unwrap();

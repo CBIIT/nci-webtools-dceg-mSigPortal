@@ -50,19 +50,19 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
 
     status: builder.query({
       query: (id) => ({
-        url: `data/refitting/${id}/status.json`,
+        url: `data/output/${id}/status.json`,
       }),
     }),
 
     params: builder.query({
       query: (id) => ({
-        url: `data/refitting/${id}/params.json`,
+        url: `data/input/${id}/params.json`,
       }),
     }),
 
     manifest: builder.query({
       query: (id) => ({
-        url: `data/refitting/${id}/manifest.json`,
+        url: `data/output/${id}/manifest.json`,
       }),
     }),
 
@@ -87,7 +87,7 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
 
     results: builder.query({
       query: (id) => ({
-        url: `data/refitting/${id}/results.json`,
+        url: `data/output/${id}/results.json`,
       }),
     }),
 
