@@ -20,6 +20,10 @@ export default function RefittingForm() {
     pollingInterval: jobId ? 5000 : 0, // Poll every 5 seconds when we have a jobId
   });
 
+  const dispatch = useDispatch();
+  const mergeSuccess = (msg) =>
+    dispatch(modalActions.mergeModal({ success: { visible: true, message: msg } }));
+
   const defaultValues = {
     signatureType: 'SBS',
     referenceGenome: 'hg19',
@@ -248,8 +252,9 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
-                Load Example MAF File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -262,8 +267,9 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
-                Download Example MAF File
+                Download MAF Example
               </Button>
              
             </Form.Group>
@@ -305,8 +311,9 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
-                Load Example Genomic File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -319,8 +326,9 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
-                Download Example Genomic File
+                Download Genomic Example
               </Button>
               
             </Form.Group>
@@ -362,8 +370,9 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
+                className='p-0'
               >
-                Load Example Clinical File
+                Load Example
               </Button>
               <Button
                 variant="link"
@@ -376,8 +385,9 @@ export default function RefittingForm() {
                   link.download = file;
                   link.click();
                 }}
+                className='p-0'
               >
-                Download Example Clinical File
+                Download Clinical Example
               </Button>
               
             </Form.Group>
