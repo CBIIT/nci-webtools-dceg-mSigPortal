@@ -11,12 +11,12 @@ export const router = Router();
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Create temp directory for this job
+    // Create input directory for this job using the same structure as extraction
     const jobId = req.jobId || uuid();
     req.jobId = jobId;
-    const uploadPath = path.join(process.env.UPLOAD_FOLDER || './uploads', jobId);
-    fs.ensureDirSync(uploadPath);
-    cb(null, uploadPath);
+    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
+    fs.ensureDirSync(inputPath);
+    cb(null, inputPath);
   },
   filename: function (req, file, cb) {
     // Use original filename with field name prefix for identification
@@ -83,7 +83,12 @@ router.post('/refitting/sbs',
       }
 
       const jobId = req.jobId || uuid();
-      const uploadPath = path.join(process.env.UPLOAD_FOLDER || './uploads', jobId);
+      const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
+      const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+      
+      // Ensure both input and output directories exist
+      fs.ensureDirSync(inputPath);
+      fs.ensureDirSync(outputPath);
       
       // Extract file paths
       const mafFilePath = files.mafFile[0].path;
@@ -92,10 +97,24 @@ router.post('/refitting/sbs',
 
       // Extract parameters with defaults
       const params = {
+        jobId,
         genome: req.body.genome || 'hg19',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
       };
+
+      // Write params.json to input folder (similar to extraction service)
+      const paramsFilePath = path.join(inputPath, 'params.json');
+      await fs.writeJson(paramsFilePath, params);
+
+      // Write initial status.json to output folder
+      const statusFilePath = path.join(outputPath, 'status.json');
+      const initialStatus = {
+        id: jobId,
+        status: 'SUBMITTED',
+        startTime: new Date().toISOString()
+      };
+      await fs.writeJson(statusFilePath, initialStatus);
 
       logger.info(`Starting refitting job ${jobId} with files:`, {
         mafFile: {
@@ -113,13 +132,10 @@ router.post('/refitting/sbs',
           path: files.clinicalFile[0].path,
           size: files.clinicalFile[0].size
         },
-        uploadPath,
+        inputPath,
+        outputPath,
         params
       });
-
-      // Create output directory
-      const outputPath = path.join(uploadPath, 'output');
-      fs.ensureDirSync(outputPath);
 
       // Start the refitting process asynchronously
       startRefittingJob({
@@ -127,6 +143,7 @@ router.post('/refitting/sbs',
         mafFilePath,
         genomicFilePath,
         clinicalFilePath,
+        inputPath,
         outputPath,
         params,
         logger
@@ -160,9 +177,8 @@ router.get('/refitting/status/:jobId', async (req, res) => {
   const { jobId } = req.params;
 
   try {
-    const uploadPath = path.join(process.env.UPLOAD_FOLDER || './uploads', jobId);
-    const outputPath = path.join(uploadPath, 'output');
-    const statusFile = path.join(uploadPath, 'status.json');
+    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+    const statusFile = path.join(outputPath, 'status.json');
     
     // Check if status file exists
     if (!fs.existsSync(statusFile)) {
@@ -206,8 +222,7 @@ router.get('/refitting/download/:jobId/:filename', async (req, res) => {
   const { jobId, filename } = req.params;
 
   try {
-    const uploadPath = path.join(process.env.UPLOAD_FOLDER || './uploads', jobId);
-    const outputPath = path.join(uploadPath, 'output');
+    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
     const filePath = path.join(outputPath, filename);
 
     // Security check: ensure the file is within the job's output directory
@@ -242,15 +257,14 @@ router.get('/refitting/download/:jobId/:filename', async (req, res) => {
 /**
  * Start a refitting job asynchronously
  */
-async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinicalFilePath, outputPath, params, logger }) {
-  const uploadPath = path.dirname(mafFilePath);
-  const statusFile = path.join(uploadPath, 'status.json');
+async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinicalFilePath, inputPath, outputPath, params, logger }) {
+  const statusFile = path.join(outputPath, 'status.json');
   
   try {
     // Update status to processing
     await fs.writeJson(statusFile, {
-      jobId,
-      status: 'processing',
+      id: jobId,
+      status: 'PROCESSING',
       startTime: new Date().toISOString(),
       params
     });
@@ -279,10 +293,19 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
 
     logger.info(`Refitting job ${jobId} completed successfully`);
 
+    // Create manifest.json similar to extraction service
+    const manifestData = {
+      jobId,
+      completedAt: new Date().toISOString(),
+      files: [params.outputFilename]
+    };
+    const manifestFile = path.join(outputPath, 'manifest.json');
+    await fs.writeJson(manifestFile, manifestData);
+
     // Update status to completed
     await fs.writeJson(statusFile, {
-      jobId,
-      status: 'completed',
+      id: jobId,
+      status: 'COMPLETED',
       startTime: (await fs.readJson(statusFile)).startTime,
       endTime: new Date().toISOString(),
       params,
@@ -295,10 +318,11 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     logger.error(`Refitting job ${jobId} failed:`, error);
 
     // Update status to failed
+    const currentStatus = await fs.readJson(statusFile).catch(() => ({}));
     await fs.writeJson(statusFile, {
-      jobId,
-      status: 'failed',
-      startTime: (await fs.readJson(statusFile)).startTime,
+      id: jobId,
+      status: 'FAILED',
+      startTime: currentStatus.startTime || new Date().toISOString(),
       endTime: new Date().toISOString(),
       params,
       error: error.message,

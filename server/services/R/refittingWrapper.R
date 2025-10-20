@@ -83,6 +83,24 @@ msigportal.refitSBS <- function(args, config = list()) {
       match_on_oncotree = FALSE
     )
     
+    # Ensure the output CSV file is in the correct output directory
+    output_csv_path <- file.path(output_dir, out_file)
+    if (!file.exists(output_csv_path)) {
+      # If the file was created elsewhere, try to find and copy it
+      possible_paths <- c(
+        file.path(getwd(), out_file),
+        file.path("/tmp", out_file),
+        out_file
+      )
+      
+      for (path in possible_paths) {
+        if (file.exists(path)) {
+          file.copy(path, output_csv_path, overwrite = TRUE)
+          break
+        }
+      }
+    }
+    
     # Format output for the targeted sequencing table
     formatted_output <- list(
       success = TRUE,
@@ -90,7 +108,7 @@ msigportal.refitSBS <- function(args, config = list()) {
       email = email,
       signatureType = signature_type,
       referenceGenome = reference_genome,
-      outputFile = file.path(output_dir, out_file),
+      outputFile = output_csv_path,
       
       # Results for targeted sequencing table
       h_burden_results = list(
@@ -113,7 +131,7 @@ msigportal.refitSBS <- function(args, config = list()) {
         unique_signatures = length(unique(results$H_Burden$Signature)),
         total_signature_activities = nrow(results$H_Burden),
         timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
-        output_csv_path = file.path(output_dir, out_file)
+        output_csv_path = output_csv_path
       ),
       
       # Metadata for the frontend
