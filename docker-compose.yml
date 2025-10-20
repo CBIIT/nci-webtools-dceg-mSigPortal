@@ -14,19 +14,20 @@ services:
   #   ports:
   #     - "8330:8330"
 
-  # extraction:
-  #   build:
-  #     context: "."
-  #     dockerfile: "./docker/extraction.dockerfile"
-  #   env_file: "./extraction-service/.env"
-  #   volumes:
-  #     - "./data:/data"
-  #   environment:
-  #     DATA_FOLDER: /data
-  #     INPUT_FOLDER: /data/input
-  #     OUTPUT_FOLDER: /data/output
-  #   ports:
-  #     - "8332:8332"
+
+  extraction:
+    build:
+      context: "."
+      dockerfile: "./docker/extraction.dockerfile"
+    env_file: "./extraction-service/.env"
+    volumes:
+      - "./data:/data"
+    environment:
+      DATA_FOLDER: /data
+      INPUT_FOLDER: /data/input
+      OUTPUT_FOLDER: /data/output
+    ports:
+      - "8332:8332"
 
   refitting:
     build:
@@ -55,14 +56,15 @@ services:
   #     APP_PATH: /mutational-signatures
   #   ports:
   #     - "3000:80"
+  
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: msigportal
+      POSTGRES_PASSWORD: msigportal
+      POSTGRES_DB: msigportal
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
 
-  # database:
-  #   image: postgres
-  #   environment:
-  #     POSTGRES_USER: msigportal
-  #     POSTGRES_PASSWORD: msigportal
-  #     POSTGRES_DB: msigportal
-  #   volumes:
-  #     - "./data:/var/lib/postgresql/data"
-  #   ports:
-  #     - "5432:5432"
