@@ -241,7 +241,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={async () => {
                   const file = 'SBS_MAF_two_samples.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   setValue(
                     'mafFile',
                     new File([await (await fetch(path)).blob()], file)
@@ -255,7 +255,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={() => {
                   const file = 'SBS_MAF_two_samples.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   const link = document.createElement('a');
                   link.href = path;
                   link.download = file;
@@ -298,7 +298,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={async () => {
                   const file = 'Genomic_information_sample.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   setValue(
                     'genomicFile',
                     new File([await (await fetch(path)).blob()], file)
@@ -312,7 +312,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={() => {
                   const file = 'Genomic_information_sample.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   const link = document.createElement('a');
                   link.href = path;
                   link.download = file;
@@ -355,7 +355,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={async () => {
                   const file = 'Clinical_sample.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   setValue(
                     'clinicalFile',
                     new File([await (await fetch(path)).blob()], file)
@@ -369,7 +369,7 @@ export default function RefittingForm() {
                 disabled={submitted}
                 onClick={() => {
                   const file = 'Clinical_sample.txt';
-                  const path = 'assets/examples/refitting/' + file;
+                  const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   const link = document.createElement('a');
                   link.href = path;
                   link.download = file;

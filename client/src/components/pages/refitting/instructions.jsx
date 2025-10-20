@@ -63,7 +63,7 @@ export default function Instructions() {
             <strong>MAF file:</strong> Contains SBS or DBS information for samples. <em>(Example provided)</em>
             <div>
             <a
-              href="/assets/examples/refitting/SBS_MAF_two_samples.txt"
+              href={import.meta.env.BASE_URL + "/assets/examples/refitting/SBS_MAF_two_samples.txt"}
               download
               className="link-primary-underline"
             >
@@ -75,7 +75,7 @@ export default function Instructions() {
             <strong>Genomic file:</strong> Defines the genomic regions targeted by sequencing panels. <em>(Example provided)</em>
           <div>
             <a
-              href="/assets/examples/refitting/Genomic_information_sample.txt"
+              href={import.meta.env.BASE_URL + "/assets/examples/refitting/Genomic_information_sample.txt"}
               download
               className="link-primary-underline"
             >
@@ -90,7 +90,7 @@ export default function Instructions() {
             </ul>
             <div>
             <a
-              href="/assets/examples/refitting/Clinical_sample.txt"
+              href={import.meta.env.BASE_URL + "/assets/examples/refitting/Clinical_sample.txt"}
               download
               className="link-primary-underline"
             >
