@@ -3,26 +3,30 @@ import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import SelectForm from '../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { useSubmitRefittingMutation, useRefittingStatusQuery } from './apiSlice';
+import { useSubmitRefittingMutation } from './apiSlice';
+import { actions as modalActions } from '../../../services/store/modal';
+import { actions as refittingActions } from '../../../services/store/refitting';
 
 export default function RefittingForm() {
-  const [submitted, setSubmitted] = useState(false);
-  const [jobId, setJobId] = useState(null);
+  const { submitted, ...state } = useSelector((state) => state.refitting.main);
+  const id = state.id || false;
+  
+  const [localSubmitted, setLocalSubmitted] = useState(false);
+  const [jobId, setJobId] = useState(id);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
   // API hooks
-  const [submitRefitting, { isLoading: loadingSubmit }] = useSubmitRefittingMutation();
-  const { data: statusData, refetch: refetchStatus } = useRefittingStatusQuery(jobId, {
-    skip: !jobId,
-    pollingInterval: jobId ? 5000 : 0, // Poll every 5 seconds when we have a jobId
-  });
+  const [submitRefitting] = useSubmitRefittingMutation();
 
   const dispatch = useDispatch();
+  const mergeState = (state) => dispatch(refittingActions.mergeRefitting({ main: state }));
   const mergeSuccess = (msg) =>
     dispatch(modalActions.mergeModal({ success: { visible: true, message: msg } }));
+
+  // Computed state for form disabled status
+  const isFormDisabled = submitted || localSubmitted;
 
   const defaultValues = {
     signatureType: 'SBS',
@@ -54,17 +58,6 @@ export default function RefittingForm() {
     jobName,
   } = watch();
 
-  // Handle status updates
-  useEffect(() => {
-    if (statusData) {
-      if (statusData.status === 'completed') {
-        setSuccess(`Analysis completed successfully! ${statusData.downloadUrl ? 'Download link available.' : ''}`);
-      } else if (statusData.status === 'failed') {
-        setError(`Analysis failed: ${statusData.error || 'Unknown error'}`);
-      }
-    }
-  }, [statusData]);
-
   const signatureTypeOptions = [
     { label: 'SBS', value: 'SBS' },
     { label: 'DBS', value: 'DBS' },
@@ -76,81 +69,73 @@ export default function RefittingForm() {
   ];
 
   const onSubmit = async (data) => {
+    // Validate required files and fields
+    if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
+      setError('Please upload all required files (MAF, Genomic, and Clinical files)');
+      return;
+    }
+    
+    if (!data.jobName || data.jobName.trim() === '') {
+      setError('Job name is required');
+      return;
+    }
+
+    // Clear any existing errors
+    setError(null);
+    setSuccess(null);
+
+    // Generate a job ID for tracking (similar to extraction)
+    const jobId = Date.now().toString();
+    
+    // Update state and navigate to status tab immediately (like extraction)
+    setJobId(jobId);
+    setLocalSubmitted(true);
+    mergeState({ id: jobId, displayTab: 'status' });
+    
+    // Show success modal immediately (like extraction)
+    mergeSuccess(
+      'Most Jobs take a long time, you will receive an email when the refitting job is complete. It is safe to close the window now'
+    );
+
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('mafFile', data.mafFile);
+    formData.append('genomicFile', data.genomicFile);
+    formData.append('clinicalFile', data.clinicalFile);
+    formData.append('genome', data.referenceGenome);
+    formData.append('email', data.email);
+    formData.append('jobName', data.jobName);
+
+    // Submit in background - errors will be handled by status component
     try {
-      setError(null);
-      setSuccess(null);
-      
-      // Validate required files
-      if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
-        setError('Please upload all required files (MAF, Genomic, and Clinical files)');
-        return;
-      }
-
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('mafFile', data.mafFile);
-      formData.append('genomicFile', data.genomicFile);
-      formData.append('clinicalFile', data.clinicalFile);
-      formData.append('genome', data.referenceGenome);
-      console.log("formData === ", formData);
-
-      // Submit the refitting job
-      const result = await submitRefitting(formData).unwrap();
-      
-      if (result.success) {
-        setJobId(result.jobId);
-        setSubmitted(true);
-        setSuccess(`Job submitted successfully! Job ID: ${result.jobId}. Please check your email for updates.`);
-      } else {
-        setError(result.error || 'Failed to submit job');
-      }
+      await submitRefitting(formData).unwrap();
+      console.log('Refitting job submitted successfully');
     } catch (error) {
       console.error('Submission error:', error);
-      setError(error.data?.error || error.message || 'An error occurred while submitting the job');
+      // Don't show errors here - let status component handle them
     }
   };
 
   const handleReset = () => {
     resetForm(defaultValues);
-    setSubmitted(false);
+    setLocalSubmitted(false);
     setJobId(null);
     setError(null);
     setSuccess(null);
+    mergeState({ id: null, displayTab: 'instructions', submitted: false });
   };
 
   return (
     <div className="p-3 bg-white border rounded">
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <LoadingOverlay active={loadingSubmit} />
         
-        {/* Status Messages */}
-        {error && (
+        {/* Show validation errors only, not submission errors */}
+        {error && !localSubmitted && (
           <Alert variant="danger" dismissible onClose={() => setError(null)}>
             {error}
           </Alert>
         )}
-        
-        {success && (
-          <Alert variant="success" dismissible onClose={() => setSuccess(null)}>
-            {success}
-          </Alert>
-        )}
 
-        {/* Job Status Display */}
-        {jobId && statusData && (
-          <Alert variant={statusData.status === 'completed' ? 'success' : statusData.status === 'failed' ? 'danger' : 'info'}>
-            <Alert.Heading>Job Status: {statusData.status.toUpperCase()}</Alert.Heading>
-            <p>Job ID: {jobId}</p>
-            {statusData.startTime && <p>Started: {new Date(statusData.startTime).toLocaleString()}</p>}
-            {statusData.endTime && <p>Completed: {new Date(statusData.endTime).toLocaleString()}</p>}
-            {statusData.status === 'completed' && statusData.downloadUrl && (
-              <Button variant="primary" onClick={downloadResults}>
-                Download Results
-              </Button>
-            )}
-          </Alert>
-        )}
-        
         <div style={{ maxHeight: '900px', overflow: 'hidden auto' }}>
           <div className="border rounded p-2 mb-3">
             <Form.Group className="mb-3">
@@ -170,7 +155,7 @@ export default function RefittingForm() {
                         value={option.value}
                         checked={field.value === option.value}
                         onChange={(e) => field.onChange(e.target.value)}
-                        disabled={submitted}
+                        disabled={isFormDisabled}
                         inline
                       />
                     ))}
@@ -201,7 +186,7 @@ export default function RefittingForm() {
                         value={option.value}
                         checked={field.value === option.value}
                         onChange={(e) => field.onChange(e.target.value)}
-                        disabled={submitted}
+                        disabled={isFormDisabled}
                         inline
                       />
                     ))}
@@ -225,7 +210,7 @@ export default function RefittingForm() {
                   <Form.File
                     {...field}
                     value={''} // set dummy value for file input
-                    disabled={submitted}
+                    disabled={isFormDisabled}
                     id="mafFile"
                     label={
                       mafFile?.name || 'Upload MAF File...'
@@ -243,7 +228,7 @@ export default function RefittingForm() {
               />
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={async () => {
                   const file = 'SBS_MAF_two_samples.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -258,7 +243,7 @@ export default function RefittingForm() {
               </Button>
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={() => {
                   const file = 'SBS_MAF_two_samples.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -284,7 +269,7 @@ export default function RefittingForm() {
                   <Form.File
                     {...field}
                     value={''} // set dummy value for file input
-                    disabled={submitted}
+                    disabled={isFormDisabled}
                     id="genomicFile"
                     label={
                       genomicFile?.name || 'Upload Genomic File...'
@@ -302,7 +287,7 @@ export default function RefittingForm() {
               />
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={async () => {
                   const file = 'Genomic_information_sample.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -317,7 +302,7 @@ export default function RefittingForm() {
               </Button>
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={() => {
                   const file = 'Genomic_information_sample.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -343,7 +328,7 @@ export default function RefittingForm() {
                   <Form.File
                     {...field}
                     value={''} // set dummy value for file input
-                    disabled={submitted}
+                    disabled={isFormDisabled}
                     id="clinicalFile"
                     label={
                       clinicalFile?.name || 'Upload Clinical File...'
@@ -361,7 +346,7 @@ export default function RefittingForm() {
               />
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={async () => {
                   const file = 'Clinical_sample.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -376,7 +361,7 @@ export default function RefittingForm() {
               </Button>
               <Button
                 variant="link"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 onClick={() => {
                   const file = 'Clinical_sample.txt';
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
@@ -408,7 +393,7 @@ export default function RefittingForm() {
                 })}
                 type="email"
                 placeholder="Enter your email address"
-                disabled={submitted}
+                disabled={isFormDisabled}
                 isInvalid={!!errors.email}
               />
               <Form.Control.Feedback type="invalid">
@@ -420,13 +405,19 @@ export default function RefittingForm() {
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label>Job Name</Form.Label>
+              <Form.Label className="required">Job Name</Form.Label>
               <Form.Control
-                {...register('jobName')}
+                {...register('jobName', { 
+                  required: 'Job name is required' 
+                })}
                 type="text"
                 placeholder="Enter a descriptive name for your analysis"
-                disabled={submitted}
+                disabled={isFormDisabled}
+                isInvalid={!!errors.jobName}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.jobName?.message}
+              </Form.Control.Feedback>
             </Form.Group>
           </div>
 
@@ -435,7 +426,6 @@ export default function RefittingForm() {
               <Button
                 variant="secondary"
                 onClick={handleReset}
-                disabled={loadingSubmit}
                 className="w-100"
               >
                 Reset
@@ -445,10 +435,10 @@ export default function RefittingForm() {
               <Button
                 variant="primary"
                 type="submit"
-                disabled={submitted || loadingSubmit}
+                disabled={isFormDisabled}
                 className="w-100"
               >
-                {loadingSubmit ? 'Submitting...' : 'Submit'}
+                Submit
               </Button>
             </Col>
           </Row>

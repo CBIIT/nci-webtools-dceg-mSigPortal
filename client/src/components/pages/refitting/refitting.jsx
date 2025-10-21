@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Nav } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions as refittingActions } from '../../../services/store/refitting';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -11,8 +13,16 @@ import TargetedSequencing from './targetedSequencing';
 import RefittingForm from './refitting-form';
 
 export default function Refitting() {
-  const [displayTab, setDisplayTab] = useState('instructions');
-  const [openSidebar, setOpenSidebar] = useState(true);
+  const { displayTab, openSidebar } = useSelector((state) => state.refitting.main);
+  const dispatch = useDispatch();
+  
+  const setDisplayTab = (tab) => dispatch(refittingActions.mergeRefitting({ 
+    main: { displayTab: tab } 
+  }));
+  
+  const setOpenSidebar = (open) => dispatch(refittingActions.mergeRefitting({ 
+    main: { openSidebar: open } 
+  }));
 
   const tabs = [
     {
