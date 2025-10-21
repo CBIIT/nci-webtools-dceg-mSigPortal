@@ -97,6 +97,20 @@ export default function RefittingForm() {
       'Most Jobs take a long time, you will receive an email when the refitting job is complete. It is safe to close the window now'
     );
 
+    // Store job in localStorage (like extraction)
+    const jobs = JSON.parse(localStorage.getItem('refitting-jobs') || '[]');
+    const newJob = {
+      id: jobId,
+      jobName: data.jobName,
+      status: 'SUBMITTED',
+      submittedAt: new Date().toISOString(),
+      email: data.email
+    };
+    const updatedJobs = [...jobs, newJob];
+    localStorage.setItem('refitting-jobs', JSON.stringify(updatedJobs));
+    console.log('Stored refitting job:', newJob);
+    console.log('All refitting jobs:', updatedJobs);
+
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('mafFile', data.mafFile);
