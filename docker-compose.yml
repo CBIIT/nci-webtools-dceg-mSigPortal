@@ -1,18 +1,18 @@
 version: "3"
 services:
-  backend:
-    build:
-      context: "."
-      dockerfile: "./docker/backend.dockerfile"
-    env_file: "./server/.env"
-    volumes:
-      - "./data:/data"
-    environment:
-      DATA_FOLDER: /data
-      INPUT_FOLDER: /data/input
-      OUTPUT_FOLDER: /data/output
-    ports:
-      - "8330:8330"
+  # backend:
+  #   build:
+  #     context: "."
+  #     dockerfile: "./docker/backend.dockerfile"
+  #   env_file: "./server/.env"
+  #   volumes:
+  #     - "./data:/data"
+  #   environment:
+  #     DATA_FOLDER: /data
+  #     INPUT_FOLDER: /data/input
+  #     OUTPUT_FOLDER: /data/output
+  #   ports:
+  #     - "8330:8330"
 
 
   extraction:
@@ -43,20 +43,19 @@ services:
     ports:
       - "8334:8334"
 
-  frontend:
-    build:
-      context: "."
-      dockerfile: "./docker/frontend.dockerfile"
-      args:
-        APP_PATH: /mutational-signatures
-    env_file: "./server/.env"
-    environment:
-      API_BASE_URL: http://backend:8330
-      API_EXTRACTION_URL: http://extraction:8332
-      APP_PATH: /mutational-signatures
-    ports:
-      - "3000:80"
-
+  # frontend:
+  #   build:
+  #     context: "."
+  #     dockerfile: "./docker/frontend.dockerfile"
+  #     args:
+  #       APP_PATH: /mutational-signatures
+  #   env_file: "./server/.env"
+  #   environment:
+  #     API_BASE_URL: http://backend:8330
+  #     API_EXTRACTION_URL: http://extraction:8332
+  #     APP_PATH: /mutational-signatures
+  #   ports:
+  #     - "3000:80"
   
   database:
     image: postgres
@@ -68,3 +67,4 @@ services:
       - "./data:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
+

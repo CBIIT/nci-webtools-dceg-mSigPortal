@@ -1,0 +1,116 @@
+import React, { useEffect, useState } from 'react';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { Container } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
+
+export default function Instructions() {
+  const examples = [
+    {
+      label: 'Example results based on SBS96 targeted sequencing',
+      path: 'Example_SBS96_Refitting',
+    },
+    {
+      label: 'Example results based on DBS78 targeted sequencing',
+      path: 'Example_DBS78_Refitting',
+    },
+  ];
+  const history = useHistory();
+  const [id, setId] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const handleExampleClick = (exampleFolder) => {
+    setIsFetching(true);
+    setId(exampleFolder);
+    // Simulate loading for example data
+    setTimeout(() => {
+      setIsFetching(false);
+      // Navigate to refitting with example data loaded
+    }, 1000);
+  };
+
+  return (
+    <Container fluid className="bg-white border rounded p-3">
+      <LoadingOverlay active={isFetching} />
+      <h4>How to Submit a Query</h4>
+      <p>
+        Use the panel on the left to configure the required options.
+      </p>
+
+      <hr />
+      
+      <hr />
+      <div className="mt-2">
+        <h4>Signature Type</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>SBS:</strong> Single Base Substitutions</li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>DBS:</strong> Double Base Substitutions</li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Reference Genome</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg19 (GRCh37):</strong> Genome Reference Consortium Human Build 37</li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg38 (GRCh38):</strong> Genome Reference Consortium Human Build 38</li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Input Files</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>MAF file:</strong> Contains SBS or DBS information for samples. <em>(Example provided)</em>
+            <div>
+            <a
+              href="/assets/examples/refitting/SBS_MAF_two_samples.txt"
+              download
+              className="link-primary-underline"
+            >
+              Example of a MAF file
+            </a>
+          </div>
+          </li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Genomic file:</strong> Defines the genomic regions targeted by sequencing panels. <em>(Example provided)</em>
+          <div>
+            <a
+              href="/assets/examples/refitting/Genomic_information_sample.txt"
+              download
+              className="link-primary-underline"
+            >
+              Example of a genomic file
+            </a>
+          </div>
+          </li>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Clinical file:</strong> Specifies sample ID, sequencing panel ID, and cancer type.
+            <ul style={{ padding: 0, paddingLeft: '20px', marginTop: '4px', columnCount: 'unset', columns: 'unset' }}>
+              <li style={{ display: 'list-item' }}>Cancer type must match one from the cancer type dictionary file.</li>
+            </ul>
+            <div>
+            <a
+              href="/assets/examples/refitting/Clinical_sample.txt"
+              download
+              className="link-primary-underline"
+            >
+              Clinical sample file
+            </a>
+          </div>
+          </li>
+        </ul>
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>Output File</h4>
+        <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
+          <li style={{ display: 'list-item', marginBottom: '8px' }}>
+            <strong>Signature activity and burden:</strong> Provides both the estimated activity of each signature 
+            and the estimated number of mutations caused by each signature for each subject.
+          </li>
+        </ul>
+      </div>
+      
+    </Container>
+  );
+}

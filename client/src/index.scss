@@ -346,6 +346,13 @@ a.nav-link.active {
   background-color: #07648d !important;
 }
 
+/* Override for refitting pages - use green instead of blue */
+.refitting-page a.nav-link.active,
+.refitting-page .nav-link.active {
+  background-color: #689f39 !important;
+  color: white;
+}
+
 .nav-tabs > .nav-item {
   // font-weight: 600;
   color: black;
@@ -681,6 +688,41 @@ select.form-control-sm {
   background-color: #b83d47 !important;
   color: white !important;
   border-color: #7f282f !important;
+}
+
+.bg-refitting {
+  background-color: #689f39;
+}
+
+.text-refitting {
+  color: #689f39;
+}
+
+.text-refitting:hover {
+  color: #4a7326;
+}
+
+.bg-refitting-darker {
+  background-color: #4a7326;
+}
+
+.btn-refitting {
+  background-color: #689f39;
+  color: white;
+  border-color: #4a7326;
+  border-radius: 12px;
+}
+
+.btn-refitting:hover {
+  background-color: #4a7326;
+  color: white;
+  border-color: #689f39;
+}
+
+.btn-refitting:active {
+  background-color: #689f39 !important;
+  color: white !important;
+  border-color: #4a7326 !important;
 }
 
 .bg-api {

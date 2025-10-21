@@ -60,8 +60,15 @@ export const extractionApiSlice = createApi({
   endpoints: () => ({}),
 });
 
+export const refittingApiSlice = createApi({
+  reducerPath: 'refittingApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
+  endpoints: () => ({}),
+});
+
 export const resetOptionsApi = optionsApiSlice.util.resetApiState();
 export const resetVisualizationApi = visualizationApiSlice.util.resetApiState();
 export const resetExplorationApi = explorationApiSlice.util.resetApiState();
 export const resetAssociationApi = associationApiSlice.util.resetApiState();
 export const resetExtractionApi = extractionApiSlice.util.resetApiState();
+export const resetRefittingApi = refittingApiSlice.util.resetApiState();
