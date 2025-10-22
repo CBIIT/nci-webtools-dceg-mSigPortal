@@ -84,8 +84,8 @@ export default function RefittingForm() {
     setError(null);
     setSuccess(null);
 
-    // Generate a job ID for tracking (similar to extraction)
-    const jobId = Date.now().toString();
+    // Generate a UUID for tracking (matching extraction format)
+    const jobId = crypto.randomUUID();
     
     // Update state and navigate to status tab immediately (like extraction)
     setJobId(jobId);
@@ -122,7 +122,7 @@ export default function RefittingForm() {
 
     // Submit in background - errors will be handled by status component
     try {
-      await submitRefitting(formData).unwrap();
+      await submitRefitting({ id: jobId, formData }).unwrap();
       console.log('Refitting job submitted successfully');
     } catch (error) {
       console.error('Submission error:', error);

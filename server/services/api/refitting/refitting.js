@@ -2,7 +2,7 @@ import Router from 'express-promise-router';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs-extra';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, validate as validateUUID } from 'uuid';
 import { execa } from 'execa';
 import { body, validationResult } from 'express-validator';
 
@@ -49,10 +49,10 @@ const validateRefittingInput = [
 ];
 
 /**
- * POST /refitting/sbs
+ * POST /submitRefitting/:id
  * Submit a refitting job with 3 required files
  */
-router.post('/refitting/sbs', 
+router.post('/submitRefitting/:id', 
   upload.fields([
     { name: 'mafFile', maxCount: 1 },
     { name: 'genomicFile', maxCount: 1 },
@@ -82,7 +82,16 @@ router.post('/refitting/sbs',
         });
       }
 
-      const jobId = req.jobId || uuid();
+      const jobId = req.params.id || uuid();
+      
+      // Validate that jobId is a valid UUID
+      if (!validateUUID(jobId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid job ID format. Must be a valid UUID.'
+        });
+      }
+
       const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
       const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
       
@@ -169,12 +178,20 @@ router.post('/refitting/sbs',
 );
 
 /**
- * GET /refitting/status/:jobId
+ * GET /refreshRefitting/:id
  * Check the status of a refitting job
  */
-router.get('/refitting/status/:jobId', async (req, res) => {
+router.get('/refreshRefitting/:id', async (req, res) => {
   const logger = req.app.locals.logger;
-  const { jobId } = req.params;
+  const { id: jobId } = req.params;
+
+  // Validate that jobId is a valid UUID
+  if (!validateUUID(jobId)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid job ID format. Must be a valid UUID.'
+    });
+  }
 
   try {
     const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
@@ -220,6 +237,14 @@ router.get('/refitting/status/:jobId', async (req, res) => {
 router.get('/refitting/download/:jobId/:filename', async (req, res) => {
   const logger = req.app.locals.logger;
   const { jobId, filename } = req.params;
+
+  // Validate that jobId is a valid UUID
+  if (!validateUUID(jobId)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid job ID format. Must be a valid UUID.'
+    });
+  }
 
   try {
     const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);

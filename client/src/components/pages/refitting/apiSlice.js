@@ -2,10 +2,10 @@ import { refittingApiSlice } from '../../../services/store/rootApi';
 
 export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // New SBS refitting endpoint
+    // Submit refitting job
     submitRefitting: builder.mutation({
-      query: (formData) => ({
-        url: `refitting/sbs`,
+      query: ({ id, formData }) => ({
+        url: `submitRefitting/${id}`,
         method: 'POST',
         body: formData,
       }),
@@ -14,7 +14,7 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
     // Check job status
     refittingStatus: builder.query({
       query: (jobId) => ({
-        url: `refitting/status/${jobId}`,
+        url: `refreshRefitting/${jobId}`,
       }),
     }),
 
@@ -25,75 +25,10 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
       }),
     }),
 
-    // Legacy endpoints (keeping for backward compatibility)
-    upload: builder.mutation({
-      query: (body) => ({
-        url: `uploadRefitting/${crypto.randomUUID()}`,
-        method: 'POST',
-        body,
-      }),
-    }),
-
-    submit: builder.mutation({
-      query: (body) => ({
-        url: `submitRefitting/${body.id}`,
-        method: 'POST',
-        body,
-      }),
-    }),
-
-    refresh: builder.query({
-      query: (id) => ({
-        url: `refreshRefitting/${id}`,
-      }),
-    }),
-
+    // Direct file access
     status: builder.query({
       query: (id) => ({
         url: `data/output/${id}/status.json`,
-      }),
-    }),
-
-    params: builder.query({
-      query: (id) => ({
-        url: `data/input/${id}/params.json`,
-      }),
-    }),
-
-    manifest: builder.query({
-      query: (id) => ({
-        url: `data/output/${id}/manifest.json`,
-      }),
-    }),
-
-    multiJobStatus: builder.query({
-      query: (body) => ({
-        url: `refreshRefittingMulti`,
-        method: 'POST',
-        body,
-      }),
-      transformResponse: (data, meta, args) => {
-        return data
-          .filter((e) => e.status && e.params)
-          .map((job) => {
-            const { status, params, manifest } = job;
-            return {
-              jobName: params.jobName,
-              ...status,
-            };
-          });
-      },
-    }),
-
-    results: builder.query({
-      query: (id) => ({
-        url: `data/output/${id}/results.json`,
-      }),
-    }),
-
-    downloadOutput: builder.query({
-      query: (id) => ({
-        url: `downloadRefittingOutput/${id}`,
       }),
     }),
   }),
@@ -103,13 +38,5 @@ export const {
   useSubmitRefittingMutation,
   useRefittingStatusQuery,
   useDownloadResultsQuery,
-  useUploadMutation,
-  useSubmitMutation,
-  useRefreshQuery,
   useStatusQuery,
-  useParamsQuery,
-  useManifestQuery,
-  useMultiJobStatusQuery,
-  useResultsQuery,
-  useDownloadOutputQuery,
 } = inputFormApiSlice;

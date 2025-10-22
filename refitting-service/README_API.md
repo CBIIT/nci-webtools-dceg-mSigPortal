@@ -49,7 +49,7 @@ The form provides "Load Example" buttons that populate with sample data:
 ## 🔧 API Endpoints
 
 ### 1. Submit Refitting Job
-**POST** `/refitting/sbs`
+**POST** `/submitRefitting/:id`
 
 **Request**: `multipart/form-data`
 - `mafFile` (file, required)
@@ -70,7 +70,7 @@ The form provides "Load Example" buttons that populate with sample data:
 ```
 
 ### 2. Check Job Status
-**GET** `/refitting/status/:jobId`
+**GET** `/refreshRefitting/:id`
 
 **Response**:
 ```json
