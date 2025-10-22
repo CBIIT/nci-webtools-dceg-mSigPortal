@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Table, Button, Form, Alert, Nav, Tab } from 'react-bootstrap';
+import { Card, Row, Col, Table, Button, Form, Alert } from 'react-bootstrap';
 
 export default function TargetedSequencing() {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('sigprofiler');
-  const [activeTab, setActiveTab] = useState('sbs');
 
   // Mock signature type from submitted job - this would come from props/context in real implementation
   const submittedSignatureType = 'SBS'; // This would be passed from the form submission
@@ -95,7 +94,7 @@ export default function TargetedSequencing() {
   };
 
   const getCurrentResults = () => {
-    return activeTab === 'sbs' ? sbsResults : dbsResults;
+    return submittedSignatureType.toLowerCase() === 'sbs' ? sbsResults : dbsResults;
   };
 
   const renderHEstResults = () => {
@@ -306,50 +305,10 @@ export default function TargetedSequencing() {
         Below are the comprehensive results showing the performance comparison between original and refitted signatures.
       </Alert>
 
-      {/* SBS/DBS Tabs */}
-      <Nav variant="tabs" className="mb-3">
-        <Nav.Item>
-          <Nav.Link 
-            active={activeTab === 'sbs'}
-            disabled={submittedSignatureType !== 'SBS'}
-            onClick={() => setActiveTab('sbs')}
-            style={{ 
-              cursor: submittedSignatureType !== 'SBS' ? 'not-allowed' : 'pointer',
-              opacity: submittedSignatureType !== 'SBS' ? 0.5 : 1,
-              backgroundColor: activeTab === 'sbs' ? '#689f39 !important' : '#e8f5e8',
-              color: activeTab === 'sbs' ? 'white !important' : '#689f39',
-              borderColor: '#689f39 !important',
-              fontWeight: activeTab === 'sbs' ? 'bold' : 'normal'
-            }}
-          >
-            SBS Results
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link 
-            active={activeTab === 'dbs'}
-            disabled={submittedSignatureType !== 'DBS'}
-            onClick={() => setActiveTab('dbs')}
-            style={{ 
-              cursor: submittedSignatureType !== 'DBS' ? 'not-allowed' : 'pointer',
-              opacity: submittedSignatureType !== 'DBS' ? 0.5 : 1,
-              backgroundColor: activeTab === 'dbs' ? '#689f39 !important' : '#e8f5e8',
-              color: activeTab === 'dbs' ? 'white !important' : '#689f39',
-              borderColor: '#689f39 !important',
-              fontWeight: activeTab === 'dbs' ? 'bold' : 'normal'
-            }}
-          >
-            DBS Results
-          </Nav.Link>
-        </Nav.Item>
-      </Nav>
-
-      
-
       <Card className="mb-4">
         <Card.Header>
           <h5 className="mb-0">
-            {activeTab.toUpperCase()} - {selectedMetric === 'h_est' && 'SBS Refitting Results (H_Burden_est.csv)'}
+            {submittedSignatureType} - {selectedMetric === 'h_est' && 'Refitting Results (H_Burden_est.csv)'}
             {selectedMetric === 'burden_est' && 'Burden_est Table - Mutation Burden Estimation'}
             {selectedMetric === 'cosine' && 'Cosine Similarity Analysis'}
             {selectedMetric === 'bic' && 'BIC Model Comparison'}
@@ -376,7 +335,7 @@ export default function TargetedSequencing() {
           {selectedMetric === 'cosine' && (
             <>
               <p>
-                Cosine similarity measures how well the refitted {activeTab.toUpperCase()} signatures match the original signatures. 
+                Cosine similarity measures how well the refitted {submittedSignatureType} signatures match the original signatures. 
                 Values closer to 1.0 indicate better similarity.
               </p>
               {renderCosineResults()}
@@ -386,7 +345,7 @@ export default function TargetedSequencing() {
           {selectedMetric === 'bic' && (
             <>
               <p>
-                BIC (Bayesian Information Criterion) comparison shows model performance for {activeTab.toUpperCase()} signatures. 
+                BIC (Bayesian Information Criterion) comparison shows model performance for {submittedSignatureType} signatures. 
                 Lower BIC scores and negative Δ AIC values indicate better model fit.
               </p>
               {renderBICResults()}
@@ -396,7 +355,7 @@ export default function TargetedSequencing() {
           {selectedMetric === 'l2norm' && (
             <>
               <p>
-                L2 Norm analysis shows the reconstruction error for each sample using {activeTab.toUpperCase()} signatures. 
+                L2 Norm analysis shows the reconstruction error for each sample using {submittedSignatureType} signatures. 
                 Lower values and positive improvements indicate better refitting performance.
               </p>
               {renderL2NormResults()}
