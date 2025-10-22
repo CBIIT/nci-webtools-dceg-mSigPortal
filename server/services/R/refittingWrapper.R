@@ -44,7 +44,7 @@ msigportal.refitSBS <- function(args, config = list()) {
   maf_file <- args$mafFile
   genomic_file <- args$genomicFile
   clinical_file <- args$clinicalFile
-  output_dir <- args$outputDir %||% "/tmp/refitting_output"
+  output_dir <- args$outputDir %||% file.path("./data/output", args$jobId %||% paste0("refitting_", format(Sys.time(), "%Y%m%d_%H%M%S")))
   
   # Form parameters
   signature_type <- args$signatureType %||% "SBS"
@@ -217,7 +217,7 @@ msigportal.validateRefittingInputs <- function(args, config = list()) {
 msigportal.getRefittingStatus <- function(args, config = list()) {
   
   job_id <- args$jobId
-  output_dir <- args$outputDir %||% "/tmp/refitting_output"
+  output_dir <- args$outputDir %||% file.path("./data/output", job_id)
   
   if (is.null(job_id)) {
     return(list(
