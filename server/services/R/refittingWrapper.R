@@ -40,11 +40,29 @@ wrapper <- function(fn, args, config = list()) {
 # Main refitting function that processes form inputs and calls the R function
 msigportal.refitSBS <- function(args, config = list()) {
   
+  # Add comprehensive logging
+  cat("=== MSigPortal Refitting Wrapper Started ===\n")
+  cat("Timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+  cat("Working directory:", getwd(), "\n")
+  cat("R version:", R.version.string, "\n")
+  
+  cat("Input arguments received:\n")
+  cat("  args structure:\n")
+  str(args)
+  cat("  config structure:\n") 
+  str(config)
+  
   # Extract form inputs
   maf_file <- args$mafFile
   genomic_file <- args$genomicFile
   clinical_file <- args$clinicalFile
   output_dir <- args$outputDir %||% file.path("./data/output", args$jobId %||% paste0("refitting_", format(Sys.time(), "%Y%m%d_%H%M%S")))
+  
+  cat("Extracted file paths:\n")
+  cat("  maf_file:", maf_file, "\n")
+  cat("  genomic_file:", genomic_file, "\n")
+  cat("  clinical_file:", clinical_file, "\n")
+  cat("  output_dir:", output_dir, "\n")
   
   # Form parameters
   signature_type <- args$signatureType %||% "SBS"
@@ -70,8 +88,20 @@ msigportal.refitSBS <- function(args, config = list()) {
   # Generate output filename
   out_file <- paste0(job_name, "_H_Burden_est.csv")
   
+  cat("Generated output filename:", out_file, "\n")
+  cat("About to call run_sbs_refitting function...\n")
+  
   # Call the main refitting function
   tryCatch({
+    cat("=== Calling run_sbs_refitting function ===\n")
+    cat("Function parameters:\n")
+    cat("  maf_file:", maf_file, "\n")
+    cat("  genomic_file:", genomic_file, "\n")
+    cat("  clinical_file:", clinical_file, "\n") 
+    cat("  output_dir:", output_dir, "\n")
+    cat("  genome:", reference_genome, "\n")
+    cat("  out_file:", out_file, "\n")
+    
     results <- run_sbs_refitting(
       maf_file = maf_file,
       genomic_file = genomic_file,
@@ -83,9 +113,16 @@ msigportal.refitSBS <- function(args, config = list()) {
       match_on_oncotree = FALSE
     )
     
+    cat("=== run_sbs_refitting function completed successfully ===\n")
+    cat("Results structure:\n")
+    str(results)
+    
     # Ensure the output CSV file is in the correct output directory
     output_csv_path <- file.path(output_dir, out_file)
+    cat("Checking for output file at:", output_csv_path, "\n")
+    
     if (!file.exists(output_csv_path)) {
+      cat("Output file not found at expected location, searching alternative paths...\n")
       # If the file was created elsewhere, try to find and copy it
       possible_paths <- c(
         file.path(getwd(), out_file),
@@ -94,12 +131,18 @@ msigportal.refitSBS <- function(args, config = list()) {
       )
       
       for (path in possible_paths) {
+        cat("Checking path:", path, "\n")
         if (file.exists(path)) {
+          cat("Found output file at:", path, "- copying to output directory\n")
           file.copy(path, output_csv_path, overwrite = TRUE)
           break
         }
       }
+    } else {
+      cat("Output file found at expected location\n")
     }
+    
+    cat("=== Formatting output for response ===\n")
     
     # Format output for the targeted sequencing table
     formatted_output <- list(
@@ -149,9 +192,26 @@ msigportal.refitSBS <- function(args, config = list()) {
       )
     )
     
+    cat("=== Refitting process completed successfully ===\n")
+    cat("Completion timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+    cat("Output file created:", output_csv_path, "\n")
+    cat("Final output structure:\n")
+    str(formatted_output)
+    
     return(formatted_output)
     
   }, error = function(e) {
+    # Log the error details
+    cat("=== ERROR in refitting process ===\n")
+    cat("Error timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+    cat("Error message:", e$message, "\n")
+    cat("Error call:", deparse(e$call), "\n")
+    cat("Job details:\n")
+    cat("  job_name:", job_name, "\n")
+    cat("  email:", email, "\n")
+    cat("  signature_type:", signature_type, "\n")
+    cat("  reference_genome:", reference_genome, "\n")
+    
     # Return error information
     return(list(
       success = FALSE,

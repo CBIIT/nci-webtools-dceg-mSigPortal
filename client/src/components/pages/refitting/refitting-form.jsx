@@ -122,10 +122,21 @@ export default function RefittingForm() {
 
     // Submit in background - errors will be handled by status component
     try {
-      await submitRefitting({ id: jobId, formData }).unwrap();
-      console.log('Refitting job submitted successfully');
+      console.log('About to submit refitting job...');
+      console.log('Job ID:', jobId);
+      console.log('FormData contents:');
+      for (let pair of formData.entries()) {
+        console.log(`  ${pair[0]}:`, pair[1]);
+      }
+      
+      const result = await submitRefitting({ id: jobId, formData }).unwrap();
+      console.log('Refitting job submitted successfully:', result);
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error('Submission error details:', error);
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      console.error('Error message:', error.message);
+      console.error('Full error object:', JSON.stringify(error, null, 2));
       // Don't show errors here - let status component handle them
     }
   };

@@ -31,22 +31,55 @@ run_sbs_refitting <- function(maf_file,
                               out_file = "H_Burden_est.csv",
                               match_on_oncotree = FALSE) {
 
+  # Add logging to track function execution
+  cat("=== SBS Refitting Function Started ===\n")
+  cat("Timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+  cat("Input parameters:\n")
+  cat("  maf_file:", maf_file, "\n")
+  cat("  genomic_file:", genomic_file, "\n") 
+  cat("  clinical_file:", clinical_file, "\n")
+  cat("  output_dir:", output_dir, "\n")
+  cat("  common_files_dir:", common_files_dir, "\n")
+  cat("  genome:", genome, "\n")
+  cat("  out_file:", out_file, "\n")
+  cat("  match_on_oncotree:", match_on_oncotree, "\n")
+
   genome <- match.arg(genome)
+  cat("Validated genome:", genome, "\n")
 
   # Check inputs exist
+  cat("Checking input files exist...\n")
   user_files <- c(maf_file, genomic_file, clinical_file)
   missing_user <- user_files[!file.exists(user_files)]
-  if (length(missing_user)) stop("Missing user files:\n", paste(missing_user, collapse = "\n"))
+  if (length(missing_user)) {
+    cat("ERROR: Missing user files:\n", paste(missing_user, collapse = "\n"), "\n")
+    stop("Missing user files:\n", paste(missing_user, collapse = "\n"))
+  }
+  cat("All user files found successfully\n")
 
-  if (!dir.exists(output_dir)) stop("Output directory does not exist: ", output_dir)
-  if (missing(common_files_dir)) stop("common_files_dir must be provided (folder with the two shared CSVs).")
+  if (!dir.exists(output_dir)) {
+    cat("ERROR: Output directory does not exist:", output_dir, "\n")
+    stop("Output directory does not exist: ", output_dir)
+  }
+  cat("Output directory exists:", output_dir, "\n")
+  
+  if (missing(common_files_dir)) {
+    cat("ERROR: common_files_dir must be provided\n")
+    stop("common_files_dir must be provided (folder with the two shared CSVs).")
+  }
+  cat("Common files directory:", common_files_dir, "\n")
 
   # Shared reference files
+  cat("Checking shared reference files...\n")
   ref_signature_file     <- file.path(common_files_dir, "Alex_Sigs_TMB_check_V3.4_SBS2_13 together.csv")
   cancer_dictionary_file <- file.path(common_files_dir, "0 Cancer_Dictionary_BZ.csv")
   common_needed <- c(ref_signature_file, cancer_dictionary_file)
   missing_common <- common_needed[!file.exists(common_needed)]
-  if (length(missing_common)) stop("Missing common reference files:\n", paste(missing_common, collapse = "\n"))
+  if (length(missing_common)) {
+    cat("ERROR: Missing common reference files:\n", paste(missing_common, collapse = "\n"), "\n")
+    stop("Missing common reference files:\n", paste(missing_common, collapse = "\n"))
+  }
+  cat("All reference files found successfully\n")
 
   # Pick genome (package must be installed, but we don't attach it globally)
   Hsapiens <- switch(

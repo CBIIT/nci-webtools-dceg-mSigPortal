@@ -9,23 +9,8 @@ import { body, validationResult } from 'express-validator';
 export const router = Router();
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Create input directory for this job using the same structure as extraction
-    const jobId = req.jobId || uuid();
-    req.jobId = jobId;
-    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
-    fs.ensureDirSync(inputPath);
-    cb(null, inputPath);
-  },
-  filename: function (req, file, cb) {
-    // Use original filename with field name prefix for identification
-    cb(null, `${file.fieldname}_${file.originalname}`);
-  }
-});
-
 const upload = multer({
-  storage: storage,
+  dest: './data/input/', // Temporary location, will be moved to proper job folder
   limits: {
     fileSize: 100 * 1024 * 1024, // 100MB limit
   },
@@ -62,10 +47,16 @@ router.post('/submitRefitting/:id',
   async (req, res) => {
     const logger = req.app.locals.logger;
     
+    console.log(`=== [${new Date().toISOString()}] REFITTING REQUEST RECEIVED ===`);
+    console.log('Request params:', req.params);
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files ? Object.keys(req.files) : 'No files');
+    
     try {
       // Check validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('Validation errors:', errors.array());
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
@@ -76,6 +67,7 @@ router.post('/submitRefitting/:id',
       // Check that all required files are uploaded
       const files = req.files;
       if (!files || !files.mafFile || !files.genomicFile || !files.clinicalFile) {
+        console.log('Missing files. Received files:', files ? Object.keys(files) : 'none');
         return res.status(400).json({
           success: false,
           error: 'Missing required files. Please upload mafFile, genomicFile, and clinicalFile.'
@@ -83,9 +75,11 @@ router.post('/submitRefitting/:id',
       }
 
       const jobId = req.params.id || uuid();
+      console.log('Processing job ID:', jobId);
       
       // Validate that jobId is a valid UUID
       if (!validateUUID(jobId)) {
+        console.log('Invalid UUID format:', jobId);
         return res.status(400).json({
           success: false,
           error: 'Invalid job ID format. Must be a valid UUID.'
@@ -95,14 +89,28 @@ router.post('/submitRefitting/:id',
       const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
       const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
       
+      console.log('Input path:', inputPath);
+      console.log('Output path:', outputPath);
+      
       // Ensure both input and output directories exist
       fs.ensureDirSync(inputPath);
       fs.ensureDirSync(outputPath);
       
-      // Extract file paths
-      const mafFilePath = files.mafFile[0].path;
-      const genomicFilePath = files.genomicFile[0].path;
-      const clinicalFilePath = files.clinicalFile[0].path;
+      // Move files from temp directory to job directory
+      const mafFilePath = path.join(inputPath, `mafFile_${files.mafFile[0].originalname}`);
+      const genomicFilePath = path.join(inputPath, `genomicFile_${files.genomicFile[0].originalname}`);
+      const clinicalFilePath = path.join(inputPath, `clinicalFile_${files.clinicalFile[0].originalname}`);
+      
+      console.log('Moving files to:');
+      console.log('  MAF:', mafFilePath);
+      console.log('  Genomic:', genomicFilePath);
+      console.log('  Clinical:', clinicalFilePath);
+      
+      await fs.move(files.mafFile[0].path, mafFilePath);
+      await fs.move(files.genomicFile[0].path, genomicFilePath);
+      await fs.move(files.clinicalFile[0].path, clinicalFilePath);
+      
+      console.log('Files moved successfully');
 
       // Extract parameters with defaults
       const params = {
@@ -146,6 +154,7 @@ router.post('/submitRefitting/:id',
         params
       });
 
+      console.log('Starting refitting job asynchronously...');
       // Start the refitting process asynchronously
       startRefittingJob({
         jobId,
@@ -158,13 +167,16 @@ router.post('/submitRefitting/:id',
         logger
       });
 
+      console.log('Responding with success...');
       // Return job ID immediately
-      res.json({
+      const response = {
         success: true,
         jobId: jobId,
         message: 'Refitting job started successfully',
         status: 'processing'
-      });
+      };
+      console.log('Response:', response);
+      res.json(response);
 
     } catch (error) {
       logger.error('Error in refitting endpoint:', error);
@@ -285,7 +297,11 @@ router.get('/refitting/download/:jobId/:filename', async (req, res) => {
 async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinicalFilePath, inputPath, outputPath, params, logger }) {
   const statusFile = path.join(outputPath, 'status.json');
   
+  console.log(`=== [${new Date().toISOString()}] STARTING REFITTING JOB ${jobId} ===`);
+  console.log('Input parameters:', { jobId, mafFilePath, genomicFilePath, clinicalFilePath, inputPath, outputPath, params });
+  
   try {
+    console.log(`[${jobId}] Updating status to PROCESSING...`);
     // Update status to processing
     await fs.writeJson(statusFile, {
       id: jobId,
@@ -293,9 +309,12 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       startTime: new Date().toISOString(),
       params
     });
+    console.log(`[${jobId}] Status updated to PROCESSING`);
 
     // Prepare arguments for the refitting service
     const refittingServicePath = path.join(process.cwd(), '../refitting-service');
+    console.log(`[${jobId}] Refitting service path: ${refittingServicePath}`);
+    
     const nodeArgs = [
       'app.js',
       jobId,
@@ -308,14 +327,25 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       '--outputFilename', params.outputFilename
     ];
 
+    console.log(`[${jobId}] Node.js arguments:`, nodeArgs);
+    console.log(`[${jobId}] Working directory: ${refittingServicePath}`);
+    console.log(`[${jobId}] About to execute: node ${nodeArgs.join(' ')}`);
+    
     logger.info(`Starting refitting process for job ${jobId}`);
 
     // Execute the refitting service
+    console.log(`[${jobId}] Executing refitting service...`);
     const { stdout, stderr } = await execa('node', nodeArgs, {
       cwd: refittingServicePath,
       timeout: 30 * 60 * 1000, // 30 minutes timeout
     });
 
+    console.log(`[${jobId}] Refitting service completed!`);
+    console.log(`[${jobId}] STDOUT:`, stdout);
+    if (stderr) {
+      console.log(`[${jobId}] STDERR:`, stderr);
+    }
+    
     logger.info(`Refitting job ${jobId} completed successfully`);
 
     // Create manifest.json similar to extraction service
@@ -340,6 +370,13 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     });
 
   } catch (error) {
+    console.log(`=== [${new Date().toISOString()}] ERROR in refitting job ${jobId} ===`);
+    console.error(`[${jobId}] Error details:`, error);
+    console.error(`[${jobId}] Error message:`, error.message);
+    console.error(`[${jobId}] Error stack:`, error.stack);
+    if (error.stdout) console.log(`[${jobId}] Error STDOUT:`, error.stdout);
+    if (error.stderr) console.log(`[${jobId}] Error STDERR:`, error.stderr);
+    
     logger.error(`Refitting job ${jobId} failed:`, error);
 
     // Update status to failed
@@ -353,5 +390,7 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       error: error.message,
       stderr: error.stderr
     });
+    
+    console.log(`[${jobId}] Status updated to FAILED`);
   }
 }
