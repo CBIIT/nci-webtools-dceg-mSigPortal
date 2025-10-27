@@ -1,9 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Table, Button, Form, Alert } from 'react-bootstrap';
 
-export default function TargetedSequencing() {
+export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('sigprofiler');
+  const [csvData, setCsvData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Load CSV data when jobId changes
+  useEffect(() => {
+    if (jobId) {
+      loadCsvData(jobId);
+    }
+  }, [jobId]);
+
+  const loadCsvData = async (jobId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/data/output/${jobId}/H_Burden_est.csv`);
+      if (!response.ok) {
+        throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+      }
+      const csvText = await response.text();
+      const parsedData = parseCsv(csvText);
+      setCsvData(parsedData);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error loading CSV data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const parseCsv = (csvText) => {
+    const lines = csvText.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.trim());
+      const row = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      return row;
+    });
+  };
 
   // Mock signature type from submitted job - this would come from props/context in real implementation
   const submittedSignatureType = 'SBS'; // This would be passed from the form submission
@@ -94,6 +137,19 @@ export default function TargetedSequencing() {
   };
 
   const getCurrentResults = () => {
+    // If we have real CSV data and a jobId, use it; otherwise fall back to mock data
+    if (jobId && csvData.length > 0) {
+      return {
+        h_estData: csvData.map(row => ({
+          sample_id: row.SAMPLE_ID || row.sample_id || '',
+          signature: row.Signature || row.signature || '',
+          activity: parseFloat(row.Activity || row.activity || 0),
+          burden: parseFloat(row.Burden || row.burden || 0)
+        }))
+      };
+    }
+    
+    // Fallback to mock data when no job ID or CSV data available
     return submittedSignatureType.toLowerCase() === 'sbs' ? sbsResults : dbsResults;
   };
 
@@ -293,17 +349,37 @@ export default function TargetedSequencing() {
     <div className="bg-white border rounded p-3">
       <h4>Targeted Sequencing Results</h4>
       
-      <Alert 
-        variant="info" 
-        style={{ 
-          backgroundColor: '#689f39', 
-          borderColor: '#689f39', 
-          color: 'white' 
-        }}
-      >
-        <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully. 
-        Below are the comprehensive results showing the performance comparison between original and refitted signatures.
-      </Alert>
+      {!jobId && (
+        <Alert variant="warning">
+          <strong>No Job Selected:</strong> Please select a job from the Status tab to view targeted sequencing results.
+        </Alert>
+      )}
+      
+      {jobId && loading && (
+        <Alert variant="info">
+          <strong>Loading:</strong> Loading analysis results for job {jobId}...
+        </Alert>
+      )}
+      
+      {jobId && error && (
+        <Alert variant="danger">
+          <strong>Error:</strong> {error}
+        </Alert>
+      )}
+      
+      {jobId && !loading && !error && (
+        <>
+          <Alert 
+            variant="info" 
+            style={{ 
+              backgroundColor: '#689f39', 
+              borderColor: '#689f39', 
+              color: 'white' 
+            }}
+          >
+            <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully. 
+            Below are the comprehensive results showing the performance comparison between original and refitted signatures.
+          </Alert>
 
       <Card className="mb-4">
         <Card.Header>
@@ -363,6 +439,8 @@ export default function TargetedSequencing() {
           )}
         </Card.Body>
       </Card>
+        </>
+      )}
 
       
     </div>

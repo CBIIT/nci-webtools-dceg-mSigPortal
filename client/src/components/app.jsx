@@ -167,7 +167,7 @@ export default function App() {
               path="/exploration/:exampleName?"
               children={<Exploration />}
             />
-            <Route path="/refitting" children={<Refitting />} />
+            <Route path="/refitting/:id?" children={<Refitting />} />
             <Route path="/association" children={<Association />} />
             <Route path="/extraction/:id?" children={<Extraction />} />
             <Route path="/publications" children={<Publications />} />

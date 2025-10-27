@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { actions as refittingActions } from '../../../services/store/refitting';
 import {
   SidebarContainer,
@@ -15,6 +16,7 @@ import RefittingForm from './refitting-form';
 export default function Refitting() {
   const { displayTab, openSidebar } = useSelector((state) => state.refitting.main);
   const dispatch = useDispatch();
+  const { id: jobId } = useParams();
   
   const setDisplayTab = (tab) => dispatch(refittingActions.mergeRefitting({ 
     main: { displayTab: tab } 
@@ -23,6 +25,13 @@ export default function Refitting() {
   const setOpenSidebar = (open) => dispatch(refittingActions.mergeRefitting({ 
     main: { openSidebar: open } 
   }));
+
+  // Auto-switch to targeted sequencing tab when job ID is provided
+  useEffect(() => {
+    if (jobId) {
+      setDisplayTab('targetedSequencing');
+    }
+  }, [jobId]);
 
   const tabs = [
     {
@@ -38,7 +47,7 @@ export default function Refitting() {
     {
       id: 'targetedSequencing',
       name: 'Targeted Sequencing',
-      disabled: false, // You might want to make this conditional based on analysis status
+      disabled: !jobId, // Only enabled when a job ID is present
     },
   ];
 
@@ -124,7 +133,7 @@ export default function Refitting() {
             <Status />
           </div>
           <div className={displayTab === 'targetedSequencing' ? 'd-block' : 'd-none'}>
-            <TargetedSequencing />
+            <TargetedSequencing jobId={jobId} />
           </div>
         </MainPanel>
       </SidebarContainer>
