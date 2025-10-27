@@ -220,7 +220,7 @@ router.get('/refreshRefitting/:id', async (req, res) => {
     const status = await fs.readJson(statusFile);
     
     // If job is completed, check for output file
-    if (status.status === 'completed') {
+    if (status.status === 'COMPLETED') {
       const outputFile = path.join(outputPath, status.outputFilename || 'H_Burden_est.csv');
       if (fs.existsSync(outputFile)) {
         status.downloadUrl = `/refitting/download/${jobId}/${status.outputFilename || 'H_Burden_est.csv'}`;
