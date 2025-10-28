@@ -85,7 +85,7 @@ export default function Status() {
       Cell: ({ row, value }) => (
         <Button
           variant="link"
-          href={`api/refitting/download/${row.original.id}/results.zip`}
+          href={`api/downloadOutput/${row.original.id}`}
           disabled={!['COMPLETED'].includes(value)}
         >
           Download

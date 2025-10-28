@@ -19,7 +19,7 @@ export default function TargetedSequencing({ jobId }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/data/output/${jobId}/H_Burden_est.csv`);
+      const response = await fetch(`/mutational-signatures/api/data/output/${jobId}/H_Burden_est.csv`);
       if (!response.ok) {
         throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
       }

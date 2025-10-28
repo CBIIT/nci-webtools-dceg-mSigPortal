@@ -243,55 +243,6 @@ router.get('/refreshRefitting/:id', async (req, res) => {
 });
 
 /**
- * GET /refitting/download/:jobId/:filename
- * Download the results of a completed refitting job
- */
-router.get('/refitting/download/:jobId/:filename', async (req, res) => {
-  const logger = req.app.locals.logger;
-  const { jobId, filename } = req.params;
-
-  // Validate that jobId is a valid UUID
-  if (!validateUUID(jobId)) {
-    return res.status(400).json({
-      success: false,
-      error: 'Invalid job ID format. Must be a valid UUID.'
-    });
-  }
-
-  try {
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
-    const filePath = path.join(outputPath, filename);
-
-    // Security check: ensure the file is within the job's output directory
-    const resolvedPath = path.resolve(filePath);
-    const resolvedOutputPath = path.resolve(outputPath);
-    if (!resolvedPath.startsWith(resolvedOutputPath)) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({
-        success: false,
-        error: 'File not found'
-      });
-    }
-
-    res.download(filePath, filename);
-
-  } catch (error) {
-    logger.error(`Error downloading file for job ${jobId}:`, error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      message: error.message
-    });
-  }
-});
-
-/**
  * Start a refitting job asynchronously
  */
 async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinicalFilePath, inputPath, outputPath, params, logger }) {
