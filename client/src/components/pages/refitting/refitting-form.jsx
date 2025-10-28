@@ -117,6 +117,7 @@ export default function RefittingForm() {
     formData.append('genomicFile', data.genomicFile);
     formData.append('clinicalFile', data.clinicalFile);
     formData.append('genome', data.referenceGenome);
+    formData.append('signatureType', data.signatureType);
     formData.append('email', data.email);
     formData.append('jobName', data.jobName);
 

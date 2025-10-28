@@ -29,6 +29,9 @@ const upload = multer({
 // Validation middleware
 const validateRefittingInput = [
   body('genome').optional().isIn(['hg19', 'hg38']).withMessage('Genome must be hg19 or hg38'),
+  body('signatureType').optional().isIn(['SBS', 'DBS', 'ID']).withMessage('Signature type must be SBS, DBS, or ID'),
+  body('jobName').optional().isString().withMessage('Job name must be a string'),
+  body('email').optional().isEmail().withMessage('Email must be valid'),
   body('matchOnOncotree').optional().isBoolean().withMessage('matchOnOncotree must be boolean'),
   body('outputFilename').optional().isString().withMessage('outputFilename must be a string'),
 ];
@@ -116,6 +119,9 @@ router.post('/submitRefitting/:id',
       const params = {
         jobId,
         genome: req.body.genome || 'hg19',
+        signatureType: req.body.signatureType || 'SBS',
+        jobName: req.body.jobName || '',
+        email: req.body.email || '',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
       };

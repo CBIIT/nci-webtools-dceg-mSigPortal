@@ -5,33 +5,48 @@ export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('sigprofiler');
   const [csvData, setCsvData] = useState([]);
+  const [jobParams, setJobParams] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load CSV data when jobId changes
+  // Load CSV data and job parameters when jobId changes
   useEffect(() => {
     if (jobId) {
-      loadCsvData(jobId);
+      loadJobData(jobId);
     }
   }, [jobId]);
 
-  const loadCsvData = async (jobId) => {
+  const loadJobData = async (jobId) => {
     setLoading(true);
     setError(null);
     try {
-      console.log(`Loading CSV data for job: ${jobId}`);
-      const response = await fetch(`/mutational-signatures/api/data/output/${jobId}/H_Burden_est.csv`);
-      if (!response.ok) {
-        throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+      console.log(`Loading job data for: ${jobId}`);
+      
+      // Load job parameters from params.json
+      const paramsResponse = await fetch(`/mutational-signatures/api/data/input/${jobId}/params.json`);
+      if (paramsResponse.ok) {
+        const paramsText = await paramsResponse.text();
+        const params = JSON.parse(paramsText);
+        console.log('Loaded job parameters:', params);
+        setJobParams(params);
+      } else {
+        console.warn('Could not load job parameters, using defaults');
+        setJobParams({ signatureType: 'SBS' }); // Default fallback
       }
-      const csvText = await response.text();
+      
+      // Load CSV data
+      const csvResponse = await fetch(`/mutational-signatures/api/data/output/${jobId}/H_Burden_est.csv`);
+      if (!csvResponse.ok) {
+        throw new Error(`Failed to load CSV data: ${csvResponse.status} ${csvResponse.statusText}`);
+      }
+      const csvText = await csvResponse.text();
       console.log('Raw CSV text:', csvText.substring(0, 500)); // Log first 500 chars
       const parsedData = parseCsv(csvText);
       console.log('Parsed CSV data:', parsedData.slice(0, 5)); // Log first 5 rows
       setCsvData(parsedData);
     } catch (err) {
       setError(err.message);
-      console.error('Error loading CSV data:', err);
+      console.error('Error loading job data:', err);
     } finally {
       setLoading(false);
     }
@@ -52,8 +67,8 @@ export default function TargetedSequencing({ jobId }) {
     });
   };
 
-  // Mock signature type from submitted job - this would come from props/context in real implementation
-  const submittedSignatureType = 'SBS'; // This would be passed from the form submission
+  // Get signature type from job parameters
+  const submittedSignatureType = jobParams?.signatureType || 'SBS';
 
   const getCurrentResults = () => {
     // If we have real CSV data and a jobId, use it
@@ -320,6 +335,16 @@ export default function TargetedSequencing({ jobId }) {
     <div className="bg-white border rounded p-3">
       <h4>Targeted Sequencing Results</h4>
       
+      {jobParams && (
+        <div className="mb-3">
+          <small className="text-muted">
+            <strong>Job:</strong> {jobParams.jobName || jobParams.jobId} | 
+            <strong> Signature Type:</strong> {jobParams.signatureType} | 
+            <strong> Genome:</strong> {jobParams.genome}
+          </small>
+        </div>
+      )}
+      
       {!jobId && (
         <Alert variant="warning">
           <strong>No Job Selected:</strong> Please select a job from the Status tab to view targeted sequencing results.
@@ -348,8 +373,7 @@ export default function TargetedSequencing({ jobId }) {
               color: 'white' 
             }}
           >
-            <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully. 
-            Below are the comprehensive results showing the performance comparison between original and refitted signatures.
+            <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully.         
           </Alert>
 
       <Card className="mb-4">
