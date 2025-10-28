@@ -19,12 +19,15 @@ export default function TargetedSequencing({ jobId }) {
     setLoading(true);
     setError(null);
     try {
+      console.log(`Loading CSV data for job: ${jobId}`);
       const response = await fetch(`/mutational-signatures/api/data/output/${jobId}/H_Burden_est.csv`);
       if (!response.ok) {
         throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
       }
       const csvText = await response.text();
+      console.log('Raw CSV text:', csvText.substring(0, 500)); // Log first 500 chars
       const parsedData = parseCsv(csvText);
+      console.log('Parsed CSV data:', parsedData.slice(0, 5)); // Log first 5 rows
       setCsvData(parsedData);
     } catch (err) {
       setError(err.message);
@@ -36,10 +39,11 @@ export default function TargetedSequencing({ jobId }) {
 
   const parseCsv = (csvText) => {
     const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
     
     return lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim());
+      // Handle quoted CSV values properly
+      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
       const row = {};
       headers.forEach((header, index) => {
         row[header] = values[index] || '';
@@ -51,93 +55,8 @@ export default function TargetedSequencing({ jobId }) {
   // Mock signature type from submitted job - this would come from props/context in real implementation
   const submittedSignatureType = 'SBS'; // This would be passed from the form submission
 
-  // Mock data for SBS results - based on actual R function output
-  const sbsResults = {
-    h_estData: [
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS10a', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS10b', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS40a', activity: 0.003, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS5', activity: 28.034, burden: 2 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS6', activity: 0.001, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS10b', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS5', activity: 32.735, burden: 2.34 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS7a', activity: 37.782, burden: 2.65 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS7b', activity: 0.16, burden: 0.01 }
-    ],
-    burden_estData: [
-      { 
-        sample: 'GENIE-DFCI-050984-218969', 
-        total_mutations: 1847, estimated_burden: 1623, accuracy: '87.9%' 
-      },
-      { 
-        sample: 'GENIE-DFCI-109295-436549', 
-        total_mutations: 2156, estimated_burden: 1934, accuracy: '89.7%' 
-      }
-    ],
-    cosineData: [
-      { signature: 'SBS1', original: 0.95, refitted: 0.92, similarity: 0.97 },
-      { signature: 'SBS2', original: 0.88, refitted: 0.85, similarity: 0.94 },
-      { signature: 'SBS3', original: 0.76, refitted: 0.79, similarity: 0.96 },
-      { signature: 'SBS13', original: 0.82, refitted: 0.80, similarity: 0.98 }
-    ],
-    bicData: [
-      { model: 'Original', signatures: 4, bic: -2847.3, deltaAIC: 0.0 },
-      { model: 'Refitted (SigProfiler)', signatures: 4, bic: -2891.7, deltaAIC: -44.4 },
-      { model: 'Refitted (deconstructSigs)', signatures: 3, bic: -2856.2, deltaAIC: -8.9 }
-    ],
-    l2NormData: [
-      { sample: 'Sample_001', original: 0.23, refitted: 0.19, improvement: '17.4%' },
-      { sample: 'Sample_002', original: 0.31, refitted: 0.28, improvement: '9.7%' },
-      { sample: 'Sample_003', original: 0.18, refitted: 0.15, improvement: '16.7%' },
-      { sample: 'Sample_004', original: 0.42, refitted: 0.38, improvement: '9.5%' }
-    ]
-  };
-
-  // Mock data for DBS results - following same format as SBS
-  const dbsResults = {
-    h_estData: [
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS2', activity: 12.456, burden: 1.2 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS6', activity: 0.002, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS11', activity: 8.923, burden: 0.8 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS1', activity: 15.234, burden: 1.5 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS2', activity: 23.567, burden: 2.1 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS6', activity: 0.045, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS11', activity: 18.789, burden: 1.7 }
-    ],
-    burden_estData: [
-      { 
-        sample: 'GENIE-DFCI-050984-218969', 
-        total_mutations: 342, estimated_burden: 298, accuracy: '87.1%' 
-      },
-      { 
-        sample: 'GENIE-DFCI-109295-436549', 
-        total_mutations: 458, estimated_burden: 412, accuracy: '90.0%' 
-      }
-    ],
-    cosineData: [
-      { signature: 'DBS1', original: 0.89, refitted: 0.87, similarity: 0.95 },
-      { signature: 'DBS2', original: 0.93, refitted: 0.91, similarity: 0.97 },
-      { signature: 'DBS6', original: 0.71, refitted: 0.74, similarity: 0.94 },
-      { signature: 'DBS11', original: 0.86, refitted: 0.84, similarity: 0.96 }
-    ],
-    bicData: [
-      { model: 'Original', signatures: 4, bic: -1923.7, deltaAIC: 0.0 },
-      { model: 'Refitted (SigProfiler)', signatures: 4, bic: -1967.2, deltaAIC: -43.5 },
-      { model: 'Refitted (deconstructSigs)', signatures: 3, bic: -1931.4, deltaAIC: -7.7 }
-    ],
-    l2NormData: [
-      { sample: 'Sample_001', original: 0.27, refitted: 0.23, improvement: '14.8%' },
-      { sample: 'Sample_002', original: 0.34, refitted: 0.31, improvement: '8.8%' },
-      { sample: 'Sample_003', original: 0.21, refitted: 0.18, improvement: '14.3%' },
-      { sample: 'Sample_004', original: 0.39, refitted: 0.35, improvement: '10.3%' }
-    ]
-  };
-
   const getCurrentResults = () => {
-    // If we have real CSV data and a jobId, use it; otherwise fall back to mock data
+    // If we have real CSV data and a jobId, use it
     if (jobId && csvData.length > 0) {
       return {
         h_estData: csvData.map(row => ({
@@ -145,12 +64,24 @@ export default function TargetedSequencing({ jobId }) {
           signature: row.Signature || row.signature || '',
           activity: parseFloat(row.Activity || row.activity || 0),
           burden: parseFloat(row.Burden || row.burden || 0)
-        }))
+        })),
+        // For now, only h_estData is available from the CSV
+        // Other data types would come from additional CSV files or API endpoints
+        burden_estData: [],
+        cosineData: [],
+        bicData: [],
+        l2NormData: []
       };
     }
     
-    // Fallback to mock data when no job ID or CSV data available
-    return submittedSignatureType.toLowerCase() === 'sbs' ? sbsResults : dbsResults;
+    // Return empty structure when no data is available
+    return {
+      h_estData: [],
+      burden_estData: [],
+      cosineData: [],
+      bicData: [],
+      l2NormData: []
+    };
   };
 
   const renderHEstResults = () => {
@@ -227,6 +158,16 @@ export default function TargetedSequencing({ jobId }) {
 
   const renderBurdenEstResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.burden_estData || results.burden_estData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No Burden Estimation Data:</strong> This data is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display burden estimation results.
+        </Alert>
+      );
+    }
+    
     return (
       <Table striped bordered hover>
         <thead>
@@ -257,6 +198,16 @@ export default function TargetedSequencing({ jobId }) {
 
   const renderCosineResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.cosineData || results.cosineData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No Cosine Similarity Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display cosine similarity results.
+        </Alert>
+      );
+    }
+    
     return (
       <Table striped bordered hover>
         <thead>
@@ -287,6 +238,16 @@ export default function TargetedSequencing({ jobId }) {
 
   const renderBICResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.bicData || results.bicData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No BIC Analysis Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display BIC model comparison results.
+        </Alert>
+      );
+    }
+    
     return (
       <Table striped bordered hover>
         <thead>
@@ -317,6 +278,16 @@ export default function TargetedSequencing({ jobId }) {
 
   const renderL2NormResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.l2NormData || results.l2NormData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No L2 Norm Analysis Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display L2 norm error analysis results.
+        </Alert>
+      );
+    }
+    
     return (
       <Table striped bordered hover>
         <thead>
