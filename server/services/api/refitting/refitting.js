@@ -115,6 +115,7 @@ router.post('/submitRefitting/:id',
       // Extract parameters with defaults
       const params = {
         jobId,
+        jobName: req.body.jobName || 'Refitting Job',
         genome: req.body.genome || 'hg19',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
@@ -129,7 +130,7 @@ router.post('/submitRefitting/:id',
       const initialStatus = {
         id: jobId,
         status: 'SUBMITTED',
-        startTime: new Date().toISOString()
+        submittedAt: new Date().toISOString()
       };
       await fs.writeJson(statusFilePath, initialStatus);
 
@@ -299,7 +300,7 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'PROCESSING',
-      startTime: new Date().toISOString(),
+      submittedAt: new Date().toISOString(),
       params
     });
     console.log(`[${jobId}] Status updated to PROCESSING`);
@@ -351,11 +352,12 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(manifestFile, manifestData);
 
     // Update status to completed
+    const currentStatus = await fs.readJson(statusFile);
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'COMPLETED',
-      startTime: (await fs.readJson(statusFile)).startTime,
-      endTime: new Date().toISOString(),
+      submittedAt: currentStatus.submittedAt,
+      stopped: new Date().toISOString(),
       params,
       outputFilename: params.outputFilename,
       stdout: stdout,
@@ -377,8 +379,8 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'FAILED',
-      startTime: currentStatus.startTime || new Date().toISOString(),
-      endTime: new Date().toISOString(),
+      submittedAt: currentStatus.submittedAt || new Date().toISOString(),
+      stopped: new Date().toISOString(),
       params,
       error: error.message,
       stderr: error.stderr
