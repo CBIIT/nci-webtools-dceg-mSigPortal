@@ -31,6 +31,27 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
         url: `data/output/${id}/status.json`,
       }),
     }),
+
+    // Multi-job status refresh
+    multiJobStatus: builder.query({
+      query: (body) => ({
+        url: `refreshRefittingMulti`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (data, meta, args) => {
+        return data
+          .filter((e) => e.status && e.params)
+          .map((job) => {
+            const { status, params } = job;
+            console.log("params --- ", params);
+            return {
+              jobName: params.jobName || 'Refitting Job',
+              ...status,
+            };
+          });
+      },
+    }),
   }),
 });
 
@@ -39,4 +60,5 @@ export const {
   useRefittingStatusQuery,
   useDownloadResultsQuery,
   useStatusQuery,
+  useMultiJobStatusQuery,
 } = inputFormApiSlice;

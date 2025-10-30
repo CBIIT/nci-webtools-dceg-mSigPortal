@@ -29,9 +29,6 @@ const upload = multer({
 // Validation middleware
 const validateRefittingInput = [
   body('genome').optional().isIn(['hg19', 'hg38']).withMessage('Genome must be hg19 or hg38'),
-  body('signatureType').optional().isIn(['SBS', 'DBS', 'ID']).withMessage('Signature type must be SBS, DBS, or ID'),
-  body('jobName').optional().isString().withMessage('Job name must be a string'),
-  body('email').optional().isEmail().withMessage('Email must be valid'),
   body('matchOnOncotree').optional().isBoolean().withMessage('matchOnOncotree must be boolean'),
   body('outputFilename').optional().isString().withMessage('outputFilename must be a string'),
 ];
@@ -119,9 +116,6 @@ router.post('/submitRefitting/:id',
       const params = {
         jobId,
         genome: req.body.genome || 'hg19',
-        signatureType: req.body.signatureType || 'SBS',
-        jobName: req.body.jobName || '',
-        email: req.body.email || '',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
       };
@@ -212,34 +206,76 @@ router.get('/refreshRefitting/:id', async (req, res) => {
   }
 
   try {
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
-    const statusFile = path.join(outputPath, 'status.json');
-    
-    // Check if status file exists
-    if (!fs.existsSync(statusFile)) {
+    const jobStatus = await getJobStatus(jobId);
+    if (typeof jobStatus === 'string') {
       return res.status(404).json({
         success: false,
-        error: 'Job not found'
+        error: jobStatus
       });
     }
+    res.json({
+      success: true,
+      ...jobStatus.status
+    });
+  } catch (error) {
+    logger.error(`Error checking status for job ${jobId}:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
 
+/**
+ * Helper function to get job status, params
+ */
+async function getJobStatus(id) {
+  if (!validateUUID(id)) {
+    return `${id} is not a valid ID`;
+  }
+
+  try {
+    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', id);
+    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', id);
+    
+    const paramsFile = path.join(inputPath, 'params.json');
+    const statusFile = path.join(outputPath, 'status.json');
+    
+    // Check if files exist
+    if (!fs.existsSync(statusFile)) {
+      return `Job not found: ${id}`;
+    }
+
+    const params = fs.existsSync(paramsFile) ? await fs.readJson(paramsFile) : {};
     const status = await fs.readJson(statusFile);
     
     // If job is completed, check for output file
-    if (status.status === 'completed') {
+    if (status.status === 'COMPLETED') {
       const outputFile = path.join(outputPath, status.outputFilename || 'H_Burden_est.csv');
       if (fs.existsSync(outputFile)) {
-        status.downloadUrl = `/refitting/download/${jobId}/${status.outputFilename || 'H_Burden_est.csv'}`;
+        status.downloadUrl = `/refitting/download/${id}/${status.outputFilename || 'H_Burden_est.csv'}`;
       }
     }
 
-    res.json({
-      success: true,
-      ...status
-    });
-
+    return { params, status };
   } catch (error) {
-    logger.error(`Error checking status for job ${jobId}:`, error);
+    return error.message;
+  }
+}
+
+/**
+ * POST /refreshRefittingMulti
+ * Check the status of multiple refitting jobs
+ */
+router.post('/refreshRefittingMulti', async (req, res) => {
+  const logger = req.app.locals.logger;
+  try {
+    const ids = req.body;
+    const statuses = await Promise.all(ids.map(getJobStatus));
+    res.json(statuses);
+  } catch (error) {
+    logger.error('/refreshRefittingMulti Error');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
