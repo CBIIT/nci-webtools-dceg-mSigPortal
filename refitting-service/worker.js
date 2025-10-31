@@ -1,5 +1,4 @@
 import path from 'path';
-import knex from 'knex';
 import { isMainModule, readJson, mkdirs } from './services/utils.js';
 import { createLogger } from './services/logger.js';
 import { refitting } from './services/refitting.js';
