@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import { v4 as uuid, validate as validateUUID } from 'uuid';
 import { execa } from 'execa';
 import { body, validationResult } from 'express-validator';
+import { sendNotification } from '../../notifications.js';
 
 export const router = Router();
 
@@ -116,6 +117,7 @@ router.post('/submitRefitting/:id',
       const params = {
         jobId,
         jobName: req.body.jobName || 'Refitting Job',
+        email: req.body.email,
         genome: req.body.genome || 'hg19',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
@@ -364,6 +366,30 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       stderr: stderr
     });
 
+    // Send success notification if email was provided
+    if (params.email) {
+      logger.info(`[${jobId}] Sending success notification to ${params.email}`);
+      try {
+        const submittedTime = new Date(currentStatus.submittedAt);
+        const executionTime = (new Date().getTime() - submittedTime.getTime()) / 1000;
+        
+        await sendNotification(
+          params.email,
+          `mSigPortal - Refitting Complete - ${params.jobName}`,
+          'templates/user-success-email.html',
+          {
+            jobName: params.jobName,
+            submittedAt: submittedTime.toISOString(),
+            executionTime: executionTime,
+            resultsUrl: `${process.env.APP_BASE_URL || 'http://localhost:8330'}/#/refitting/${jobId}`,
+          }
+        );
+        logger.info(`[${jobId}] Success notification sent`);
+      } catch (emailError) {
+        logger.error(`[${jobId}] Failed to send success notification:`, emailError);
+      }
+    }
+
   } catch (error) {
     console.log(`=== [${new Date().toISOString()}] ERROR in refitting job ${jobId} ===`);
     console.error(`[${jobId}] Error details:`, error);
@@ -387,5 +413,31 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     });
     
     console.log(`[${jobId}] Status updated to FAILED`);
+
+    // Send failure notification if email was provided
+    if (params.email) {
+      logger.info(`[${jobId}] Sending failure notification to ${params.email}`);
+      try {
+        const submittedTime = currentStatus.submittedAt 
+          ? new Date(currentStatus.submittedAt) 
+          : new Date();
+        const executionTime = (new Date().getTime() - submittedTime.getTime()) / 1000;
+        
+        await sendNotification(
+          params.email,
+          `mSigPortal - Refitting Analysis Failed - ${params.jobName}`,
+          'templates/user-failure-email.html',
+          {
+            jobName: params.jobName,
+            submittedAt: submittedTime.toISOString(),
+            executionTime: executionTime,
+            error: error.message || JSON.stringify(error, null, 2),
+          }
+        );
+        logger.info(`[${jobId}] Failure notification sent`);
+      } catch (emailError) {
+        logger.error(`[${jobId}] Failed to send failure notification:`, emailError);
+      }
+    }
   }
 }
