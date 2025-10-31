@@ -6,6 +6,7 @@ import { v4 as uuid, validate as validateUUID } from 'uuid';
 import { execa } from 'execa';
 import { body, validationResult } from 'express-validator';
 import { sendNotification } from '../../notifications.js';
+import { getWorker } from '../../workers.js';
 
 export const router = Router();
 
@@ -169,6 +170,11 @@ router.post('/submitRefitting/:id',
         params,
         logger
       });
+      // Get worker based on environment configuration
+      // const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
+      
+      // // Start the refitting process using worker
+      // worker(jobId, req.app, 'refitting', process.env);
 
       console.log('Responding with success...');
       // Return job ID immediately
@@ -222,6 +228,80 @@ router.get('/refreshRefitting/:id', async (req, res) => {
     });
   } catch (error) {
     logger.error(`Error checking status for job ${jobId}:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /refitting/run/:id
+ * Execute the refitting job (called by worker)
+ */
+router.get('/refitting/run/:id', async (req, res) => {
+  const logger = req.app.locals.logger;
+  const { id: jobId } = req.params;
+
+  // Validate that jobId is a valid UUID
+  if (!validateUUID(jobId)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid job ID format. Must be a valid UUID.'
+    });
+  }
+
+  try {
+    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
+    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+    
+    const paramsFile = path.join(inputPath, 'params.json');
+    if (!fs.existsSync(paramsFile)) {
+      return res.status(404).json({
+        success: false,
+        error: `Job not found: ${jobId}`
+      });
+    }
+
+    const params = await fs.readJson(paramsFile);
+    
+    // Get file paths from input directory
+    const files = fs.readdirSync(inputPath);
+    const mafFile = files.find(f => f.startsWith('mafFile_'));
+    const genomicFile = files.find(f => f.startsWith('genomicFile_'));
+    const clinicalFile = files.find(f => f.startsWith('clinicalFile_'));
+
+    if (!mafFile || !genomicFile || !clinicalFile) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required input files'
+      });
+    }
+
+    const mafFilePath = path.join(inputPath, mafFile);
+    const genomicFilePath = path.join(inputPath, genomicFile);
+    const clinicalFilePath = path.join(inputPath, clinicalFile);
+
+    // Start the refitting process asynchronously
+    startRefittingJob({
+      jobId,
+      mafFilePath,
+      genomicFilePath,
+      clinicalFilePath,
+      inputPath,
+      outputPath,
+      params,
+      logger
+    });
+
+    res.json({
+      success: true,
+      jobId: jobId,
+      message: 'Refitting job started'
+    });
+  } catch (error) {
+    logger.error(`Error running refitting job ${jobId}:`, error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
