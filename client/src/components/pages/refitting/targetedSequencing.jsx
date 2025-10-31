@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Table, Button, Form, Alert } from 'react-bootstrap';
+import { parseCSV } from '../../../services/utils';
 
 export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
@@ -41,7 +42,7 @@ export default function TargetedSequencing({ jobId }) {
       }
       const csvText = await csvResponse.text();
       console.log('Raw CSV text:', csvText.substring(0, 500)); // Log first 500 chars
-      const parsedData = parseCsv(csvText);
+      const parsedData = await parseCSV(csvText);
       console.log('Parsed CSV data:', parsedData.slice(0, 5)); // Log first 5 rows
       setCsvData(parsedData);
     } catch (err) {
@@ -52,21 +53,6 @@ export default function TargetedSequencing({ jobId }) {
     }
   };
 
-  const parseCsv = (csvText) => {
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-    
-    return lines.slice(1).map(line => {
-      // Handle quoted CSV values properly
-      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-      const row = {};
-      headers.forEach((header, index) => {
-        row[header] = values[index] || '';
-      });
-      return row;
-    });
-  };
-
   // Get signature type from job parameters
   const submittedSignatureType = jobParams?.signatureType || 'SBS';
 
@@ -74,12 +60,14 @@ export default function TargetedSequencing({ jobId }) {
     // If we have real CSV data and a jobId, use it
     if (jobId && csvData.length > 0) {
       return {
-        h_estData: csvData.map(row => ({
-          sample_id: row.SAMPLE_ID || row.sample_id || '',
-          signature: row.Signature || row.signature || '',
-          activity: parseFloat(row.Activity || row.activity || 0),
-          burden: parseFloat(row.Burden || row.burden || 0)
-        })),
+        h_estData: csvData
+          .filter(row => row.SAMPLE_ID || row.sample_id) // Filter out empty rows
+          .map(row => ({
+            sample_id: row.SAMPLE_ID || row.sample_id || '',
+            signature: row.Signature || row.signature || '',
+            activity: parseFloat(row.Activity || row.activity || 0),
+            burden: parseFloat(row.Burden || row.burden || 0)
+          })),
         // For now, only h_estData is available from the CSV
         // Other data types would come from additional CSV files or API endpoints
         burden_estData: [],
