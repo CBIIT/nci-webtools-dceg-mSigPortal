@@ -171,10 +171,10 @@ router.post('/submitRefitting/:id',
         logger
       });
       // Get worker based on environment configuration
-      // const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
+       const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
       
-      // // Start the refitting process using worker
-      // worker(jobId, req.app, 'refitting', process.env);
+      // Start the refitting process using worker
+       worker(jobId, req.app, 'refitting', process.env);
 
       console.log('Responding with success...');
       // Return job ID immediately
