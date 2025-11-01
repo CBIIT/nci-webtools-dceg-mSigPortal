@@ -19,7 +19,7 @@ export default function Status() {
   useEffect(() => {
     const localJobs = JSON.parse(localStorage.getItem('refitting-jobs') || '[]');
     setJobs(localJobs);
-  }, []);
+  }, [localStorage.getItem('refitting-jobs')]);
 
   // update jobs in local storage
   useEffect(() => {
