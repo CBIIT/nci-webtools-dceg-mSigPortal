@@ -61,12 +61,12 @@ export default function TargetedSequencing({ jobId }) {
     if (jobId && csvData.length > 0) {
       return {
         h_estData: csvData
-          .filter(row => row.SAMPLE_ID || row.sample_id) // Filter out empty rows
+          .filter(row => row.SAMPLE_ID ) // Filter out empty rows
           .map(row => ({
-            sample_id: row.SAMPLE_ID || row.sample_id || '',
-            signature: row.Signature || row.signature || '',
-            activity: parseFloat(row.Activity || row.activity || 0),
-            burden: parseFloat(row.Burden || row.burden || 0)
+            sample_id: row.SAMPLE_ID || '',
+            signature: row.Signature || '',
+            activity: parseFloat(row.Activity || 0),
+            burden: parseFloat(row.Burden || 0)
           })),
         // For now, only h_estData is available from the CSV
         // Other data types would come from additional CSV files or API endpoints
