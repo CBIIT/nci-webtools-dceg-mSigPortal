@@ -30,7 +30,38 @@ export async function main(argv = process.argv, env = process.env) {
 
   const logger = createLogger(env.REFITTING_APP_NAME || 'RefittingService', env.LOG_LEVEL);
   
-  logger.log({ params });
+  // Log what we read from params.json
+  logger.info(`[${id}] Reading params.json from: ${paramsFilePath}`);
+  logger.info(`[${id}] params.json contents:`, JSON.stringify(params, null, 2));
+  logger.info(`[${id}] params.email = ${params.email}`);
+  logger.info(`[${id}] params.jobName = ${params.jobName}`);
+
+  // Get file paths from input directory
+  const fs = await import('fs');
+  const files = fs.readdirSync(inputFolder);
+  const mafFile = files.find(f => f.startsWith('mafFile_'));
+  const genomicFile = files.find(f => f.startsWith('genomicFile_'));
+  const clinicalFile = files.find(f => f.startsWith('clinicalFile_'));
+
+  if (!mafFile || !genomicFile || !clinicalFile) {
+    throw new Error('Missing required input files (mafFile, genomicFile, or clinicalFile)');
+  }
+
+  // Construct complete params object with file paths
+  const completeParams = {
+    ...params,
+    id,
+    mafFile: path.resolve(inputFolder, mafFile),
+    genomicFile: path.resolve(inputFolder, genomicFile),
+    clinicalFile: path.resolve(inputFolder, clinicalFile),
+    outputPath: outputFolder,
+  };
+
+  logger.info(`[${id}] Complete params being passed to refitting:`, JSON.stringify(completeParams, null, 2));
+  logger.info(`[${id}] completeParams.email = ${completeParams.email}`);
+  logger.info(`[${id}] completeParams.jobName = ${completeParams.jobName}`);
   
-  return await refitting(params, logger, env);
+  logger.log({ params: completeParams });
+  
+  return await refitting(completeParams, logger, env);
 }

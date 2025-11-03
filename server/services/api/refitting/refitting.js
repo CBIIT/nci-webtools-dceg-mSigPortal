@@ -399,7 +399,9 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       '--outputPath', outputPath,
       '--genome', params.genome,
       '--matchOnOncotree', params.matchOnOncotree.toString(),
-      '--outputFilename', params.outputFilename
+      '--outputFilename', params.outputFilename,
+      '--jobName', params.jobName || jobId,
+      '--email', params.email || ''
     ];
 
     console.log(`[${jobId}] Node.js arguments:`, nodeArgs);
