@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Table, Button, Form, Alert } from 'react-bootstrap';
+import { Card, Row, Col, Button, Form, Alert } from 'react-bootstrap';
 import { parseCSV } from '../../../services/utils';
+import Table from '../../controls/table/table2';
 
 export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
@@ -106,55 +107,67 @@ export default function TargetedSequencing({ jobId }) {
       };
     });
     
+    // Prepare data for Activity table
+    const activityData = samples.map(sample => {
+      const row = { sample_id: sample };
+      signatures.forEach(sig => {
+        row[sig] = dataLookup[sample]?.[sig]?.activity ?? 'N/A';
+      });
+      return row;
+    });
+    
+    // Prepare data for Burden table
+    const burdenData = samples.map(sample => {
+      const row = { sample_id: sample };
+      signatures.forEach(sig => {
+        row[sig] = dataLookup[sample]?.[sig]?.burden ?? 'N/A';
+      });
+      return row;
+    });
+    
+    // Define columns for Activity table
+    const activityColumns = [
+      {
+        accessor: 'sample_id',
+        Header: 'H_est',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      ...signatures.map(sig => ({
+        accessor: sig,
+        Header: sig,
+      }))
+    ];
+    
+    // Define columns for Burden table
+    const burdenColumns = [
+      {
+        accessor: 'sample_id',
+        Header: 'Burden_est',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      ...signatures.map(sig => ({
+        accessor: sig,
+        Header: sig,
+      }))
+    ];
+    
     return (
       <div>
         <h6>Activity Values</h6>
-        <Table striped bordered hover responsive className="mb-4">
-          <thead>
-            <tr>
-              <th>H_est</th>
-              {signatures.map(sig => (
-                <th key={sig}>{sig}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {samples.map(sample => (
-              <tr key={sample}>
-                <td><strong>{sample}</strong></td>
-                {signatures.map(sig => (
-                  <td key={sig}>
-                    {dataLookup[sample]?.[sig]?.activity ?? 'N/A'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <Table 
+          columns={activityColumns}
+          data={activityData}
+          striped
+          bordered
+        />
         
-        <h6>Burden Values</h6>
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>Burden_est</th>
-              {signatures.map(sig => (
-                <th key={sig}>{sig}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {samples.map(sample => (
-              <tr key={sample}>
-                <td><strong>{sample}</strong></td>
-                {signatures.map(sig => (
-                  <td key={sig}>
-                    {dataLookup[sample]?.[sig]?.burden ?? 'N/A'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <h6 className="mt-4">Burden Values</h6>
+        <Table 
+          columns={burdenColumns}
+          data={burdenData}
+          striped
+          bordered
+        />
       </div>
     );
   };
@@ -171,31 +184,38 @@ export default function TargetedSequencing({ jobId }) {
       );
     }
     
+    const columns = [
+      {
+        accessor: 'sample',
+        Header: 'Sample',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'total_mutations',
+        Header: 'Total Mutations',
+        Cell: ({ value }) => value.toLocaleString(),
+      },
+      {
+        accessor: 'estimated_burden',
+        Header: 'Estimated Burden',
+        Cell: ({ value }) => value.toLocaleString(),
+      },
+      {
+        accessor: 'accuracy',
+        Header: 'Accuracy',
+        Cell: ({ value }) => (
+          <span className="text-success">{value}</span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Sample</th>
-            <th>Total Mutations</th>
-            <th>Estimated Burden</th>
-            <th>Accuracy</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.burden_estData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.sample}</strong></td>
-              <td>{row.total_mutations.toLocaleString()}</td>
-              <td>{row.estimated_burden.toLocaleString()}</td>
-              <td>
-                <span className="text-success">
-                  {row.accuracy}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.burden_estData}
+        striped
+        bordered
+      />
     );
   };
 
@@ -211,31 +231,40 @@ export default function TargetedSequencing({ jobId }) {
       );
     }
     
+    const columns = [
+      {
+        accessor: 'signature',
+        Header: 'Signature',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'original',
+        Header: 'Original Weight',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'refitted',
+        Header: 'Refitted Weight',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'similarity',
+        Header: 'Cosine Similarity',
+        Cell: ({ value }) => (
+          <span className={value >= 0.95 ? 'text-success' : value >= 0.90 ? 'text-warning' : 'text-danger'}>
+            {value.toFixed(3)}
+          </span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Signature</th>
-            <th>Original Weight</th>
-            <th>Refitted Weight</th>
-            <th>Cosine Similarity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.cosineData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.signature}</strong></td>
-              <td>{row.original.toFixed(3)}</td>
-              <td>{row.refitted.toFixed(3)}</td>
-              <td>
-                <span className={row.similarity >= 0.95 ? 'text-success' : row.similarity >= 0.90 ? 'text-warning' : 'text-danger'}>
-                  {row.similarity.toFixed(3)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.cosineData}
+        striped
+        bordered
+      />
     );
   };
 
@@ -251,31 +280,39 @@ export default function TargetedSequencing({ jobId }) {
       );
     }
     
+    const columns = [
+      {
+        accessor: 'model',
+        Header: 'Model',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'signatures',
+        Header: 'Signatures',
+      },
+      {
+        accessor: 'bic',
+        Header: 'BIC Score',
+        Cell: ({ value }) => value.toFixed(1),
+      },
+      {
+        accessor: 'deltaAIC',
+        Header: 'Δ AIC',
+        Cell: ({ value }) => (
+          <span className={value < 0 ? 'text-success' : 'text-muted'}>
+            {value.toFixed(1)}
+          </span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Signatures</th>
-            <th>BIC Score</th>
-            <th>Δ AIC</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.bicData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.model}</strong></td>
-              <td>{row.signatures}</td>
-              <td>{row.bic.toFixed(1)}</td>
-              <td>
-                <span className={row.deltaAIC < 0 ? 'text-success' : 'text-muted'}>
-                  {row.deltaAIC.toFixed(1)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.bicData}
+        striped
+        bordered
+      />
     );
   };
 
@@ -291,31 +328,38 @@ export default function TargetedSequencing({ jobId }) {
       );
     }
     
+    const columns = [
+      {
+        accessor: 'sample',
+        Header: 'Sample',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'original',
+        Header: 'Original L2 Norm',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'refitted',
+        Header: 'Refitted L2 Norm',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'improvement',
+        Header: 'Improvement',
+        Cell: ({ value }) => (
+          <span className="text-success">{value}</span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Sample</th>
-            <th>Original L2 Norm</th>
-            <th>Refitted L2 Norm</th>
-            <th>Improvement</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.l2NormData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.sample}</strong></td>
-              <td>{row.original.toFixed(3)}</td>
-              <td>{row.refitted.toFixed(3)}</td>
-              <td>
-                <span className="text-success">
-                  {row.improvement}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.l2NormData}
+        striped
+        bordered
+      />
     );
   };
 
