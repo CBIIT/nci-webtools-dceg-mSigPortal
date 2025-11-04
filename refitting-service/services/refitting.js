@@ -17,17 +17,6 @@ export async function refitting(params, logger, env = process.env) {
   const start = new Date();
   const { id, mafFile, genomicFile, clinicalFile, outputPath, genome, outputFilename, matchOnOncotree, jobName, email } = params;
   
-  // Log all parameters for debugging
-  logger.info(`[${id}] ========== REFITTING JOB START ==========`);
-  logger.info(`[${id}] All parameters received:`, JSON.stringify(params, null, 2));
-  logger.info(`[${id}] Extracted email parameter: ${email}`);
-  logger.info(`[${id}] Extracted jobName parameter: ${jobName}`);
-  logger.info(`[${id}] Environment variables - APP_BASE_URL: ${env.APP_BASE_URL}`);
-  logger.info(`[${id}] Environment variables - EMAIL_SMTP_HOST: ${env.EMAIL_SMTP_HOST}`);
-  logger.info(`[${id}] Environment variables - EMAIL_SMTP_PORT: ${env.EMAIL_SMTP_PORT}`);
-  logger.info(`[${id}] Environment variables - EMAIL_ADMIN: ${env.EMAIL_ADMIN}`);
-  logger.info(`[${id}] ==========================================`);
-  
   // Get paths for status file
   const statusFilePath = path.join(outputPath, 'status.json');
   
@@ -104,10 +93,6 @@ export async function refitting(params, logger, env = process.env) {
     logger.info(`[${id}] Checking email notification - email param: ${email}, params.email: ${params.email}`);
     if (params.email) {
       logger.info(`[${id}] Email is provided, preparing to send success notification`);
-      logger.info(`[${id}] Email address: ${email}`);
-      logger.info(`[${id}] Job name: ${jobName || id}`);
-      logger.info(`[${id}] APP_BASE_URL: ${env.APP_BASE_URL || 'http://localhost:8330'}`);
-      logger.info(`[${id}] Email environment - SMTP Host: ${env.EMAIL_SMTP_HOST}, Port: ${env.EMAIL_SMTP_PORT}, Admin: ${env.EMAIL_ADMIN}`);
       
       try {
         const submittedTime = new Date(statusData.submittedAt || start);
@@ -162,10 +147,6 @@ export async function refitting(params, logger, env = process.env) {
     logger.info(`[${id}] Checking failure email notification - email param: ${email}, params.email: ${params.email}`);
     if (params.email) {
       logger.info(`[${id}] Email is provided, preparing to send failure notification`);
-      logger.info(`[${id}] Email address: ${email}`);
-      logger.info(`[${id}] Job name: ${jobName || id}`);
-      logger.info(`[${id}] APP_BASE_URL: ${env.APP_BASE_URL || 'http://localhost:8330'}`);
-      logger.info(`[${id}] Email environment - SMTP Host: ${env.EMAIL_SMTP_HOST}, Port: ${env.EMAIL_SMTP_PORT}, Admin: ${env.EMAIL_ADMIN}`);
       
       try {
         const submittedTime = new Date(statusData.submittedAt || start);
