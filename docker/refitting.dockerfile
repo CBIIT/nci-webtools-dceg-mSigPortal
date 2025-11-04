@@ -32,5 +32,4 @@ RUN touch .env
 
 EXPOSE 8334
 
-# CMD npm run start
-CMD sleep infinity
+CMD npm run start
