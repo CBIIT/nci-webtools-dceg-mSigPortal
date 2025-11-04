@@ -8,6 +8,7 @@ import { body, validationResult } from 'express-validator';
 import { getWorker } from '../../workers.js';
 
 export const router = Router();
+const env = process.env;
 
 // Configure multer for file uploads
 const upload = multer({
@@ -87,8 +88,8 @@ router.post('/submitRefitting/:id',
         });
       }
 
-      const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
-      const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+      const inputPath = path.join(env.INPUT_FOLDER || './data/input', jobId);
+      const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', jobId);
       
       console.log('Input path:', inputPath);
       console.log('Output path:', outputPath);
@@ -170,10 +171,13 @@ router.post('/submitRefitting/:id',
         logger
       });
       // Get worker based on environment configuration
-       const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
-      
+      // const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
+      const type =
+          env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'fargate';
+        const worker = getWorker(type);
+
       // Start the refitting process using worker
-       worker(jobId, req.app, 'refitting', process.env);
+       worker(jobId, req.app, 'refitting', env);
 
       console.log('Responding with success...');
       // Return job ID immediately
@@ -252,8 +256,8 @@ router.get('/refitting/run/:id', async (req, res) => {
   }
 
   try {
-    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+    const inputPath = path.join(env.INPUT_FOLDER || './data/input', jobId);
+    const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', jobId);
     
     const paramsFile = path.join(inputPath, 'params.json');
     if (!fs.existsSync(paramsFile)) {
@@ -318,8 +322,8 @@ async function getJobStatus(id) {
   }
 
   try {
-    const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', id);
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', id);
+    const inputPath = path.join(env.INPUT_FOLDER || './data/input', id);
+    const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', id);
     
     const paramsFile = path.join(inputPath, 'params.json');
     const statusFile = path.join(outputPath, 'status.json');
