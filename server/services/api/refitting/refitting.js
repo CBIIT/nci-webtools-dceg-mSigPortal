@@ -407,15 +407,10 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       '--jobName', params.jobName || jobId,
       '--email', params.email || ''
     ];
-
-    console.log(`[${jobId}] Node.js arguments:`, nodeArgs);
-    console.log(`[${jobId}] Working directory: ${refittingServicePath}`);
-    console.log(`[${jobId}] About to execute: node ${nodeArgs.join(' ')}`);
     
     logger.info(`Starting refitting process for job ${jobId}`);
 
-    // Execute the refitting service
-    console.log(`[${jobId}] Executing refitting service...`);
+    // Execute the refitting service   
     const { stdout, stderr } = await execa('node', nodeArgs, {
       cwd: refittingServicePath,
       timeout: 30 * 60 * 1000, // 30 minutes timeout
