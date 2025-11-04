@@ -1,3 +1,6 @@
-install.packages(c("tidyverse", "jsonlite", "BiocManager"))
+install.packages("devtools")
+devtools::install_version("tidyverse", version = "2.0.0")
+devtools::install_version("jsonlite", version = "2.0.0")
+devtools::install_version("BiocManager", version = "1.30.26")
 BiocManager::install(c("BSgenome.Hsapiens.UCSC.hg38", "BSgenome.Hsapiens.UCSC.hg19"))
-install.packages("SATS")
+devtools::install_version("SATS", version = "1.0.6")
