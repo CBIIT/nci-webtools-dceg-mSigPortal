@@ -7,7 +7,6 @@ import {
 } from '../etiology/apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Plotly from '../../../controls/plotly/plot/plot';
-import SATSSection from '../etiology/SATSSection';
 
 export default function STSSignatureInfo({ data }) {
   const dispatch = useDispatch();
@@ -192,9 +191,6 @@ export default function STSSignatureInfo({ data }) {
                 <div className="text-center my-4">No data available</div>
               )}
             </div>
-            {signature && (
-              <SATSSection selectedSignature={signature} />
-            )}
           </div>
         </>
       )}

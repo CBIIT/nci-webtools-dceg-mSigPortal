@@ -5,6 +5,7 @@ import { actions as catalogActions } from '../../../../services/store/catalog';
 import STSEtiologyOptions from './stsEtiologyOptions';
 import STSSignatureOptions from './stsSignatureOptions';
 import STSSignatureInfo from './stsSignatureInfo';
+import STSTissueDistribution from './STSTissueDistribution';
 import { useEtiologyOptionsQuery } from '../etiology/apiSlice';
 import '../etiology/etiology.scss';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -42,6 +43,10 @@ export default function STS() {
       <p className="text-muted">
         Unlike COSMIC signatures, which are derived from tumor mutational counts (TMC) obtained from whole-genome or whole-exome sequencing (WGS/WES), signatures from targeted sequencing are derived from tumor mutational burden (TMB) estimated using targeted sequencing panels. Consequently, the profiles of TMC- and TMB-based signatures are similar but not identical (e.g., SBS5).
       </p>
+      
+      {/* Tissue Distribution with both SBS and DBS plots */}
+      <STSTissueDistribution selectedSignature={signature} />
+      
       {data && data[0]?.category == category ? (
         <>
           <STSEtiologyOptions data={data} />
