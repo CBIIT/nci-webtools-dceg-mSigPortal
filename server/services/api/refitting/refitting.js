@@ -120,6 +120,7 @@ router.post('/submitRefitting/:id',
         jobName: req.body.jobName || 'Refitting Job',
         email: req.body.email,
         genome: req.body.genome || 'hg19',
+        signatureType: req.body.signatureType || 'SBS',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
       };

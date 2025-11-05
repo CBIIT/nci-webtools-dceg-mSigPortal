@@ -29,7 +29,6 @@ export default function TargetedSequencing({ jobId }) {
       if (paramsResponse.ok) {
         const paramsText = await paramsResponse.text();
         const params = JSON.parse(paramsText);
-        console.log('Loaded job parameters:', params);
         setJobParams(params);
       } else {
         console.warn('Could not load job parameters, using defaults');
