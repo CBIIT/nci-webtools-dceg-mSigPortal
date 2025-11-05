@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "nodemailer": "^6.9.0",
     "r-wrapper": "^1.1.2",
     "winston": "^3.17.0"
   }

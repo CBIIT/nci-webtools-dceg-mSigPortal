@@ -1,100 +1,90 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, Table, Button, Form, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Button, Form, Alert } from 'react-bootstrap';
+import { parseCSV } from '../../../services/utils';
+import Table from '../../controls/table/table2';
 
-export default function TargetedSequencing() {
+export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('sigprofiler');
+  const [csvData, setCsvData] = useState([]);
+  const [jobParams, setJobParams] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Mock signature type from submitted job - this would come from props/context in real implementation
-  const submittedSignatureType = 'SBS'; // This would be passed from the form submission
+  // Load CSV data and job parameters when jobId changes
+  useEffect(() => {
+    if (jobId) {
+      loadJobData(jobId);
+    }
+  }, [jobId]);
 
-  // Mock data for SBS results - based on actual R function output
-  const sbsResults = {
-    h_estData: [
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS10a', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS10b', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS40a', activity: 0.003, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS5', activity: 28.034, burden: 2 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'SBS6', activity: 0.001, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS10b', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS5', activity: 32.735, burden: 2.34 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS7a', activity: 37.782, burden: 2.65 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'SBS7b', activity: 0.16, burden: 0.01 }
-    ],
-    burden_estData: [
-      { 
-        sample: 'GENIE-DFCI-050984-218969', 
-        total_mutations: 1847, estimated_burden: 1623, accuracy: '87.9%' 
-      },
-      { 
-        sample: 'GENIE-DFCI-109295-436549', 
-        total_mutations: 2156, estimated_burden: 1934, accuracy: '89.7%' 
+  const loadJobData = async (jobId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log(`Loading job data for: ${jobId}`);
+      
+      // Load job parameters from params.json
+      const paramsResponse = await fetch(`/mutational-signatures/api/data/input/${jobId}/params.json`);
+      if (paramsResponse.ok) {
+        const paramsText = await paramsResponse.text();
+        const params = JSON.parse(paramsText);
+        setJobParams(params);
+      } else {
+        console.warn('Could not load job parameters, using defaults');
+        setJobParams({ signatureType: 'SBS' }); // Default fallback
       }
-    ],
-    cosineData: [
-      { signature: 'SBS1', original: 0.95, refitted: 0.92, similarity: 0.97 },
-      { signature: 'SBS2', original: 0.88, refitted: 0.85, similarity: 0.94 },
-      { signature: 'SBS3', original: 0.76, refitted: 0.79, similarity: 0.96 },
-      { signature: 'SBS13', original: 0.82, refitted: 0.80, similarity: 0.98 }
-    ],
-    bicData: [
-      { model: 'Original', signatures: 4, bic: -2847.3, deltaAIC: 0.0 },
-      { model: 'Refitted (SigProfiler)', signatures: 4, bic: -2891.7, deltaAIC: -44.4 },
-      { model: 'Refitted (deconstructSigs)', signatures: 3, bic: -2856.2, deltaAIC: -8.9 }
-    ],
-    l2NormData: [
-      { sample: 'Sample_001', original: 0.23, refitted: 0.19, improvement: '17.4%' },
-      { sample: 'Sample_002', original: 0.31, refitted: 0.28, improvement: '9.7%' },
-      { sample: 'Sample_003', original: 0.18, refitted: 0.15, improvement: '16.7%' },
-      { sample: 'Sample_004', original: 0.42, refitted: 0.38, improvement: '9.5%' }
-    ]
+      
+      // Load CSV data
+      const csvResponse = await fetch(`/mutational-signatures/api/data/output/${jobId}/H_Burden_est.csv`);
+      if (!csvResponse.ok) {
+        throw new Error(`Failed to load CSV data: ${csvResponse.status} ${csvResponse.statusText}`);
+      }
+      const csvText = await csvResponse.text();
+      console.log('Raw CSV text:', csvText.substring(0, 500)); // Log first 500 chars
+      const parsedData = await parseCSV(csvText);
+      console.log('Parsed CSV data:', parsedData.slice(0, 5)); // Log first 5 rows
+      setCsvData(parsedData);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error loading job data:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Mock data for DBS results - following same format as SBS
-  const dbsResults = {
-    h_estData: [
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS1', activity: 0, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS2', activity: 12.456, burden: 1.2 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS6', activity: 0.002, burden: 0 },
-      { sample_id: 'GENIE-DFCI-050984-218969', signature: 'DBS11', activity: 8.923, burden: 0.8 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS1', activity: 15.234, burden: 1.5 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS2', activity: 23.567, burden: 2.1 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS6', activity: 0.045, burden: 0 },
-      { sample_id: 'GENIE-DFCI-109295-436549', signature: 'DBS11', activity: 18.789, burden: 1.7 }
-    ],
-    burden_estData: [
-      { 
-        sample: 'GENIE-DFCI-050984-218969', 
-        total_mutations: 342, estimated_burden: 298, accuracy: '87.1%' 
-      },
-      { 
-        sample: 'GENIE-DFCI-109295-436549', 
-        total_mutations: 458, estimated_burden: 412, accuracy: '90.0%' 
-      }
-    ],
-    cosineData: [
-      { signature: 'DBS1', original: 0.89, refitted: 0.87, similarity: 0.95 },
-      { signature: 'DBS2', original: 0.93, refitted: 0.91, similarity: 0.97 },
-      { signature: 'DBS6', original: 0.71, refitted: 0.74, similarity: 0.94 },
-      { signature: 'DBS11', original: 0.86, refitted: 0.84, similarity: 0.96 }
-    ],
-    bicData: [
-      { model: 'Original', signatures: 4, bic: -1923.7, deltaAIC: 0.0 },
-      { model: 'Refitted (SigProfiler)', signatures: 4, bic: -1967.2, deltaAIC: -43.5 },
-      { model: 'Refitted (deconstructSigs)', signatures: 3, bic: -1931.4, deltaAIC: -7.7 }
-    ],
-    l2NormData: [
-      { sample: 'Sample_001', original: 0.27, refitted: 0.23, improvement: '14.8%' },
-      { sample: 'Sample_002', original: 0.34, refitted: 0.31, improvement: '8.8%' },
-      { sample: 'Sample_003', original: 0.21, refitted: 0.18, improvement: '14.3%' },
-      { sample: 'Sample_004', original: 0.39, refitted: 0.35, improvement: '10.3%' }
-    ]
-  };
+  // Get signature type from job parameters
+  const submittedSignatureType = jobParams?.signatureType || 'SBS';
 
   const getCurrentResults = () => {
-    return submittedSignatureType.toLowerCase() === 'sbs' ? sbsResults : dbsResults;
+    // If we have real CSV data and a jobId, use it
+    if (jobId && csvData.length > 0) {
+      return {
+        h_estData: csvData
+          .filter(row => row.SAMPLE_ID ) // Filter out empty rows
+          .map(row => ({
+            sample_id: row.SAMPLE_ID || '',
+            signature: row.Signature || '',
+            activity: parseFloat(row.Activity || 0),
+            burden: parseFloat(row.Burden || 0)
+          })),
+        // For now, only h_estData is available from the CSV
+        // Other data types would come from additional CSV files or API endpoints
+        burden_estData: [],
+        cosineData: [],
+        bicData: [],
+        l2NormData: []
+      };
+    }
+    
+    // Return empty structure when no data is available
+    return {
+      h_estData: [],
+      burden_estData: [],
+      cosineData: [],
+      bicData: [],
+      l2NormData: []
+    };
   };
 
   const renderHEstResults = () => {
@@ -116,176 +106,259 @@ export default function TargetedSequencing() {
       };
     });
     
+    // Prepare data for Activity table
+    const activityData = samples.map(sample => {
+      const row = { sample_id: sample };
+      signatures.forEach(sig => {
+        row[sig] = dataLookup[sample]?.[sig]?.activity ?? 'N/A';
+      });
+      return row;
+    });
+    
+    // Prepare data for Burden table
+    const burdenData = samples.map(sample => {
+      const row = { sample_id: sample };
+      signatures.forEach(sig => {
+        row[sig] = dataLookup[sample]?.[sig]?.burden ?? 'N/A';
+      });
+      return row;
+    });
+    
+    // Define columns for Activity table
+    const activityColumns = [
+      {
+        accessor: 'sample_id',
+        Header: 'H_est',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      ...signatures.map(sig => ({
+        accessor: sig,
+        Header: sig,
+      }))
+    ];
+    
+    // Define columns for Burden table
+    const burdenColumns = [
+      {
+        accessor: 'sample_id',
+        Header: 'Burden_est',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      ...signatures.map(sig => ({
+        accessor: sig,
+        Header: sig,
+      }))
+    ];
+    
     return (
       <div>
         <h6>Activity Values</h6>
-        <Table striped bordered hover responsive className="mb-4">
-          <thead>
-            <tr>
-              <th>H_est</th>
-              {signatures.map(sig => (
-                <th key={sig}>{sig}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {samples.map(sample => (
-              <tr key={sample}>
-                <td><strong>{sample}</strong></td>
-                {signatures.map(sig => (
-                  <td key={sig}>
-                    {dataLookup[sample]?.[sig]?.activity ?? 'N/A'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <Table 
+          columns={activityColumns}
+          data={activityData}
+          striped
+          bordered
+        />
         
-        <h6>Burden Values</h6>
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>Burden_est</th>
-              {signatures.map(sig => (
-                <th key={sig}>{sig}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {samples.map(sample => (
-              <tr key={sample}>
-                <td><strong>{sample}</strong></td>
-                {signatures.map(sig => (
-                  <td key={sig}>
-                    {dataLookup[sample]?.[sig]?.burden ?? 'N/A'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <h6 className="mt-4">Burden Values</h6>
+        <Table 
+          columns={burdenColumns}
+          data={burdenData}
+          striped
+          bordered
+        />
       </div>
     );
   };
 
   const renderBurdenEstResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.burden_estData || results.burden_estData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No Burden Estimation Data:</strong> This data is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display burden estimation results.
+        </Alert>
+      );
+    }
+    
+    const columns = [
+      {
+        accessor: 'sample',
+        Header: 'Sample',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'total_mutations',
+        Header: 'Total Mutations',
+        Cell: ({ value }) => value.toLocaleString(),
+      },
+      {
+        accessor: 'estimated_burden',
+        Header: 'Estimated Burden',
+        Cell: ({ value }) => value.toLocaleString(),
+      },
+      {
+        accessor: 'accuracy',
+        Header: 'Accuracy',
+        Cell: ({ value }) => (
+          <span className="text-success">{value}</span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Sample</th>
-            <th>Total Mutations</th>
-            <th>Estimated Burden</th>
-            <th>Accuracy</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.burden_estData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.sample}</strong></td>
-              <td>{row.total_mutations.toLocaleString()}</td>
-              <td>{row.estimated_burden.toLocaleString()}</td>
-              <td>
-                <span className="text-success">
-                  {row.accuracy}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.burden_estData}
+        striped
+        bordered
+      />
     );
   };
 
   const renderCosineResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.cosineData || results.cosineData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No Cosine Similarity Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display cosine similarity results.
+        </Alert>
+      );
+    }
+    
+    const columns = [
+      {
+        accessor: 'signature',
+        Header: 'Signature',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'original',
+        Header: 'Original Weight',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'refitted',
+        Header: 'Refitted Weight',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'similarity',
+        Header: 'Cosine Similarity',
+        Cell: ({ value }) => (
+          <span className={value >= 0.95 ? 'text-success' : value >= 0.90 ? 'text-warning' : 'text-danger'}>
+            {value.toFixed(3)}
+          </span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Signature</th>
-            <th>Original Weight</th>
-            <th>Refitted Weight</th>
-            <th>Cosine Similarity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.cosineData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.signature}</strong></td>
-              <td>{row.original.toFixed(3)}</td>
-              <td>{row.refitted.toFixed(3)}</td>
-              <td>
-                <span className={row.similarity >= 0.95 ? 'text-success' : row.similarity >= 0.90 ? 'text-warning' : 'text-danger'}>
-                  {row.similarity.toFixed(3)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.cosineData}
+        striped
+        bordered
+      />
     );
   };
 
   const renderBICResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.bicData || results.bicData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No BIC Analysis Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display BIC model comparison results.
+        </Alert>
+      );
+    }
+    
+    const columns = [
+      {
+        accessor: 'model',
+        Header: 'Model',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'signatures',
+        Header: 'Signatures',
+      },
+      {
+        accessor: 'bic',
+        Header: 'BIC Score',
+        Cell: ({ value }) => value.toFixed(1),
+      },
+      {
+        accessor: 'deltaAIC',
+        Header: 'Δ AIC',
+        Cell: ({ value }) => (
+          <span className={value < 0 ? 'text-success' : 'text-muted'}>
+            {value.toFixed(1)}
+          </span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Signatures</th>
-            <th>BIC Score</th>
-            <th>Δ AIC</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.bicData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.model}</strong></td>
-              <td>{row.signatures}</td>
-              <td>{row.bic.toFixed(1)}</td>
-              <td>
-                <span className={row.deltaAIC < 0 ? 'text-success' : 'text-muted'}>
-                  {row.deltaAIC.toFixed(1)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.bicData}
+        striped
+        bordered
+      />
     );
   };
 
   const renderL2NormResults = () => {
     const results = getCurrentResults();
+    
+    if (!results.l2NormData || results.l2NormData.length === 0) {
+      return (
+        <Alert variant="info">
+          <strong>No L2 Norm Analysis Data:</strong> This analysis is not available in the current H_Burden_est.csv file. 
+          Additional analysis outputs would be needed to display L2 norm error analysis results.
+        </Alert>
+      );
+    }
+    
+    const columns = [
+      {
+        accessor: 'sample',
+        Header: 'Sample',
+        Cell: ({ value }) => <strong>{value}</strong>,
+      },
+      {
+        accessor: 'original',
+        Header: 'Original L2 Norm',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'refitted',
+        Header: 'Refitted L2 Norm',
+        Cell: ({ value }) => value.toFixed(3),
+      },
+      {
+        accessor: 'improvement',
+        Header: 'Improvement',
+        Cell: ({ value }) => (
+          <span className="text-success">{value}</span>
+        ),
+      },
+    ];
+    
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Sample</th>
-            <th>Original L2 Norm</th>
-            <th>Refitted L2 Norm</th>
-            <th>Improvement</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.l2NormData.map((row, index) => (
-            <tr key={index}>
-              <td><strong>{row.sample}</strong></td>
-              <td>{row.original.toFixed(3)}</td>
-              <td>{row.refitted.toFixed(3)}</td>
-              <td>
-                <span className="text-success">
-                  {row.improvement}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Table 
+        columns={columns}
+        data={results.l2NormData}
+        striped
+        bordered
+      />
     );
   };
 
@@ -293,17 +366,46 @@ export default function TargetedSequencing() {
     <div className="bg-white border rounded p-3">
       <h4>Targeted Sequencing Results</h4>
       
-      <Alert 
-        variant="info" 
-        style={{ 
-          backgroundColor: '#689f39', 
-          borderColor: '#689f39', 
-          color: 'white' 
-        }}
-      >
-        <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully. 
-        Below are the comprehensive results showing the performance comparison between original and refitted signatures.
-      </Alert>
+      {jobParams && (
+        <div className="mb-3">
+          <small className="text-muted">
+            <strong>Job:</strong> {jobParams.jobName || jobParams.jobId} | 
+            <strong> Signature Type:</strong> {jobParams.signatureType} | 
+            <strong> Genome:</strong> {jobParams.genome}
+          </small>
+        </div>
+      )}
+      
+      {!jobId && (
+        <Alert variant="warning">
+          <strong>No Job Selected:</strong> Please select a job from the Status tab to view targeted sequencing results.
+        </Alert>
+      )}
+      
+      {jobId && loading && (
+        <Alert variant="info">
+          <strong>Loading:</strong> Loading analysis results for job {jobId}...
+        </Alert>
+      )}
+      
+      {jobId && error && (
+        <Alert variant="danger">
+          <strong>Error:</strong> {error}
+        </Alert>
+      )}
+      
+      {jobId && !loading && !error && (
+        <>
+          <Alert 
+            variant="info" 
+            style={{ 
+              backgroundColor: '#689f39', 
+              borderColor: '#689f39', 
+              color: 'white' 
+            }}
+          >
+            <strong>Analysis Complete:</strong> Your refitting analysis has been completed successfully.         
+          </Alert>
 
       <Card className="mb-4">
         <Card.Header>
@@ -363,6 +465,8 @@ export default function TargetedSequencing() {
           )}
         </Card.Body>
       </Card>
+        </>
+      )}
 
       
     </div>

@@ -99,16 +99,17 @@ export default function RefittingForm() {
 
     // Store job in localStorage (like extraction)
     const jobs = JSON.parse(localStorage.getItem('refitting-jobs') || '[]');
-    const newJob = {
-      id: jobId,
-      jobName: data.jobName,
-      status: 'SUBMITTED',
-      submittedAt: new Date().toISOString(),
-      email: data.email
-    };
-    const updatedJobs = [...jobs, newJob];
+    // const newJob = {
+    //   id: jobId,
+    //   jobName: data.jobName,
+    //   status: 'SUBMITTED',
+    //   submittedAt: new Date().toISOString(),
+    //   email: data.email
+    // };
+
+    const updatedJobs = [...jobs, jobId];
     localStorage.setItem('refitting-jobs', JSON.stringify(updatedJobs));
-    console.log('Stored refitting job:', newJob);
+    console.log('Stored refitting job:', jobId);
     console.log('All refitting jobs:', updatedJobs);
 
     // Create FormData for file upload
@@ -117,6 +118,7 @@ export default function RefittingForm() {
     formData.append('genomicFile', data.genomicFile);
     formData.append('clinicalFile', data.clinicalFile);
     formData.append('genome', data.referenceGenome);
+    formData.append('signatureType', data.signatureType);
     formData.append('email', data.email);
     formData.append('jobName', data.jobName);
 

@@ -40,6 +40,8 @@ export async function runLocalWorker(id, app, taskName, env = process.env) {
     return await profilerExtraction(params, logger, dbConnection, env);
   } else if (taskName === 'extraction') {
     fetch(`${env.API_BASE_URL}/extraction/run/${id}`);
+  } else if (taskName === 'refitting') {
+    fetch(`${env.API_BASE_URL}/refitting/run/${id}`);
   }
 }
 
@@ -58,6 +60,10 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
     extraction: {
       name: 'extraction-worker',
       taskDefinition: env.EXTRACTION_WORKER_TASK_NAME,
+    },
+    refitting: {
+      name: 'refitting-worker',
+      taskDefinition: env.REFITTING_WORKER_TASK_NAME,
     },
   };
   const client = new ECSClient();

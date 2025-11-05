@@ -5,8 +5,10 @@ import fs from 'fs-extra';
 import { v4 as uuid, validate as validateUUID } from 'uuid';
 import { execa } from 'execa';
 import { body, validationResult } from 'express-validator';
+import { getWorker } from '../../workers.js';
 
 export const router = Router();
+const env = process.env;
 
 // Configure multer for file uploads
 const upload = multer({
@@ -86,8 +88,8 @@ router.post('/submitRefitting/:id',
         });
       }
 
-      const inputPath = path.join(process.env.INPUT_FOLDER || './data/input', jobId);
-      const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
+      const inputPath = path.join(env.INPUT_FOLDER || './data/input', jobId);
+      const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', jobId);
       
       console.log('Input path:', inputPath);
       console.log('Output path:', outputPath);
@@ -115,7 +117,10 @@ router.post('/submitRefitting/:id',
       // Extract parameters with defaults
       const params = {
         jobId,
+        jobName: req.body.jobName || 'Refitting Job',
+        email: req.body.email,
         genome: req.body.genome || 'hg19',
+        signatureType: req.body.signatureType || 'SBS',
         matchOnOncotree: req.body.matchOnOncotree === 'true' || false,
         outputFilename: req.body.outputFilename || 'H_Burden_est.csv'
       };
@@ -129,7 +134,7 @@ router.post('/submitRefitting/:id',
       const initialStatus = {
         id: jobId,
         status: 'SUBMITTED',
-        startTime: new Date().toISOString()
+        submittedAt: new Date().toISOString()
       };
       await fs.writeJson(statusFilePath, initialStatus);
 
@@ -166,6 +171,14 @@ router.post('/submitRefitting/:id',
         params,
         logger
       });
+      // Get worker based on environment configuration
+      // const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
+      const type =
+          env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'fargate';
+        const worker = getWorker(type);
+
+      // Start the refitting process using worker
+       worker(jobId, req.app, 'refitting', env);
 
       console.log('Responding with success...');
       // Return job ID immediately
@@ -206,32 +219,17 @@ router.get('/refreshRefitting/:id', async (req, res) => {
   }
 
   try {
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
-    const statusFile = path.join(outputPath, 'status.json');
-    
-    // Check if status file exists
-    if (!fs.existsSync(statusFile)) {
+    const jobStatus = await getJobStatus(jobId);
+    if (typeof jobStatus === 'string') {
       return res.status(404).json({
         success: false,
-        error: 'Job not found'
+        error: jobStatus
       });
     }
-
-    const status = await fs.readJson(statusFile);
-    
-    // If job is completed, check for output file
-    if (status.status === 'COMPLETED') {
-      const outputFile = path.join(outputPath, status.outputFilename || 'H_Burden_est.csv');
-      if (fs.existsSync(outputFile)) {
-        status.downloadUrl = `/refitting/download/${jobId}/${status.outputFilename || 'H_Burden_est.csv'}`;
-      }
-    }
-
     res.json({
       success: true,
-      ...status
+      ...jobStatus.status
     });
-
   } catch (error) {
     logger.error(`Error checking status for job ${jobId}:`, error);
     res.status(500).json({
@@ -243,12 +241,12 @@ router.get('/refreshRefitting/:id', async (req, res) => {
 });
 
 /**
- * GET /refitting/download/:jobId/:filename
- * Download the results of a completed refitting job
+ * GET /refitting/run/:id
+ * Execute the refitting job (called by worker)
  */
-router.get('/refitting/download/:jobId/:filename', async (req, res) => {
+router.get('/refitting/run/:id', async (req, res) => {
   const logger = req.app.locals.logger;
-  const { jobId, filename } = req.params;
+  const { id: jobId } = req.params;
 
   // Validate that jobId is a valid UUID
   if (!validateUUID(jobId)) {
@@ -259,30 +257,112 @@ router.get('/refitting/download/:jobId/:filename', async (req, res) => {
   }
 
   try {
-    const outputPath = path.join(process.env.OUTPUT_FOLDER || './data/output', jobId);
-    const filePath = path.join(outputPath, filename);
-
-    // Security check: ensure the file is within the job's output directory
-    const resolvedPath = path.resolve(filePath);
-    const resolvedOutputPath = path.resolve(outputPath);
-    if (!resolvedPath.startsWith(resolvedOutputPath)) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    if (!fs.existsSync(filePath)) {
+    const inputPath = path.join(env.INPUT_FOLDER || './data/input', jobId);
+    const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', jobId);
+    
+    const paramsFile = path.join(inputPath, 'params.json');
+    if (!fs.existsSync(paramsFile)) {
       return res.status(404).json({
         success: false,
-        error: 'File not found'
+        error: `Job not found: ${jobId}`
       });
     }
 
-    res.download(filePath, filename);
+    const params = await fs.readJson(paramsFile);
+    
+    // Get file paths from input directory
+    const files = fs.readdirSync(inputPath);
+    const mafFile = files.find(f => f.startsWith('mafFile_'));
+    const genomicFile = files.find(f => f.startsWith('genomicFile_'));
+    const clinicalFile = files.find(f => f.startsWith('clinicalFile_'));
 
+    if (!mafFile || !genomicFile || !clinicalFile) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required input files'
+      });
+    }
+
+    const mafFilePath = path.join(inputPath, mafFile);
+    const genomicFilePath = path.join(inputPath, genomicFile);
+    const clinicalFilePath = path.join(inputPath, clinicalFile);
+
+    // Start the refitting process asynchronously
+    startRefittingJob({
+      jobId,
+      mafFilePath,
+      genomicFilePath,
+      clinicalFilePath,
+      inputPath,
+      outputPath,
+      params,
+      logger
+    });
+
+    res.json({
+      success: true,
+      jobId: jobId,
+      message: 'Refitting job started'
+    });
   } catch (error) {
-    logger.error(`Error downloading file for job ${jobId}:`, error);
+    logger.error(`Error running refitting job ${jobId}:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Helper function to get job status, params
+ */
+async function getJobStatus(id) {
+  if (!validateUUID(id)) {
+    return `${id} is not a valid ID`;
+  }
+
+  try {
+    const inputPath = path.join(env.INPUT_FOLDER || './data/input', id);
+    const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', id);
+    
+    const paramsFile = path.join(inputPath, 'params.json');
+    const statusFile = path.join(outputPath, 'status.json');
+    
+    // Check if files exist
+    if (!fs.existsSync(statusFile)) {
+      return `Job not found: ${id}`;
+    }
+
+    const params = fs.existsSync(paramsFile) ? await fs.readJson(paramsFile) : {};
+    const status = await fs.readJson(statusFile);
+    
+    // If job is completed, check for output file
+    if (status.status === 'COMPLETED') {
+      const outputFile = path.join(outputPath, status.outputFilename || 'H_Burden_est.csv');
+      if (fs.existsSync(outputFile)) {
+        status.downloadUrl = `/refitting/download/${id}/${status.outputFilename || 'H_Burden_est.csv'}`;
+      }
+    }
+
+    return { params, status };
+  } catch (error) {
+    return error.message;
+  }
+}
+
+/**
+ * POST /refreshRefittingMulti
+ * Check the status of multiple refitting jobs
+ */
+router.post('/refreshRefittingMulti', async (req, res) => {
+  const logger = req.app.locals.logger;
+  try {
+    const ids = req.body;
+    const statuses = await Promise.all(ids.map(getJobStatus));
+    res.json(statuses);
+  } catch (error) {
+    logger.error('/refreshRefittingMulti Error');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -306,7 +386,7 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'PROCESSING',
-      startTime: new Date().toISOString(),
+      submittedAt: new Date().toISOString(),
       params
     });
     console.log(`[${jobId}] Status updated to PROCESSING`);
@@ -324,17 +404,14 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
       '--outputPath', outputPath,
       '--genome', params.genome,
       '--matchOnOncotree', params.matchOnOncotree.toString(),
-      '--outputFilename', params.outputFilename
+      '--outputFilename', params.outputFilename,
+      '--jobName', params.jobName || jobId,
+      '--email', params.email || ''
     ];
-
-    console.log(`[${jobId}] Node.js arguments:`, nodeArgs);
-    console.log(`[${jobId}] Working directory: ${refittingServicePath}`);
-    console.log(`[${jobId}] About to execute: node ${nodeArgs.join(' ')}`);
     
     logger.info(`Starting refitting process for job ${jobId}`);
 
-    // Execute the refitting service
-    console.log(`[${jobId}] Executing refitting service...`);
+    // Execute the refitting service   
     const { stdout, stderr } = await execa('node', nodeArgs, {
       cwd: refittingServicePath,
       timeout: 30 * 60 * 1000, // 30 minutes timeout
@@ -358,11 +435,12 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(manifestFile, manifestData);
 
     // Update status to completed
+    const currentStatus = await fs.readJson(statusFile);
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'COMPLETED',
-      startTime: (await fs.readJson(statusFile)).startTime,
-      endTime: new Date().toISOString(),
+      submittedAt: currentStatus.submittedAt,
+      stopped: new Date().toISOString(),
       params,
       outputFilename: params.outputFilename,
       stdout: stdout,
@@ -384,8 +462,8 @@ async function startRefittingJob({ jobId, mafFilePath, genomicFilePath, clinical
     await fs.writeJson(statusFile, {
       id: jobId,
       status: 'FAILED',
-      startTime: currentStatus.startTime || new Date().toISOString(),
-      endTime: new Date().toISOString(),
+      submittedAt: currentStatus.submittedAt || new Date().toISOString(),
+      stopped: new Date().toISOString(),
       params,
       error: error.message,
       stderr: error.stderr
