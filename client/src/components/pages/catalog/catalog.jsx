@@ -4,6 +4,7 @@ import { Route, Redirect, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ReferenceSignature from './referenceSignature/referenceSignatures';
 import Etiology from './etiology/etiology';
+import STS from './sts/sts';
 import { actions } from '../../../services/store/catalog';
 
 export default function Explore() {
@@ -14,7 +15,8 @@ export default function Explore() {
   const { displayTab } = store.main;
 
   const tabs = [
-    { name: 'Signature Catalog', id: 'etiology' },
+    { name: 'TMC Signatures Catalog', id: 'etiology' },
+    { name: 'Signatures from Targeted Sequencing', id: 'STS' },
     { name: 'Reference Signature', id: 'referenceSignature' },
   ];
 
@@ -85,6 +87,7 @@ export default function Explore() {
             render={() => <Redirect to={`/catalog/${displayTab}`} />}
           />
           <Route path="/catalog/etiology" component={Etiology} />
+          <Route path="/catalog/STS" component={STS} />
           <Route
             path="/catalog/referenceSignature"
             component={ReferenceSignature}
