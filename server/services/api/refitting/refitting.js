@@ -160,25 +160,13 @@ router.post('/submitRefitting/:id',
       });
 
       console.log('Starting refitting job asynchronously...');
-      // Start the refitting process asynchronously
-      startRefittingJob({
-        jobId,
-        mafFilePath,
-        genomicFilePath,
-        clinicalFilePath,
-        inputPath,
-        outputPath,
-        params,
-        logger
-      });
-      // Get worker based on environment configuration
-      // const worker = getWorker(process.env.REFITTING_WORKER_TYPE || 'local');
+      // Get worker based on environment configuration (same logic as visualization)
       const type =
           env.NODE_ENV === 'development' || !req.body?.email ? 'local' : 'fargate';
-        const worker = getWorker(type);
+      const worker = getWorker(type);
 
       // Start the refitting process using worker
-       worker(jobId, req.app, 'refitting', env);
+      worker(jobId, req.app, 'refitting', env);
 
       console.log('Responding with success...');
       // Return job ID immediately
