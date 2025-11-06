@@ -28,11 +28,38 @@ export default function STS() {
     category: category,
   });
 
-  // automatically choose first etiology
+  // Custom sort function matching the one in STSEtiologyOptions
+  function etiologySort(a, b) {
+    const cnRegex = /^CN:/;
+    const unkRegex = /^Unknown/;
+    const unkOrder = [
+      'Unknown chemotherapy treatment',
+      'Unknown (clock-like signature)',
+      'Unknown',
+    ];
+
+    if (a.match(cnRegex)) {
+      return 1;
+    } else if (b.match(cnRegex)) {
+      return -1;
+    } else if (a.match(unkRegex) || b.match(unkRegex)) {
+      return unkOrder.indexOf(a) - unkOrder.indexOf(b);
+    } else if (a)
+      return a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      });
+    else {
+      return 0;
+    }
+  }
+
+  // automatically choose first etiology (using the same sort as display)
   useEffect(() => {
     if (data && data[0]?.category == category && !etiology) {
+      const sortedEtiologies = [...new Set(data.map((e) => e.etiology))].sort(etiologySort);
       mergeSTS({
-        etiology: [...new Set(data.map((e) => e.etiology))].sort()[0],
+        etiology: sortedEtiologies[0],
       });
     }
   }, [data, etiology, signature]);
