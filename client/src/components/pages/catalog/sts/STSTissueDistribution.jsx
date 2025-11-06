@@ -6,7 +6,7 @@ import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery, useSatsExample
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 // Component to render a single SATS plot without header
-function SATSPlot({ signatureName, signatureSetName, useExampleData }) {
+function SATSPlot({ signatureName, signatureSetName, useExampleData, plotTitle, yAxisLabel }) {
   // For non-STS categories, use real API data (skip when using example data)
   const { 
     data: plotConfig, 
@@ -32,6 +32,23 @@ function SATSPlot({ signatureName, signatureSetName, useExampleData }) {
   const finalFetching = useExampleData ? fetchingExample : fetchingPlot;
   const finalError = useExampleData ? exampleError : plotError;
 
+  // Modify layout to include custom title and y-axis label
+  const customLayout = finalPlotConfig?.layout ? {
+    ...finalPlotConfig.layout,
+    title: {
+      text: plotTitle ? `<b>${plotTitle}</b>` : finalPlotConfig.layout.title?.text || finalPlotConfig.layout.title,
+      font: {
+        family: 'Times New Roman',
+        size: 18
+      },
+      x: 0.5
+    },
+    yaxis: {
+      ...finalPlotConfig.layout.yaxis,
+      title: yAxisLabel || finalPlotConfig.layout.yaxis?.title
+    }
+  } : null;
+
   return (
     <Card className="mb-3">
       <Card.Body style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -44,11 +61,11 @@ function SATSPlot({ signatureName, signatureSetName, useExampleData }) {
           </div>
         )}
 
-        {finalPlotConfig && finalPlotConfig.traces && finalPlotConfig.traces.length > 0 ? (
+        {finalPlotConfig && finalPlotConfig.traces && finalPlotConfig.traces.length > 0 && customLayout ? (
           <div style={{ display: 'flex', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
             <Plot
               data={JSON.parse(JSON.stringify(finalPlotConfig.traces))}
-              layout={JSON.parse(JSON.stringify(finalPlotConfig.layout))}
+              layout={JSON.parse(JSON.stringify(customLayout))}
               config={finalPlotConfig.config}
               style={{ width: '100%', height: '900px' }}
               useResizeHandler={true}
@@ -105,6 +122,8 @@ export default function STSTissueDistribution({ selectedSignature }) {
         signatureName={sbsSignature}
         signatureSetName={sbsSignatureSetName}
         useExampleData={true}
+        plotTitle="Repertoire of single base substitution (SBS) mutational signatures detected by targeted sequencing"
+        yAxisLabel="Mutations per Mb"
       />
 
       {/* DBS Plot */}
@@ -112,6 +131,8 @@ export default function STSTissueDistribution({ selectedSignature }) {
         signatureName={dbsSignature}
         signatureSetName={dbsSignatureSetName}
         useExampleData={true}
+        plotTitle="Repertoire of double base substitution (DBS) mutational signatures detected by targeted sequencing"
+        yAxisLabel="Mutations per Mb"
       />
     </div>
   );

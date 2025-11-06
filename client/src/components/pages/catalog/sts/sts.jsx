@@ -39,11 +39,10 @@ export default function STS() {
 
   return (
     <Container fluid className="p-4 bg-white border rounded">
-      <h5 className="separator mb-4">Signatures from Targeted Sequencing</h5>
-      <p className="text-muted">
+      <div>
         Unlike COSMIC signatures, which are derived from tumor mutational counts (TMC) obtained from whole-genome or whole-exome sequencing (WGS/WES), signatures from targeted sequencing are derived from tumor mutational burden (TMB) estimated using targeted sequencing panels. Consequently, the profiles of TMC- and TMB-based signatures are similar but not identical (e.g., SBS5).
-      </p>
-      
+      </div>
+
       {/* Tissue Distribution with both SBS and DBS plots */}
       <STSTissueDistribution selectedSignature={signature} />
       
