@@ -15,13 +15,22 @@ const r = rWrapper.async;
  */
 export async function refitting(params, logger, env = process.env) {
   const start = new Date();
-  const { id, mafFile, genomicFile, clinicalFile, outputPath, genome, outputFilename, matchOnOncotree, jobName, email } = params;
+  const { id, mafFile, genomicFile, clinicalFile, outputPath, genome, outputFilename, matchOnOncotree, jobName, email, profileType } = params;
   
   // Get paths for status file
   const statusFilePath = path.join(outputPath, 'status.json');
   
   try {
     logger.info(`Starting refitting job ${id} with params:`, params);
+    
+    // Determine profile type (default to SBS for backward compatibility)
+    const profile = (profileType || 'SBS').toUpperCase();
+    logger.info(`Profile type: ${profile}`);
+    
+    // Validate profile type
+    if (!['SBS', 'DBS'].includes(profile)) {
+      throw new Error(`Invalid profile type: ${profile}. Must be either 'SBS' or 'DBS'`);
+    }
     
     // Update status to IN_PROGRESS
     const currentStatus = await readJson(statusFilePath).catch(() => ({}));
@@ -55,9 +64,13 @@ export async function refitting(params, logger, env = process.env) {
     // Set up common files directory (reference files)
     const commonFilesDir = path.join(process.cwd(), 'data');
     
-    // Call the R refitting function
-    logger.info(`Calling R refitting script for job ${id}`);
-    const result = await r("./refitting.R", "run_sbs_refitting", {
+    // Determine which R function to call based on profile type
+    const rFunctionName = profile === 'DBS' ? 'run_dbs_refitting' : 'run_sbs_refitting';
+    const defaultOutputFilename = profile === 'DBS' ? 'H_Burden_est_DBS.csv' : 'H_Burden_est.csv';
+    
+    // Call the appropriate R refitting function
+    logger.info(`Calling R refitting script for job ${id} with function: ${rFunctionName}`);
+    const result = await r("./refitting.R", rFunctionName, {
       maf_file: mafFile,
       genomic_file: genomicFile,
       clinical_file: clinicalFile,
@@ -65,11 +78,11 @@ export async function refitting(params, logger, env = process.env) {
       common_files_dir: commonFilesDir,
       genome: genome || 'hg19',
       save_csv: true,
-      out_file: outputFilename || 'H_Burden_est.csv',
+      out_file: outputFilename || defaultOutputFilename,
       match_on_oncotree: matchOnOncotree === 'true' || matchOnOncotree === true
     });
     
-    logger.info(`R refitting completed successfully for job ${id}`);
+    logger.info(`R ${profile} refitting completed successfully for job ${id}`);
     logger.info(`Results summary: ${result?.H_Burden?.length || 0} entries processed`);
     
     const end = new Date();

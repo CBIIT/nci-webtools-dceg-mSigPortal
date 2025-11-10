@@ -58,6 +58,18 @@ export default function RefittingForm() {
     jobName,
   } = watch();
 
+  // Sync form values to Redux store so Instructions component can access them
+  useEffect(() => {
+    dispatch(refittingActions.mergeRefitting({ 
+      userForm: { 
+        signatureType,
+        referenceGenome,
+        email,
+        jobName,
+      }
+    }));
+  }, [signatureType, referenceGenome, email, jobName, dispatch]);
+
   const signatureTypeOptions = [
     { label: 'SBS', value: 'SBS' },
     { label: 'DBS', value: 'DBS' },
@@ -68,6 +80,63 @@ export default function RefittingForm() {
     { label: 'hg38 (GRCh38)', value: 'hg38' },
   ];
 
+  // Validate MAF file content matches signature type
+  const validateMafFile = async (file, signatureType) => {
+    if (!file) return { isValid: true };
+    
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        return { isValid: false, error: 'MAF file appears to be empty or invalid' };
+      }
+      
+      // Check header contains required columns
+      const header = lines[0].toLowerCase();
+      const requiredColumns = ['variant_type', 'chromosome', 'start_position', 'reference_allele', 'tumor_seq_allele2', 'tumor_sample_barcode'];
+      const missingColumns = requiredColumns.filter(col => !header.includes(col));
+      
+      if (missingColumns.length > 0) {
+        return { 
+          isValid: false, 
+          error: `MAF file missing required columns: ${missingColumns.join(', ')}` 
+        };
+      }
+      
+      // Check variant types in data rows
+      const dataLines = lines.slice(1, Math.min(lines.length, 100)); // Check first 100 data lines
+      const variantTypeIndex = lines[0].split('\t').findIndex(col => 
+        col.toLowerCase().includes('variant_type')
+      );
+      
+      if (variantTypeIndex === -1) return { isValid: true }; // Skip validation if column not found
+      
+      const variantTypes = dataLines
+        .map(line => line.split('\t')[variantTypeIndex])
+        .filter(vt => vt && vt.trim())
+        .map(vt => vt.trim().toUpperCase());
+      
+      const expectedType = signatureType === 'SBS' ? 'SNP' : 'DNP';
+      const hasExpectedType = variantTypes.some(vt => vt === expectedType);
+      const hasWrongType = variantTypes.some(vt => vt === (signatureType === 'SBS' ? 'DNP' : 'SNP'));
+      
+      if (hasWrongType && !hasExpectedType) {
+        return {
+          isValid: false,
+          error: `This MAF file contains ${signatureType === 'SBS' ? 'DBS (DNP)' : 'SBS (SNP)'} variants but you selected ${signatureType} analysis. Please select the correct signature type or upload the appropriate MAF file.`
+        };
+      }
+      
+      return { isValid: true };
+    } catch (error) {
+      return { 
+        isValid: false, 
+        error: 'Error reading MAF file. Please check the file format.' 
+      };
+    }
+  };
+
   const onSubmit = async (data) => {
     // Validate required files and fields
     if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
@@ -77,6 +146,13 @@ export default function RefittingForm() {
     
     if (!data.jobName || data.jobName.trim() === '') {
       setError('Job name is required');
+      return;
+    }
+
+    // Validate MAF file content matches signature type
+    const mafValidation = await validateMafFile(data.mafFile, data.signatureType);
+    if (!mafValidation.isValid) {
+      setError(mafValidation.error);
       return;
     }
 
@@ -228,11 +304,11 @@ export default function RefittingForm() {
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label>Upload MAF File <span style={{ color: 'crimson' }}>*</span></Form.Label>
+              <Form.Label>Upload {signatureType} MAF File <span style={{ color: 'crimson' }}>*</span></Form.Label>
               <Controller
                 name="mafFile"
                 control={control}
-                rules={{ required: 'MAF file is required' }}
+                rules={{ required: `${signatureType} MAF file is required` }}
                 render={({ field }) => (
                   <Form.File
                     {...field}
@@ -240,10 +316,10 @@ export default function RefittingForm() {
                     disabled={isFormDisabled}
                     id="mafFile"
                     label={
-                      mafFile?.name || 'Upload MAF File...'
+                      mafFile?.name || `Upload ${signatureType} MAF File...`
                     }
                     isInvalid={errors.mafFile}
-                    feedback="Please upload a MAF file"
+                    feedback={`Please upload a ${signatureType} MAF file`}
                     onChange={(e) => {
                       if (e.target.files.length) {
                         setValue('mafFile', e.target.files[0]);
@@ -257,7 +333,7 @@ export default function RefittingForm() {
                 variant="link"
                 disabled={isFormDisabled}
                 onClick={async () => {
-                  const file = 'SBS_MAF_two_samples.txt';
+                  const file = `${signatureType}_MAF_two_samples.txt`;
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   setValue(
                     'mafFile',
@@ -266,13 +342,13 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Load Example
+                Load {signatureType} Example
               </Button>
               <Button
                 variant="link"
                 disabled={isFormDisabled}
                 onClick={() => {
-                  const file = 'SBS_MAF_two_samples.txt';
+                  const file = `${signatureType}_MAF_two_samples.txt`;
                   const path = import.meta.env.BASE_URL + '/assets/examples/refitting/' + file;
                   const link = document.createElement('a');
                   link.href = path;
@@ -281,7 +357,7 @@ export default function RefittingForm() {
                 }}
                 className='p-0'
               >
-                Download MAF Example
+                Download {signatureType} MAF Example
               </Button>
              
             </Form.Group>

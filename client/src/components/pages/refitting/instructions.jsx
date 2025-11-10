@@ -3,6 +3,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Container } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 
 export default function Instructions() {
   const examples = [
@@ -18,6 +19,9 @@ export default function Instructions() {
   const history = useHistory();
   const [id, setId] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
+  
+  // Get current signature type from Redux store
+  const { signatureType } = useSelector((state) => state.refitting.userForm);
 
   const handleExampleClick = (exampleFolder) => {
     setIsFetching(true);
@@ -60,14 +64,14 @@ export default function Instructions() {
         <h4>Input Files</h4>
         <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
           <li style={{ display: 'list-item', marginBottom: '8px' }}>
-            <strong>MAF file:</strong> Contains SBS or DBS information for samples. <em>(Example provided)</em>
+            <strong>MAF file:</strong> Contains {signatureType} mutation information for samples. <em>(Example provided)</em>
             <div>
             <a
-              href={import.meta.env.BASE_URL + "/assets/examples/refitting/SBS_MAF_two_samples.txt"}
+              href={import.meta.env.BASE_URL + `/assets/examples/refitting/${signatureType}_MAF_two_samples.txt`}
               download
               className="link-primary-underline"
             >
-              Example of a MAF file
+              Example of a {signatureType} MAF file
             </a>
           </div>
           </li>
