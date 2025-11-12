@@ -22,10 +22,13 @@ export async function refitting(params, logger, env = process.env) {
   
   try {
     logger.info(`Starting refitting job ${id} with params:`, params);
+    logger.info(`Raw profileType parameter: ${profileType}`);
+    logger.info(`params.profileType: ${params.profileType}`);
+    logger.info(`params.signatureType: ${params.signatureType}`);
     
     // Determine profile type (default to SBS for backward compatibility)
-    const profile = (profileType || 'SBS').toUpperCase();
-    logger.info(`Profile type: ${profile}`);
+    const profile = (profileType || params.profileType || params.signatureType || 'SBS').toUpperCase();
+    logger.info(`Final determined profile: ${profile}`);
     
     // Validate profile type
     if (!['SBS', 'DBS'].includes(profile)) {
