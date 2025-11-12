@@ -1,10 +1,6 @@
 import { groupBy } from 'lodash';
 
 export default function SATSSignaturePresence(data, options = {}) {
-  console.log('SATS function called with data:', data);
-  console.log('Data type:', typeof data);
-  console.log('Data keys:', data ? Object.keys(data) : 'null/undefined');
-  
   if (!data) {
     console.error('SATS: No data provided');
     return { traces: [], layout: {}, config: {} };
@@ -336,9 +332,6 @@ export default function SATSSignaturePresence(data, options = {}) {
       cancerOrder = Object.entries(cancerTypeData)
         .sort((a, b) => a[1].num - b[1].num) // Sort by CancerType_num (ascending)
         .map(([cancer, _]) => cancer);
-        
-      console.log('🎯 Using pre-sorted cancer order (CancerType_num):', cancerOrder);
-      console.log('🎯 Cancer data:', cancerTypeData);
     } else {
       // Fallback: Use TMB_all for sorting
       const cancerTMBTotals = {};
@@ -351,9 +344,6 @@ export default function SATSSignaturePresence(data, options = {}) {
       cancerOrder = Object.entries(cancerTMBTotals)
         .sort((a, b) => b[1] - a[1]) // Sort by TMB_all descending
         .map(([cancer, _]) => cancer);
-        
-      console.log('🎯 Cancer order (sorted by TMB_all descending):', cancerOrder);
-      console.log('🎯 Cancer TMB totals:', cancerTMBTotals);
     }
 
     // Get all signatures and sort them properly
@@ -361,9 +351,6 @@ export default function SATSSignaturePresence(data, options = {}) {
     tmbSignatures = sortSignatures([...new Set(tmbData.map(item => item.SBS))]).reverse();
     // For dot plot, keep normal order (SBS1 at bottom, higher numbers above)
     dotSignatures = sortSignatures([...new Set(dotData.map(item => item.SBS))]);
-    
-    console.log('🎯 Sorted TMB signatures (reversed for stacking):', tmbSignatures);
-    console.log('🎯 Sorted dot signatures:', dotSignatures);
   } else {
     // Legacy format
     
@@ -385,9 +372,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     tmbSignatures = sortSignatures([...new Set(tmbData.map(item => item.signature))]).reverse();
     // For dot plot, keep normal order (SBS1 at bottom, higher numbers above)
     dotSignatures = sortSignatures([...new Set(dotData.map(item => item.signature))]);
-    
-    console.log('🎯 Sorted TMB signatures (legacy, reversed for stacking):', tmbSignatures);
-    console.log('🎯 Sorted dot signatures (legacy):', dotSignatures);
+
   }
 
   const traces = [];
