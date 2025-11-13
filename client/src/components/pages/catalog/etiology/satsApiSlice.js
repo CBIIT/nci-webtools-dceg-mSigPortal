@@ -17,31 +17,12 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
         },
       }),
       transformResponse: (data, meta, args) => {
-        console.log('🎯 SATS API Raw Data:', {
-          endpoint: 'signature_etiology',
-          params: args,
-          dataLength: data?.length || 0,
-          sampleData: data?.slice(0, 3) || [],
-          fields: data?.length > 0 ? Object.keys(data[0]) : []
-        });
-
         if (!data || data.length === 0) {
-          console.warn('⚠️ No data returned from signature_etiology API');
           return { traces: [], layout: {}, config: {} };
         }
 
         // Transform the etiology data into SATS format
         const transformedData = transformEtiologyDataToSATS(data);
-        
-        // Log the transformed data for debugging
-        logSATSData(transformedData.tmbData);
-        
-        console.log('🎯 SATS Transformed Data:', {
-          tmbDataLength: transformedData.tmbData?.length || 0,
-          dotDataLength: transformedData.dotData?.length || 0,
-          sampleTmbData: transformedData.tmbData?.slice(0, 3) || [],
-          expectedFields: ['CancerType', 'SBS', 'Count', 'Proportion', 'N', 'Presence', 'TMB_all', 'CancerType_num']
-        });
         
         // Generate the SATS plot
         return SATSSignaturePresence(transformedData);
@@ -55,9 +36,7 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
           const exampleData = isDBS ? satsExampleData_DBS : satsExampleData_SBS;
           const signatureField = isDBS ? 'DBS' : 'SBS';
           
-          console.log('🎯 Creating Complete SATS Plot from example data...');
-          console.log('📊 Using data for:', isDBS ? 'DBS' : 'SBS');
-          console.log('📊 Example data sample:', exampleData?.slice(0, 3));
+
           
           if (!exampleData || exampleData.length === 0) {
             throw new Error('Example data not available');
@@ -72,7 +51,6 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
 
           if (hasPreSortedData) {
             // Use existing TMB_all and CancerType_num values (data is already sorted)
-            console.log('🎯 Using pre-sorted example data with existing TMB_all and CancerType_num');
             
             transformedData = exampleData.map(item => {
               const signatureValue = item[signatureField] || item.SBS || item.DBS;
@@ -92,7 +70,6 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
             });
           } else {
             // Calculate TMB totals and sorting (for data without pre-sorted values)
-            console.log('🎯 Calculating TMB totals and sorting for example data');
             
             const cancerTMBTotals = new Map();
             exampleData.forEach(item => {
@@ -136,31 +113,14 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
             });
           }
 
-          console.log('🔄 Transformed data sample:', transformedData.slice(0, 3));
-          console.log('📊 Total records transformed:', transformedData.length);
-          console.log('🏥 Unique cancer types:', [...new Set(transformedData.map(d => d.cancer))]);
-          console.log('✍️ Unique signatures:', [...new Set(transformedData.map(d => d.signature))]);
-
-          // Check if any records have presence > 0
-          const validRecords = transformedData.filter(d => d.presence > 0);
-          console.log('✅ Records with presence > 0:', validRecords.length);
-          console.log('📈 Sample valid records:', validRecords.slice(0, 5));
-
           // Generate the complete SATS plot using SATSSignaturePresence function (TMB + Dot plot)
-          console.log('🎯 Calling SATSSignaturePresence for complete plot...');
           const plotResult = SATSSignaturePresence({ 
             tmbData: transformedData, 
             dotData: transformedData 
           });
           
-          console.log('🎯 SATSSignaturePresence result:', plotResult);
-          console.log('📈 Plot traces:', plotResult?.traces);
-          console.log('📊 Plot traces count:', plotResult?.traces?.length);
-          console.log('🎨 Plot layout:', plotResult?.layout);
-          
           // If SATSSignaturePresence doesn't work, fall back to just the dot plot
           if (!plotResult?.traces || plotResult.traces.length === 0) {
-            console.log('⚠️ SATSSignaturePresence failed, falling back to dot plot only');
             const dotPlotResult = SATSDotPlot(transformedData);
             return { data: dotPlotResult };
           }
@@ -171,7 +131,6 @@ export const satsApiSlice = catalogApiSlice.injectEndpoints({
           
           // Final fallback: create simple dot plot
           try {
-            console.log('🔄 Attempting fallback to dot plot...');
             // Use the same logic to determine data file and signature field
             const isDBS = signatureType && signatureType.includes('DBS');
             const fallbackData = isDBS ? satsExampleData_DBS : satsExampleData_SBS;
@@ -376,24 +335,7 @@ function transformEtiologyDataToSATS(etiologyData) {
   };
 }
 
-// Log the transformed data for debugging
-function logSATSData(satsData) {
-  if (satsData && satsData.length > 0) {
-    console.log('🎯 SATS Data Sample (first 5 rows):');
-    console.table(satsData.slice(0, 5));
-    
-    // Verify expected columns exist
-    const expectedColumns = ['CancerType', 'SBS', 'Count', 'Proportion', 'N', 'Presence', 'TMB_all', 'Label', 'CancerType_num'];
-    const actualColumns = Object.keys(satsData[0] || {});
-    const missingColumns = expectedColumns.filter(col => !actualColumns.includes(col));
-    
-    if (missingColumns.length > 0) {
-      console.warn('⚠️ Missing expected columns:', missingColumns);
-    } else {
-      console.log('✅ All expected columns present:', expectedColumns);
-    }
-  }
-}
+
 
 // Alternative transformation if you have different data structure
 function transformSignatureActivityToSATS(activityData) {
