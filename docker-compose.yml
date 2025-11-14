@@ -41,6 +41,7 @@ services:
       OUTPUT_FOLDER: /data/output
     ports:
       - "8334:8334"
+    entrypoint: ["node", "worker.js", "60e27908-e163-4251-a6ab-43194ad28c21"]
 
   # frontend:
   #   build:
