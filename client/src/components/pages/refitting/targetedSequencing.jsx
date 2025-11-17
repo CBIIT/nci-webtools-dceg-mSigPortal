@@ -152,15 +152,15 @@ export default function TargetedSequencing({ jobId }) {
     
     return (
       <div>
-        <h6>Activity Values</h6>
+        <h3 className='h6-title'>Activity Values</h3>
         <Table 
           columns={activityColumns}
           data={activityData}
           striped
           bordered
         />
-        
-        <h6 className="mt-4">Burden Values</h6>
+
+        <h3 className="mt-4 h6-title">Burden Values</h3>
         <Table 
           columns={burdenColumns}
           data={burdenData}
@@ -364,7 +364,7 @@ export default function TargetedSequencing({ jobId }) {
 
   return (
     <div className="bg-white border rounded p-3">
-      <h4>Targeted Sequencing Results</h4>
+      <h1 className='h4-title'>Targeted Sequencing Results</h1>
       
       {jobParams && (
         <div className="mb-3">
@@ -409,13 +409,13 @@ export default function TargetedSequencing({ jobId }) {
 
       <Card className="mb-4">
         <Card.Header>
-          <h5 className="mb-0">
+          <h2 className="h5-title mb-0">
             {submittedSignatureType} - {selectedMetric === 'h_est' && 'Refitting Results (H_Burden_est.csv)'}
             {selectedMetric === 'burden_est' && 'Burden_est Table - Mutation Burden Estimation'}
             {selectedMetric === 'cosine' && 'Cosine Similarity Analysis'}
             {selectedMetric === 'bic' && 'BIC Model Comparison'}
             {selectedMetric === 'l2norm' && 'L2 Norm Error Analysis'}
-          </h5>
+          </h2>
         </Card.Header>
         <Card.Body>
           {selectedMetric === 'h_est' && (

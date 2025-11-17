@@ -32,7 +32,7 @@ export default function Instructions() {
   return (
     <Container fluid className="bg-white border rounded p-3">
       <LoadingOverlay active={isFetching} />
-      <h4>How to Submit a Query</h4>
+      <h1 className='h4-title'>How to Submit a Query</h1>
       <p>
         Use the panel on the left to configure the required options.
       </p>
@@ -41,7 +41,7 @@ export default function Instructions() {
       
       <hr />
       <div className="mt-2">
-        <h4>Signature Type</h4>
+        <h1 className='h4-title'>Signature Type</h1>
         <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
           <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>SBS:</strong> Single Base Substitutions</li>
           <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>DBS:</strong> Double Base Substitutions</li>
@@ -49,7 +49,7 @@ export default function Instructions() {
       </div>
       <hr />
       <div className="mt-2">
-        <h4>Reference Genome</h4>
+        <h1 className='h4-title'>Reference Genome</h1>
         <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
           <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg19 (GRCh37):</strong> Genome Reference Consortium Human Build 37</li>
           <li style={{ display: 'list-item', marginBottom: '8px' }}><strong>hg38 (GRCh38):</strong> Genome Reference Consortium Human Build 38</li>
@@ -57,7 +57,7 @@ export default function Instructions() {
       </div>
       <hr />
       <div className="mt-2">
-        <h4>Input Files</h4>
+        <h1 className='h4-title'>Input Files</h1>
         <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
           <li style={{ display: 'list-item', marginBottom: '8px' }}>
             <strong>MAF file:</strong> Contains SBS or DBS information for samples. <em>(Example provided)</em>
@@ -102,7 +102,7 @@ export default function Instructions() {
       </div>
       <hr />
       <div className="mt-2">
-        <h4>Output File</h4>
+        <h1 className='h4-title'>Output File</h1>
         <ul style={{ padding: 0, paddingLeft: '20px', columnCount: 'unset', columns: 'unset' }}>
           <li style={{ display: 'list-item', marginBottom: '8px' }}>
             <strong>Signature activity and burden:</strong> Provides both the estimated activity of each signature 
