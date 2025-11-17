@@ -53,6 +53,7 @@ export default function Refitting() {
 
   return (
     <div className="position-relative refitting-page">
+      <h1 className="sr-only">Refitting</h1>
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
           {/* for desktops and tablets */}
@@ -71,7 +72,7 @@ export default function Refitting() {
                     style={{
                       textDecoration: 'none',
                       fontSize: '12pt',
-                      color: '#689f39',
+                      color: '#406024',
                       fontWeight: '500',
                     }}
                     onClick={() => setDisplayTab(id)}

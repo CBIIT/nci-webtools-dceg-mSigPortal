@@ -399,8 +399,8 @@ export default function TargetedSequencing({ jobId }) {
           <Alert 
             variant="info" 
             style={{ 
-              backgroundColor: '#689f39', 
-              borderColor: '#689f39', 
+              backgroundColor: '#406024', 
+              borderColor: '#406024', 
               color: 'white' 
             }}
           >
