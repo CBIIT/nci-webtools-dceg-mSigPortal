@@ -518,9 +518,8 @@ run_dbs_refitting <- function(maf_file,
       cat("Warning: No mapping in annotation file for sample", sid, "(CANCER_TYPE=", ct, "). Trying 'Other' cancer type.\n")
       idx <- which(annoFile$CANCER_TYPE == "Other")
       if (!length(idx)) {
-        # If 'Other' not found, use the first available cancer type
-        cat("Warning: 'Other' cancer type not found. Using first available cancer type for sample", sid, "\n")
-        idx <- 1
+        # If 'Other' not found, throw an error instead of using the first available cancer type
+        stop("No valid cancer type mapping found for sample ", sid, " (CANCER_TYPE=", ct, "). Please check your annotation file.")
       }
     }
 
