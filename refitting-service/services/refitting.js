@@ -64,8 +64,10 @@ export async function refitting(params, logger, env = process.env) {
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
-    // Set up common files directory (reference files)
-    const commonFilesDir = path.join(process.cwd(), 'data');
+    // Set up common files directory (reference files) - use DATA_FOLDER env var with common subfolder
+    const dataFolder = env.DATA_FOLDER || path.join(process.cwd(), 'data');
+    const commonFilesDir = path.join(dataFolder, 'common');
+    logger.info(`Using common files directory: ${commonFilesDir}`);
     
     // Determine which R function to call based on profile type
     const rFunctionName = profile === 'DBS' ? 'run_dbs_refitting' : 'run_sbs_refitting';
