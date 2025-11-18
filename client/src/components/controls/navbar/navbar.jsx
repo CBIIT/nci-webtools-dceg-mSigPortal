@@ -12,10 +12,10 @@ export function NavbarCustom({ links }) {
         className="shadow-sm bg-nav p-0 border-0 d-none d-lg-block"
         expand="lg"
       >
-        <div className="container">
+        <div className="container mx-auto">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <div className="mx-auto">
+            <div className="navbar-nav-container">
               {[{ route: '/', title: 'Home', exact: true }]
                 .concat(links)
                 .filter((link) => link.title)
@@ -23,14 +23,14 @@ export function NavbarCustom({ links }) {
                 .map(({ route, action, title, exact }, index) => (
                   <div
                     data-testid="Navbar"
-                    className="d-inline-block"
+                    className="flex-shrink-0"
                     key={title}
                   >
                     <NavLink
                       data-testid={`Navbar-NavLink-${index}`}
                       id={title + '-navbar'}
                       // key={title}
-                      className="navlinks py-2 px-3 d-inline-block"
+                      className="navlinks py-2 px-2 d-inline-block text-nowrap"
                       activeClassName="active-navlinks"
                       exact={exact}
                       to={route}

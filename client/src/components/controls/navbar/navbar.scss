@@ -4,6 +4,12 @@
   color: white;
 }
 
+.navbar-nav-container {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
 .navlinks:hover {
   background-color: #f1e4ef;
   color: #8e4b86;
@@ -21,7 +27,6 @@
   border-color: #f5f5f5;
   background-color: #8e4b86;
 }
-
 
 // .active-navlinks {
 //   background-color: #fc8701 !important;
@@ -76,3 +81,16 @@
 //   color: black !important;
 //   font-weight: 700 !important;
 // }
+
+// Responsive navbar styling for large screens - keeping original font size
+@media (min-width: 1200px) {
+  .navlinks {
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .navlinks {
+    padding: 0.5rem 1rem !important;
+  }
+}
