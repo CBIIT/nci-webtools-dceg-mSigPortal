@@ -66,9 +66,12 @@ export async function refitting(params, logger, env = process.env) {
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
-    // Set up common files directory (reference files) - use DATA_FOLDER env var with common subfolder
-    const dataFolder = env.DATA_FOLDER || path.join(process.cwd(), 'data');
-    const commonFilesDir = path.join(dataFolder, 'common');
+    // Set up refitting files directory (reference files) - use DATA_FOLDER env var with refitting subfolder
+    const dataFolder = env.DATA_FOLDER;
+    if (!dataFolder) {
+      throw new Error('DATA_FOLDER environment variable must be set');
+    }
+    const commonFilesDir = path.join(dataFolder, 'refitting');
     
     // Determine which R function to call based on profile type
     const rFunctionName = normalizedProfile === 'DBS' ? 'run_dbs_refitting' : 'run_sbs_refitting';

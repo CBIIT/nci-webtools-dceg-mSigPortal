@@ -102,10 +102,12 @@ msigportal.refitSBS <- function(args, config = list()) {
     cat("  genome:", reference_genome, "\n")
     cat("  out_file:", out_file, "\n")
     
-    # Set common files directory for SBS - use DATA_FOLDER env var with common subfolder
-    data_folder <- Sys.getenv("DATA_FOLDER", default = "./data")
-    common_files_dir <- file.path(data_folder, "common")
-    cat("Using common files directory:", common_files_dir, "\n")
+    # Set refitting files directory for SBS - use DATA_FOLDER env var with refitting subfolder
+    data_folder <- Sys.getenv("DATA_FOLDER")
+    if (data_folder == "") {
+      stop("DATA_FOLDER environment variable must be set")
+    }
+    common_files_dir <- file.path(data_folder, "refitting")
     
     results <- run_sbs_refitting(
       maf_file = maf_file,
@@ -390,10 +392,12 @@ msigportal.refitDBS <- function(args, config = list()) {
     cat("  genome:", reference_genome, "\n")
     cat("  out_file:", out_file, "\n")
     
-    # Set common files directory for DBS - use DATA_FOLDER env var with common subfolder
-    data_folder <- Sys.getenv("DATA_FOLDER", default = "./data")
-    common_files_dir <- file.path(data_folder, "common")
-    cat("Using common files directory:", common_files_dir, "\n")
+    # Set refitting files directory for DBS - use DATA_FOLDER env var with refitting subfolder
+    data_folder <- Sys.getenv("DATA_FOLDER")
+    if (data_folder == "") {
+      stop("DATA_FOLDER environment variable must be set")
+    }
+    common_files_dir <- file.path(data_folder, "refitting")
     
     results <- run_dbs_refitting(
       maf_file = maf_file,
