@@ -264,7 +264,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
-                className='p-0'
+                className='p-0 mr-3'
               >
                 Load Example
               </Button>
@@ -323,7 +323,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
-                className='p-0'
+                className='p-0 mr-3'
               >
                 Load Example
               </Button>
@@ -382,7 +382,7 @@ export default function RefittingForm() {
                     new File([await (await fetch(path)).blob()], file)
                   );
                 }}
-                className='p-0'
+                className='p-0 mr-3'
               >
                 Load Example
               </Button>
