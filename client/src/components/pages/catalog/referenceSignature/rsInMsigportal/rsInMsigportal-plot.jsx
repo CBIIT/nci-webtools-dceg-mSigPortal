@@ -45,12 +45,14 @@ export default function RsInMsigportal() {
         </div>
       ) : (
         data && (
-          <Plotly
-            className="w-100"
-            data={cloneDeep(data.traces)}
-            layout={cloneDeep(data.layout)}
-            config={cloneDeep(data.config)}
-          />
+          <div style={{ overflowX: 'auto', width: '100%' }}>
+            <Plotly
+              style={{ minWidth: '1200px' }}
+              data={cloneDeep(data.traces)}
+              layout={cloneDeep(data.layout)}
+              config={cloneDeep(data.config)}
+            />
+          </div>
         )
       )}
     </div>
