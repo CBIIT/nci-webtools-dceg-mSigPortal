@@ -28,6 +28,45 @@
   background-color: #8e4b86;
 }
 
+// Custom wider container for navbar
+.navbar-wide-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .navbar-wide-container {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 768px) {
+  .navbar-wide-container {
+    max-width: 800px;
+  }
+}
+
+@media (min-width: 992px) {
+  .navbar-wide-container {
+    max-width: 1100px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .navbar-wide-container {
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .navbar-wide-container {
+    max-width: 1600px;
+  }
+}
+
 // .active-navlinks {
 //   background-color: #fc8701 !important;
 //   color: #2f2f2f !important;
