@@ -498,8 +498,7 @@ run_dbs_refitting <- function(maf_file,
     
     # Handle missing cancer type - use default or skip this sample
     if (is.na(ct)) {
-      cat("Warning: No CANCER_TYPE for sample:", sid, ". Using default cancer type 'Other'.\n")
-      ct <- "Other"  # Use a default cancer type
+      stop("No CANCER_TYPE found for sample: ", sid, ". Please provide a valid cancer type in the clinical_sample data.")
     }
 
     # map cancer type (optionally include ONCOTREE)
