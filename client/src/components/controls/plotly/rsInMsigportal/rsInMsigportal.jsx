@@ -510,7 +510,8 @@ export default function RsInMsigportal(rawData) {
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 920,
-    autosize: true,
+    width: 1600,
+    autosize: false,
     margin: {
       l: 0,
       r: 50,
