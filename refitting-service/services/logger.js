@@ -31,14 +31,6 @@ export function formatObject(object) {
 }
 
 export function createLogger(name, level = 'info') {
-  const { APP_TIER, DATADOG_HOST, DATADOG_API_KEY } = process.env;
-  const datadogTransportOptions = {
-    host: DATADOG_HOST,
-    path: `/api/v2/logs?dd-api-key=${DATADOG_API_KEY}&ddsource=nodejs&service=${APP_TIER}-msigportal-batch`,
-    ssl: true,
-    format: format.json(),
-  };
-
   return new createWinstonLogger({
     level: level,
     format: format.combine(
@@ -51,10 +43,7 @@ export function createLogger(name, level = 'info') {
           )}`
       )
     ),
-    transports: [
-      new transports.Console(),
-      new transports.Http(datadogTransportOptions),
-    ],
+    transports: [new transports.Console()],
     exitOnError: false,
   });
 }
