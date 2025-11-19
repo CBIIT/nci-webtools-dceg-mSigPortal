@@ -33,6 +33,6 @@ export async function main(argv = process.argv, env = process.env) {
     },
     useNullAsDefault: true,
   });
-  logger.log({ params });
+  logger.info({ params });
   return await profilerExtraction(params, logger, localDb, env);
 }
