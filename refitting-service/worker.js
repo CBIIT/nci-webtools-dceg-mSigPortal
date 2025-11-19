@@ -55,6 +55,7 @@ export async function main(argv = process.argv, env = process.env) {
     genomicFile: path.resolve(inputFolder, genomicFile),
     clinicalFile: path.resolve(inputFolder, clinicalFile),
     outputPath: outputFolder,
+    profileType: params.signatureType, // Map signatureType to profileType for the refitting service
   };
 
   logger.info(`[${id}] Complete params being passed to refitting:`, JSON.stringify(completeParams, null, 2));
