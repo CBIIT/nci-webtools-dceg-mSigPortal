@@ -24,6 +24,8 @@ import { router as extractionRoutes } from '../services/api/extraction/extractio
 import { router as refittingRoutes } from '../services/api/refitting/refitting.js';
 
 export function createApi(env) {
+  router.get('/ping', async (req, res) => res.json(true));
+  
   // register middleware
   const router = Router();
   router.use(express.json());
@@ -42,7 +44,6 @@ export function createApi(env) {
   });
 
   // register routes
-  router.get('/ping', async (req, res) => res.json(true));
   router.use(general);
   router.use(visualizationRoutes);
   router.use(userVisualizationRoutes);
