@@ -2,12 +2,21 @@ import { refittingApiSlice } from '../../../services/store/rootApi';
 
 export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // Upload files
+    upload: builder.mutation({
+      query: (body) => ({
+        url: `upload/${crypto.randomUUID()}`,
+        method: 'POST',
+        body,
+      }),
+    }),
+
     // Submit refitting job
     submitRefitting: builder.mutation({
-      query: ({ id, formData }) => ({
-        url: `submitRefitting/${id}`,
+      query: (body) => ({
+        url: `submitRefitting/${body.id}`,
         method: 'POST',
-        body: formData,
+        body,
       }),
     }),
 
@@ -56,6 +65,7 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
 });
 
 export const {
+  useUploadMutation,
   useSubmitRefittingMutation,
   useRefittingStatusQuery,
   useDownloadResultsQuery,

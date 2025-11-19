@@ -55,12 +55,13 @@ export async function runLocalWorker(id, app, taskName, env = process.env) {
  */
 export async function runFargateWorker(id, app, taskName, env = process.env) {
   const { ECS_CLUSTER, SUBNET_IDS, SECURITY_GROUP_IDS } = env;
+  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   const taskTypes = {
     visualization: { name: 'worker', taskDefinition: env.WORKER_TASK_NAME },
-    extraction: {
-      name: 'extraction-worker',
-      taskDefinition: env.EXTRACTION_WORKER_TASK_NAME,
-    },
+    // extraction: {
+    //   name: 'extraction-worker',
+    //   taskDefinition: env.EXTRACTION_WORKER_TASK_NAME,
+    // },
     refitting: {
       name: 'refitting-worker',
       taskDefinition: env.REFITTING_WORKER_TASK_NAME,
@@ -75,7 +76,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
     'worker.js',
     id,
   ];
-  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+
   const taskCommand = new RunTaskCommand({
     cluster: ECS_CLUSTER,
     count: 1,
@@ -96,11 +97,16 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
       ],
     },
   });
-  const response = await client.send(taskCommand);
-  logger.info('Submitted Fargate RunTask command');
-  logger.info(workerCommand);
-  logger.info(response);
-  return response;
+  try {
+    const response = await client.send(taskCommand);
+    logger.info('Submitted Fargate RunTask command');
+    logger.info(workerCommand);
+    logger.info(response);
+    return response;
+  } catch (error) {
+    logger.error('Error submitting Fargate RunTask command');
+    logger.error(error);
+  }
 }
 
 /**

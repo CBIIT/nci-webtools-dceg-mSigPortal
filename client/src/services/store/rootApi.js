@@ -62,7 +62,7 @@ export const extractionApiSlice = createApi({
 
 export const refittingApiSlice = createApi({
   reducerPath: 'refittingApi',
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.BASE_URL + '/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'api' }),
   endpoints: () => ({}),
 });
 
