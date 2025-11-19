@@ -1,0 +1,8 @@
+-e git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor
+-e git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator
+SigProfilerAssignment==0.0.14
+sigProfilerPlotting==1.2.2
+
+pandas==1.3.5
+numpy==1.26.4
+PyPDF2==2.11.2
