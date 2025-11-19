@@ -68,14 +68,17 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
     },
   };
   const client = new ECSClient();
-  const workerCommand = [
-    'node',
-    '--require',
-    'dotenv/config',
-    '--max-old-space-size=16384',
-    'worker.js',
-    id,
-  ];
+  const workerCommand = {
+    visualization: [
+      'node',
+      '--require',
+      'dotenv/config',
+      '--max-old-space-size=16384',
+      'worker.js',
+      id,
+    ],
+    refitting: ['node', '--max-old-space-size=16384', 'worker.js', id],
+  };
 
   const taskCommand = new RunTaskCommand({
     cluster: ECS_CLUSTER,
@@ -92,7 +95,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
       containerOverrides: [
         {
           name: taskTypes[taskName].name,
-          command: workerCommand,
+          command: workerCommand[taskName],
         },
       ],
     },
@@ -100,7 +103,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
   try {
     const response = await client.send(taskCommand);
     logger.info('Submitted Fargate RunTask command');
-    logger.info(workerCommand);
+    logger.info(workerCommand[taskName]);
     logger.info(response);
     return response;
   } catch (error) {
