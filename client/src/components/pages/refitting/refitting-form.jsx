@@ -176,6 +176,9 @@ export default function RefittingForm() {
         signatureType: data.signatureType,
         email: data.email,
         jobName: data.jobName,
+        mafFileName: data.mafFile.name,
+        genomicFileName: data.genomicFile.name,
+        clinicalFileName: data.clinicalFile.name,
       };
 
       await submitRefitting(params).unwrap();
