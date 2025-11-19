@@ -15,13 +15,27 @@ const r = rWrapper.async;
  */
 export async function refitting(params, logger, env = process.env) {
   const start = new Date();
-  const { id, mafFile, genomicFile, clinicalFile, outputPath, genome, outputFilename, matchOnOncotree, jobName, email } = params;
+  const { id, mafFile, genomicFile, clinicalFile, outputPath, genome, outputFilename, matchOnOncotree, jobName, email, profileType } = params;
   
   // Get paths for status file
   const statusFilePath = path.join(outputPath, 'status.json');
   
   try {
-    logger.info(`Starting refitting job ${id} with params:`, params);
+    logger.info(`Starting refitting job ${id}`);
+    
+    // Determine profile type - require either profileType or params.profileType
+    const profile = (profileType || params.profileType);
+    
+    if (!profile) {
+      throw new Error(`Missing required parameter: profileType. Must be either 'SBS' or 'DBS'`);
+    }
+    
+    const normalizedProfile = profile.toUpperCase();
+    
+    // Validate profile type
+    if (!['SBS', 'DBS'].includes(normalizedProfile)) {
+      throw new Error(`Invalid profile type: ${normalizedProfile}. Must be either 'SBS' or 'DBS'`);
+    }
     
     // Update status to IN_PROGRESS
     const currentStatus = await readJson(statusFilePath).catch(() => ({}));
@@ -32,7 +46,7 @@ export async function refitting(params, logger, env = process.env) {
       submittedAt: currentStatus.submittedAt || new Date().toISOString(),
     });
     
-    // Validate required parameters
+    // Validate required parameters (profileType already validated above)
     const required = ['mafFile', 'genomicFile', 'clinicalFile', 'outputPath'];
     const missing = required.filter(param => !params[param]);
     if (missing.length > 0) {
@@ -52,12 +66,20 @@ export async function refitting(params, logger, env = process.env) {
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
-    // Set up common files directory (reference files)
-    const commonFilesDir = path.join(process.cwd(), 'data');
+    // Set up refitting files directory (reference files) - use DATA_FOLDER env var with refitting subfolder
+    const dataFolder = env.DATA_FOLDER;
+    if (!dataFolder) {
+      throw new Error('DATA_FOLDER environment variable must be set');
+    }
+    const commonFilesDir = path.join(dataFolder, 'refitting');
     
-    // Call the R refitting function
-    logger.info(`Calling R refitting script for job ${id}`);
-    const result = await r("./refitting.R", "run_sbs_refitting", {
+    // Determine which R function to call based on profile type
+    const rFunctionName = normalizedProfile === 'DBS' ? 'run_dbs_refitting' : 'run_sbs_refitting';
+    const defaultOutputFilename = normalizedProfile === 'DBS' ? 'H_Burden_est_DBS.csv' : 'H_Burden_est.csv';
+    
+    // Call the appropriate R refitting function
+    logger.info(`Running ${normalizedProfile} refitting for job ${id}`);
+    const result = await r("./refitting.R", rFunctionName, {
       maf_file: mafFile,
       genomic_file: genomicFile,
       clinical_file: clinicalFile,
@@ -65,16 +87,13 @@ export async function refitting(params, logger, env = process.env) {
       common_files_dir: commonFilesDir,
       genome: genome || 'hg19',
       save_csv: true,
-      out_file: outputFilename || 'H_Burden_est.csv',
+      out_file: outputFilename || defaultOutputFilename,
       match_on_oncotree: matchOnOncotree === 'true' || matchOnOncotree === true
     });
     
-    logger.info(`R refitting completed successfully for job ${id}`);
-    logger.info(`Results summary: ${result?.H_Burden?.length || 0} entries processed`);
-    
     const end = new Date();
     const duration = (end - start) / 1000;
-    logger.info(`Refitting job ${id} completed in ${duration} seconds`);
+    logger.info(`Job ${id} completed successfully in ${duration}s - ${result?.H_Burden?.length || 0} entries processed`);
     
     // Update status to COMPLETED
     const statusData = await readJson(statusFilePath).catch(() => ({}));
@@ -90,10 +109,7 @@ export async function refitting(params, logger, env = process.env) {
     });
 
     // Send success notification if email was provided
-    logger.info(`[${id}] Checking email notification - email param: ${email}, params.email: ${params.email}`);
     if (params.email) {
-      logger.info(`[${id}] Email is provided, preparing to send success notification`);
-      
       try {
         const submittedTime = new Date(statusData.submittedAt || start);
         const executionTime = (new Date().getTime() - submittedTime.getTime()) / 1000;
@@ -105,8 +121,6 @@ export async function refitting(params, logger, env = process.env) {
           resultsUrl: `${env.APP_BASE_URL || 'http://localhost:8330'}/#/refitting/${id}`,
         };
         
-        logger.info(`[${id}] Email notification data:`, emailData);
-        
         await sendNotification(
           email,
           `mSigPortal - Refitting Complete - ${jobName || id}`,
@@ -114,14 +128,10 @@ export async function refitting(params, logger, env = process.env) {
           emailData,
           env
         );
-        logger.info(`[${id}] Success notification sent successfully to ${email}`);
+        logger.info(`[${id}] Success notification sent to ${email}`);
       } catch (emailError) {
-        logger.error(`[${id}] Failed to send success notification:`, emailError);
-        logger.error(`[${id}] Email error details:`, emailError.message);
-        logger.error(`[${id}] Email error stack:`, emailError.stack);
+        logger.error(`[${id}] Failed to send success notification: ${emailError.message}`);
       }
-    } else {
-      logger.info(`[${id}] No email provided, skipping notification. params:`, { email, 'params.email': params.email });
     }
     
     return result;
@@ -144,10 +154,7 @@ export async function refitting(params, logger, env = process.env) {
     });
 
     // Send failure notification if email was provided
-    logger.info(`[${id}] Checking failure email notification - email param: ${email}, params.email: ${params.email}`);
     if (params.email) {
-      logger.info(`[${id}] Email is provided, preparing to send failure notification`);
-      
       try {
         const submittedTime = new Date(statusData.submittedAt || start);
         const executionTime = (new Date().getTime() - submittedTime.getTime()) / 1000;
@@ -159,8 +166,6 @@ export async function refitting(params, logger, env = process.env) {
           error: error.message || JSON.stringify(error, null, 2),
         };
         
-        logger.info(`[${id}] Failure email notification data:`, emailData);
-        
         await sendNotification(
           email,
           `mSigPortal - Refitting Analysis Failed - ${jobName || id}`,
@@ -168,14 +173,10 @@ export async function refitting(params, logger, env = process.env) {
           emailData,
           env
         );
-        logger.info(`[${id}] Failure notification sent successfully to ${email}`);
+        logger.info(`[${id}] Failure notification sent to ${email}`);
       } catch (emailError) {
-        logger.error(`[${id}] Failed to send failure notification:`, emailError);
-        logger.error(`[${id}] Email error details:`, emailError.message);
-        logger.error(`[${id}] Email error stack:`, emailError.stack);
+        logger.error(`[${id}] Failed to send failure notification: ${emailError.message}`);
       }
-    } else {
-      logger.info(`[${id}] No email provided, skipping failure notification. params:`, { email, 'params.email': params.email });
     }
     
     throw error;
