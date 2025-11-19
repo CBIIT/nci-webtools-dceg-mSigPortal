@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --env-file=.env app.js",
+    "start": "node --env-file=.env worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
