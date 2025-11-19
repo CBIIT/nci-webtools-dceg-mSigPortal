@@ -53,7 +53,6 @@ export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
           .filter((e) => e.status && e.params)
           .map((job) => {
             const { status, params } = job;
-            console.log("params --- ", params);
             return {
               jobName: params.jobName || 'Refitting Job',
               ...status,
