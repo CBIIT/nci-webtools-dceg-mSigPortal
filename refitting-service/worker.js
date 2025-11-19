@@ -16,6 +16,7 @@ if (isMainModule(import.meta)) {
 
 export async function main(argv = process.argv, env = process.env) {
   const id = argv[2];
+  const logger = createLogger(`Refitting Worker ${id}`, env.LOG_LEVEL);
   if (!id) throw new Error("Missing id");
 
   const inputFolder = path.resolve(env.INPUT_FOLDER, id);
@@ -24,7 +25,6 @@ export async function main(argv = process.argv, env = process.env) {
 
   const paramsFilePath = path.resolve(inputFolder, "params.json");
   const params = await readJson(paramsFilePath);
-  const logger = createLogger(env.REFITTING_APP_NAME, env.LOG_LEVEL);
 
   const mafFile = path.resolve(inputFolder, params.mafFileName);
   const genomicFile = path.resolve(inputFolder, params.genomicFileName);
