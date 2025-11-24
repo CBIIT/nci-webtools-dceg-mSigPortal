@@ -10,6 +10,7 @@ sum <- function(a, b) {
 suppressPackageStartupMessages({
   library(tidyverse)
   library(GenomicRanges)
+  library(GenomeInfoDb)
   library(Biostrings)
   library(SATS)
   library(BSgenome)  # for getSeq()
@@ -106,6 +107,13 @@ run_sbs_refitting <- function(maf_file,
   clinical_sample <- utils::read.table(clinical_file, header = TRUE, sep = "\t", quote = "",
                                        stringsAsFactors = FALSE, check.names = FALSE)
   annoFile <- utils::read.csv(cancer_dictionary_file, check.names = FALSE)
+  
+  # IMPORTANT: Always use hg19 for ref.genome parameter in GeneratePanelSize()
+  # because the genomic_information file contains hg19 coordinates.
+  # The 'genome' parameter above only controls which BSgenome package to use for sequence retrieval.
+  ref_genome_for_panel <- "hg19"
+  cat("NOTE: Using ref.genome='hg19' for GeneratePanelSize() (matches genomic_information coordinates)\n")
+  cat("      BSgenome package selected:", genome, "\n")
 
   # Column checks
   need_mut <- c("Chromosome","Start_Position","Variant_Type","Reference_Allele","Tumor_Seq_Allele2","Tumor_Sample_Barcode")
@@ -121,23 +129,72 @@ run_sbs_refitting <- function(maf_file,
   if (length(miss_anno)) stop("Annotation file missing columns: ", paste(miss_anno, collapse = ", "))
 
   # ---- helper: V from MAF (96 x N) ----
-  make_V <- function(maf, order96, Hs) {
+  make_V <- function(maf, order96, Hs, genome_version = "unknown") {
     maf <- tibble::as_tibble(maf)
     snv <- dplyr::filter(maf, Variant_Type == "SNP")
+    
     if (nrow(snv) == 0) {
       return(matrix(0, nrow = length(order96), ncol = 0, dimnames = list(order96, NULL)))
     }
 
+    # Validate coordinates against genome boundaries
+    seqlengths_ref <- GenomeInfoDb::seqlengths(Hs)
+    
+    snv$chr_name <- paste0("chr", snv$Chromosome)
+    
+    # Check for invalid chromosomes and positions
+    invalid_rows <- c()
+    
+    for (i in seq_len(nrow(snv))) {
+      chr <- snv$chr_name[i]
+      pos <- snv$Start_Position[i]
+      
+      if (!chr %in% names(seqlengths_ref)) {
+        cat("WARNING: Chromosome", chr, "not found in", genome_version, "reference. Skipping variant at position", pos, "\n")
+        invalid_rows <- c(invalid_rows, i)
+        next
+      }
+      
+      chr_len <- seqlengths_ref[chr]
+      if (is.na(chr_len)) {
+        cat("WARNING: Unknown length for", chr, ". Skipping variant at position", pos, "\n")
+        invalid_rows <- c(invalid_rows, i)
+        next
+      }
+      
+      # Check if position is within bounds (need -1 and +1 for context)
+      if (pos < 2 || pos > (chr_len - 1)) {
+        cat("WARNING: Position", pos, "on", chr, "is out of bounds for", genome_version, "(chr length:", chr_len, "). Skipping this variant.\n")
+        invalid_rows <- c(invalid_rows, i)
+      }
+    }
+    
+    # Remove invalid rows
+    if (length(invalid_rows) > 0) {
+      cat("Removed", length(invalid_rows), "variant(s) with invalid coordinates\n")
+      snv <- snv[-invalid_rows, ]
+      
+      if (nrow(snv) == 0) {
+        cat("WARNING: All variants were filtered out due to coordinate issues. Returning empty matrix.\n")
+        return(matrix(0, nrow = length(order96), ncol = 0, dimnames = list(order96, NULL)))
+      }
+    }
+
     gr5 <- GenomicRanges::GRanges(
-      seqnames = paste0("chr", snv$Chromosome),
+      seqnames = snv$chr_name,
       IRanges::IRanges(start = snv$Start_Position - 1, end = snv$Start_Position - 1),
       strand = "+"
     )
     gr3 <- GenomicRanges::GRanges(
-      seqnames = paste0("chr", snv$Chromosome),
+      seqnames = snv$chr_name,
       IRanges::IRanges(start = snv$Start_Position + 1, end = snv$Start_Position + 1),
       strand = "+"
     )
+
+    # Restrict GRanges to only use sequences available in the reference genome
+    # This prevents the seqinfo merge warnings
+    GenomeInfoDb::seqlevels(gr5, pruning.mode="coarse") <- GenomeInfoDb::seqlevelsInUse(gr5)
+    GenomeInfoDb::seqlevels(gr3, pruning.mode="coarse") <- GenomeInfoDb::seqlevelsInUse(gr3)
 
     s5 <- BSgenome::getSeq(Hs, gr5)
     s3 <- BSgenome::getSeq(Hs, gr3)
@@ -172,15 +229,36 @@ run_sbs_refitting <- function(maf_file,
   }
 
   # ---- V ----
-  V <- make_V(mutations2, Mut_category_order, Hsapiens)
+  cat("Creating V matrix from MAF file...\n")
+  V <- make_V(mutations2, Mut_category_order, Hsapiens, genome)
+  cat("V matrix created with dimensions:", nrow(V), "x", ncol(V), "\n")
 
   # ---- Panel context & L ----
-  Panel_context <- SATS::GeneratePanelSize(
-    genomic_information = genomic_information,
-    Class = "SBS",
-    SBS_order = "COSMIC",
-    ref.genome = genome
-  )
+  cat("Generating panel context from genomic information file...\n")
+  cat("NOTE: Using ref.genome='", ref_genome_for_panel, "' (matches genomic_information file coordinates)\n")
+  
+  Panel_context <- tryCatch({
+    SATS::GeneratePanelSize(
+      genomic_information = genomic_information,
+      Class = "SBS",
+      SBS_order = "COSMIC",
+      ref.genome = ref_genome_for_panel  # Always use hg19 to match data file coordinates
+    )
+  }, error = function(e) {
+    if (grepl("beyond the boundaries", e$message) || grepl("non-circular sequence", e$message)) {
+      stop("\n\n================================================================================\n",
+           "ERROR: Genome coordinate mismatch detected!\n\n",
+           "The genomic_information file contains coordinates that are incompatible with ", ref_genome_for_panel, ".\n",
+           "This typically means your data uses different genome coordinates.\n\n",
+           "SOLUTIONS:\n",
+           "1. Verify your genomic_information file uses ", ref_genome_for_panel, " coordinates\n",
+           "2. Convert your genomic_information file coordinates to ", ref_genome_for_panel, " using liftOver\n\n",
+           "Original error: ", e$message, "\n",
+           "================================================================================\n")
+    } else {
+      stop(e)
+    }
+  })
   if (!identical(rownames(Panel_context), rownames(V)))
     stop("Panel_context/V rownames mismatch.")
 
@@ -337,6 +415,13 @@ run_dbs_refitting <- function(maf_file,
                                        stringsAsFactors = FALSE, check.names = FALSE)
   annoFile <- utils::read.csv(cancer_dictionary_file, check.names = FALSE)
 
+  # IMPORTANT: Always use hg19 for ref.genome parameter in GeneratePanelSize()
+  # because the genomic_information file contains hg19 coordinates.
+  # The 'genome' parameter above only controls which BSgenome package to use for sequence retrieval.
+  ref_genome_for_panel <- "hg19"
+  cat("NOTE: Using ref.genome='hg19' for GeneratePanelSize() (matches genomic_information coordinates)\n")
+  cat("      BSgenome package selected:", genome, "\n")
+
   # Column checks
   need_mut <- c("Chromosome","Start_Position","End_Position","Variant_Type","Reference_Allele","Tumor_Seq_Allele2","Tumor_Sample_Barcode")
   miss_mut <- setdiff(need_mut, names(mutations2))
@@ -358,17 +443,63 @@ run_dbs_refitting <- function(maf_file,
       return(matrix(0, nrow = length(order78), ncol = 0, dimnames = list(order78, NULL)))
     }
 
+    # Validate coordinates against genome boundaries
+    seqlengths_ref <- GenomeInfoDb::seqlengths(Hs)
+    dnv$chr_name <- paste0("chr", dnv$Chromosome)
+    
+    # Check for invalid chromosomes and positions
+    invalid_rows <- c()
+    for (i in seq_len(nrow(dnv))) {
+      chr <- dnv$chr_name[i]
+      start_pos <- dnv$Start_Position[i]
+      end_pos <- dnv$End_Position[i]
+      
+      if (!chr %in% names(seqlengths_ref)) {
+        cat("WARNING: Chromosome", chr, "not found in", genome, "reference. Skipping variant at position", start_pos, "-", end_pos, "\n")
+        invalid_rows <- c(invalid_rows, i)
+        next
+      }
+      
+      chr_len <- seqlengths_ref[chr]
+      if (is.na(chr_len)) {
+        cat("WARNING: Unknown length for", chr, ". Skipping variant at position", start_pos, "-", end_pos, "\n")
+        invalid_rows <- c(invalid_rows, i)
+        next
+      }
+      
+      # Check if positions are within bounds
+      if (start_pos < 1 || end_pos > chr_len) {
+        cat("WARNING: Position", start_pos, "-", end_pos, "on", chr, "is out of bounds for", genome, "(length:", chr_len, "). Skipping this variant.\n")
+        invalid_rows <- c(invalid_rows, i)
+      }
+    }
+    
+    # Remove invalid rows
+    if (length(invalid_rows) > 0) {
+      cat("Removed", length(invalid_rows), "DBS variant(s) with invalid coordinates\n")
+      dnv <- dnv[-invalid_rows, ]
+      
+      if (nrow(dnv) == 0) {
+        cat("WARNING: All DBS variants were filtered out due to coordinate issues. Returning empty matrix.\n")
+        return(matrix(0, nrow = length(order78), ncol = 0, dimnames = list(order78, NULL)))
+      }
+    }
+
     dnv_5_GRanges <- GenomicRanges::GRanges(
-      seqnames = paste0("chr", dnv$Chromosome),
+      seqnames = dnv$chr_name,
       IRanges::IRanges(start = dnv$Start_Position, end = dnv$Start_Position),
       strand = "+"
     )
     
     dnv_3_GRanges <- GenomicRanges::GRanges(
-      seqnames = paste0("chr", dnv$Chromosome),
+      seqnames = dnv$chr_name,
       IRanges::IRanges(start = dnv$End_Position, end = dnv$End_Position),
       strand = "+"
     )
+    
+    # Restrict GRanges to only use sequences available in the reference genome
+    GenomeInfoDb::seqlevels(dnv_5_GRanges, pruning.mode="coarse") <- GenomeInfoDb::seqlevelsInUse(dnv_5_GRanges)
+    GenomeInfoDb::seqlevels(dnv_3_GRanges, pruning.mode="coarse") <- GenomeInfoDb::seqlevelsInUse(dnv_3_GRanges)
     
     DNV_5 <- BSgenome::getSeq(Hs, dnv_5_GRanges)
     DNV_3 <- BSgenome::getSeq(Hs, dnv_3_GRanges)
@@ -441,11 +572,14 @@ run_dbs_refitting <- function(maf_file,
   V <- make_DBS_V(mutations2, Mut_category_order, Hsapiens)
 
   # ---- Panel context & L ----
+  cat("Generating panel context from genomic information file...\n")
+  cat("NOTE: Using ref.genome='", ref_genome_for_panel, "' (matches genomic_information file coordinates)\n")
+  
   Panel_context <- SATS::GeneratePanelSize(
     genomic_information = genomic_information,
     Class = "DBS",
     SBS_order = "COSMIC",
-    ref.genome = genome
+    ref.genome = ref_genome_for_panel  # Always use hg19 to match data file coordinates
   )
   if (!identical(rownames(Panel_context), rownames(V)))
     stop("Panel_context/V rownames mismatch.")
