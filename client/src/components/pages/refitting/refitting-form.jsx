@@ -449,7 +449,7 @@ export default function RefittingForm() {
                 variant="link"
                 disabled={isFormDisabled}
                 onClick={async () => {
-                  const file = 'Clinical_sample.txt';
+                  const file = `${signatureType}_Clinical_sample.txt`;
                   const path =
                     import.meta.env.BASE_URL +
                     'assets/examples/refitting/' +
@@ -461,13 +461,13 @@ export default function RefittingForm() {
                 }}
                 className="p-0 mr-3"
               >
-                Load Example
+                Load {signatureType} Example
               </Button>
               <Button
                 variant="link"
                 disabled={isFormDisabled}
                 onClick={() => {
-                  const file = 'Clinical_sample.txt';
+                  const file = `${signatureType}_Clinical_sample.txt`;
                   const path =
                     import.meta.env.BASE_URL +
                     'assets/examples/refitting/' +
@@ -479,7 +479,7 @@ export default function RefittingForm() {
                 }}
                 className="p-0"
               >
-                Download Clinical Example
+                Download {signatureType} Clinical Example
               </Button>
             </Form.Group>
           </div>
