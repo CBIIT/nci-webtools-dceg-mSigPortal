@@ -272,11 +272,38 @@ run_sbs_refitting <- function(maf_file,
       SEQ_ASSAY_ID = clinical_sample$SEQ_ASSAY_ID[keep]
     )
   )
+  
+  # Filter V matrix to only include samples that have L matrix (i.e., samples with clinical data)
+  V <- V[, colnames(V) %in% colnames(L), drop = FALSE]
+  cat("V matrix filtered to", ncol(V), "samples with clinical data\n")
+  
   if (!identical(rownames(L), rownames(V)))
     stop("L/V rownames mismatch.")
 
-  # ---- Refitting per sample ----
-  tumor_ID <- colnames(V)
+  # ---- Refitting per sample (SBS) ----
+  # Only process samples that exist in both V matrix and clinical data
+  tumor_ID <- colnames(V)[colnames(V) %in% clinical_sample$SAMPLE_ID]
+  
+  if (length(tumor_ID) == 0) {
+    cat("WARNING: No samples found with both mutation data and clinical information.\n")
+    cat("Returning empty results.\n")
+    
+    out <- tibble::tibble(SAMPLE_ID = character(),
+                          Signature  = character(),
+                          Activity   = double(),
+                          Burden     = double())
+    
+    # Still write the empty CSV file
+    if (isTRUE(save_csv)) {
+      utils::write.csv(out, file.path(output_dir, out_file), row.names = FALSE)
+      message("Wrote empty results: ", file.path(output_dir, out_file))
+    }
+    
+    return(list(H_Burden = out, V = V, L = L, Panel_context = Panel_context))
+  }
+  
+  cat("Processing", length(tumor_ID), "samples with complete data\n")
+  
   out <- tibble::tibble(SAMPLE_ID = character(),
                         Signature  = character(),
                         Activity   = double(),
@@ -284,7 +311,10 @@ run_sbs_refitting <- function(maf_file,
 
   for (sid in tumor_ID) {
     ct <- clinical_sample$CANCER_TYPE[match(sid, clinical_sample$SAMPLE_ID)]
-    if (is.na(ct)) stop("No CANCER_TYPE for sample: ", sid)
+    if (is.na(ct)) {
+      cat("WARNING: No CANCER_TYPE found for sample:", sid, ". Skipping this sample.\n")
+      next
+    }
 
     # map cancer type (optionally include ONCOTREE)
     if (isTRUE(match_on_oncotree) && "ONCOTREE_CODE" %in% names(clinical_sample) && "ONCOTREE_CODE" %in% names(annoFile)) {
@@ -395,6 +425,12 @@ run_dbs_refitting <- function(maf_file,
     hg19 = BSgenome.Hsapiens.UCSC.hg19::Hsapiens,
     hg38 = BSgenome.Hsapiens.UCSC.hg38::Hsapiens
   )
+  
+  # IMPORTANT: For DBS V matrix generation, always use hg19 to match MAF/genomic_information coordinates
+  # The input files contain hg19 coordinates, so we must use hg19 BSgenome
+  # to fetch correct reference sequences, regardless of user's genome selection
+  Hsapiens_for_V <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
+  cat("NOTE: Using hg19 BSgenome for V matrix generation (matches input file coordinates)\n")
 
   # Load RefTMB dataset from SATS (dataset, not an exported object)
   utils::data("RefTMB", package = "SATS", envir = environment())
@@ -569,7 +605,8 @@ run_dbs_refitting <- function(maf_file,
   }
 
   # ---- V ----
-  V <- make_DBS_V(mutations2, Mut_category_order, Hsapiens)
+  # Use Hsapiens_for_V (hg19) to ensure correct reference sequences matching input coordinates
+  V <- make_DBS_V(mutations2, Mut_category_order, Hsapiens_for_V)
 
   # ---- Panel context & L ----
   cat("Generating panel context from genomic information file...\n")
@@ -602,6 +639,7 @@ run_dbs_refitting <- function(maf_file,
       )
     )
     cat("L matrix generated for", ncol(L), "samples\n")
+    cat("Note: V matrix keeps all", ncol(V), "samples (matching working R Studio code)\n")
   } else {
     # If no clinical overlap, create L matrix based on V matrix samples and use default assay
     cat("No clinical samples overlap with V matrix. Creating default L matrix for V samples.\n")
@@ -618,45 +656,35 @@ run_dbs_refitting <- function(maf_file,
   }
   
   if (!identical(rownames(L), rownames(V)))
+  if (!identical(rownames(L), rownames(V)))
     stop("L/V rownames mismatch.")
 
-  # ---- Refitting per sample ----
+  # ---- Refitting per sample (DBS) ----
+  # Match working R Studio code: use ALL samples from V matrix
   tumor_ID <- colnames(V)
+  
+  cat("Processing", length(tumor_ID), "samples from V matrix\n")
+  
   out <- tibble::tibble(SAMPLE_ID = character(),
                         Signature  = character(),
                         Activity   = double(),
                         Burden     = double())
 
   for (sid in tumor_ID) {
-    ct <- clinical_sample$CANCER_TYPE[match(sid, clinical_sample$SAMPLE_ID)]
+    # Finding cancer type - matches working R Studio approach
+    sample_cancer_type <- clinical_sample$CANCER_TYPE[clinical_sample$SAMPLE_ID == sid]
     
-    # Handle missing cancer type - use default or skip this sample
-    if (is.na(ct)) {
-      stop("No CANCER_TYPE found for sample: ", sid, ". Please provide a valid cancer type in the clinical_sample data.")
-    }
-
-    # map cancer type (optionally include ONCOTREE)
-    if (isTRUE(match_on_oncotree) && "ONCOTREE_CODE" %in% names(clinical_sample) && "ONCOTREE_CODE" %in% names(annoFile)) {
-      oc  <- clinical_sample$ONCOTREE_CODE[match(sid, clinical_sample$SAMPLE_ID)]
-      if (!is.na(oc)) {
-        idx <- which(annoFile$CANCER_TYPE == ct & annoFile$ONCOTREE_CODE == oc)
-      } else {
-        idx <- which(annoFile$CANCER_TYPE == ct)
-      }
-    } else {
-      idx <- which(annoFile$CANCER_TYPE == ct)
-    }
+    cat("Sample:", sid, "has CANCER_TYPE:", sample_cancer_type, "\n")
+    cat("Available CANCER_TYPEs in annoFile:", paste(unique(annoFile$CANCER_TYPE), collapse=", "), "\n")
     
-    # If no mapping found for the specific cancer type, try with a more general approach
+    idx <- which(sample_cancer_type == annoFile$CANCER_TYPE)
+    
     if (!length(idx)) {
-      cat("Warning: No mapping in annotation file for sample", sid, "(CANCER_TYPE=", ct, "). Trying 'Other' cancer type.\n")
-      idx <- which(annoFile$CANCER_TYPE == "Other")
-      if (!length(idx)) {
-        # If 'Other' not found, throw an error instead of using the first available cancer type
-        stop("No valid cancer type mapping found for sample ", sid, " (CANCER_TYPE=", ct, "). Please check your annotation file.")
-      }
+      cat("WARNING: No mapping found in annotation file for sample", sid, 
+          "with CANCER_TYPE '", sample_cancer_type, "'. Skipping this sample.\n")
+      next
     }
-
+    
     CanType <- annoFile$cancerAnalyzed[idx[1]]
     cat("Sample", sid, "mapped to cancer type:", CanType, "\n")
 
