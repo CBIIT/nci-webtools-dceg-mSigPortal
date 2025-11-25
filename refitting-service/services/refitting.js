@@ -75,7 +75,7 @@ export async function refitting(params, logger, env = process.env) {
     
     // Determine which R function to call based on profile type
     const rFunctionName = normalizedProfile === 'DBS' ? 'run_dbs_refitting' : 'run_sbs_refitting';
-    const defaultOutputFilename = normalizedProfile === 'DBS' ? 'H_Burden_est_DBS.csv' : 'H_Burden_est.csv';
+    const defaultOutputFilename = 'H_Burden_est.csv';
     
     // Call the appropriate R refitting function
     logger.info(`Running ${normalizedProfile} refitting for job ${id}`);
