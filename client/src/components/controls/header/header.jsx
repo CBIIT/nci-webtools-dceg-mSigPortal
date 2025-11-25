@@ -8,18 +8,15 @@ export function Header() {
     <div className="bg-light">
       <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
       <div className="usa-banner" aria-label="Official government website">
-        <div className="container mx-auto">
+        <div className={`d-none d-md-block ${pathname === '/' ? 'container' : ''}`}>
           <div className="usa-banner__header">
             <div className="usa-banner__inner">
-              <div className="container" >
-                <div className="usa-banner__header-text">
+              <div className="usa-banner__header-text ml-3" style={{ whiteSpace: 'nowrap' }}>
                 An official website of the United States government
               </div>
             </div>
-              
-            </div>
           </div>
-        </div>       
+        </div>
       </div>
       <div>
         {/* <a
