@@ -366,7 +366,7 @@ run_dbs_refitting <- function(maf_file,
                               common_files_dir,
                               genome = c("hg19","hg38"),
                               save_csv = TRUE,
-                              out_file = "H_Burden_est_DBS.csv",
+                              out_file = "H_Burden_est.csv",
                               match_on_oncotree = FALSE) {
 
   # Add logging to track function execution
