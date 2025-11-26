@@ -276,7 +276,7 @@ export default function RsComparisonPlot() {
           className="text-center"
           style={{ display: plotError ? 'block' : 'none' }}
         >
-          <p>An error has occured. Please verify your input.</p>
+          <p>An error has occurred. Please verify your input.</p>
         </div>
 
         {plot && !plotError && (

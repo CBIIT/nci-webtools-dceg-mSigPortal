@@ -93,7 +93,7 @@ export default function Etiology() {
       )}
       {error && (
         <div>
-          {error?.data || 'An error occured while retrieving etiology options'}
+          {error?.data || 'An error occurred while retrieving etiology options'}
         </div>
       )}
     </Container>

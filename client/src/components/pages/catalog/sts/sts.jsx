@@ -86,7 +86,7 @@ export default function STS() {
       )}
       {error && (
         <div>
-          {error?.data || 'An error occured while retrieving STS signatures'}
+          {error?.data || 'An error occurred while retrieving STS signatures'}
         </div>
       )}
     </Container>

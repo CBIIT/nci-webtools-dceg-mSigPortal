@@ -152,7 +152,7 @@ export default function ClusteredPlot({ state, form }) {
       )}
       {error && (
         <p className="text-center">
-          An error has occured. Please check your inputs and try again.
+          An error has occurred. Please check your inputs and try again.
         </p>
       )}
     </div>

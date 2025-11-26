@@ -43,7 +43,7 @@ export default function MutProfilePlot({ state, form }) {
         />
       ) : (
         <div className="text-center">
-          <div>An error has occured</div>
+          <div>An error has occurred</div>
           <div>{error?.message}</div>
         </div>
       )}

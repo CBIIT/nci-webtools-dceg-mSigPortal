@@ -28,7 +28,7 @@ export function ErrorModal(props) {
         <div className="w-100">{message}</div>
         <br />
         <p>
-          An error has occured. If the issue persists, please contact an admin
+          An error has occurred. If the issue persists, please contact an admin
           for assistance.{' '}
           <a href="mailto:mSigPortalWebAdmin@mail.nih.gov">
             mSigPortalWebAdmin@mail.nih.gov

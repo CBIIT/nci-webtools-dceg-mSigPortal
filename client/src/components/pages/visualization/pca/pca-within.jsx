@@ -134,10 +134,10 @@ export default function PcaWithin({ state }) {
           </Col>
         </Row>
       </Form>
-      {error && (
+      {(error || data?.output?.uncaughtError) && (
         <>
           <hr />
-          <p className="p-3">An error has occured. Please verify your input.</p>
+          <p className="p-3">An error has occurred. Please verify your input.</p>
         </>
       )}
 

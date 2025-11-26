@@ -218,7 +218,7 @@ async function visualizationWrapper(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.error(`/visualizationWrapper: An error occured with fn: ${fn}`);
+    logger.error(`/visualizationWrapper: An error occurred with fn: ${fn}`);
     next(err);
   }
 }

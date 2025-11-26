@@ -233,7 +233,7 @@ export default function UserForm() {
       // }
     } catch (error) {
       console.error(error);
-      mergeError('An error occured while uploading files. Please try again.');
+      mergeError('An error occurred while uploading files. Please try again.');
     }
   }
 

@@ -212,7 +212,7 @@ export default function CsPublic({ state }) {
           <>
             <hr />
             <div className="p-3">
-              <p>An error has occured. Please verify your input.</p>
+              <p>An error has occurred. Please verify your input.</p>
               <p>{error.data}</p>
             </div>
           </>

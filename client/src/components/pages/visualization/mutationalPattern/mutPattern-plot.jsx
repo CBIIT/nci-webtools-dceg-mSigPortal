@@ -190,7 +190,7 @@ export default function MutPatternPlot({ state }) {
         {patternError && (
           <div className="p-3 text-center">
             <b>Frequency of Mutational Pattern</b>
-            <p>An error has occured. Please verify your input.</p>
+            <p>An error has occurred. Please verify your input.</p>
           </div>
         )}
       </div>
@@ -222,7 +222,7 @@ export default function MutPatternPlot({ state }) {
         {patternError && (
           <div className="p-3 text-center">
             <b>Proportion of Mutational Pattern</b>
-            <p>An error has occured. Please verify your input.</p>
+            <p>An error has occurred. Please verify your input.</p>
           </div>
         )}
       </div>

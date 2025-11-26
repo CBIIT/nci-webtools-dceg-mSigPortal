@@ -113,7 +113,7 @@ async function associationWrapper(req, res, next) {
       ...rest,
     });
   } catch (err) {
-    logger.error(`/associationWrapper: An error occured with fn:${fn}`);
+    logger.error(`/associationWrapper: An error occurred with fn:${fn}`);
     next(err);
   }
 }
