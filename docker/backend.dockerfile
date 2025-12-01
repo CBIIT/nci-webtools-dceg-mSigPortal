@@ -42,8 +42,8 @@ RUN cd /tmp && \
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
-RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
-
+#RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
+RUN pip3 install --force-reinstall --no-cache-dir pandas==1.3.5
 # install bcftools
 RUN cd /tmp \
     && curl -L https://github.com/samtools/bcftools/releases/download/1.16/bcftools-1.16.tar.bz2 | tar xj \
