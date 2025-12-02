@@ -43,7 +43,8 @@ RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigPr
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
 #RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
-RUN pip3 install pandas==1.5.3 seaborn 
+#RUN pip3 install pandas==1.5.3 seaborn 
+RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5 seaborn
 
 # install bcftools
 RUN cd /tmp \
