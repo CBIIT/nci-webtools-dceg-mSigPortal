@@ -54,7 +54,8 @@ RUN cd /tmp && \
 
 # install python packages
 #RUN pip3 install numpy==1.26.4 pandas==1.5.3 seaborn 
-RUN pip3 install pandas==1.5.3 seaborn 
+#RUN pip3 install pandas==1.5.3 seaborn 
+RUN pip3 install numpy==1.26.4 pandas==1.3.5 seaborn
 
 # install client python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
