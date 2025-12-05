@@ -94,7 +94,7 @@ export default function Instructions() {
             </ul>
             <div>
             <a
-              href={import.meta.env.BASE_URL + "/assets/examples/refitting/Clinical_sample.txt"}
+              href={import.meta.env.BASE_URL + `/assets/examples/refitting/${signatureType}Clinical_sample.txt`}
               download
               className="link-primary-underline"
             >
