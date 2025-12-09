@@ -8,6 +8,7 @@ library(ggpubr)
 library(jsonlite)
 library(stringr)
 library(aws.s3)
+source("services/R/utils.R")
 
 # capture console output for all functions called in wrapper
 wrapper <- function(fn, args, config = list()) {
@@ -463,8 +464,7 @@ msigportal.exposurePublic <- function(args, config) {
   } else {
     seqmatrixFile <- paste0(common$study, "_", common$strategy, "_seqmatrix_refdata.RData")
   }
-  file <- get_object(paste0(config$prefix, "Seqmatrix/", seqmatrixFile), config$bucket)
-  seqmatrix_refdata_selected <- get(load(rawConnection(file)))
+  seqmatrix_refdata_selected <- s3load_as(paste0(config$prefix, "Seqmatrix/", seqmatrixFile), config$bucket)
   seqmatrix_refdata_selected <- seqmatrix_refdata_selected %>% filter(Profile == signature_refsets_selected$Profile[1], Cancer_Type == common$cancerType)
 
   # Tumor Overall Mutational Burden
