@@ -13,7 +13,7 @@ export default function Instructions() {
         sequencing data. The set of mutational signatures used for refitting for
         each cancer type is shown on the{' '}
         <a
-          href="/#/catalog/sts"
+          href={`#/catalog/sts`}
           className="link-primary-underline"
           target="_blank"
         >
@@ -23,7 +23,7 @@ export default function Instructions() {
         file and have to be matched to those listed in the Cancer Type column of
         the{' '}
         <a
-          href="/assets/examples/refitting/CancerTypes_Dictionary.csv"
+          href="assets/examples/refitting/CancerTypes_Dictionary.csv"
           download
           className="link-primary-underline"
         >
@@ -87,7 +87,7 @@ export default function Instructions() {
             information for samples. <em>(Example provided)</em>
             <div>
               <a
-                href={`/assets/examples/refitting/${signatureType}_MAF_two_samples.txt`}
+                href={`assets/examples/refitting/${signatureType}_MAF_two_samples.txt`}
                 download
                 className="link-primary-underline"
               >
@@ -101,7 +101,7 @@ export default function Instructions() {
             <div>
               <a
                 href={
-                  '/assets/examples/refitting/Genomic_information_sample.txt'
+                  'assets/examples/refitting/Genomic_information_sample.txt'
                 }
                 download
                 className="link-primary-underline"
@@ -128,7 +128,7 @@ export default function Instructions() {
             </ul>
             <div>
               <a
-                href={`/assets/examples/refitting/${signatureType}_Clinical_sample.txt`}
+                href={`assets/examples/refitting/${signatureType}_Clinical_sample.txt`}
                 download
                 className="link-primary-underline"
               >
