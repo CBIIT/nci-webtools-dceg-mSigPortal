@@ -7,8 +7,30 @@ export default function Instructions() {
 
   return (
     <Container fluid className="bg-white border rounded p-3">
-      <h1 className="h4-title">How to Submit a Query</h1>
-      <p>Use the panel on the left to configure the required options.</p>
+      <h1 className="h4-title">Refitting for Targeted Sequencing</h1>
+      <p>
+        This webpage provides mutational signature refitting for targeted
+        sequencing data. The set of mutational signatures used for refitting for
+        each cancer type is shown on the{' '}
+        <a
+          href="/#/catalog/sts"
+          className="link-primary-underline"
+          target="_blank"
+        >
+          signature catalogue webpage
+        </a>
+        . The applicable cancer types must be specified in the clinical input
+        file and have to be matched to those listed in the Cancer Type column of
+        the{' '}
+        <a
+          href="/assets/examples/refitting/CancerTypes_Dictionary.csv"
+          download
+          className="link-primary-underline"
+        >
+          cancer dictionary file
+        </a>
+        . Use the panel on the left to configure the remaining required inputs.
+      </p>
       <hr />
       <div className="mt-2">
         <h1 className="h4-title">Signature Type</h1>

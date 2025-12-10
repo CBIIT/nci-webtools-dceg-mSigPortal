@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Button, Form, Alert } from 'react-bootstrap';
+import { Card, Alert } from 'react-bootstrap';
 import { parseCSV } from '../../../services/utils';
 import Table from '../../controls/table/table2';
 
 export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState('sigprofiler');
   const [csvData, setCsvData] = useState([]);
   const [jobParams, setJobParams] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -452,6 +451,10 @@ export default function TargetedSequencing({ jobId }) {
                   {renderL2NormResults()}
                 </>
               )}
+              <div className="text-muted">
+                N/A - the corresponding signature was not refitted for this
+                sample.
+              </div>
             </Card.Body>
           </Card>
         </>

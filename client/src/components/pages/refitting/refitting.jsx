@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -10,26 +10,34 @@ import {
 } from '../../controls/sidebar-container/sidebar-container';
 import Instructions from './instructions';
 import Status from './status';
-import TargetedSequencing from './targetedSequencing';
+import Results from './results';
 import RefittingForm from './refitting-form';
 
 export default function Refitting() {
-  const { displayTab, openSidebar } = useSelector((state) => state.refitting.main);
+  const { displayTab, openSidebar } = useSelector(
+    (state) => state.refitting.main
+  );
   const dispatch = useDispatch();
   const { id: jobId } = useParams();
-  
-  const setDisplayTab = (tab) => dispatch(refittingActions.mergeRefitting({ 
-    main: { displayTab: tab } 
-  }));
-  
-  const setOpenSidebar = (open) => dispatch(refittingActions.mergeRefitting({ 
-    main: { openSidebar: open } 
-  }));
 
-  // Auto-switch to targeted sequencing tab when job ID is provided
+  const setDisplayTab = (tab) =>
+    dispatch(
+      refittingActions.mergeRefitting({
+        main: { displayTab: tab },
+      })
+    );
+
+  const setOpenSidebar = (open) =>
+    dispatch(
+      refittingActions.mergeRefitting({
+        main: { openSidebar: open },
+      })
+    );
+
+  // Auto-switch to results tab when job ID is provided
   useEffect(() => {
     if (jobId) {
-      setDisplayTab('targetedSequencing');
+      setDisplayTab('results');
     }
   }, [jobId]);
 
@@ -45,8 +53,8 @@ export default function Refitting() {
       disabled: false,
     },
     {
-      id: 'targetedSequencing',
-      name: 'Targeted Sequencing',
+      id: 'results',
+      name: 'Results',
       disabled: !jobId, // Only enabled when a job ID is present
     },
   ];
@@ -133,8 +141,8 @@ export default function Refitting() {
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
             <Status />
           </div>
-          <div className={displayTab === 'targetedSequencing' ? 'd-block' : 'd-none'}>
-            <TargetedSequencing jobId={jobId} />
+          <div className={displayTab === 'results' ? 'd-block' : 'd-none'}>
+            <Results jobId={jobId} />
           </div>
         </MainPanel>
       </SidebarContainer>
