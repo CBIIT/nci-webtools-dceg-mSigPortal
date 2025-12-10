@@ -7,9 +7,11 @@ export default function RsProfile() {
   const { plots } = store.rSProfiles;
   return (
     <div>
-      Enter any [Signature Source], [Profile Name], [Reference Signature Set],
-      [Experimental Strategy], and [Signature Name] below to visualize the
-      mutational signature profile.
+      <div className="p-3">
+        Enter any [Signature Source], [Profile Name], [Reference Signature Set],
+        [Experimental Strategy], and [Signature Name] below to visualize the
+        mutational signature profile.
+      </div>
       <hr />
       {/* {plots.map((e, i) => (
         <RsProfileFormPlot options={e} index={i} />

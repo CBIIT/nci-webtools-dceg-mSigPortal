@@ -15,9 +15,9 @@ export default function Explore() {
   const { displayTab } = store.main;
 
   const tabs = [
-    { name: 'TMC Signatures Catalog', id: 'etiology' },
-    { name: 'Signatures from Targeted Sequencing', id: 'STS' },
-    { name: 'Reference Signature', id: 'referenceSignature' },
+    { name: 'WGS/WES Signatures Catalog', id: 'etiology' },
+    { name: 'TS Signatures Catalog', id: 'STS' },
+    { name: 'Reference Signatures Comparison', id: 'referenceSignature' },
   ];
 
   function handleTabChange(tab) {

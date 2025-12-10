@@ -1,4 +1,4 @@
-import { Tab, Nav } from 'react-bootstrap';
+import { Container, Tab, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import RsInMsigportal from './rsInMsigportal/rsInMsigportal-plot';
 import RsProfile from './rsProfile/rsProfile';
@@ -44,10 +44,14 @@ export default function ReferenceSignature() {
   ];
 
   return (
-    <div style={{ minHeight: '500px' }}>
+    <Container
+      fluid
+      className="p-4 bg-white border rounded"
+      style={{ minHeight: '500px' }}
+    >
+      <h4 className="text-center mb-3">Reference Signatures Comparison</h4>
       <Tab.Container
         transition={false}
-        className="mt-2"
         activeKey={displayTab}
         onSelect={(tab) => mergeState({ displayTab: tab })}
       >
@@ -64,7 +68,7 @@ export default function ReferenceSignature() {
             </Nav.Item>
           ))}
         </Nav>
-        <Tab.Content className="bg-white tab-pane-bordered rounded-0 d-block">
+        <Tab.Content className="bg-white tab-pane-bordered d-block">
           {tabs.map(({ key, component }) => (
             <Tab.Pane key={key} eventKey={key} className="border-0">
               {component}
@@ -72,6 +76,6 @@ export default function ReferenceSignature() {
           ))}
         </Tab.Content>
       </Tab.Container>
-    </div>
+    </Container>
   );
 }

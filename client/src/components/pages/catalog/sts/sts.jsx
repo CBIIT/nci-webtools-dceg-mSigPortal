@@ -14,12 +14,9 @@ const actions = { ...catalogActions };
 
 export default function STS() {
   const dispatch = useDispatch();
-  const mergeSTS = (state) =>
-    dispatch(actions.mergeCatalog({ sts: state }));
+  const mergeSTS = (state) => dispatch(actions.mergeCatalog({ sts: state }));
 
-  const { etiology, signature } = useSelector(
-    (state) => state.catalog.sts
-  );
+  const { etiology, signature } = useSelector((state) => state.catalog.sts);
 
   // Fixed category to STS
   const category = 'STS';
@@ -57,7 +54,9 @@ export default function STS() {
   // automatically choose first etiology (using the same sort as display)
   useEffect(() => {
     if (data && data[0]?.category == category && !etiology) {
-      const sortedEtiologies = [...new Set(data.map((e) => e.etiology))].sort(etiologySort);
+      const sortedEtiologies = [...new Set(data.map((e) => e.etiology))].sort(
+        etiologySort
+      );
       mergeSTS({
         etiology: sortedEtiologies[0],
       });
@@ -66,13 +65,31 @@ export default function STS() {
 
   return (
     <Container fluid className="p-4 bg-white border rounded">
-      <div>
-        Unlike COSMIC signatures, which are derived from tumor mutational counts (TMC) obtained from whole-genome or whole-exome sequencing (WGS/WES), signatures from targeted sequencing are derived from tumor mutational burden (TMB) estimated using targeted sequencing panels. Consequently, the profiles of TMC- and TMB-based signatures are similar but not identical (e.g., SBS5).
-      </div>
+      <h4 className="text-center mb-3">Targeted Sequencing Signatures Catalog</h4>
+      <p>
+        This webpage presents a pan-cancer catalogue of mutational signatures
+        derived from targeted sequencing data. The repertoire plots below
+        display the frequencies of single base substitution (SBS) and double
+        base substitution (DBS) signatures identified across 111,711 tumors
+        spanning 23 cancer types in AACR Project GENIE (version 13.0). You can
+        hover over each color block or data point to view the corresponding
+        frequency.
+      </p>
+      <p>
+        Below the repertoire plots, we list the proposed etiologies for each
+        mutational signature along with its corresponding profile plot. You may
+        notice that these profiles differ slightly from those of the COSMIC
+        mutational signatures. COSMIC signatures are derived from tumor
+        mutational counts (TMC) obtained through whole-genome or whole-exome
+        sequencing (WGS/WES), whereas the signatures shown here are based on
+        tumor mutational burden (TMB) estimated from targeted sequencing panels.
+        As a result, TMC- and TMB-based signature profiles are similar but not
+        identical (e.g., SBS5).
+      </p>
 
       {/* Tissue Distribution with both SBS and DBS plots */}
       <STSTissueDistribution selectedSignature={signature} />
-      
+
       {data && data[0]?.category == category ? (
         <>
           <STSEtiologyOptions data={data} />

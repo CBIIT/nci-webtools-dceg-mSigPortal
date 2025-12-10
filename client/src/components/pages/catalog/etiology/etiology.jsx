@@ -78,6 +78,7 @@ export default function Etiology() {
 
   return (
     <Container fluid className="p-4 bg-white border rounded">
+      <h4 className="text-center mb-3">Whole-genome or Whole-exome Signatures Catalog</h4>
       <h5 className="separator">Categories</h5>
       <CategoryOptions categories={categories} />
       {data && data[0]?.category == category ? (
