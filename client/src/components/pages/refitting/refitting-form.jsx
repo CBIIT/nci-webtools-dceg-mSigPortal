@@ -2,20 +2,21 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { useUploadMutation, useSubmitRefittingMutation } from './apiSlice';
 import { actions as modalActions } from '../../../services/store/modal';
 import { actions as refittingActions } from '../../../services/store/refitting';
 
 export default function RefittingForm() {
   const { submitted, ...state } = useSelector((state) => state.refitting.main);
-  const id = state.id || false;
-
+  const history = useHistory();
   const [localSubmitted, setLocalSubmitted] = useState(false);
   const [error, setError] = useState(null);
 
   // API hooks
   const [uploadFiles, { isLoading: isUploading }] = useUploadMutation();
-  const [submitRefitting, { isLoading: isSubmitting }] = useSubmitRefittingMutation();
+  const [submitRefitting, { isLoading: isSubmitting }] =
+    useSubmitRefittingMutation();
 
   const dispatch = useDispatch();
   const mergeState = (state) =>
@@ -26,7 +27,8 @@ export default function RefittingForm() {
     );
 
   // Computed state for form disabled status
-  const isFormDisabled = submitted || localSubmitted || isUploading || isSubmitting;
+  const isFormDisabled =
+    submitted || localSubmitted || isUploading || isSubmitting;
 
   const defaultValues = {
     signatureType: 'SBS',
@@ -58,14 +60,16 @@ export default function RefittingForm() {
 
   // Sync form values to Redux store so Instructions component can access them
   useEffect(() => {
-    dispatch(refittingActions.mergeRefitting({ 
-      userForm: { 
-        signatureType,
-        referenceGenome,
-        email,
-        jobName,
-      }
-    }));
+    dispatch(
+      refittingActions.mergeRefitting({
+        userForm: {
+          signatureType,
+          referenceGenome,
+          email,
+          jobName,
+        },
+      })
+    );
   }, [signatureType, referenceGenome, email, jobName, dispatch]);
 
   const signatureTypeOptions = [
@@ -81,56 +85,74 @@ export default function RefittingForm() {
   // Validate MAF file content matches signature type
   const validateMafFile = async (file, signatureType) => {
     if (!file) return { isValid: true };
-    
+
     try {
       const text = await file.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
+      const lines = text.split('\n').filter((line) => line.trim());
+
       if (lines.length < 2) {
-        return { isValid: false, error: 'MAF file appears to be empty or invalid' };
-      }
-      
-      // Check header contains required columns
-      const header = lines[0].toLowerCase();
-      const requiredColumns = ['variant_type', 'chromosome', 'start_position', 'reference_allele', 'tumor_seq_allele2', 'tumor_sample_barcode'];
-      const missingColumns = requiredColumns.filter(col => !header.includes(col));
-      
-      if (missingColumns.length > 0) {
-        return { 
-          isValid: false, 
-          error: `MAF file missing required columns: ${missingColumns.join(', ')}` 
+        return {
+          isValid: false,
+          error: 'MAF file appears to be empty or invalid',
         };
       }
-      
+
+      // Check header contains required columns
+      const header = lines[0].toLowerCase();
+      const requiredColumns = [
+        'variant_type',
+        'chromosome',
+        'start_position',
+        'reference_allele',
+        'tumor_seq_allele2',
+        'tumor_sample_barcode',
+      ];
+      const missingColumns = requiredColumns.filter(
+        (col) => !header.includes(col)
+      );
+
+      if (missingColumns.length > 0) {
+        return {
+          isValid: false,
+          error: `MAF file missing required columns: ${missingColumns.join(
+            ', '
+          )}`,
+        };
+      }
+
       // Check variant types in data rows
       const dataLines = lines.slice(1, Math.min(lines.length, 100)); // Check first 100 data lines
-      const variantTypeIndex = lines[0].split('\t').findIndex(col => 
-        col.toLowerCase().includes('variant_type')
-      );
-      
+      const variantTypeIndex = lines[0]
+        .split('\t')
+        .findIndex((col) => col.toLowerCase().includes('variant_type'));
+
       if (variantTypeIndex === -1) return { isValid: true }; // Skip validation if column not found
-      
+
       const variantTypes = dataLines
-        .map(line => line.split('\t')[variantTypeIndex])
-        .filter(vt => vt && vt.trim())
-        .map(vt => vt.trim().toUpperCase());
-      
+        .map((line) => line.split('\t')[variantTypeIndex])
+        .filter((vt) => vt && vt.trim())
+        .map((vt) => vt.trim().toUpperCase());
+
       const expectedType = signatureType === 'SBS' ? 'SNP' : 'DNP';
-      const hasExpectedType = variantTypes.some(vt => vt === expectedType);
-      const hasWrongType = variantTypes.some(vt => vt === (signatureType === 'SBS' ? 'DNP' : 'SNP'));
-      
+      const hasExpectedType = variantTypes.some((vt) => vt === expectedType);
+      const hasWrongType = variantTypes.some(
+        (vt) => vt === (signatureType === 'SBS' ? 'DNP' : 'SNP')
+      );
+
       if (hasWrongType && !hasExpectedType) {
         return {
           isValid: false,
-          error: `This MAF file contains ${signatureType === 'SBS' ? 'DBS (DNP)' : 'SBS (SNP)'} variants but you selected ${signatureType} analysis. Please select the correct signature type or upload the appropriate MAF file.`
+          error: `This MAF file contains ${
+            signatureType === 'SBS' ? 'DBS (DNP)' : 'SBS (SNP)'
+          } variants but you selected ${signatureType} analysis. Please select the correct signature type or upload the appropriate MAF file.`,
         };
       }
-      
+
       return { isValid: true };
     } catch (error) {
-      return { 
-        isValid: false, 
-        error: 'Error reading MAF file. Please check the file format.' 
+      return {
+        isValid: false,
+        error: 'Error reading MAF file. Please check the file format.',
       };
     }
   };
@@ -138,17 +160,22 @@ export default function RefittingForm() {
   const onSubmit = async (data) => {
     // Validate required files and fields
     if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
-      setError('Please upload all required files (MAF, Genomic, and Clinical files)');
+      setError(
+        'Please upload all required files (MAF, Genomic, and Clinical files)'
+      );
       return;
     }
-    
+
     if (!data.jobName || data.jobName.trim() === '') {
       setError('Job name is required');
       return;
     }
 
     // Validate MAF file content matches signature type
-    const mafValidation = await validateMafFile(data.mafFile, data.signatureType);
+    const mafValidation = await validateMafFile(
+      data.mafFile,
+      data.signatureType
+    );
     if (!mafValidation.isValid) {
       setError(mafValidation.error);
       return;
@@ -201,6 +228,7 @@ export default function RefittingForm() {
   };
 
   const handleReset = () => {
+    history.push('/refitting');
     resetForm(defaultValues);
     setLocalSubmitted(false);
     setError(null);
@@ -292,7 +320,10 @@ export default function RefittingForm() {
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label>Upload {signatureType} MAF File <span style={{ color: 'crimson' }}>*</span></Form.Label>
+              <Form.Label>
+                Upload {signatureType} MAF File{' '}
+                <span style={{ color: 'crimson' }}>*</span>
+              </Form.Label>
               <Controller
                 name="mafFile"
                 control={control}
