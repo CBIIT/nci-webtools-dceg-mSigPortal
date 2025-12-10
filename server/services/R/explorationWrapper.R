@@ -869,9 +869,13 @@ msigportal.msLandscape <- function(args, ...) {
     rownames(mdata) <- transformExposure$sample
     clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
     cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
+  
+    # Fix: Convert to standard hclust class to avoid "condition has length > 1" error
+    cluster_for_plot <- cluster
+    class(cluster_for_plot) <- "hclust"
     
     # create ggplot plotly dendrogram
-    dendrogramPlot <- ggdendro::ggdendrogram(cluster)
+    dendrogramPlot <- ggdendro::ggdendrogram(cluster_for_plot)
     dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
 
     # sort according to hierarchy order
