@@ -246,36 +246,20 @@ async function startRefittingJob({
 }) {
   const statusFile = path.join(outputPath, 'status.json');
 
-  console.log(
-    `=== [${new Date().toISOString()}] STARTING REFITTING JOB ${jobId} ===`
-  );
-  console.log('Input parameters:', {
-    jobId,
-    mafFilePath,
-    genomicFilePath,
-    clinicalFilePath,
-    inputPath,
-    outputPath,
-    params,
-  });
-
   try {
-    console.log(`[${jobId}] Updating status to PROCESSING...`);
     // Update status to processing
     await writeJson(statusFile, {
       id: jobId,
-      status: 'PROCESSING',
+      status: 'IN_PROGRESS',
       submittedAt: new Date().toISOString(),
       params,
     });
-    console.log(`[${jobId}] Status updated to PROCESSING`);
 
     // Prepare arguments for the refitting service
     const refittingServicePath = path.join(
       process.cwd(),
       '../refitting-service'
     );
-    console.log(`[${jobId}] Refitting service path: ${refittingServicePath}`);
 
     const nodeArgs = [
       'app.js',
@@ -338,15 +322,6 @@ async function startRefittingJob({
       stderr: stderr,
     });
   } catch (error) {
-    console.log(
-      `=== [${new Date().toISOString()}] ERROR in refitting job ${jobId} ===`
-    );
-    console.error(`[${jobId}] Error details:`, error);
-    console.error(`[${jobId}] Error message:`, error.message);
-    console.error(`[${jobId}] Error stack:`, error.stack);
-    if (error.stdout) console.log(`[${jobId}] Error STDOUT:`, error.stdout);
-    if (error.stderr) console.log(`[${jobId}] Error STDERR:`, error.stderr);
-
     logger.error(`Refitting job ${jobId} failed:`, error);
 
     // Update status to failed
@@ -360,7 +335,5 @@ async function startRefittingJob({
       error: error.message,
       stderr: error.stderr,
     });
-
-    console.log(`[${jobId}] Status updated to FAILED`);
   }
 }

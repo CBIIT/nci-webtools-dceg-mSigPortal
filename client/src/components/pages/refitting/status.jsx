@@ -17,7 +17,9 @@ export default function Status() {
 
   // get jobs from local storage
   useEffect(() => {
-    const localJobs = JSON.parse(localStorage.getItem('refitting-jobs') || '[]');
+    const localJobs = JSON.parse(
+      localStorage.getItem('refitting-jobs') || '[]'
+    );
     setJobs(localJobs);
   }, [localStorage.getItem('refitting-jobs')]);
 
@@ -41,9 +43,7 @@ export default function Status() {
       accessor: 'jobName',
       Header: 'Name',
       Cell: ({ row, value }) => (
-        <Link to={`/refitting/${row.original.id}`}>
-          {value}
-        </Link>
+        <Link to={`/refitting/${row.original.id}`}>{value}</Link>
       ),
     },
     {
@@ -51,7 +51,7 @@ export default function Status() {
       Header: 'Status',
       Cell: ({ value }) => {
         if (value === 'SUBMITTED') return 'Submitted';
-        else if (value === 'IN_PROGRESS' || value === 'PROCESSING') return 'In Progress';
+        else if (value === 'IN_PROGRESS') return 'In Progress';
         else if (value === 'FAILED') return 'Failed';
         else if (value === 'COMPLETED') return 'Completed';
         else return value;
@@ -88,7 +88,7 @@ export default function Status() {
         <Button
           variant="link"
           href={`api/downloadOutput/${row.original.id}`}
-          disabled={!['COMPLETED'].includes(value)}
+          disabled={!['COMPLETED', 'FAILED'].includes(value)}
         >
           Download
         </Button>
