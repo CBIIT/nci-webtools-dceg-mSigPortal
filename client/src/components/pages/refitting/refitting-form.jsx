@@ -217,9 +217,9 @@ export default function RefittingForm() {
       const updatedJobs = [...jobs, id];
       localStorage.setItem('refitting-jobs', JSON.stringify(updatedJobs));
 
-      // Show success message
+      history.push(`/refitting/${id}`);
       mergeSuccess(
-        'Most Jobs take a long time, you will receive an email when the refitting job is complete. It is safe to close the window now'
+        `Your job was successfully submitted to the queue. You will receive an email at ${data.email} with your results.`
       );
     } catch (error) {
       setError(error.message || 'Failed to submit');

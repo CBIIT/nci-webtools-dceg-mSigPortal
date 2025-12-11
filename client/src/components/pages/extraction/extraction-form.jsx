@@ -497,7 +497,7 @@ export default function ExtractionForm({ formLimits }) {
     history.push(`/extraction/${submitStatus.id}`);
     mergeState({ id, displayTab: 'status' });
     mergeSuccess(
-      `Most Jobs take a long time, you will receive an email when the extraction job is complete. It is safe to close the window now`
+      `Most jobs take a long time, you will receive an email when the extraction job is complete. It is safe to close the window now`
     );
     const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
     localStorage.setItem('jobs', JSON.stringify([...jobs, id]));
