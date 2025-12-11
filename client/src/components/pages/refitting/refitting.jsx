@@ -55,12 +55,11 @@ export default function Refitting() {
       })
     );
 
-  // Auto-switch to results tab when job ID is provided
   useEffect(() => {
-    if (jobId) {
+    if (status && status.status === 'COMPLETED') {
       setDisplayTab('results');
     }
-  }, [jobId]);
+  }, [status]);
 
   const tabs = [
     {
