@@ -324,6 +324,37 @@ export default function RefittingForm() {
                 Upload {signatureType} MAF File{' '}
                 <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
+              <Row className="m-0">
+                <Col lg="6" className="p-0">
+                  <Button
+                    className="p-0 font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    href={`assets/examples/refitting/${signatureType}_MAF_two_samples.txt`}
+                    download
+                  >
+                    Download Example
+                  </Button>
+                </Col>
+                <Col lg="6" className="p-0 d-flex">
+                  <Button
+                    className="p-0 ml-auto font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    type="button"
+                    onClick={async () => {
+                      const file = `${signatureType}_MAF_two_samples.txt`;
+                      const path = 'assets/examples/refitting/' + file;
+                      setValue(
+                        'mafFile',
+                        new File([await (await fetch(path)).blob()], file)
+                      );
+                    }}
+                  >
+                    Load Example SBS
+                  </Button>
+                </Col>
+              </Row>
               <Controller
                 name="mafFile"
                 control={control}
@@ -348,48 +379,45 @@ export default function RefittingForm() {
                   />
                 )}
               />
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={async () => {
-                  const file = `${signatureType}_MAF_two_samples.txt`;
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  setValue(
-                    'mafFile',
-                    new File([await (await fetch(path)).blob()], file)
-                  );
-                }}
-                className="p-0 mr-3"
-              >
-                Load {signatureType} Example
-              </Button>
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={() => {
-                  const file = `${signatureType}_MAF_two_samples.txt`;
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  const link = document.createElement('a');
-                  link.href = path;
-                  link.download = file;
-                  link.click();
-                }}
-                className="p-0"
-              >
-                Download {signatureType} MAF Example
-              </Button>
             </Form.Group>
 
             <Form.Group className="mb-2">
               <Form.Label>
                 Upload Genomic File <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
+              <Row className="m-0">
+                <Col lg="6" className="p-0">
+                  <Button
+                    className="p-0 font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    href={
+                      'assets/examples/refitting/Genomic_information_sample.txt'
+                    }
+                    download
+                  >
+                    Download Example
+                  </Button>
+                </Col>
+                <Col lg="6" className="p-0 d-flex">
+                  <Button
+                    className="p-0 ml-auto font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    type="button"
+                    onClick={async () => {
+                      const file = 'Genomic_information_sample.txt';
+                      const path = 'assets/examples/refitting/' + file;
+                      setValue(
+                        'genomicFile',
+                        new File([await (await fetch(path)).blob()], file)
+                      );
+                    }}
+                  >
+                    Load Example
+                  </Button>
+                </Col>
+              </Row>
               <Controller
                 name="genomicFile"
                 control={control}
@@ -412,48 +440,43 @@ export default function RefittingForm() {
                   />
                 )}
               />
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={async () => {
-                  const file = 'Genomic_information_sample.txt';
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  setValue(
-                    'genomicFile',
-                    new File([await (await fetch(path)).blob()], file)
-                  );
-                }}
-                className="p-0 mr-3"
-              >
-                Load Example
-              </Button>
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={() => {
-                  const file = 'Genomic_information_sample.txt';
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  const link = document.createElement('a');
-                  link.href = path;
-                  link.download = file;
-                  link.click();
-                }}
-                className="p-0"
-              >
-                Download Genomic Example
-              </Button>
             </Form.Group>
 
             <Form.Group className="mb-2">
               <Form.Label>
                 Upload Clinical File <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
+              <Row className="m-0">
+                <Col lg="6" className="p-0">
+                  <Button
+                    className="p-0 font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    href={`assets/examples/refitting/${signatureType}_Clinical_sample.txt`}
+                    download
+                  >
+                    Download Example
+                  </Button>
+                </Col>
+                <Col lg="6" className="p-0 d-flex">
+                  <Button
+                    className="p-0 ml-auto font-14"
+                    disabled={isFormDisabled}
+                    variant="link"
+                    type="button"
+                    onClick={async () => {
+                      const file = `${signatureType}_Clinical_sample.txt`;
+                      const path = 'assets/examples/refitting/' + file;
+                      setValue(
+                        'clinicalFile',
+                        new File([await (await fetch(path)).blob()], file)
+                      );
+                    }}
+                  >
+                    Load Example {signatureType} File
+                  </Button>
+                </Col>
+              </Row>
               <Controller
                 name="clinicalFile"
                 control={control}
@@ -476,42 +499,6 @@ export default function RefittingForm() {
                   />
                 )}
               />
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={async () => {
-                  const file = `${signatureType}_Clinical_sample.txt`;
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  setValue(
-                    'clinicalFile',
-                    new File([await (await fetch(path)).blob()], file)
-                  );
-                }}
-                className="p-0 mr-3"
-              >
-                Load {signatureType} Example
-              </Button>
-              <Button
-                variant="link"
-                disabled={isFormDisabled}
-                onClick={() => {
-                  const file = `${signatureType}_Clinical_sample.txt`;
-                  const path =
-                    import.meta.env.BASE_URL +
-                    'assets/examples/refitting/' +
-                    file;
-                  const link = document.createElement('a');
-                  link.href = path;
-                  link.download = file;
-                  link.click();
-                }}
-                className="p-0"
-              >
-                Download {signatureType} Clinical Example
-              </Button>
             </Form.Group>
           </div>
 
