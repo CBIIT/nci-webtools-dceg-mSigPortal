@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Button, Nav } from 'react-bootstrap';
+import React, { useCallback, useEffect } from 'react';
+import { Button, Nav, Alert } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { actions as refittingActions } from '../../../services/store/refitting';
@@ -12,6 +12,8 @@ import Instructions from './instructions';
 import Status from './status';
 import Results from './results';
 import RefittingForm from './refitting-form';
+import { useRefittingStatusQuery } from './apiSlice';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 export default function Refitting() {
   const { displayTab, openSidebar } = useSelector(
@@ -19,6 +21,25 @@ export default function Refitting() {
   );
   const dispatch = useDispatch();
   const { id: jobId } = useParams();
+
+  const {
+    data: refreshStatus,
+    error,
+    refetch: refreshRefitting,
+  } = useRefittingStatusQuery(jobId, { skip: !jobId });
+
+  const status = refreshStatus?.status;
+  const isDone = ['COMPLETED', 'FAILED'].includes(status?.status);
+
+  const refreshState = useCallback(() => {
+    refreshRefitting();
+  }, [refreshRefitting]);
+
+  useEffect(() => {
+    const interval = setInterval(refreshState, 1000 * 60);
+    if (isDone || error) clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [isDone, error, refreshState]);
 
   const setDisplayTab = (tab) =>
     dispatch(
@@ -55,7 +76,7 @@ export default function Refitting() {
     {
       id: 'results',
       name: 'Results',
-      disabled: !jobId, // Only enabled when a job ID is present
+      disabled: !jobId || status?.status !== 'COMPLETED',
     },
   ];
 
@@ -135,6 +156,31 @@ export default function Refitting() {
           <RefittingForm />
         </SidebarPanel>
         <MainPanel>
+          {error && <Alert variant="danger">Results expired</Alert>}
+          {status?.status === 'SUBMITTED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                Your job has been submitted. You will receive an email once it
+                is complete.
+              </p>
+            </div>
+          )}
+          {status?.status === 'IN_PROGRESS' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>Your analysis is currently in progress.</p>
+              <LoadingOverlay active={true} />
+            </div>
+          )}
+          {status?.status === 'FAILED' && (
+            <div className="border rounded bg-white mb-3 p-3">
+              <p>
+                An error occurred during calculation:{' '}
+                {status?.error || 'INTERNAL ERROR'}. Please contact the site
+                administrator for assistance if this issue persists.
+              </p>
+            </div>
+          )}
+
           <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
             <Instructions />
           </div>
