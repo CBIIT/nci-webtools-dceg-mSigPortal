@@ -30,7 +30,7 @@ export function NavbarCustom({ links }) {
                       data-testid={`Navbar-NavLink-${index}`}
                       id={title + '-navbar'}
                       // key={title}
-                      className="navlinks py-2 px-2 d-inline-block text-nowrap"
+                      className="navlinks py-2 d-inline-block text-nowrap"
                       activeClassName="active-navlinks"
                       exact={exact}
                       to={route}
