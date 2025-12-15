@@ -351,7 +351,7 @@ export default function RefittingForm() {
                       );
                     }}
                   >
-                    Load Example SBS
+                    Load {signatureType} Example
                   </Button>
                 </Col>
               </Row>
@@ -473,7 +473,7 @@ export default function RefittingForm() {
                       );
                     }}
                   >
-                    Load Example {signatureType} File
+                    Load {signatureType} Example
                   </Button>
                 </Col>
               </Row>
