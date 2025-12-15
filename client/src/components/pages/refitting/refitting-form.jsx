@@ -324,8 +324,8 @@ export default function RefittingForm() {
                 Upload {signatureType} MAF File{' '}
                 <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
-              <Row className="m-0">
-                <Col lg="6" className="p-0">
+              <Row className="m-0 justify-content-between">
+                <Col sm="auto" className="p-0">
                   <Button
                     className="p-0 font-14"
                     disabled={isFormDisabled}
@@ -336,9 +336,9 @@ export default function RefittingForm() {
                     Download Example
                   </Button>
                 </Col>
-                <Col lg="6" className="p-0 d-flex">
+                <Col sm="auto" className="p-0 d-flex">
                   <Button
-                    className="p-0 ml-auto font-14"
+                    className="p-0 font-14"
                     disabled={isFormDisabled}
                     variant="link"
                     type="button"
@@ -385,8 +385,8 @@ export default function RefittingForm() {
               <Form.Label>
                 Upload Genomic File <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
-              <Row className="m-0">
-                <Col lg="6" className="p-0">
+              <Row className="m-0 justify-content-between">
+                <Col sm="auto" className="p-0">
                   <Button
                     className="p-0 font-14"
                     disabled={isFormDisabled}
@@ -399,9 +399,9 @@ export default function RefittingForm() {
                     Download Example
                   </Button>
                 </Col>
-                <Col lg="6" className="p-0 d-flex">
+                <Col sm="auto" className="p-0 d-flex">
                   <Button
-                    className="p-0 ml-auto font-14"
+                    className="p-0 font-14"
                     disabled={isFormDisabled}
                     variant="link"
                     type="button"
@@ -446,8 +446,8 @@ export default function RefittingForm() {
               <Form.Label>
                 Upload Clinical File <span style={{ color: 'crimson' }}>*</span>
               </Form.Label>
-              <Row className="m-0">
-                <Col lg="6" className="p-0">
+              <Row className="m-0 justify-content-between">
+                <Col sm="auto" className="p-0">
                   <Button
                     className="p-0 font-14"
                     disabled={isFormDisabled}
@@ -458,9 +458,9 @@ export default function RefittingForm() {
                     Download Example
                   </Button>
                 </Col>
-                <Col lg="6" className="p-0 d-flex">
+                <Col sm="auto" className="p-0 d-flex">
                   <Button
-                    className="p-0 ml-auto font-14"
+                    className="p-0 font-14"
                     disabled={isFormDisabled}
                     variant="link"
                     type="button"
