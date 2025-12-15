@@ -186,9 +186,13 @@ export default function Refitting() {
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
             <Status />
           </div>
-          <div className={displayTab === 'results' ? 'd-block' : 'd-none'}>
-            <Results jobId={jobId} />
-          </div>
+          {status && status.status === 'COMPLETED' && (
+            <>
+              <div className={displayTab === 'results' ? 'd-block' : 'd-none'}>
+                <Results jobId={jobId} />
+              </div>
+            </>
+          )}
         </MainPanel>
       </SidebarContainer>
     </div>
