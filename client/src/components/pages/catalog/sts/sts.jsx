@@ -65,26 +65,27 @@ export default function STS() {
 
   return (
     <Container fluid className="p-4 bg-white border rounded">
-      <h4 className="text-center mb-3">Targeted Sequencing Signatures Catalog</h4>
+      <h4 className="text-center mb-3">
+        Targeted Sequencing Signatures Catalog
+      </h4>
       <p>
-        This webpage presents a pan-cancer catalogue of mutational signatures
-        derived from targeted sequencing data. The repertoire plots below
-        display the frequencies of single base substitution (SBS) and double
-        base substitution (DBS) signatures identified across 111,711 tumors
-        spanning 23 cancer types in AACR Project GENIE (version 13.0). You can
-        hover over each color block or data point to view the corresponding
-        frequency.
+        This webpage presents a pan-cancer catalog of mutational signatures
+        derived from targeted sequencing (TS) data using the SATS method. The
+        repertoire plots below display the frequencies of single base
+        substitution (SBS) and double base substitution (DBS) signatures
+        identified across 111,711 tumors spanning 23 cancer types in AACR
+        Project GENIE (version 13.0). You may move the computer cursor over each
+        color block or dot to view its frequency.
       </p>
       <p>
-        Below the repertoire plots, we list the proposed etiologies for each
-        mutational signature along with its corresponding profile plot. You may
-        notice that these profiles differ slightly from those of the COSMIC
-        mutational signatures. COSMIC signatures are derived from tumor
-        mutational counts (TMC) obtained through whole-genome or whole-exome
-        sequencing (WGS/WES), whereas the signatures shown here are based on
-        tumor mutational burden (TMB) estimated from targeted sequencing panels.
-        As a result, TMC- and TMB-based signature profiles are similar but not
-        identical (e.g., SBS5).
+        In addition to signature frequencies, we provide the proposed etiologies
+        for each mutational signature along with its profile plot. These
+        profiles may differ slightly from those obtained through whole-genome or
+        whole-exome sequencing (WGS/WES). WGS/WES signatures are derived from
+        tumor mutational counts (TMC), whereas the signatures shown here are
+        based on tumor mutational burden (TMB) estimated from TS panels.
+        Consequently, WGS/WES- and TS-based signature profiles are similar but
+        not identical (e.g., SBS5).
       </p>
 
       {/* Tissue Distribution with both SBS and DBS plots */}
