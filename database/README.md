@@ -50,12 +50,12 @@ Notes:
 1. SSH to the EFS host for the account's EFS volume (usually the docker host)
 2. Sync s3 bucket to the EFS folder
 ```
-aws s3 sync s3://bucket-name/msigportal/Database/ /local/content/analysistools_efs/msigportal/Database/ --delete --dryrun (verify paths with dryrun tag first)
+aws s3 sync s3://bucket-name/msigportal/Database/ /path/to/analysistools_efs/msigportal/Database/ --delete --dryrun (verify paths with dryrun tag first)
 ```
 3. After sync is complete, update the permissions of the folder
 ```
-chmod -R 755 /local/content/analysistools_efs/msigportal/
-chown -R 1000:1000 /local/content/analysistools_efs/msigportal/
+chmod -R 755 /paht/to/analysistools_efs/msigportal/
+chown -R 1000:1000 /path/to/analysistools_efs/msigportal/
 ```
 
 ## Association
