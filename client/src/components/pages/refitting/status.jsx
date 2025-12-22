@@ -9,7 +9,7 @@ import moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 momentDurationFormatSetup(moment);
 
-export default function Status() {
+export default function Status({ setDisplayTab }) {
   const [jobs, setJobs] = useState([]);
   const { data, isFetching, refetch } = useMultiJobStatusQuery(jobs, {
     skip: !jobs || !jobs.length,
@@ -43,7 +43,12 @@ export default function Status() {
       accessor: 'jobName',
       Header: 'Name',
       Cell: ({ row, value }) => (
-        <Link to={`/refitting/${row.original.id}`}>{value}</Link>
+        <Link
+          to={`/refitting/${row.original.id}`}
+          onClick={() => row.original.status === 'COMPLETED' && setDisplayTab('results')}
+        >
+          {value}
+        </Link>
       ),
     },
     {

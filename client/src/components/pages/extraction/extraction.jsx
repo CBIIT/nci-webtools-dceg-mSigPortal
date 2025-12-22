@@ -316,7 +316,9 @@ export default function Extraction() {
             <Instructions formLimits={formLimits} />
           </div>
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
-            <Status />
+            <Status
+              setDisplayTab={(tab) => mergeState({ displayTab: tab })}
+            />
           </div>
           {status && status.status === 'COMPLETED' && (
             <>

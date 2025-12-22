@@ -16,11 +16,12 @@ import { useRefittingStatusQuery } from './apiSlice';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 
 export default function Refitting() {
-  const { displayTab, openSidebar } = useSelector(
+  const { displayTab, openSidebar, ...state } = useSelector(
     (state) => state.refitting.main
   );
   const dispatch = useDispatch();
-  const { id: jobId } = useParams();
+  const urlParamId = useParams()?.id;
+  const jobId = urlParamId || state.id || false;
 
   const {
     data: refreshStatus,
@@ -40,6 +41,17 @@ export default function Refitting() {
     if (isDone || error) clearInterval(interval);
     return () => clearInterval(interval);
   }, [isDone, error, refreshState]);
+
+  // Save jobId from URL to store when job is valid
+  useEffect(() => {
+    if (urlParamId && status) {
+      dispatch(
+        refittingActions.mergeRefitting({
+          main: { id: urlParamId, submitted: true },
+        })
+      );
+    }
+  }, [urlParamId, status, dispatch]);
 
   const setDisplayTab = (tab) =>
     dispatch(
@@ -184,7 +196,7 @@ export default function Refitting() {
             <Instructions />
           </div>
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
-            <Status />
+            <Status setDisplayTab={setDisplayTab} />
           </div>
           {status && status.status === 'COMPLETED' && (
             <>
