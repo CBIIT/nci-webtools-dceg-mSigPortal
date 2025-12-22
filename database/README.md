@@ -35,7 +35,7 @@ node startDatabaseImport.js --schema schema.js --sources sources.js --provider l
 - Optionally, we can execute the database import remotely in S3 (sync your new Database files there first):
 
 ```
-aws s3 sync path-to-local-folder/Database/ s3://bucket-name/Database/
+aws s3 sync path-to-local-folder/Database/ s3://bucket-name/msigportal/Database/
 node startDatabaseImport.js --schema schema.js --sources sources.js --provider s3 s3://bucket-name/msigportal/Database
 ```
 
@@ -44,6 +44,19 @@ node startDatabaseImport.js --schema schema.js --sources sources.js --provider s
 Notes:
 
 1. Sequencing Strategy/Dataset are used interchangably (eg: WES, WGS, etc)
+
+### Upload to EFS
+
+1. SSH to the EFS host for the account's EFS volume (usually the docker host)
+2. Sync s3 bucket to the EFS folder
+```
+aws s3 sync s3://bucket-name/msigportal/Database/ /local/content/analysistools_efs/msigportal/Database/ --delete --dryrun (verify paths with dryrun tag first)
+```
+3. After sync is complete, update the permissions of the folder
+```
+chmod -R 755 /local/content/analysistools_efs/msigportal/
+chown -R 1000:1000 /local/content/analysistools_efs/msigportal/
+```
 
 ## Association
 
