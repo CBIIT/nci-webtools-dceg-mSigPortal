@@ -14,10 +14,17 @@ export class S3Provider {
     this.readFileMetadata = this.readFileMetadata.bind(this);
     this.parseS3Path = this.parseS3Path.bind(this);
     this.isAbsoluteS3Path = this.isAbsoluteS3Path.bind(this);
+    this.joinPath = this.joinPath.bind(this);
+  }
+
+  joinPath(basePath, relativePath) {
+    const base = basePath.endsWith("/") ? basePath.slice(0, -1) : basePath;
+    const relative = relativePath.startsWith("/") ? relativePath.slice(1) : relativePath;
+    return `${base}/${relative}`;
   }
 
   async listFiles(path) {
-    const targetPath = this.isAbsoluteS3Path(path) ? path : this.basePath + path;
+    const targetPath = this.isAbsoluteS3Path(path) ? path : this.joinPath(this.basePath, path);
     const { bucket, key } = this.parseS3Path(targetPath);
     let keys = [];
 
@@ -32,7 +39,7 @@ export class S3Provider {
   }
 
   async readFile(path) {
-    const targetPath = this.isAbsoluteS3Path(path) ? path : this.basePath + path;
+    const targetPath = this.isAbsoluteS3Path(path) ? path : this.joinPath(this.basePath, path);
     const { bucket, key } = this.parseS3Path(targetPath);
     const s3Response = await this.client.send(
       new GetObjectCommand({
@@ -44,7 +51,7 @@ export class S3Provider {
   }
 
   async readFileMetadata(path) {
-    const targetPath = this.isAbsoluteS3Path(path) ? path : this.basePath + path;
+    const targetPath = this.isAbsoluteS3Path(path) ? path : this.joinPath(this.basePath, path);
     const { bucket, key } = this.parseS3Path(targetPath);
     const s3Response = await this.client.send(
       new GetObjectAttributesCommand({
