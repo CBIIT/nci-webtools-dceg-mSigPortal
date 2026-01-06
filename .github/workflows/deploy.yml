@@ -49,6 +49,7 @@ jobs:
       ECS_WORKER_MEMORY_UNITS: "40 GB"
       PYTHON_SCRIPT_PATH: mSigPortal_Profiler_Extraction.py
       R_SCRIPT_PATH: Rscript/Sigvisualfunc.R
+      EXTRACTION_WORKER_TYPE: "batch"
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
