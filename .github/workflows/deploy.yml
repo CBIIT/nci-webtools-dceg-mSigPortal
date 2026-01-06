@@ -75,17 +75,41 @@ jobs:
           path: python_r_script_repo
 
       # Free disk space for extraction image build
-      - name: Free Disk Space (Ubuntu)
+      - name: Free Disk Space
         if: ${{ inputs.rebuild_extraction_image }}
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
+        run: |
+          # Remove Java (JDKs)
+          sudo rm -rf /usr/lib/jvm
+
+          # Remove .NET SDKs
+          sudo rm -rf /usr/share/dotnet
+
+          # Remove Swift toolchain
+          sudo rm -rf /usr/share/swift
+
+          # Remove Haskell (GHC)
+          sudo rm -rf /usr/local/.ghcup
+
+          # Remove Julia
+          sudo rm -rf /usr/local/julia*
+
+          # Remove Android SDKs
+          sudo rm -rf /usr/local/lib/android
+
+          # Remove Chromium (optional if not using for browser tests)
+          sudo rm -rf /usr/local/share/chromium
+
+          # Remove Microsoft/Edge and Google Chrome builds
+          sudo rm -rf /opt/microsoft /opt/google
+
+          # Remove Azure CLI
+          sudo rm -rf /opt/az
+
+          # Remove PowerShell
+          sudo rm -rf /usr/local/share/powershell
+
+          # Remove CodeQL and other toolcaches
+          sudo rm -rf /opt/hostedtoolcache
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -112,7 +136,6 @@ jobs:
           echo "REFITTING_IMAGE_LATEST=$REPO:$IMAGE_TIER-refitting-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
 
-          echo "PARAMETER_PATH=/analysistools/${TIER}/${APP}" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
@@ -122,23 +145,37 @@ jobs:
           fi
 
       - name: Retrieve SSM parameters
-        uses: dkershner6/aws-ssm-getparameters-action@v2
-        with:
-          parameterPairs: |
-            ${{ env.PARAMETER_PATH }}/ecs_cluster = ECS_CLUSTER,
-            ${{ env.PARAMETER_PATH }}/ecs_web_task = ECS_WEB_TASK,
-            ${{ env.PARAMETER_PATH }}/ecs_web_service = ECS_WEB_SERVICE,
-            ${{ env.PARAMETER_PATH }}/ecs_worker_task = ECS_WORKER_TASK,
-            ${{ env.PARAMETER_PATH }}/ecs_refitting_worker_task = ECS_REFITTING_WORKER_TASK,
-            ${{ env.PARAMETER_PATH }}/ecs_cpu_units = ECS_CPU_UNITS,
-            ${{ env.PARAMETER_PATH }}/ecs_memory_units = ECS_MEMORY_UNITS,
-            ${{ env.PARAMETER_PATH }}/role_arn = ROLE_ARN,
-            ${{ env.PARAMETER_PATH }}/efs_filesystem_id = EFS_FILESYSTEM_ID,
-            ${{ env.PARAMETER_PATH }}/efs_access_point_id = EFS_ACCESS_POINT_ID,
-            ${{ env.PARAMETER_PATH }}/batch_compute_environment = BATCH_COMPUTE_ENVIRONMENT,
-            ${{ env.PARAMETER_PATH }}/batch_job_definition = BATCH_JOB_DEFINITION,
-            ${{ env.PARAMETER_PATH }}/batch_role_arn = BATCH_ROLE_ARN
-          withDecryption: "true"
+        run: |
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["ecs_web_task"]="ECS_WEB_TASK"
+            ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_worker_task"]="ECS_WORKER_TASK"
+            ["ecs_refitting_worker_task"]="ECS_REFITTING_WORKER_TASK"
+            ["ecs_cpu_units"]="ECS_CPU_UNITS"
+            ["ecs_memory_units"]="ECS_MEMORY_UNITS"
+            ["role_arn"]="ROLE_ARN"
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+            ["batch_compute_environment"]="BATCH_COMPUTE_ENVIRONMENT"
+            ["batch_job_definition"]="BATCH_JOB_DEFINITION"
+            ["batch_role_arn"]="BATCH_ROLE_ARN"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${PARAMETER_PATH}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
 
       - name: Login to Amazon ECR
         id: login-ecr
