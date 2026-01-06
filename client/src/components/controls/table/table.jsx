@@ -23,7 +23,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
   useEffect(() => {
     const timeout = setTimeout(() => {
-      handleSetSearchTerm(value);
+      handleSearch(value);
     }, 500);
 
     return () => clearTimeout(timeout);

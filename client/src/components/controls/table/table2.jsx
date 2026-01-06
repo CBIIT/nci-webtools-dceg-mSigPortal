@@ -32,7 +32,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, title }) {
   const [value, setValue] = useState(globalFilter);
   useEffect(() => {
     const timeout = setTimeout(() => {
-      handleSetSearchTerm(value);
+      setGlobalFilter(value);
     }, 500);
 
     return () => clearTimeout(timeout);
