@@ -1,0 +1,188 @@
+name: Deploy Batch Extraction Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-extraction:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.tier }}
+    env:
+      APP: msigportal
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: aws
+      DOCKER_BUILDKIT: 1
+      BACKEND_CONTAINER_PORT: 9000
+      BATCH_INSTANCE_TYPE: "g5.12xlarge"
+      BATCH_CPU_UNITS: 48
+      BATCH_GPU_UNITS: 4
+      BATCH_MEMORY_UNITS: 190000
+      EXTRACTION_WORKER_TYPE: "batch"
+      PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
+      TIER: ${{ inputs.tier }}
+      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Checkout external scripts repository
+        uses: actions/checkout@v4
+        with:
+          repository: xtmgah/mSigPortal
+          path: python_r_script_repo
+
+      # Free disk space
+      - name: Free Disk Space
+        run: |
+          # Remove Java (JDKs)
+          sudo rm -rf /usr/lib/jvm
+
+          # Remove .NET SDKs
+          sudo rm -rf /usr/share/dotnet
+
+          # Remove Swift toolchain
+          sudo rm -rf /usr/share/swift
+
+          # Remove Haskell (GHC)
+          sudo rm -rf /usr/local/.ghcup
+
+          # Remove Julia
+          sudo rm -rf /usr/local/julia*
+
+          # Remove Android SDKs
+          sudo rm -rf /usr/local/lib/android
+
+          # Remove Chromium (optional if not using for browser tests)
+          sudo rm -rf /usr/local/share/chromium
+
+          # Remove Microsoft/Edge and Google Chrome builds
+          sudo rm -rf /opt/microsoft /opt/google
+
+          # Remove Azure CLI
+          sudo rm -rf /opt/az
+
+          # Remove PowerShell
+          sudo rm -rf /usr/local/share/powershell
+
+          # Remove CodeQL and other toolcaches
+          sudo rm -rf /opt/hostedtoolcache
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-msigportal-extraction-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set dynamic environment variables
+        run: |
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
+
+          echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+
+          if [[ "$TIER" == "dev" ]]; then
+            echo "LOG_LEVEL=debug" >> $GITHUB_ENV
+          else
+            echo "LOG_LEVEL=info" >> $GITHUB_ENV
+          fi
+
+      - name: Retrieve SSM parameters
+        run: |
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+            ["batch_compute_environment"]="BATCH_COMPUTE_ENVIRONMENT"
+            ["batch_job_definition"]="BATCH_JOB_DEFINITION"
+            ["batch_role_arn"]="BATCH_ROLE_ARN"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${PARAMETER_PATH}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create and use a new builder instance
+        run: docker buildx create --name extraction-builder --use
+
+      - name: Copy Python SigProfilerExtractor Script for extraction
+        run: |
+          mkdir -p extraction-service/services/python
+          cp python_r_script_repo/${{ env.PYTHON_EXTRACTION_SCRIPT_PATH }} extraction-service/services/python/
+
+      - name: Build and push extraction image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/extraction-batch.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.BATCH_EXTRACTION_IMAGE }}
+            ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      - name: Create rendered task definitions directory
+        run: mkdir -p rendered
+
+      - name: Substitute batch extraction worker job definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/batch-extraction-worker.yml > rendered/batch-extraction-worker.yml
+          echo "Rendered batch extraction worker job definition:"
+          cat rendered/batch-extraction-worker.yml
+
+      - name: Register batch extraction job definition
+        run: |
+          arn=$(aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml --query "jobDefinitionArn" --output text)
+          echo "Registered batch extraction job definition: $arn"
+
+      - name: Update batch compute environment instance type
+        run: |
+          aws batch update-compute-environment \
+            --compute-environment ${{ env.BATCH_COMPUTE_ENVIRONMENT }} \
+            --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
+          echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
+

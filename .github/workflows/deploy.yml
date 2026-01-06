@@ -1,4 +1,4 @@
-name: Deploy mSigPortal
+name: Deploy Web Service and Workers
 
 on:
   workflow_dispatch:
@@ -22,11 +22,6 @@ on:
         description: "Rebuild backend image"
         required: false
         default: true
-        type: boolean
-      rebuild_extraction_image:
-        description: "Rebuild extraction image"
-        required: false
-        default: false
         type: boolean
       rebuild_refitting_image:
         description: "Rebuild refitting image"
@@ -52,13 +47,7 @@ jobs:
       BACKEND_CONTAINER_PORT: 9000
       ECS_WORKER_CPU_UNITS: "16 vCPU"
       ECS_WORKER_MEMORY_UNITS: "40 GB"
-      BATCH_INSTANCE_TYPE: "g5.12xlarge"
-      BATCH_CPU_UNITS: 48
-      BATCH_GPU_UNITS: 4
-      BATCH_MEMORY_UNITS: 190000
-      EXTRACTION_WORKER_TYPE: "batch"
       PYTHON_SCRIPT_PATH: mSigPortal_Profiler_Extraction.py
-      PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
       R_SCRIPT_PATH: Rscript/Sigvisualfunc.R
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
@@ -74,9 +63,8 @@ jobs:
           repository: xtmgah/mSigPortal
           path: python_r_script_repo
 
-      # Free disk space for extraction image build
+      # Free disk space
       - name: Free Disk Space
-        if: ${{ inputs.rebuild_extraction_image }}
         run: |
           # Remove Java (JDKs)
           sudo rm -rf /usr/lib/jvm
@@ -126,15 +114,11 @@ jobs:
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
           echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
           echo "REFITTING_IMAGE=$REPO:$IMAGE_TIER-refitting-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "BATCH_EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
 
           echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
-          echo "EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "REFITTING_IMAGE_LATEST=$REPO:$IMAGE_TIER-refitting-${{ github.ref_name }}-latest" >> $GITHUB_ENV
-          echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
 
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
@@ -160,9 +144,6 @@ jobs:
             ["role_arn"]="ROLE_ARN"
             ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
             ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
-            ["batch_compute_environment"]="BATCH_COMPUTE_ENVIRONMENT"
-            ["batch_job_definition"]="BATCH_JOB_DEFINITION"
-            ["batch_role_arn"]="BATCH_ROLE_ARN"
           )
 
           # Retrieve each parameter and export to environment
@@ -196,13 +177,6 @@ jobs:
           cp python_r_script_repo/${{ env.PYTHON_SCRIPT_PATH }} server/services/python/
           mkdir -p server/services/R
           cp python_r_script_repo/${{ env.R_SCRIPT_PATH }} server/services/R/
-
-      # Copy scripts for extraction image build
-      - name: Copy Python SigProfilerExtractor Script for extraction
-        if: ${{ inputs.rebuild_extraction_image }}
-        run: |
-          mkdir -p extraction-service/services/python
-          cp python_r_script_repo/${{ env.PYTHON_EXTRACTION_SCRIPT_PATH }} extraction-service/services/python/
 
       # Build Backend Image
       - name: Build and push backend image
@@ -238,23 +212,6 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
-
-      # Build Extraction (Batch) Image
-      - name: Build and push extraction image
-        if: ${{ inputs.rebuild_extraction_image }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/extraction-batch.dockerfile
-          pull: true
-          push: true
-          tags: |
-            ${{ env.BATCH_EXTRACTION_IMAGE }}
-            ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
-          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,image-manifest=true,oci-mediatypes=true,mode=max
 
       # Build Refitting Image
       - name: Build and push refitting image
@@ -295,12 +252,6 @@ jobs:
           echo "Rendered refitting worker task definition:"
           cat rendered/refitting-worker.yml
 
-      - name: Substitute batch extraction worker job definition variables
-        run: |
-          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/batch-extraction-worker.yml > rendered/batch-extraction-worker.yml
-          echo "Rendered batch extraction worker job definition:"
-          cat rendered/batch-extraction-worker.yml
-
       - name: Register web task definition
         id: register-web
         run: |
@@ -317,18 +268,6 @@ jobs:
         run: |
           arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/refitting-worker.yml --query "taskDefinition.taskDefinitionArn" --output text)
           echo "Registered refitting worker task definition: $arn"
-
-      - name: Register batch extraction job definition
-        run: |
-          arn=$(aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml --query "jobDefinitionArn" --output text)
-          echo "Registered batch extraction job definition: $arn"
-
-      - name: Update batch compute environment instance type
-        run: |
-          aws batch update-compute-environment \
-            --compute-environment ${{ env.BATCH_COMPUTE_ENVIRONMENT }} \
-            --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
-          echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
 
       - name: Deploy web service
         run: |
