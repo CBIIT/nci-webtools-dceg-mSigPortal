@@ -1,8 +1,32 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
+function parseVersionAndDate(versionString) {
+  if (!versionString)
+    return { version: 'dev', date: new Date().toISOString().split('T')[0] };
+  const versionMatch = versionString.match(/(\d+\.\d+\.\d+)(_dev)?/);
+  const version = versionMatch
+    ? versionMatch[1] + (versionMatch[2] || '')
+    : 'dev';
+
+  // Extract 8-digit date if present
+  const dateMatch = versionString.match(/(\d{8})/)?.[1];
+  const date = dateMatch
+    ? `${dateMatch.slice(0, 4)}-${dateMatch.slice(4, 6)}-${dateMatch.slice(
+        6,
+        8
+      )}`
+    : new Date().toISOString().split('T')[0];
+
+  return { version, date };
+}
+
 export function Footer() {
   const location = useLocation();
+  const { version, date } = parseVersionAndDate(
+    import.meta.env.VITE_APP_VERSION
+  );
+
   return (
     <div className="py-2 bg-gray">
       <div className={location.pathname === '/' ? '' : 'pl-2 pr-4'}>
@@ -47,12 +71,14 @@ export function Footer() {
                   </div>
                   <div className="my-0">
                     <span className="text-light">
-                      <b>Version </b>{__APP_VERSION__}
+                      <b>Version: </b>
+                      {version}
                     </span>
                   </div>
                   <div className="my-0">
                     <span className="text-light">
-                      <b>Last Update: </b>{__APP_LAST_UPDATE__}
+                      <b>Last Update: </b>
+                      {date}
                     </span>
                   </div>
                 </div>
