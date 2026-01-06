@@ -1,0 +1,114 @@
+jobDefinitionName: "${BATCH_JOB_DEFINITION}"
+type: container
+containerProperties:
+  image: "${BATCH_EXTRACTION_IMAGE_LATEST}"
+  command: ["bash", "-c", "dnf install -y pciutils && lspci"]
+  jobRoleArn: "${BATCH_ROLE_ARN}"
+  executionRoleArn: "${BATCH_ROLE_ARN}"
+  volumes:
+    - name: data
+      efsVolumeConfiguration:
+        fileSystemId: "${EFS_FILESYSTEM_ID}"
+        authorizationConfig:
+          accessPointId: "${EFS_ACCESS_POINT_ID}"
+          iam: ENABLED
+        transitEncryption: ENABLED
+  mountPoints:
+    - sourceVolume: data
+      containerPath: "/data"
+      readOnly: false
+  resourceRequirements:
+    - type: GPU
+      value: "${BATCH_GPU_UNITS}"
+    - type: VCPU
+      value: "${BATCH_CPU_UNITS}"
+    - type: MEMORY
+      value: "${BATCH_MEMORY_UNITS}"
+  environment:
+    - name: AWS_DEFAULT_REGION
+      value: "${AWS_REGION}"
+    - name: APP_NAME
+      value: "${APP}"
+    - name: EXTRACTION_APP_NAME
+      value: "${APP}-extraction"
+    - name: APP_PORT
+      value: "${BACKEND_CONTAINER_PORT}"
+    - name: APP_TIER
+      value: "${TIER}"
+    - name: WORKER_TYPE
+      value: "fargate"
+    - name: EXTRACTION_WORKER_TYPE
+      value: "${EXTRACTION_WORKER_TYPE}"
+    - name: LOG_LEVEL
+      value: "${LOG_LEVEL}"
+  secrets:
+    - name: API_BASE_URL
+      valueFrom: "/analysistools/${TIER}/${APP}/base_url"
+    - name: APP_BASE_URL
+      valueFrom: "/analysistools/${TIER}/${APP}/base_url"
+    - name: DATA_FOLDER
+      valueFrom: "/analysistools/${TIER}/${APP}/data_folder"
+    - name: INPUT_FOLDER
+      valueFrom: "/analysistools/${TIER}/${APP}/input_folder"
+    - name: OUTPUT_FOLDER
+      valueFrom: "/analysistools/${TIER}/${APP}/output_folder"
+    - name: DATA_BUCKET
+      valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
+    - name: DATA_BUCKET_PREFIX
+      valueFrom: "/analysistools/${TIER}/${APP}/data_bucket_prefix"
+    - name: IO_BUCKET
+      valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
+    - name: INPUT_KEY_PREFIX
+      valueFrom: "/analysistools/${TIER}/${APP}/input_key_prefix"
+    - name: OUTPUT_KEY_PREFIX
+      valueFrom: "/analysistools/${TIER}/${APP}/output_key_prefix"
+    - name: EMAIL_ADMIN
+      valueFrom: "/analysistools/${TIER}/${APP}/email_admin"
+    - name: EMAIL_SMTP_HOST
+      valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_host"
+    - name: EMAIL_SMTP_PORT
+      valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_port"
+    - name: VPC_ID
+      valueFrom: "/analysistools/${TIER}/${APP}/vpc_id"
+    - name: SUBNET_IDS
+      valueFrom: "/analysistools/${TIER}/${APP}/subnet_ids"
+    - name: SECURITY_GROUP_IDS
+      valueFrom: "/analysistools/${TIER}/${APP}/security_group_ids"
+    - name: ECS_CLUSTER
+      valueFrom: "/analysistools/${TIER}/${APP}/ecs_cluster"
+    - name: WORKER_TASK_NAME
+      valueFrom: "/analysistools/${TIER}/${APP}/ecs_worker_task"
+    - name: POSTGRES_HOST
+      valueFrom: "/analysistools/${TIER}/${APP}/postgres_host"
+    - name: POSTGRES_PORT
+      valueFrom: "/analysistools/${TIER}/${APP}/postgres_port"
+    - name: POSTGRES_USER
+      valueFrom: "/analysistools/${TIER}/${APP}/postgres_user"
+    - name: POSTGRES_PASS
+      valueFrom: "/analysistools/${TIER}/${APP}/postgres_pass"
+    - name: POSTGRES_DB
+      valueFrom: "/analysistools/${TIER}/${APP}/postgres_db"
+    - name: BATCH_COMPUTE_ENVIRONMENT
+      valueFrom: "/analysistools/${TIER}/${APP}/batch_compute_environment"
+    - name: BATCH_JOB_QUEUE
+      valueFrom: "/analysistools/${TIER}/${APP}/batch_job_queue"
+    - name: BATCH_JOB_DEFINITION
+      valueFrom: "/analysistools/${TIER}/${APP}/batch_job_definition"
+    - name: DATADOG_HOST
+      valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+    - name: DATADOG_API_KEY
+      valueFrom: /analysistools/${TIER}/datadog/api_key
+  logConfiguration:
+    logDriver: awslogs
+    options:
+      awslogs-group: "/analysistools/${TIER}/${APP}/batch"
+      awslogs-region: "${AWS_REGION}"
+      awslogs-stream-prefix: batch
+propagateTags: true
+tags:
+  Project: "${APP}"
+  ApplicationName: "${APP}"
+  Name: "${TIER}-${APP}-batch-extraction-worker-ecs-task"
+  EnvironmentTier: "${TIER}"
+  Function: Compute
+  Creator: TF

@@ -1,0 +1,304 @@
+name: Deploy mSigPortal
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+      rebuild_frontend_image:
+        description: "Rebuild frontend image"
+        required: false
+        default: true
+        type: boolean
+      rebuild_backend_image:
+        description: "Rebuild backend image"
+        required: false
+        default: true
+        type: boolean
+      rebuild_extraction_image:
+        description: "Rebuild extraction image"
+        required: false
+        default: false
+        type: boolean
+      rebuild_refitting_image:
+        description: "Rebuild refitting image"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.tier }}
+    env:
+      APP: msigportal
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: aws
+      DOCKER_BUILDKIT: 1
+      FRONTEND_CONTAINER_PORT: 80
+      BACKEND_CONTAINER_PORT: 9000
+      ECS_WORKER_CPU_UNITS: "16 vCPU"
+      ECS_WORKER_MEMORY_UNITS: "40 GB"
+      BATCH_INSTANCE_TYPE: "g5.12xlarge"
+      BATCH_CPU_UNITS: 48
+      BATCH_GPU_UNITS: 4
+      BATCH_MEMORY_UNITS: 190000
+      EXTRACTION_WORKER_TYPE: "batch"
+      PYTHON_SCRIPT_PATH: mSigPortal_Profiler_Extraction.py
+      PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
+      R_SCRIPT_PATH: Rscript/Sigvisualfunc.R
+      TIER: ${{ inputs.tier }}
+      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Checkout external scripts repository
+        uses: actions/checkout@v4
+        with:
+          repository: xtmgah/mSigPortal
+          path: python_r_script_repo
+
+      # Free disk space for extraction image build
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ inputs.rebuild_extraction_image }}
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-msigportal-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set dynamic environment variables
+        run: |
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
+
+          echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "REFITTING_IMAGE=$REPO:$IMAGE_TIER-refitting-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+
+          echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "REFITTING_IMAGE_LATEST=$REPO:$IMAGE_TIER-refitting-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+
+          echo "PARAMETER_PATH=/analysistools/${TIER}/${APP}" >> $GITHUB_ENV
+          echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+
+          if [[ "$TIER" == "dev" ]]; then
+            echo "LOG_LEVEL=debug" >> $GITHUB_ENV
+          else
+            echo "LOG_LEVEL=info" >> $GITHUB_ENV
+          fi
+
+      - name: Retrieve SSM parameters
+        uses: dkershner6/aws-ssm-getparameters-action@v2
+        with:
+          parameterPairs: |
+            ${{ env.PARAMETER_PATH }}/ecs_cluster = ECS_CLUSTER,
+            ${{ env.PARAMETER_PATH }}/ecs_web_task = ECS_WEB_TASK,
+            ${{ env.PARAMETER_PATH }}/ecs_web_service = ECS_WEB_SERVICE,
+            ${{ env.PARAMETER_PATH }}/ecs_worker_task = ECS_WORKER_TASK,
+            ${{ env.PARAMETER_PATH }}/ecs_refitting_worker_task = ECS_REFITTING_WORKER_TASK,
+            ${{ env.PARAMETER_PATH }}/ecs_cpu_units = ECS_CPU_UNITS,
+            ${{ env.PARAMETER_PATH }}/ecs_memory_units = ECS_MEMORY_UNITS,
+            ${{ env.PARAMETER_PATH }}/role_arn = ROLE_ARN,
+            ${{ env.PARAMETER_PATH }}/efs_filesystem_id = EFS_FILESYSTEM_ID,
+            ${{ env.PARAMETER_PATH }}/efs_access_point_id = EFS_ACCESS_POINT_ID,
+            ${{ env.PARAMETER_PATH }}/batch_compute_environment = BATCH_COMPUTE_ENVIRONMENT,
+            ${{ env.PARAMETER_PATH }}/batch_job_definition = BATCH_JOB_DEFINITION,
+            ${{ env.PARAMETER_PATH }}/batch_role_arn = BATCH_ROLE_ARN
+          withDecryption: "true"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create and use a new builder instance
+        run: docker buildx create --name msigportal-builder --use
+
+      # Copy scripts for backend image build
+      - name: Copy Python Profiler Extraction Script for backend
+        if: ${{ inputs.rebuild_backend_image }}
+        run: |
+          cp python_r_script_repo/${{ env.PYTHON_SCRIPT_PATH }} server/services/python/
+          mkdir -p server/services/R
+          cp python_r_script_repo/${{ env.R_SCRIPT_PATH }} server/services/R/
+
+      # Copy scripts for extraction image build
+      - name: Copy Python SigProfilerExtractor Script for extraction
+        if: ${{ inputs.rebuild_extraction_image }}
+        run: |
+          mkdir -p extraction-service/services/python
+          cp python_r_script_repo/${{ env.PYTHON_EXTRACTION_SCRIPT_PATH }} extraction-service/services/python/
+
+      # Build Backend Image
+      - name: Build and push backend image
+        if: ${{ inputs.rebuild_backend_image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}
+            ${{ env.BACKEND_IMAGE_LATEST }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+            VITE_APP_VERSION=${{ github.ref_name }}
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      # Build Frontend Image
+      - name: Build and push frontend image
+        if: ${{ inputs.rebuild_frontend_image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}
+            ${{ env.FRONTEND_IMAGE_LATEST }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      # Build Extraction (Batch) Image
+      - name: Build and push extraction image
+        if: ${{ inputs.rebuild_extraction_image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/extraction-batch.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.BATCH_EXTRACTION_IMAGE }}
+            ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      # Build Refitting Image
+      - name: Build and push refitting image
+        if: ${{ inputs.rebuild_refitting_image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/refitting.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.REFITTING_IMAGE }}
+            ${{ env.REFITTING_IMAGE_LATEST }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      # Process and register task definitions
+      - name: Create rendered task definitions directory
+        run: mkdir -p rendered
+
+      - name: Substitute web task definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/web.yml > rendered/web.yml
+          echo "Rendered web task definition:"
+          cat rendered/web.yml
+
+      - name: Substitute worker task definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/worker.yml > rendered/worker.yml
+          echo "Rendered worker task definition:"
+          cat rendered/worker.yml
+
+      - name: Substitute refitting worker task definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/refitting-worker.yml > rendered/refitting-worker.yml
+          echo "Rendered refitting worker task definition:"
+          cat rendered/refitting-worker.yml
+
+      - name: Substitute batch extraction worker job definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/batch-extraction-worker.yml > rendered/batch-extraction-worker.yml
+          echo "Rendered batch extraction worker job definition:"
+          cat rendered/batch-extraction-worker.yml
+
+      - name: Register web task definition
+        id: register-web
+        run: |
+          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/web.yml --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "WEB_TASK_DEF_ARN=$arn" >> $GITHUB_ENV
+          echo "Registered web task definition: $arn"
+
+      - name: Register worker task definition
+        run: |
+          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/worker.yml --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "Registered worker task definition: $arn"
+
+      - name: Register refitting worker task definition
+        run: |
+          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/refitting-worker.yml --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "Registered refitting worker task definition: $arn"
+
+      - name: Register batch extraction job definition
+        run: |
+          arn=$(aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml --query "jobDefinitionArn" --output text)
+          echo "Registered batch extraction job definition: $arn"
+
+      - name: Update batch compute environment instance type
+        run: |
+          aws batch update-compute-environment \
+            --compute-environment ${{ env.BATCH_COMPUTE_ENVIRONMENT }} \
+            --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
+          echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
+
+      - name: Deploy web service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_WEB_SERVICE }} \
+            --task-definition $WEB_TASK_DEF_ARN \
+            --desired-count 1 \
+            --force-new-deployment
+          echo "Deployed web service with task definition: $WEB_TASK_DEF_ARN"

@@ -1,0 +1,127 @@
+family: "${ECS_REFITTING_WORKER_TASK}"
+networkMode: awsvpc
+cpu: "${ECS_WORKER_CPU_UNITS}"
+memory: "${ECS_WORKER_MEMORY_UNITS}"
+executionRoleArn: "${ROLE_ARN}"
+taskRoleArn: "${ROLE_ARN}"
+requiresCompatibilities:
+  - FARGATE
+ephemeralStorage:
+  sizeInGiB: 100
+volumes:
+  - name: data
+    efsVolumeConfiguration:
+      fileSystemId: "${EFS_FILESYSTEM_ID}"
+      authorizationConfig:
+        accessPointId: "${EFS_ACCESS_POINT_ID}"
+        iam: ENABLED
+      transitEncryption: ENABLED
+containerDefinitions:
+  - name: logs
+    image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+    firelensConfiguration:
+      type: fluentbit
+      options:
+        enable-ecs-log-metadata: "true"
+    memoryReservation: 50
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/${TIER}/${APP}/refitting-worker"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream-prefix: logs
+
+  - name: refitting-worker
+    image: "${REFITTING_IMAGE_LATEST}"
+    environment:
+      - name: AWS_DEFAULT_REGION
+        value: "${AWS_REGION}"
+      - name: APP_NAME
+        value: "${APP}"
+      - name: APP_TIER
+        value: "${TIER}"
+      - name: WORKER_TYPE
+        value: "fargate"
+      - name: LOG_LEVEL
+        value: "${LOG_LEVEL}"
+    secrets:
+      - name: SERVER_TIMEOUT
+        valueFrom: "/analysistools/${TIER}/${APP}/server_timeout"
+      - name: API_BASE_URL
+        valueFrom: "/analysistools/${TIER}/${APP}/base_url"
+      - name: APP_BASE_URL
+        valueFrom: "/analysistools/${TIER}/${APP}/base_url"
+      - name: DATA_FOLDER
+        valueFrom: "/analysistools/${TIER}/${APP}/data_folder"
+      - name: INPUT_FOLDER
+        valueFrom: "/analysistools/${TIER}/${APP}/input_folder"
+      - name: OUTPUT_FOLDER
+        valueFrom: "/analysistools/${TIER}/${APP}/output_folder"
+      - name: DATA_BUCKET
+        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
+      - name: DATA_BUCKET_PREFIX
+        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket_prefix"
+      - name: IO_BUCKET
+        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
+      - name: INPUT_KEY_PREFIX
+        valueFrom: "/analysistools/${TIER}/${APP}/input_key_prefix"
+      - name: OUTPUT_KEY_PREFIX
+        valueFrom: "/analysistools/${TIER}/${APP}/output_key_prefix"
+      - name: EMAIL_ADMIN
+        valueFrom: "/analysistools/${TIER}/${APP}/email_admin"
+      - name: EMAIL_SMTP_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_host"
+      - name: EMAIL_SMTP_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_port"
+      - name: VPC_ID
+        valueFrom: "/analysistools/${TIER}/${APP}/vpc_id"
+      - name: SUBNET_IDS
+        valueFrom: "/analysistools/${TIER}/${APP}/subnet_ids"
+      - name: SECURITY_GROUP_IDS
+        valueFrom: "/analysistools/${TIER}/${APP}/security_group_ids"
+      - name: ECS_CLUSTER
+        valueFrom: "/analysistools/${TIER}/${APP}/ecs_cluster"
+      - name: WORKER_TASK_NAME
+        valueFrom: "/analysistools/${TIER}/${APP}/ecs_worker_task"
+      - name: POSTGRES_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_host"
+      - name: POSTGRES_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_port"
+      - name: POSTGRES_USER
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_user"
+      - name: POSTGRES_PASS
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_pass"
+      - name: POSTGRES_DB
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_db"
+    mountPoints:
+      - sourceVolume: data
+        containerPath: "/data"
+        readOnly: false
+    logConfiguration:
+      logDriver: awsfirelens
+      options:
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: "${TIER}-${APP}-refitting-worker"
+        dd_source: "nodejs"
+        dd_tags: "project:${APP} tier:${TIER}"
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/${TIER}/datadog/api_key
+tags:
+  - key: Project
+    value: "${APP}"
+  - key: ApplicationName
+    value: "${APP}"
+  - key: ResourceName
+    value: "${TIER}-${APP}-refitting-worker-ecs-task"
+  - key: EnvironmentTier
+    value: "${ENVIRONMENT_TIER}"
+  - key: ResourceFunction
+    value: compute
+  - key: Creator
+    value: TF
