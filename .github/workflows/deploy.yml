@@ -13,21 +13,6 @@ on:
           - qa
           - stage
           - prod
-      rebuild_frontend_image:
-        description: "Rebuild frontend image"
-        required: false
-        default: true
-        type: boolean
-      rebuild_backend_image:
-        description: "Rebuild backend image"
-        required: false
-        default: true
-        type: boolean
-      rebuild_refitting_image:
-        description: "Rebuild refitting image"
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   id-token: write
@@ -173,7 +158,6 @@ jobs:
 
       # Copy scripts for backend image build
       - name: Copy Python Profiler Extraction Script for backend
-        if: ${{ inputs.rebuild_backend_image }}
         run: |
           cp python_r_script_repo/${{ env.PYTHON_SCRIPT_PATH }} server/services/python/
           mkdir -p server/services/R
@@ -181,7 +165,6 @@ jobs:
 
       # Build Backend Image
       - name: Build and push backend image
-        if: ${{ inputs.rebuild_backend_image }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -199,7 +182,6 @@ jobs:
 
       # Build Frontend Image
       - name: Build and push frontend image
-        if: ${{ inputs.rebuild_frontend_image }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -216,7 +198,6 @@ jobs:
 
       # Build Refitting Image
       - name: Build and push refitting image
-        if: ${{ inputs.rebuild_refitting_image }}
         uses: docker/build-push-action@v6
         with:
           context: .
