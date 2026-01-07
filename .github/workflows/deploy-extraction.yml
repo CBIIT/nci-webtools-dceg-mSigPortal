@@ -26,7 +26,7 @@ jobs:
       APP: msigportal
       TZ: America/New_York
       AWS_REGION: us-east-1
-      TASK_DEFINITION_TEMPLATE_PATH: aws
+      TASK_DEFINITION_TEMPLATE_PATH: .github/aws
       DOCKER_BUILDKIT: 1
       BACKEND_CONTAINER_PORT: 9000
       BATCH_INSTANCE_TYPE: "g5.12xlarge"
