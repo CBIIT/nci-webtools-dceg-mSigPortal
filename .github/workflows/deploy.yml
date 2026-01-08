@@ -234,29 +234,17 @@ jobs:
           echo "Rendered refitting worker task definition:"
           cat rendered/refitting-worker.yml
 
-      - name: Register web task definition
-        id: register-web
+      - name: Register task definitions
         run: |
-          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/web.yml --query "taskDefinition.taskDefinitionArn" --output text)
-          echo "WEB_TASK_DEF_ARN=$arn" >> $GITHUB_ENV
-          echo "Registered web task definition: $arn"
-
-      - name: Register worker task definition
-        run: |
-          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/worker.yml --query "taskDefinition.taskDefinitionArn" --output text)
-          echo "Registered worker task definition: $arn"
-
-      - name: Register refitting worker task definition
-        run: |
-          arn=$(aws ecs register-task-definition --cli-input-yaml file://rendered/refitting-worker.yml --query "taskDefinition.taskDefinitionArn" --output text)
-          echo "Registered refitting worker task definition: $arn"
+          aws ecs register-task-definition --cli-input-yaml file://rendered/web.yml
+          aws ecs register-task-definition --cli-input-yaml file://rendered/worker.yml
+          aws ecs register-task-definition --cli-input-yaml file://rendered/refitting-worker.yml
 
       - name: Deploy web service
         run: |
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER }} \
             --service ${{ env.ECS_WEB_SERVICE }} \
-            --task-definition $WEB_TASK_DEF_ARN \
+            --task-definition ${{ env.ECS_WEB_TASK }} \
             --desired-count 1 \
             --force-new-deployment
-          echo "Deployed web service with task definition: $WEB_TASK_DEF_ARN"

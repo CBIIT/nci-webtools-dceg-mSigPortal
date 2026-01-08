@@ -175,9 +175,7 @@ jobs:
           cat rendered/batch-extraction-worker.yml
 
       - name: Register batch extraction job definition
-        run: |
-          arn=$(aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml --query "jobDefinitionArn" --output text)
-          echo "Registered batch extraction job definition: $arn"
+        run: aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml
 
       - name: Update batch compute environment instance type
         run: |
