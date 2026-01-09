@@ -176,7 +176,6 @@ jobs:
             ${{ env.BACKEND_IMAGE_LATEST }}
           build-args: |
             BUILDKIT_INLINE_CACHE=1
-            VITE_APP_VERSION=${{ github.ref_name }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,image-manifest=true,oci-mediatypes=true,mode=max
 
@@ -193,6 +192,7 @@ jobs:
             ${{ env.FRONTEND_IMAGE_LATEST }}
           build-args: |
             BUILDKIT_INLINE_CACHE=1
+            VITE_APP_VERSION=${{ github.ref_name }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
 

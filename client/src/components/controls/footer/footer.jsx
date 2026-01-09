@@ -3,11 +3,11 @@ import { useLocation } from 'react-router-dom';
 
 function parseVersionAndDate(versionString) {
   if (!versionString)
-    return { version: 'dev', date: new Date().toISOString().split('T')[0] };
+    return { version: 'N/A', date: new Date().toISOString().split('T')[0] };
   const versionMatch = versionString.match(/(\d+\.\d+\.\d+)(_dev)?/);
   const version = versionMatch
     ? versionMatch[1] + (versionMatch[2] || '')
-    : 'dev';
+    : 'N/A';
 
   // Extract 8-digit date if present
   const dateMatch = versionString.match(/(\d{8})/)?.[1];

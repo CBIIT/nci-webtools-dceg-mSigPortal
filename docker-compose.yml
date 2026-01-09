@@ -28,34 +28,34 @@ services:
   #   ports:
   #     - "8332:8332"
 
-  refitting:
-    build:
-      context: "."
-      dockerfile: "./docker/refitting.dockerfile"
-    env_file: "./refitting-service/.env"
-    volumes:
-      - "./data:/data"
-    environment:
-      DATA_FOLDER: /data
-      INPUT_FOLDER: /data/input
-      OUTPUT_FOLDER: /data/output
-    ports:
-      - "8334:8334"
-    #entrypoint: ["node", "worker.js", "25e22bdb-2f8e-47c8-aef1-d00a58f0b7ba"]
-
-  # frontend:
+  # refitting:
   #   build:
   #     context: "."
-  #     dockerfile: "./docker/frontend.dockerfile"
-  #     args:
-  #       APP_PATH: /mutational-signatures
-  #   env_file: "./server/.env"
+  #     dockerfile: "./docker/refitting.dockerfile"
+  #   env_file: "./refitting-service/.env"
+  #   volumes:
+  #     - "./data:/data"
   #   environment:
-  #     API_BASE_URL: http://backend:8330
-  #     API_EXTRACTION_URL: http://extraction:8332
-  #     APP_PATH: /mutational-signatures
+  #     DATA_FOLDER: /data
+  #     INPUT_FOLDER: /data/input
+  #     OUTPUT_FOLDER: /data/output
   #   ports:
-  #     - "3000:80"
+  #     - "8334:8334"
+    #entrypoint: ["node", "worker.js", "25e22bdb-2f8e-47c8-aef1-d00a58f0b7ba"]
+
+  frontend:
+    build:
+      context: "."
+      dockerfile: "./docker/frontend.dockerfile"
+      args:
+        VITE_APP_VERSION: msigportal_1.1.0_20260109
+    env_file: "./server/.env"
+    environment:
+      API_BASE_URL: http://backend:8330
+      API_EXTRACTION_URL: http://extraction:8332
+      APP_PATH: /mutational-signatures
+    ports:
+      - "3000:80"
 
   # database:
   #   image: postgres
