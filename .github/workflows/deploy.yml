@@ -248,3 +248,11 @@ jobs:
             --task-definition ${{ env.ECS_WEB_TASK }} \
             --desired-count 1 \
             --force-new-deployment
+
+      - name: Remove old task definitions
+        run: |
+          for family in "$ECS_WEB_TASK" "$ECS_WORKER_TASK" "$ECS_REFITTING_WORKER_TASK"; do
+              echo "Pruning old revisions for family: $family"
+              aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[3:]' --output text \
+                  | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          done
