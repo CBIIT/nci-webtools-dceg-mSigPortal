@@ -107,7 +107,7 @@ async function msLandscape(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName },
+      { signatureSetName, strategy },
       columns,
       limit
     );
@@ -124,6 +124,12 @@ async function msLandscape(req, res, next) {
       args,
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
+    if (rest?.output?.uncaughtError) {
+      logger.error(
+        `/msLandscape: An error occurred ${rest.output.uncaughtError}`
+      );
+      logger.error(stdout);
+    }
     res.json({ userId, stdout, ...rest });
   } catch (err) {
     logger.error(`/msLandscape: An error occurred `);
@@ -147,7 +153,7 @@ async function msDecomposition(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName },
+      { signatureSetName, strategy },
       columns,
       limit
     );
