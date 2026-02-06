@@ -171,7 +171,6 @@ jobs:
           pull: true
           push: true
           tags: |
-            # ${{ env.BACKEND_IMAGE }}
             ${{ env.BACKEND_IMAGE_LATEST }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=min
@@ -185,7 +184,6 @@ jobs:
           pull: true
           push: true
           tags: |
-            # ${{ env.FRONTEND_IMAGE }}
             ${{ env.FRONTEND_IMAGE_LATEST }}
           build-args: |
             VITE_APP_VERSION=${{ github.ref_name }}
@@ -201,7 +199,6 @@ jobs:
           pull: true
           push: true
           tags: |
-            # ${{ env.REFITTING_IMAGE }}
             ${{ env.REFITTING_IMAGE_LATEST }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache,mode=min

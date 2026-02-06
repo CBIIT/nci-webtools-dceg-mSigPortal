@@ -157,7 +157,6 @@ jobs:
           pull: true
           push: true
           tags: |
-            # ${{ env.BATCH_EXTRACTION_IMAGE }}
             ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,mode=min
