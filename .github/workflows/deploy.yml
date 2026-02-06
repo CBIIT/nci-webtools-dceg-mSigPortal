@@ -171,9 +171,10 @@ jobs:
           pull: true
           push: true
           tags: |
+            ${{ env.BACKEND_IMAGE }}
             ${{ env.BACKEND_IMAGE_LATEST }}
-          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=min
+          cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_LATEST }}
+          cache-to: type=inline
 
       # Build Frontend Image
       - name: Build and push frontend image
@@ -184,11 +185,12 @@ jobs:
           pull: true
           push: true
           tags: |
+            ${{ env.FRONTEND_IMAGE }}
             ${{ env.FRONTEND_IMAGE_LATEST }}
           build-args: |
             VITE_APP_VERSION=${{ github.ref_name }}
-          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,mode=min
+          cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE_LATEST }}
+          cache-to: type=inline
 
       # Build Refitting Image
       - name: Build and push refitting image
@@ -199,9 +201,10 @@ jobs:
           pull: true
           push: true
           tags: |
+            ${{ env.REFITTING_IMAGE }}
             ${{ env.REFITTING_IMAGE_LATEST }}
-          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache,mode=min
+          cache-from: type=registry,ref=${{ env.REFITTING_IMAGE_LATEST }}
+          cache-to: type=inline
 
       # Process and register task definitions
       - name: Create rendered task definitions directory
@@ -245,6 +248,6 @@ jobs:
         run: |
           for family in "$ECS_WEB_TASK" "$ECS_WORKER_TASK" "$ECS_REFITTING_WORKER_TASK"; do
               echo "Pruning old revisions for family: $family"
-              aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[10:]' --output text \
+              aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[3:]' --output text \
                   | xargs -n1 -r aws ecs deregister-task-definition --task-definition
           done
