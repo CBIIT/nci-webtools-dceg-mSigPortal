@@ -27,7 +27,6 @@ jobs:
       TZ: America/New_York
       AWS_REGION: us-east-1
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
-      DOCKER_BUILDKIT: 1
       BACKEND_CONTAINER_PORT: 9000
       BATCH_INSTANCE_TYPE: "g5.12xlarge"
       BATCH_CPU_UNITS: 48
@@ -158,12 +157,10 @@ jobs:
           pull: true
           push: true
           tags: |
-            ${{ env.BATCH_EXTRACTION_IMAGE }}
+            # ${{ env.BATCH_EXTRACTION_IMAGE }}
             ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,image-manifest=true,oci-mediatypes=true,mode=max
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,mode=min
 
       - name: Create rendered task definitions directory
         run: mkdir -p rendered

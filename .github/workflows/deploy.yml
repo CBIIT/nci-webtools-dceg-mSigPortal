@@ -27,7 +27,6 @@ jobs:
       TZ: America/New_York
       AWS_REGION: us-east-1
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
-      DOCKER_BUILDKIT: 1
       FRONTEND_CONTAINER_PORT: 80
       BACKEND_CONTAINER_PORT: 9000
       ECS_WORKER_CPU_UNITS: "16 vCPU"
@@ -172,12 +171,10 @@ jobs:
           pull: true
           push: true
           tags: |
-            ${{ env.BACKEND_IMAGE }}
+            # ${{ env.BACKEND_IMAGE }}
             ${{ env.BACKEND_IMAGE_LATEST }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=min
 
       # Build Frontend Image
       - name: Build and push frontend image
@@ -188,13 +185,12 @@ jobs:
           pull: true
           push: true
           tags: |
-            ${{ env.FRONTEND_IMAGE }}
+            # ${{ env.FRONTEND_IMAGE }}
             ${{ env.FRONTEND_IMAGE_LATEST }}
           build-args: |
-            BUILDKIT_INLINE_CACHE=1
             VITE_APP_VERSION=${{ github.ref_name }}
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,mode=min
 
       # Build Refitting Image
       - name: Build and push refitting image
@@ -205,12 +201,10 @@ jobs:
           pull: true
           push: true
           tags: |
-            ${{ env.REFITTING_IMAGE }}
+            # ${{ env.REFITTING_IMAGE }}
             ${{ env.REFITTING_IMAGE_LATEST }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache,image-manifest=true,oci-mediatypes=true,mode=max
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:refitting-cache,mode=min
 
       # Process and register task definitions
       - name: Create rendered task definitions directory
