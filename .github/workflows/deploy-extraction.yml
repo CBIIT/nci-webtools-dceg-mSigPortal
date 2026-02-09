@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   deploy-extraction:
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -36,7 +37,7 @@ jobs:
       PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
-      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
       - name: Checkout main repository

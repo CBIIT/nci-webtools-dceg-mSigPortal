@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   deploy:
+    timeout-minutes: 120
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -36,7 +37,7 @@ jobs:
       EXTRACTION_WORKER_TYPE: "batch"
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
-      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
       - name: Checkout main repository
