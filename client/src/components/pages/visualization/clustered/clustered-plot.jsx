@@ -8,10 +8,8 @@ import { useClusteredQuery } from './apiSlice';
 export default function ClusteredPlot({ state, form }) {
   const { params: visParams, id } = state;
   const { sample } = form;
-  const cluster = visParams.Cluster === 'True';
-
+  const cluster = visParams.args.Cluster === 'True';
   const [params, setParams] = useState();
-
   const { data, error, isFetching } = useClusteredQuery(params, {
     skip: !params,
   });
