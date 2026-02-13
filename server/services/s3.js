@@ -4,6 +4,7 @@ import {
   PutObjectCommand,
   ListObjectsCommand,
 } from '@aws-sdk/client-s3';
+import { fromSSO } from '@aws-sdk/credential-providers';
 import { createWriteStream, createReadStream, statSync } from 'fs';
 import { readdir } from 'fs/promises';
 import path from 'path';
@@ -21,11 +22,15 @@ async function getFiles(dir) {
   return files.flat();
 }
 
-export async function getObjectBuffer(
-  key,
-  bucket,
-  config = { region: 'us-east-1' }
-) {
+const credentials = process.env.AWS_PROFILE
+  ? fromSSO({ profile: process.env.AWS_PROFILE })
+  : undefined;
+const defaultConfig = {
+  region: 'us-east-1',
+  ...(credentials && { credentials }),
+};
+
+export async function getObjectBuffer(key, bucket, config = defaultConfig) {
   const s3 = new S3Client(config);
   const params = { Bucket: bucket, Key: key.replace(/^(\.\.(\/|\\|$))+/, '') };
   const { Body } = await s3.send(new GetObjectCommand(params));
@@ -36,7 +41,7 @@ export async function downloadObject(
   destination,
   key,
   bucket,
-  config = { region: 'us-east-1' }
+  config = defaultConfig
 ) {
   const s3 = new S3Client(config);
   const params = { Bucket: bucket, Key: key };
@@ -44,12 +49,7 @@ export async function downloadObject(
   return writeStream(destination, Body);
 }
 
-export function uploadObject(
-  file,
-  key,
-  bucket,
-  config = { region: 'us-east-1' }
-) {
+export function uploadObject(file, key, bucket, config = defaultConfig) {
   const s3 = new S3Client(config);
   const params = {
     Bucket: bucket,
@@ -59,7 +59,7 @@ export function uploadObject(
   return s3.send(new PutObjectCommand(params));
 }
 
-export function listObjects(prefix, bucket, config = { region: 'us-east-1' }) {
+export function listObjects(prefix, bucket, config = defaultConfig) {
   const s3 = new S3Client(config);
   return s3.send(new ListObjectsCommand({ Prefix: prefix, Bucket: bucket }));
 }
