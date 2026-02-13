@@ -42,7 +42,10 @@ RUN cd /tmp && \
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
+RUN pip3 install seaborn==0.13.2
 RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
+# patch: alias renamed module so upstream SigProfilerSimulator can find it
+RUN echo 'from SigProfilerMatrixGenerator.scripts import SigProfilerMatrixGenerator as MutationMatrixGenerator' >> /src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/scripts/__init__.py
 
 # install bcftools
 RUN cd /tmp \
