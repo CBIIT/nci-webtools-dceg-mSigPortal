@@ -6,7 +6,21 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const BASE_URL = env.APP_PATH || '';
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'fix-gz-mime-type',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url?.endsWith('.gz')) {
+              res.setHeader('Content-Type', 'application/gzip');
+              res.setHeader('Content-Encoding', 'identity');
+            }
+            next();
+          });
+        },
+      },
+    ],
     base: BASE_URL,
     server: {
       port: 3000,
