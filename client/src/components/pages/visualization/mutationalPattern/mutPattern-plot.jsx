@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button, Form, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import Plotly from '../../../controls/plotly/plot/plot';
@@ -17,7 +17,6 @@ export default function MutPatternPlot({ state }) {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -25,7 +24,6 @@ export default function MutPatternPlot({ state }) {
       pattern: 'NCG>NTG',
     },
   });
-  const { proportion, pattern } = watch();
 
   const {
     data: scatterData,
@@ -183,7 +181,7 @@ export default function MutPatternPlot({ state }) {
             <b>Frequency of Mutational Pattern</b>
             <p>
               No mutational pattern with proportion of mutations large than{' '}
-              {proportion}. Try a lower proportion value.
+              {barParams.proportion}. Try a lower proportion value.
             </p>
           </div>
         )}
