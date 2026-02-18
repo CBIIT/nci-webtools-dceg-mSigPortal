@@ -44,6 +44,12 @@ export default function MsAssociation(
     }
   }
 
+  if (xValues.length !== yValues.length) {
+    throw new Error(
+      `Signature sample counts do not match: "${signatureName1}" has ${xValues.length} samples, "${signatureName2}" has ${yValues.length} samples.`
+    );
+  }
+
   const minX = Math.min(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
 
   const maxX = Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
@@ -211,5 +217,6 @@ export default function MsAssociation(
       t: 150,
     },
   };
+
   return { traces: traces, layout: layout };
 }

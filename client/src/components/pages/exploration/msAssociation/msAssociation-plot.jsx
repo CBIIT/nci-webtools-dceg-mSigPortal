@@ -52,18 +52,20 @@ export default function MsAssociationPlot({ state, form }) {
     }
   }, [signatureName1, signatureName2, both]);
 
+  const plotError = error || error2 || data?.error || data2?.error;
+  const plotData = data || data2;
+  console.log('plotError', plotError);
+  console.log('plotData', plotData);
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {(error || error2) && (
-        <p className="p-3 text-danger">{error || error2}</p>
-      )}
-      {(data || data2) && (
+      {plotError && <p className="p-3 text-danger">{plotError}</p>}
+      {plotData && !plotError && (
         <Plotly
           className="w-100"
-          data={data?.traces || data2?.traces}
-          layout={data?.layout || data2?.layout}
-          config={data?.config || data2?.config}
+          data={plotData.traces}
+          layout={plotData.layout}
+          config={plotData.config}
         />
       )}
     </div>

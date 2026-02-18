@@ -43,9 +43,13 @@ export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
             },
       }),
       transformResponse: (data, meta, arg) => {
-        const { signatureName, both } = arg;
-        const [signatureName1, signatureName2] = signatureName.split(';');
-        return MsAssociation(data, signatureName1, signatureName2, both);
+        try {
+          const { signatureName, both } = arg;
+          const [signatureName1, signatureName2] = signatureName.split(';');
+          return MsAssociation(data, signatureName1, signatureName2, both);
+        } catch (e) {
+          return { error: e.message };
+        }
       },
     }),
     msAssociation2Source: builder.query({
