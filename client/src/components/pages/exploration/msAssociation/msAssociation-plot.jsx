@@ -16,11 +16,7 @@ export default function MsAssociationPlot({ state, form }) {
   const { data, error, isFetching } = useMsAssociationQuery(params, {
     skip: !params,
   });
-  const {
-    data: alt,
-    error: altError,
-    isFetching: altFetching,
-  } = useMsAssociation2SourceQuery(params2, {
+  const { data: data2, error: error2 } = useMsAssociation2SourceQuery(params2, {
     skip: !params2,
   });
 
@@ -59,15 +55,15 @@ export default function MsAssociationPlot({ state, form }) {
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {(error || altError) && (
-        <p className="p-3 text-danger">{error || altError}</p>
+      {(error || error2) && (
+        <p className="p-3 text-danger">{error || error2}</p>
       )}
-      {(data || alt) && (
+      {(data || data2) && (
         <Plotly
           className="w-100"
-          data={data?.traces || alt?.traces}
-          layout={data?.layout || alt?.layout}
-          config={data?.config || alt?.config}
+          data={data?.traces || data2?.traces}
+          layout={data?.layout || data2?.layout}
+          config={data?.config || data2?.config}
         />
       )}
     </div>
