@@ -6,7 +6,7 @@ export default function MsIndividual_RS32(rawData, arg) {
     x: 0.5,
     y: 0.5,
     text: arg.params_activity.signatureSetName
-      ? 'Signature SetName: <b>' +
+      ? 'Signature Set Name: <b>' +
         arg.params_activity.signatureSetName +
         '</b> is not supported in MS Individual'
       : 'No data found, please try again',

@@ -1,6 +1,6 @@
 export default function MsIndividual_Error(rawData, arg, profile) {
   const error = arg.params_activity.signatureSetName
-    ? 'Signature SetName: ' +
+    ? 'Signature Set Name: ' +
       arg.params_activity.signatureSetName +
       ' is not supported in MS Individual'
     : profile === 'Data mismatch'

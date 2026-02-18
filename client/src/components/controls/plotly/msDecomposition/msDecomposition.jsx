@@ -14,7 +14,7 @@ export default function MsDecomposition(data, arg) {
       x: 0.5,
       y: 0.5,
       text: arg?.signatureSetName
-        ? 'Signature SetName: <b>' +
+        ? 'Signature Set Name: <b>' +
           arg.signatureSetName +
           '</b> is not supported in MS Decomposition'
         : 'No data found, please try again',
