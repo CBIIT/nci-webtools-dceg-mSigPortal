@@ -6,6 +6,7 @@ import { createLogger } from './services/logger.js';
 import { createApi } from './routes/router.js';
 import { isMainModule } from './services/utils.js';
 import { createDatabaseCache } from './services/cache.js';
+import { startCron } from './services/cron.js';
 
 // if this module is the main module, start the app
 if (isMainModule(import.meta)) {
@@ -23,6 +24,7 @@ export function main(env) {
   const { APP_PORT, APP_NAME, SERVER_TIMEOUT } = env;
   const serverTimeout = (+SERVER_TIMEOUT || 900) * 1000;
   const app = createApp(env);
+  startCron(app);
   const server = app.listen(APP_PORT, () => {
     app.locals.logger.info(`${APP_NAME} started on port ${APP_PORT}`);
   });
