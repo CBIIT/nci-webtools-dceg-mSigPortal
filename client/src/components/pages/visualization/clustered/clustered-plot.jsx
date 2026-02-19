@@ -24,7 +24,7 @@ export default function ClusteredPlot({ state, form }) {
 
       setParams(params);
     }
-  }, [cluster, sample]);
+  }, [cluster, id, sample]);
 
   const columns = useMemo(
     () => [
