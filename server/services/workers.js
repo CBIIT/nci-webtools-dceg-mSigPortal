@@ -71,8 +71,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
   const workerCommand = {
     visualization: [
       'node',
-      '--require',
-      'dotenv/config',
+      '--env-file=.env',
       '--max-old-space-size=16384',
       'worker.js',
       id,

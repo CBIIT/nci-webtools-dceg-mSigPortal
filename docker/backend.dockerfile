@@ -12,8 +12,8 @@ RUN dnf -y update \
     libjpeg-turbo-devel \
     libxml2-devel \
     mpfr-devel \
-    nodejs \
-    npm \
+    nodejs20 \
+    nodejs20-npm  \
     openssl-devel \
     python3-devel \
     python3-pip \
@@ -28,7 +28,7 @@ RUN dnf -y update \
     which \
     && dnf clean all
 
-
+RUN ln -s -f /usr/bin/node-20 /usr/bin/node; ln -s -f /usr/bin/npm-20 /usr/bin/npm;
 RUN mkdir -p /deploy/server /deploy/logs
 
 # install system fonts
