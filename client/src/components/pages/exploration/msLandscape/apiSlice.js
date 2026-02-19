@@ -9,6 +9,9 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, params) => {
+        if (data.output?.uncaughtError) {
+          throw new Error(data.output.uncaughtError);
+        }
         const { cosineData, exposureData, dendrogram } = data.output;
         if (cosineData && exposureData) {
           return MsLandscape(
@@ -18,7 +21,7 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
             dendrogram
           );
         } else {
-          throw new Error(data.stdout);
+          throw new Error('No data available');
         }
       },
     }),

@@ -113,7 +113,13 @@ async function msLandscape(req, res, next) {
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      { study, strategy, cancer, profile: signatureData[0].profile },
+      {
+        study,
+        strategy,
+        cancer,
+        profile: signatureData[0].profile,
+        matrix: String(signatureData[0].matrix),
+      },
       columns,
       limit
     );
@@ -129,6 +135,7 @@ async function msLandscape(req, res, next) {
         `/msLandscape: An error occurred ${rest.output.uncaughtError}`
       );
       logger.error(stdout);
+      return next(new Error(rest.output.uncaughtError));
     }
     res.json({ userId, stdout, ...rest });
   } catch (err) {

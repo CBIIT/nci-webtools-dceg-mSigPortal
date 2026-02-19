@@ -867,15 +867,14 @@ msigportal.msLandscape <- function(args, ...) {
   # check if mdata contains at least one signature
   if (dim(mdata)[2] > 1) {
     rownames(mdata) <- transformExposure$sample
-    clustern <- ifelse(dim(mdata)[1] < 10, 2L, 5)
-    cluster <- factoextra::hcut(mdata, k = clustern, hc_func = "hclust", hc_metric = "euclidean", hc_method = "ward.D2", stand = TRUE)
-  
-    # Fix: Convert to standard hclust class to avoid "condition has length > 1" error
-    cluster_for_plot <- cluster
-    class(cluster_for_plot) <- "hclust"
-    
-    # create ggplot plotly dendrogram
-    dendrogramPlot <- ggdendro::ggdendrogram(cluster_for_plot)
+    nsamples <- dim(mdata)[1]
+    if (nsamples < 3) {
+      stop("Too few samples for MS Landscape plot")
+    }
+
+    cluster <- hclust(dist(scale(mdata)), method = "ward.D2")
+
+    dendrogramPlot <- ggdendro::ggdendrogram(cluster)
     dendrogram_json <- fromJSON(plotly::plotly_json(dendrogramPlot))
 
     # sort according to hierarchy order
@@ -883,7 +882,7 @@ msigportal.msLandscape <- function(args, ...) {
       arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
       filter(exposure > 0)
     cosineData <- cosineData %>%
-      arrange(factor(sample, levels = cluster$labels[cluster$order])) %>% 
+      arrange(factor(sample, levels = cluster$labels[cluster$order])) %>%
       replace(is.na(.), 0)
   } else {
     exposureData <- args$exposureData %>%
