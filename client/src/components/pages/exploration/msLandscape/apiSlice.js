@@ -9,8 +9,8 @@ export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
         params,
       }),
       transformResponse: (data, meta, params) => {
-        if (data.output?.uncaughtError) {
-          throw new Error(data.output.uncaughtError);
+        if (data.output?.error || data.output?.uncaughtError) {
+          throw new Error(data.output.error || data.output.uncaughtError);
         }
         const { cosineData, exposureData, dendrogram } = data.output;
         if (cosineData && exposureData) {

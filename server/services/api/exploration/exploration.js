@@ -130,12 +130,11 @@ async function msLandscape(req, res, next) {
       args,
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
-    if (rest?.output?.uncaughtError) {
-      logger.error(
-        `/msLandscape: An error occurred ${rest.output.uncaughtError}`
-      );
+    if (rest?.output?.error || rest?.output?.uncaughtError) {
+      const errMsg = rest.output.error || rest.output.uncaughtError;
+      logger.error(`/msLandscape: ${errMsg}`);
       logger.error(stdout);
-      return next(new Error(rest.output.uncaughtError));
+      return next(new Error(errMsg));
     }
     res.json({ userId, stdout, ...rest });
   } catch (err) {

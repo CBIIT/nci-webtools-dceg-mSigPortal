@@ -2,6 +2,7 @@ library(tidyverse)
 library(jsonlite)
 library(aws.s3)
 library(scales)
+source("services/R/utils.R")
 
 # capture console output for all functions called in wrapper
 wrapper <- function(fn, args, config) {
@@ -14,6 +15,9 @@ wrapper <- function(fn, args, config) {
 
   tryCatch({
     output <- get(paste0("msigportal.", fn))(args, config)
+  }, known_error = function(e) {
+    print(e)
+    output <<- append(output, list(error = e$message))
   }, error = function(e) {
     print(e)
     output <<- append(output, list(uncaughtError = e$message))

@@ -141,8 +141,8 @@ export default function PublicForm() {
       const { id, output: assocOutput } = assocResponse;
       const { output: expOutput } = expResponse;
 
-      if (assocOutput.uncaughtError) throw assocOutput.uncaughtError;
-      if (expOutput.uncaughtError) throw expOutput.uncaughtError;
+      if (assocOutput.error || assocOutput.uncaughtError) throw assocOutput.error || assocOutput.uncaughtError;
+      if (expOutput.error || expOutput.uncaughtError) throw expOutput.error || expOutput.uncaughtError;
 
       mergeState({
         submitted: true,

@@ -7,7 +7,7 @@ export default function MsDecomposition(data, arg) {
   let boxes;
   let cancerName;
   let layout;
-  if ('uncaughtError' in data) {
+  if ('error' in data || 'uncaughtError' in data) {
     const annotation = {
       xref: 'paper',
       yref: 'paper',

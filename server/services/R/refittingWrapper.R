@@ -6,8 +6,7 @@ library(BSgenome)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(jsonlite)
-
-# Load the refitting function
+source("services/R/utils.R")
 source("/app/refitting-service/refitting.R")
 
 # capture console output for all functions called in wrapper
@@ -22,6 +21,10 @@ wrapper <- function(fn, args, config = list()) {
   tryCatch(
     {
       output <- get(paste0("msigportal.", fn))(args, config)
+    },
+    known_error = function(e) {
+      print(e)
+      output <<- append(output, list(error = e$message))
     },
     error = function(e) {
       print(e)

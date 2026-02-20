@@ -22,6 +22,10 @@ wrapper <- function(fn, args, config = list()) {
     {
       output <- get(paste0("msigportal.", fn))(args, config)
     },
+    known_error = function(e) {
+      print(e)
+      output <<- append(output, list(error = e$message))
+    },
     error = function(e) {
       print(e)
       output <<- append(output, list(uncaughtError = e$message))
