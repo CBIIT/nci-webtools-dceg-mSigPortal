@@ -27,8 +27,9 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 const actions = { ...extractionActions, ...modalActions };
 
 export default function Extraction() {
-  const formLimits = process.env?.EXTRACTION_FORM_LIMIT
-    ? JSON.parse(process.env.EXTRACTION_FORM_LIMIT)
+  const env = import.meta.env;
+  const formLimits = env?.EXTRACTION_FORM_LIMIT
+    ? JSON.parse(env.EXTRACTION_FORM_LIMIT)
     : {
         minimum_signatures: [1, 15],
         maximum_signatures: [1, 15],
@@ -316,9 +317,7 @@ export default function Extraction() {
             <Instructions formLimits={formLimits} />
           </div>
           <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
-            <Status
-              setDisplayTab={(tab) => mergeState({ displayTab: tab })}
-            />
+            <Status setDisplayTab={(tab) => mergeState({ displayTab: tab })} />
           </div>
           {status && status.status === 'COMPLETED' && (
             <>
