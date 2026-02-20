@@ -23,6 +23,10 @@ wrapper <- function(fn, args, config = list()) {
     {
       output <- get(paste0("msigportal.", fn))(args, config)
     },
+    known_error = function(e) {
+      print(e)
+      output <<- append(output, list(error = e$message))
+    },
     error = function(e) {
       print(e)
       output <<- append(output, list(uncaughtError = e$message))
@@ -843,7 +847,15 @@ msigportal.msLandscape <- function(args, ...) {
     pivot_wider(id_cols = MutationType, names_from = Sample, values_from = Mutations) %>%
     arrange(MutationType) ## have to sort the mutationtype
 
-  decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+  tryCatch(
+    {
+      decompsite_input <- calculate_similarities(orignal_genomes = seqmatrixData, signature = signatureData, signature_activaties = exposureData)
+    },
+    error = function(e) {
+      print(e)
+      known_error("An error occurred. The selected study or reference signature may not be supported for MS Landscape plot.")
+    }
+  )
 
   transformExposure <- args$exposureData %>%
     select(sample, signatureName, exposure) %>%
@@ -869,7 +881,7 @@ msigportal.msLandscape <- function(args, ...) {
     rownames(mdata) <- transformExposure$sample
     nsamples <- dim(mdata)[1]
     if (nsamples < 3) {
-      stop("Too few samples for MS Landscape plot")
+      known_error("Too few samples for MS Landscape plot")
     }
 
     cluster <- hclust(dist(scale(mdata)), method = "ward.D2")
