@@ -83,6 +83,8 @@ RUN npm install
 # copy the rest of the application
 COPY server .
 
+# Create ENV file so nodejs doesn't crash https://github.com/nodejs/node/issues/50993
+RUN touch .env
 
 # ensure symlink exists for /data/genomes
 ENV GENOME_PATH=/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
