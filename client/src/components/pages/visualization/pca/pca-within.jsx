@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Alert } from 'react-bootstrap';
 import Select from '../../../controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { usePcaWithinQuery, usePcaSignatureSetsQuery } from './apiSlice';
@@ -137,12 +137,12 @@ export default function PcaWithin({ state }) {
       {(error || data?.output?.error || data?.output?.uncaughtError) && (
         <>
           <hr />
-          <p className="p-3">
+          <Alert variant="warning" className="mx-3">
             {error ||
               data?.output?.error ||
               data?.output?.uncaughtError ||
               'An error has occurred. Please verify your input.'}
-          </p>
+          </Alert>
         </>
       )}
 
