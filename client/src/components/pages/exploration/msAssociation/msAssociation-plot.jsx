@@ -16,11 +16,7 @@ export default function MsAssociationPlot({ state, form }) {
   const { data, error, isFetching } = useMsAssociationQuery(params, {
     skip: !params,
   });
-  const {
-    data: alt,
-    error: altError,
-    isFetching: altFetching,
-  } = useMsAssociation2SourceQuery(params2, {
+  const { data: data2, error: error2 } = useMsAssociation2SourceQuery(params2, {
     skip: !params2,
   });
 
@@ -56,18 +52,20 @@ export default function MsAssociationPlot({ state, form }) {
     }
   }, [signatureName1, signatureName2, both]);
 
+  const plotError = error || error2 || data?.error || data2?.error;
+  const plotData = data || data2;
+  console.log('plotError', plotError);
+  console.log('plotData', plotData);
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {(error || altError) && (
-        <p className="p-3 text-danger">{error || altError}</p>
-      )}
-      {(data || alt) && (
+      {plotError && <p className="p-3 text-danger">{plotError}</p>}
+      {plotData && !plotError && (
         <Plotly
           className="w-100"
-          data={data?.traces || alt?.traces}
-          layout={data?.layout || alt?.layout}
-          config={data?.config || alt?.config}
+          data={plotData.traces}
+          layout={plotData.layout}
+          config={plotData.config}
         />
       )}
     </div>

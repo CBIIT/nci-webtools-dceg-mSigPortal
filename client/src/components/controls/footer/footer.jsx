@@ -3,22 +3,22 @@ import { useLocation } from 'react-router-dom';
 
 function parseVersionAndDate(versionString) {
   if (!versionString)
-    return { version: 'dev', date: new Date().toISOString().split('T')[0] };
-  const versionMatch = versionString.match(/(\d+\.\d+\.\d+)(_dev)?/);
-  const version = versionMatch
-    ? versionMatch[1] + (versionMatch[2] || '')
-    : 'dev';
+    return { version: 'missing env: VITE_APP_VERSION', date: 'N/A' };
 
-  // Extract 8-digit date if present
-  const dateMatch = versionString.match(/(\d{8})/)?.[1];
-  const date = dateMatch
-    ? `${dateMatch.slice(0, 4)}-${dateMatch.slice(4, 6)}-${dateMatch.slice(
-        6,
-        8
-      )}`
-    : new Date().toISOString().split('T')[0];
+  // Check for format: msigportal_X.X.X_YYYYMMDD
+  const formatMatch = versionString.match(/msigportal_(\d+\.\d+\.\d+)_(\d{8})/);
 
-  return { version, date };
+  if (formatMatch) {
+    const version = formatMatch[1];
+    const dateStr = formatMatch[2];
+    const date = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(
+      6,
+      8
+    )}`;
+    return { version, date };
+  }
+
+  return { version: versionString, date: 'N/A' };
 }
 
 export function Footer() {

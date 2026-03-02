@@ -137,12 +137,12 @@ export default function PcaWithin({ state }) {
       {(error || data?.output?.error || data?.output?.uncaughtError) && (
         <>
           <hr />
-          <div className="px-3 pt-3">
-            An error has occurred. Please verify your input
-          </div>
-          <div className="px-3 pb-3">
-            {error || data?.output?.error || data?.output?.uncaughtError}
-          </div>
+          <p className="p-3">
+            {error ||
+              data?.output?.error ||
+              data?.output?.uncaughtError ||
+              'An error has occurred. Please verify your input.'}
+          </p>
         </>
       )}
 

@@ -20,14 +20,14 @@ permissions:
 
 jobs:
   deploy-extraction:
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
       APP: msigportal
       TZ: America/New_York
       AWS_REGION: us-east-1
-      TASK_DEFINITION_TEMPLATE_PATH: aws
-      DOCKER_BUILDKIT: 1
+      TASK_DEFINITION_TEMPLATE_PATH: .github/aws
       BACKEND_CONTAINER_PORT: 9000
       BATCH_INSTANCE_TYPE: "g5.12xlarge"
       BATCH_CPU_UNITS: 48
@@ -37,7 +37,7 @@ jobs:
       PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
-      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
       - name: Checkout main repository
@@ -160,10 +160,8 @@ jobs:
           tags: |
             ${{ env.BATCH_EXTRACTION_IMAGE }}
             ${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
-          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:extraction-cache,image-manifest=true,oci-mediatypes=true,mode=max
+          cache-from: type=registry,ref=${{ env.BATCH_EXTRACTION_IMAGE_LATEST }}
+          cache-to: type=inline
 
       - name: Create rendered task definitions directory
         run: mkdir -p rendered
@@ -175,9 +173,7 @@ jobs:
           cat rendered/batch-extraction-worker.yml
 
       - name: Register batch extraction job definition
-        run: |
-          arn=$(aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml --query "jobDefinitionArn" --output text)
-          echo "Registered batch extraction job definition: $arn"
+        run: aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml
 
       - name: Update batch compute environment instance type
         run: |

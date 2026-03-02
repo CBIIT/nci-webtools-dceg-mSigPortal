@@ -15,7 +15,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     groupBy(inputData, (e) => `${e.study}_${e.sample}`)
   ).map((samples) => {
     return {
-      study: `${samples[0].study}`,
+      study: samples[0].study,
       sample: `${samples[0].sample}`,
       type: type,
       cancer: samples[0].cancer,
@@ -34,7 +34,7 @@ export default function mutationalPatternScatter(inputData, arg) {
 
   const tmpdata1 = Object.values(groupByStudySampleType).map((samples) => {
     return {
-      study: `${samples[0].study}`,
+      study: samples[0].study,
       sample: `${samples[0].sample}`,
       n0: samples.reduce((acc, e) => acc + e.mutations, 0),
     };
@@ -85,9 +85,9 @@ export default function mutationalPatternScatter(inputData, arg) {
   const tmpdata2 = Object.values(groupByStudySampleTypeFilter).map(
     (samples) => {
       return {
-        study: `${samples[0].study}`,
+        study: samples[0].study,
         sample: `${samples[0].sample}`,
-        cancer: `${samples[0].cancer}`,
+        cancer: samples[0].cancer,
         type: type,
         n1: samples.reduce((acc, e) => acc + e.mutations, 0),
       };
@@ -282,7 +282,7 @@ export default function mutationalPatternScatter(inputData, arg) {
 
   // Create an array to store all the traces
   let scatterTraces = [];
-  let scatterLegdend = [];
+  let scatterLegend = [];
   // Create an array of keys from the originalColorPallet object
 
   // Loop through each group in the groupByCancer result
@@ -293,7 +293,7 @@ export default function mutationalPatternScatter(inputData, arg) {
       name:
         result[0]?.study !== undefined
           ? result[0].study + '@' + result[0].cancer
-          : 'Input',
+          : 'User Data',
       x: result.map((e) => e.n1),
       y: result.map((e) => e.n2),
       customdata: result.map((e) => ({
@@ -302,7 +302,7 @@ export default function mutationalPatternScatter(inputData, arg) {
         study:
           e?.study !== undefined
             ? result[0].study + '@' + result[0].cancer
-            : 'Input',
+            : 'User Data',
       })),
       mode: 'markers',
       type: 'scatter',
@@ -352,11 +352,11 @@ export default function mutationalPatternScatter(inputData, arg) {
       },
     };
 
-    let traceLedgend = {
+    let traceLegend = {
       name:
         result[0]?.study !== undefined
           ? result[0].study + '@' + result[0].cancer
-          : 'Input',
+          : 'User Data',
       x: [null],
       y: [null],
       mode: 'markers',
@@ -386,7 +386,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     };
 
     scatterTraces.push(trace);
-    scatterLegdend.push(traceLedgend);
+    scatterLegend.push(traceLegend);
   }
   // Function to generate a random color
   function getRandomColor() {
@@ -442,7 +442,7 @@ export default function mutationalPatternScatter(inputData, arg) {
     // trace3,
     ...tracesSize,
     ...scatterTraces,
-    ...scatterLegdend,
+    ...scatterLegend,
   ];
   let layout = {
     height: 1000,

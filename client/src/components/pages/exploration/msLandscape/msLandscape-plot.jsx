@@ -35,8 +35,7 @@ export default function MsLandscapePlot({ state, variableFile }) {
       <LoadingOverlay active={isFetching} />
       {error && (
         <p className="p-3 text-danger">
-          {error.name}
-          {error.message}
+          {error.data?.error || error.error || 'Plot is unavailable'}
         </p>
       )}
       {data && (

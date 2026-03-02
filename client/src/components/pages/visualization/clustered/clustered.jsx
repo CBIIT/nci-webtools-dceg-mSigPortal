@@ -7,8 +7,8 @@ import { useState } from 'react';
 export default function ClusteredIdentification({ state }) {
   const { id, params } = state;
   const [form, setForm] = useState({ sample: '' });
-  const inputFormat = params.Input_Format;
-  const cluster = params.Cluster === 'True';
+  const inputFormat = params.args.Input_Format;
+  const cluster = params.args.Cluster === 'True';
 
   return (
     <div className="bg-white border rounded" style={{ minHeight: '500px' }}>

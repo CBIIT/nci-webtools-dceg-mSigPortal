@@ -12,9 +12,14 @@ function getData(
 ) {
   const conditions = pickBy(
     query,
-    (v) => (v || v === '') && !v.includes('%') && !v.includes('*ALL')
+    (v) =>
+      (v || v === '') &&
+      (typeof v !== 'string' || (!v.includes('%') && !v.includes('*ALL')))
   );
-  const patterns = pickBy(query, (v) => v && v.includes('%'));
+  const patterns = pickBy(
+    query,
+    (v) => typeof v === 'string' && v.includes('%')
+  );
 
   let sqlQuery = connection
     .select(columns.includes(',') ? columns.split(',') : columns)
@@ -34,6 +39,10 @@ function getData(
   // use WHERE IN query on conditions delimited by semi-colons (;)
   if (conditions) {
     Object.entries(conditions).forEach(([column, values]) => {
+      if (typeof values !== 'string') {
+        sqlQuery = sqlQuery.andWhere(column, values);
+        return;
+      }
       const splitValues = values.split(';');
       if (splitValues.length > 1) {
         sqlQuery.whereIn(

@@ -7,20 +7,16 @@ export default function MsDecomposition(data, arg) {
   let boxes;
   let cancerName;
   let layout;
-  // console.log('data', data);
-  if ('uncaughtError' in data) {
-    // "uncaughtError" property exists in the data object
-    // Handle the error here
+  if ('error' in data || 'uncaughtError' in data) {
     const annotation = {
       xref: 'paper',
       yref: 'paper',
-
       x: 0.5,
       y: 0.5,
-      text: arg.params_activity.signatureSetName
-        ? 'Signature SetName: <b>' +
-          arg.params_activity.signatureSetName +
-          '</b> is not supported in MS Individual'
+      text: arg?.signatureSetName
+        ? 'Signature Set Name: <b>' +
+          arg.signatureSetName +
+          '</b> is not supported in MS Decomposition'
         : 'No data found, please try again',
       font: {
         size: 15,

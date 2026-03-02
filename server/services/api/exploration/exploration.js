@@ -107,13 +107,19 @@ async function msLandscape(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName },
+      { signatureSetName, strategy },
       columns,
       limit
     );
     const seqmatrixData = await getSeqmatrixData(
       connection,
-      { study, strategy, cancer, profile: signatureData[0].profile },
+      {
+        study,
+        strategy,
+        cancer,
+        profile: signatureData[0].profile,
+        matrix: String(signatureData[0].matrix),
+      },
       columns,
       limit
     );
@@ -124,6 +130,12 @@ async function msLandscape(req, res, next) {
       args,
     });
     const { stdout, ...rest } = JSON.parse(wrapper);
+    if (rest?.output?.error || rest?.output?.uncaughtError) {
+      const errMsg = rest.output.error || rest.output.uncaughtError;
+      logger.error(`/msLandscape: ${errMsg}`);
+      logger.error(stdout);
+      return next(new Error(errMsg));
+    }
     res.json({ userId, stdout, ...rest });
   } catch (err) {
     logger.error(`/msLandscape: An error occurred `);
@@ -147,7 +159,7 @@ async function msDecomposition(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName },
+      { signatureSetName, strategy },
       columns,
       limit
     );

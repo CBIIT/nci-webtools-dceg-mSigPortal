@@ -208,13 +208,15 @@ export default function CsPublic({ state }) {
         </Row>
       </Form>
       <div id="csWithinPlot">
-        {error && (
+        {(error || data?.output?.error || data?.output?.uncaughtError) && (
           <>
             <hr />
-            <div className="p-3">
-              <p>An error has occurred. Please verify your input.</p>
-              <p>{error.data}</p>
-            </div>
+            <p className="p-3">
+              {error ||
+                data?.output?.error ||
+                data?.output?.uncaughtError ||
+                'An error has occurred. Please verify your input.'}
+            </p>
           </>
         )}
         {data?.output.plotPath && (

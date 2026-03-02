@@ -1,3 +1,11 @@
+known_error <- function(message) {
+  cond <- structure(
+    class = c("known_error", "error", "condition"),
+    list(message = message)
+  )
+  stop(cond)
+}
+
 # Load RData from S3 and return with custom variable name
 s3load_as <- function(object, bucket) {
     temp_env <- new.env()

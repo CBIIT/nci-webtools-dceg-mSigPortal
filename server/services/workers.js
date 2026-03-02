@@ -71,8 +71,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
   const workerCommand = {
     visualization: [
       'node',
-      '--require',
-      'dotenv/config',
+      '--env-file=.env',
       '--max-old-space-size=16384',
       'worker.js',
       id,
@@ -123,7 +122,7 @@ export async function runFargateWorker(id, app, taskName, env = process.env) {
 export async function runBatchWorker(id, app, taskName, env = process.env) {
   const { BATCH_JOB_QUEUE, BATCH_JOB_DEFINITION } = env;
   const client = new BatchClient();
-  const workerCommand = ['node', '--require', 'dotenv/config', 'worker.js', id];
+  const workerCommand = ['node', '--env-file=.env', 'worker.js', id];
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   const jobCommand = new SubmitJobCommand({
     // SubmitJobRequest

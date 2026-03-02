@@ -22,6 +22,10 @@ wrapper <- function(fn, args, config = list()) {
     {
       output <- get(paste0("msigportal.", fn))(args, config)
     },
+    known_error = function(e) {
+      print(e)
+      output <<- append(output, list(error = e$message))
+    },
     error = function(e) {
       print(e)
       output <<- append(output, list(uncaughtError = e$message))
@@ -32,6 +36,33 @@ wrapper <- function(fn, args, config = list()) {
       return(toJSON(list(stdout = stdout, output = output), pretty = TRUE, auto_unbox = TRUE))
     }
   )
+}
+
+# load public seqmatrix data from S3
+# Returns list with either 'data' on success or 'error' on failure
+load_public_seqmatrix_data <- function(study, cancerType, experimentalStrategy = NULL, config, subset_files) {
+  # Build filter based on whether Dataset is provided
+  if (is.null(experimentalStrategy)) {
+    publicDataFile <- subset_files %>%
+      filter(Study == study, Cancer_Type == cancerType) %>%
+      pull(file)
+  } else {
+    publicDataFile <- subset_files %>%
+      filter(Study == study, Cancer_Type == cancerType, Dataset == experimentalStrategy) %>%
+      pull(file)
+  }
+
+  if (length(publicDataFile) == 0) {
+    error_msg <- if (is.null(experimentalStrategy)) {
+      paste0("Seqmatrix data not found for Study: ", study, " Cancer Type: ", cancerType)
+    } else {
+      paste0("Seqmatrix data not found for Study: ", study, " Cancer Type: ", cancerType, " Dataset: ", experimentalStrategy)
+    }
+    return(list(error = error_msg))
+  }
+
+  data <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  return(list(data = data))
 }
 
 # get all Reference Signature Set options using profile_name (profile type and matrix size)
@@ -136,10 +167,11 @@ msigportal.profilerSummaryPublic <- function(args, config) {
 
   plotPath <- paste0(config$savePath, "profilerSummary.svg")
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  seqmatrix_refdata_public <- result$data
 
   data_input <- seqmatrix_refdata_public %>%
     group_by(Sample, Profile) %>%
@@ -185,11 +217,11 @@ msigportal.cosineSimilarityWithinPublic <- function(args, config) {
   plotPath <- paste0(config$savePath, "cos_sim_within.svg")
   txtPath <- paste0(config$savePath, "cos_sim_within.txt")
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  seqmatrix_refdata_public <- result$data
 
   data_input <- seqmatrix_refdata_public %>%
     filter(Profile == paste0(args$profileType, args$matrixSize)) %>%
@@ -264,10 +296,11 @@ msigportal.cosineSimilarityRefSigPublic <- function(args, config) {
     select(Signature_name, MutationType, Contribution) %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  seqmatrix_refdata_public <- result$data
 
   data_input <- seqmatrix_refdata_public %>%
     filter(Profile == profile_name) %>%
@@ -306,10 +339,11 @@ msigportal.cosineSimilarityPublic <- function(args, config) {
   data_input <- data_input %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType) %>%
-    pull(file)
-  publicData <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, NULL, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  publicData <- result$data
 
 
   sigmatrix_data <- publicData %>%
@@ -380,10 +414,11 @@ msigportal.profileComparisonWithinPublic <- function(args, config) {
   matrix_size <- if_else(args$profileType == "SBS", "96", if_else(args$profileType == "DBS", "78", if_else(args$profileType == "ID", "83", NA_character_)))
   profile_name <- paste0(args$profileType, matrix_size)
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  seqmatrix_refdata_public <- result$data
 
 
   data_input <- seqmatrix_refdata_public %>%
@@ -477,10 +512,11 @@ msigportal.profileComparisonRefSigPublic <- function(args, config) {
       } else {
         profile2 <- refsig %>% select(MutationType, one_of(args$compare))
       }
-      publicDataFile <- seqmatrix_refdata_subset_files %>%
-        filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-        pull(file)
-      seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+      result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+      if (!is.null(result$error)) {
+        return(result)
+      }
+      seqmatrix_refdata_public <- result$data
 
       profile1 <- seqmatrix_refdata_public %>%
         filter(Profile == profile_name) %>%
@@ -514,10 +550,11 @@ msigportal.profileComparisonPublic <- function(args, config) {
   profile1 <- data_input %>% select(MutationType, one_of(args$userSample))
 
   ## seqmatrix data from public data
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType) %>%
-    pull(file)
-  publicData <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, NULL, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  publicData <- result$data
 
 
   profile2 <- publicData %>%
@@ -627,10 +664,11 @@ msigportal.mutationalPatternPublic <- function(args, config) {
       barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
 
       if (args$cancerType != "PanCancer") {
-        publicDataFile <- seqmatrix_refdata_subset_files %>%
-          filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-          pull(file)
-        seqmatrix_refdata <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket) %>% filter(Study == args$study)
+        result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+        if (!is.null(result$error)) {
+          return(result)
+        }
+        seqmatrix_refdata <- result$data %>% filter(Study == args$study)
       } else {
         s3load(paste0(config$prefix, "Seqmatrix/", args$study, "_", args$experimentalStrategy, "_seqmatrix_refdata.RData"), config$bucket)
       }
@@ -779,13 +817,11 @@ msigportal.pcaPublic <- function(args, config) {
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   matrix_size <- if_else(args$profileType == "SBS", "96", if_else(args$profileType == "DBS", "78", if_else(args$profileType == "ID", "83", NA_character_)))
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-  if (length(publicDataFile) == 0) {
-    return(list(error = paste0("Seqmatrix data not found for Study: ", args$study, " Cancer Type: ", args$cancerType, " Dataset: ", args$experimentalStrategy)))
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
   }
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  seqmatrix_refdata_public <- result$data
 
   data_input <- seqmatrix_refdata_public %>%
     filter(Profile == profile_name) %>%
@@ -893,10 +929,11 @@ msigportal.pcaWithPublic <- function(args, config) {
   data_input1 <- data_input1 %>% select_if(~ !is.numeric(.) || sum(.) > 0)
 
   ## seqmatrix data from public data
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType) %>%
-    pull(file)
-  publicData <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, NULL, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  publicData <- result$data
 
   data_input2 <- publicData %>%
     filter(Profile == args$profileName) %>%
@@ -1024,10 +1061,11 @@ msigportal.downloadPublicData <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
-  publicDataFile <- seqmatrix_refdata_subset_files %>%
-    filter(Study == args$study, Cancer_Type == args$cancerType, Dataset == args$experimentalStrategy) %>%
-    pull(file)
-  seqmatrix_refdata_public <- s3load_as(paste0(config$prefix, "Seqmatrix/", publicDataFile), config$bucket)
+  result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+  if (!is.null(result$error)) {
+    return(result)
+  }
+  seqmatrix_refdata_public <- result$data
 
   # delcare variables for download fn
   study <<- args$study

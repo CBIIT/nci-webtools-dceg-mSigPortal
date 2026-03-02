@@ -6,6 +6,7 @@ import { createLogger } from './services/logger.js';
 import { createApi } from './routes/router.js';
 import { isMainModule } from './services/utils.js';
 import { createDatabaseCache } from './services/cache.js';
+import { startCron } from './services/cron.js';
 
 // if this module is the main module, start the app
 if (isMainModule(import.meta)) {
@@ -19,10 +20,11 @@ if (isMainModule(import.meta)) {
  * @param {object} env
  * @returns {http.Server} a node http server
  */
-export function main(env) {
+export async function main(env) {
   const { APP_PORT, APP_NAME, SERVER_TIMEOUT } = env;
   const serverTimeout = (+SERVER_TIMEOUT || 900) * 1000;
-  const app = createApp(env);
+  const app = await createApp(env);
+  startCron(app);
   const server = app.listen(APP_PORT, () => {
     app.locals.logger.info(`${APP_NAME} started on port ${APP_PORT}`);
   });
@@ -30,7 +32,7 @@ export function main(env) {
   return server;
 }
 
-function createApp(env) {
+async function createApp(env) {
   const { APP_NAME, LOG_LEVEL } = env;
   const app = express();
 
@@ -60,7 +62,12 @@ function createApp(env) {
       useNullAsDefault: true,
     });
   app.locals.cache = createDatabaseCache(app.locals.connection, 'cache');
-  app.locals.cache.initialize();
+
+  try {
+    await app.locals.cache.initialize();
+  } catch (error) {
+    app.locals.logger.error(`Failed to initialize database cache: ${error.message}`);
+  }
 
   app.use('/api', createApi(env));
 
