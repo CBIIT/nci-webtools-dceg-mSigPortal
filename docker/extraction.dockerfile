@@ -26,6 +26,7 @@ RUN dnf -y update \
     which \
     && dnf clean all
 
+RUN ln -s -f /usr/bin/node-20 /usr/bin/node; ln -s -f /usr/bin/npm-20 /usr/bin/npm;
 RUN mkdir -p /deploy/app /deploy/logs
 
 
@@ -50,6 +51,9 @@ RUN npm install
 
 # copy the rest of the application
 COPY extraction-service /deploy/app/
+
+# Create ENV file so nodejs doesn't crash https://github.com/nodejs/node/issues/50993
+RUN touch .env
 
 # ensure symlink exists for /data/genomes
 ENV GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb

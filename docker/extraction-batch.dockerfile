@@ -1,5 +1,7 @@
 FROM nvidia/cuda:12.1.1-runtime-rockylinux9
 
+RUN dnf -y module enable nodejs:20 && dnf clean all
+
 RUN dnf -y update \
     && dnf -y install \
     bzip2 \
@@ -71,6 +73,9 @@ RUN npm install
 
 # copy the rest of the application
 COPY extraction-service /deploy/app/
+
+# Create ENV file so nodejs doesn't crash https://github.com/nodejs/node/issues/50993
+RUN touch .env
 
 # ensure symlink exists for /data/genomes
 ENV GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
