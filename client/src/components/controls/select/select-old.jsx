@@ -57,7 +57,7 @@ export default function CustomSelect({
         options={optionsObject}
         value={optionsObject.filter((option) => option.value === value)}
         onChange={(option) => onChange(option.value)}
-        isDisabled={disabled}
+        isDisabled={!!disabled}
         {...props}
         {...rest}
       />
