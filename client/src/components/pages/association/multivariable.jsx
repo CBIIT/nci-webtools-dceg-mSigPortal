@@ -591,7 +591,7 @@ export default function Multivariable() {
               </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
-                  <legend className="font-weight-bold">Method</legend>
+                  <legend id="testType-label" className="font-weight-bold">Method</legend>
                   <CustomSelect
                     className="mb-0"
                     disabled={
@@ -602,6 +602,7 @@ export default function Multivariable() {
                     }
                     id="testType"
                     label=""
+                    aria-labelledby="testType-label"
                     value={testType}
                     options={['lm', 'glm']}
                     onChange={(e) => mergeState({ testType: e })}

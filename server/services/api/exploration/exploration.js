@@ -118,7 +118,9 @@ async function msLandscape(req, res, next) {
         strategy,
         cancer,
         profile: signatureData[0].profile,
-        matrix: String(signatureData[0].matrix),
+        ...(signatureData[0]?.matrix
+          ? { matrix: String(signatureData[0].matrix) }
+          : {}),
       },
       columns,
       limit
