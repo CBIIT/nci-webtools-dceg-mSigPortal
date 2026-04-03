@@ -7,7 +7,7 @@ if (length(args) == 0) {
     stop("Usage: Rscript combineDatasets.R 'inputFileGlobPattern' processorFunction outputFile.csv")
 }
 
-inputFiles <- Sys.glob(args[1])
+inputFiles <- unlist(lapply(strsplit(args[1], " ")[[1]], Sys.glob))
 processorFunction <- args[2]
 outputFile <- args[3]
 
@@ -24,11 +24,12 @@ regex_group <- function(str, pattern) {
 }
 
 combineAssociationFiles <- function(x) {
+    if (!"icgc_specimen_id" %in% names(x)) x$icgc_specimen_id <- NA_character_
+    if (!"icgc_donor_id" %in% names(x)) x$icgc_donor_id <- NA_character_
     x %>%
-        rowwise() %>%
         mutate(
-            Study = extract(basename(filepath), "_", 1),
-            Dataset = extract(basename(filepath), "_", 2),
+            Study = sub("_.*", "", basename(filepath)),
+            Dataset = sub("^[^_]+_([^_]+)_.*", "\\1", basename(filepath)),
             .before = Cancer_Type
         ) %>%
         rename(
@@ -43,20 +44,23 @@ combineAssociationFiles <- function(x) {
             variableName = variable_name,
             variableValue = variable_value,
             variableValueType = variable_value_type
-        )
+        ) %>%
+        select(study, strategy, cancer, sample, icgcSpecimenId, icgcDonorId, dataSource, dataType, variableName, variableValue, variableValueType)
 }
 
 combineExposureFiles <- function(x) {
-    x %>% rename(
-        study = Study,
-        strategy = Dataset,
-        cancer = Cancer_Type,
-        organ = Organ,
-        sample = Sample,
-        signatureSetName = Signature_set_name,
-        signatureName = Signature_name,
-        exposure = Exposure
-    )
+    x %>%
+        mutate(study = sub("_.*", "", basename(filepath))) %>%
+        rename(
+            strategy = Dataset,
+            cancer = Cancer_Type,
+            organ = Organ,
+            sample = Sample,
+            signatureSetName = Signature_set_name,
+            signatureName = Signature_name,
+            exposure = Exposure
+        ) %>%
+        select(study, strategy, cancer, organ, sample, signatureSetName, signatureName, exposure)
 }
 
 combineSeqmatrixFiles <- function(x) {
@@ -64,19 +68,16 @@ combineSeqmatrixFiles <- function(x) {
         mutate(
             profile = regex_extract(Profile, "^[A-Z]+"),
             matrix = regex_extract(Profile, "[0-9]+$"),
-            .before = Profile
+            study = sub("_.*", "", basename(filepath))
         ) %>%
         rename(
-            study = Study,
             cancer = Cancer_Type,
             sample = Sample,
             strategy = Dataset,
             mutationType = MutationType,
             mutations = Mutations
         ) %>%
-        select(
-            -Profile
-        )
+        select(study, cancer, sample, strategy, profile, matrix, mutationType, mutations)
 }
 
 combineSignatureFiles <- function(x) {
@@ -207,7 +208,15 @@ combineRefgenome <- function(x) {
         )
 }
 
-datasets <- sapply(inputFiles, function(f) get(load(f)), simplify = F)
-combinedDatasets <- bind_rows(datasets, .id = "filepath")
-processedDatasets <- do.call(processorFunction, list(x = combinedDatasets)) %>% select(-filepath)
-vroom_write(processedDatasets, file = outputFile, delim = ",", na = "")
+first <- TRUE
+for (f in inputFiles) {
+    env <- new.env()
+    load(f, envir = env)
+    dataset <- get(ls(env)[1], envir = env)
+    dataset$filepath <- f
+    processed <- do.call(processorFunction, list(x = dataset)) %>% select(-any_of("filepath"))
+    vroom_write(processed, file = outputFile, delim = ",", na = "", append = !first)
+    first <- FALSE
+    rm(env, dataset, processed)
+    gc()
+}
