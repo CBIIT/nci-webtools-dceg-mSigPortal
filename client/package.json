@@ -12,7 +12,7 @@
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@reduxjs/toolkit": "^1.8.2",
     "@stdlib/stats-pcorrtest": "^0.2.2",
-    "axios": "^1.7.5",
+    "axios": "^1.15.2",
     "bootstrap": "^4.6.2",
     "bootstrap-icons": "^1.11.3",
     "d3": "^7.4.4",
