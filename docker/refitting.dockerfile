@@ -2,16 +2,13 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
     && dnf -y install \
-    nodejs20 \
-    nodejs20-npm  \
+    nodejs24 \
+    R-4.3.2 \
     tar \ 
     gzip \
     libcurl-devel \
-    wget \
-    R-4.3.2 \
     && dnf clean all
 
-RUN ln -s -f /usr/bin/node-20 /usr/bin/node; ln -s -f /usr/bin/npm-20 /usr/bin/npm;
 RUN mkdir -p /refitting-service
 
 WORKDIR /refitting-service

@@ -1,34 +1,21 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
+    && dnf -y install spal-release \
     && dnf -y install \
-    bzip2 \
-    cairo-devel \
-    cmake \
     dnf-plugins-core \
     git \
-    gmp-devel \
-    libcurl-devel \
-    libjpeg-turbo-devel \
-    libxml2-devel \
-    mpfr-devel \
-    nodejs20 \
-    nodejs20-npm  \
-    openssl-devel \
+    tar \
+    nodejs24 \
     python3-devel \
     python3-pip \
-    python3-setuptools \
-    python3-wheel \
     R-4.3.2 \
-    fribidi-devel \
-    libtiff-devel \
-    rsync \
-    tar \
-    wget \ 
-    which \
+    bcftools \
+    glpk \
+    libuv \
+    libcurl-devel \
     && dnf clean all
 
-RUN ln -s -f /usr/bin/node-20 /usr/bin/node; ln -s -f /usr/bin/npm-20 /usr/bin/npm;
 RUN mkdir -p /deploy/server /deploy/logs
 
 # install system fonts
@@ -36,7 +23,6 @@ RUN cd /tmp && \
     git clone https://github.com/xtmgah/SigProfilerPlotting && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
-
 
 # install python packages
 RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
@@ -46,16 +32,6 @@ RUN pip3 install seaborn==0.13.2
 RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
 # patch: alias renamed module so upstream SigProfilerSimulator can find it
 RUN echo 'from SigProfilerMatrixGenerator.scripts import SigProfilerMatrixGenerator as MutationMatrixGenerator' >> /src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/scripts/__init__.py
-
-# install bcftools
-RUN cd /tmp \
-    && curl -L https://github.com/samtools/bcftools/releases/download/1.16/bcftools-1.16.tar.bz2 | tar xj \
-    && cd bcftools-1.16 \
-    && ./configure --enable-libcurl --prefix=/tmp/bcftools-1.16  \
-    && make \
-    && make install \
-    && mv ./bcftools /usr/local/bin \
-    && chmod +x /usr/local/bin/bcftools
 
 # install genomes
 # NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
@@ -73,6 +49,7 @@ COPY server/.Rprofile .
 COPY server/install.R .
 COPY server/r-packages .
 
+RUN mkdir -p /root/.R && echo "CXX11STD = -std=gnu++14" >> /root/.R/Makevars
 RUN Rscript install.R
 
 # install npm packages

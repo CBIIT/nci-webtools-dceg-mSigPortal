@@ -8,7 +8,6 @@ remotes::install_version("cowplot", version = "1.2.0")
 remotes::install_version("ggExtra", version = "0.11.0")
 remotes::install_version("ggside", version = "0.4.0")
 remotes::install_version("svglite", version = "2.2.2")
-remotes::install_version("renv", version = "1.1.5")
 remotes::install_version("conflicted", version = "1.2.0")
 remotes::install_version("coop", version = "0.6-3")
 remotes::install_version("dplyr", version = "1.1.4")
@@ -38,6 +37,9 @@ remotes::install_version("igraph", version = "2.2.1")
 remotes::install_version("networkD3", version = "0.4.1")
 
 remotes::install_local("./r-packages/skit-0.0.2.tar.gz")
+
+remotes::install_github("YuLab-SMU/treeio")
+remotes::install_github("YuLab-SMU/ggtree")
 
 BiocManager::install(c(
   "BSgenome.Hsapiens.UCSC.hg19",
