@@ -85,6 +85,7 @@ combineSignatureFiles <- function(x) {
         mutate(
             profile = regex_extract(Profile, "^[A-Z]+"),
             matrix = regex_extract(Profile, "[0-9]+$"),
+            Contribution = as.numeric(Contribution),
             .before = Profile
         ) %>%
         rename(
@@ -208,15 +209,25 @@ combineRefgenome <- function(x) {
         )
 }
 
-first <- TRUE
+all_data <- list()
 for (f in inputFiles) {
     env <- new.env()
     load(f, envir = env)
     dataset <- get(ls(env)[1], envir = env)
     dataset$filepath <- f
     processed <- do.call(processorFunction, list(x = dataset)) %>% select(-any_of("filepath"))
-    vroom_write(processed, file = outputFile, delim = ",", na = "", append = !first)
-    first <- FALSE
+    if (nrow(processed) > 0) {
+        all_data[[length(all_data) + 1]] <- processed
+    }
     rm(env, dataset, processed)
     gc()
 }
+
+combined <- bind_rows(all_data)
+before <- nrow(combined)
+combined <- distinct(combined)
+after <- nrow(combined)
+if (before > after) {
+    cat("Removed", before - after, "duplicate rows\n")
+}
+vroom_write(combined, file = outputFile, delim = ",", na = "")
