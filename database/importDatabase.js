@@ -68,7 +68,7 @@ export async function importDatabase(
 
     for (let postImportStep of postImportSteps) {
       logger.info(`Running post-import step (${postImportStep.description})`);
-      await postImportStep.callback(connection);
+      await postImportStep.callback(connection, logger);
     }
 
     return totalCount;
