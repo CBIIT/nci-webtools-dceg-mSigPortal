@@ -5,7 +5,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 export default function MsPrevalancePlot({ form, state }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMsPrevelencePlotQuery(params, {
+  const { currentData, error, isFetching } = useMsPrevelencePlotQuery(params, {
     skip: !params,
   });
 
@@ -30,13 +30,13 @@ export default function MsPrevalancePlot({ form, state }) {
     <div>
       <LoadingOverlay active={isFetching} />
       {error && <p className="p-3 text-danger">Plot is unavailable</p>}
-      {data && (
+      {currentData && (
         <div>
           <Plotly
             className="w-100"
-            data={data.traces}
-            layout={data.layout}
-            config={data.config}
+            data={currentData.traces}
+            layout={currentData.layout}
+            config={currentData.config}
           />
           <div className="p-3">
             <p>

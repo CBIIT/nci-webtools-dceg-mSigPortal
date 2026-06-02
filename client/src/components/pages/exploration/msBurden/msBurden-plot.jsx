@@ -5,7 +5,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 export default function MsBurdenPlot({ state, form }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMsBurdenQuery(params, {
+  const { currentData, error, isFetching } = useMsBurdenQuery(params, {
     skip: !params,
   });
 
@@ -37,12 +37,12 @@ export default function MsBurdenPlot({ state, form }) {
         Mutational Signature Burden Across Cancer Types
       </h5>
       {error && <p className="p-3 text-danger">{error}</p>}
-      {data && (
+      {currentData && (
         <Plotly
           className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
+          data={currentData.traces}
+          layout={currentData.layout}
+          config={currentData.config}
         />
       )}
     </div>

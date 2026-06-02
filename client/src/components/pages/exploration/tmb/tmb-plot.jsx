@@ -5,11 +5,10 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 export default function TmbPlot({ state }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useTmbPlotQuery(params, {
+  const { currentData, error, isFetching } = useTmbPlotQuery(params, {
     skip: !params,
   });
 
-  //console.log('TMB ', data);
   const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
   // query after public form is submitted
   useEffect(() => {
@@ -34,12 +33,12 @@ export default function TmbPlot({ state }) {
       <LoadingOverlay active={isFetching} />
       <br></br>
       <h5 className="d-flex justify-content-center">Tumor Mutational Burden</h5>
-      {data && !error ? (
+      {currentData && !error ? (
         <Plotly
           className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
+          data={currentData.traces}
+          layout={currentData.layout}
+          config={currentData.config}
         />
       ) : (
         <div className="text-center my-4">No data available</div>

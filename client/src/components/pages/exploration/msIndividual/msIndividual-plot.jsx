@@ -6,7 +6,7 @@ import { NavHashLink } from 'react-router-hash-link';
 
 export default function MsIndividualPlot({ state, form }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useMsIndividualQuery(params, {
+  const { currentData, error, isFetching } = useMsIndividualQuery(params, {
     skip: !params,
   });
 
@@ -61,15 +61,15 @@ export default function MsIndividualPlot({ state, form }) {
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {error || (data && data.error) ? (
+      {error || (currentData && currentData.error) ? (
         <p className="p-3 text-danger">Plot is unavailable</p>
-      ) : data ? (
+      ) : currentData ? (
         <div>
           <Plotly
             className="w-100"
-            data={data.traces}
-            layout={data.layout}
-            config={data.config}
+            data={currentData.traces}
+            layout={currentData.layout}
+            config={currentData.config}
           />
           <div className="p-3">
             <p>

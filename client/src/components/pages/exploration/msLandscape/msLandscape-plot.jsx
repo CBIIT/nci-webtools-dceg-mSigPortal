@@ -6,7 +6,7 @@ import { readFile, parseMatrix } from '../../../controls/utils/utils';
 
 export default function MsLandscapePlot({ state, variableFile }) {
   const [params, setParams] = useState('');
-  let { data, error, isFetching } = useMsLandscapePlotQuery(params, {
+  let { currentData, error, isFetching } = useMsLandscapePlotQuery(params, {
     skip: !params,
   });
 
@@ -38,8 +38,8 @@ export default function MsLandscapePlot({ state, variableFile }) {
           {error.data?.error || error.error || 'Plot is unavailable'}
         </p>
       )}
-      {data && (
-        <Plotly data={data.traces} layout={data.layout} config={data.config} />
+      {currentData && (
+        <Plotly data={currentData.traces} layout={currentData.layout} config={currentData.config} />
       )}
     </div>
   );
