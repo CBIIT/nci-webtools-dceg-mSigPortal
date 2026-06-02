@@ -125,6 +125,22 @@ async function msLandscape(req, res, next) {
       columns,
       limit
     );
+    if (exposureData.length === 0) {
+      return next(
+        new Error('No exposure data available for the selected signature set.')
+      );
+    }
+    if (signatureData.length === 0) {
+      return next(
+        new Error('No signature data available for the selected signature set.')
+      );
+    }
+    if (seqmatrixData.length === 0) {
+      return next(
+        new Error('No seqmatrix data available for the selected study.')
+      );
+    }
+
     const fn = 'msLandscape';
     const args = { exposureData, signatureData, seqmatrixData };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
@@ -171,6 +187,22 @@ async function msDecomposition(req, res, next) {
       columns,
       limit
     );
+    if (exposureData.length === 0) {
+      return next(
+        new Error('No exposure data available for the selected signature set.')
+      );
+    }
+    if (signatureData.length === 0) {
+      return next(
+        new Error('No signature data available for the selected signature set.')
+      );
+    }
+    if (seqmatrixData.length === 0) {
+      return next(
+        new Error('No seqmatrix data available for the selected parameters.')
+      );
+    }
+
     const fn = 'msDecomposition';
     const args = { exposureData, signatureData, seqmatrixData };
     const id = userId || randomUUID();
