@@ -32,6 +32,7 @@ export default function Publications() {
               bordered
               options={{
                 initialState: {
+                  sortBy: [{ id: 'year', desc: true }],
                   hiddenColumns: [
                     'diseaseOrPhenotypeOrExposure',
                     'firstAuthor',
@@ -57,6 +58,7 @@ export default function Publications() {
               bordered
               options={{
                 initialState: {
+                  sortBy: [{ id: 'year', desc: true }],
                   hiddenColumns: [
                     'diseaseOrPhenotypeOrExposure',
                     'firstAuthor',
@@ -81,6 +83,7 @@ export default function Publications() {
               bordered
               options={{
                 initialState: {
+                  sortBy: [{ id: 'year', desc: true }],
                   hiddenColumns: ['bioRxivOrPubmedId', 'doi', 'note'],
                 },
               }}
@@ -99,6 +102,7 @@ export default function Publications() {
               bordered
               options={{
                 initialState: {
+                  sortBy: [{ id: 'year', desc: true }],
                   hiddenColumns: [
                     'programmingLanguage',
                     'firstAuthor',
