@@ -47,6 +47,12 @@ containerDefinitions:
         valueFrom: "/analysistools/${TIER}/${APP}/postgres_pass"
       - name: POSTGRES_DB
         valueFrom: "/analysistools/${TIER}/${APP}/postgres_db"
+      - name: EMAIL_ADMIN
+        valueFrom: "/analysistools/${TIER}/${APP}/email_admin"
+      - name: EMAIL_SMTP_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_host"
+      - name: EMAIL_SMTP_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/email_smtp_port"
     logConfiguration:
       logDriver: awsfirelens
       options:

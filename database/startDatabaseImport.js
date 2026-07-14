@@ -9,6 +9,7 @@ import {
   createConnection,
   getSourceProvider,
 } from "./services/utils.js";
+import { sendImportNotification } from "./services/notifications.js";
 import { importDatabase } from "./importDatabase.js";
 
 // determine if this script was launched from the command line
@@ -46,6 +47,7 @@ export async function importData(
 ) {
   const connection = createConnection(config.database);
   const importLog = await getPendingImportLog(connection);
+  let status = "COMPLETED";
 
   logger.info(`Started msigportal data import`);
 
@@ -82,10 +84,25 @@ export async function importData(
     );
     await updateImportLog({ status: "COMPLETED" });
   } catch (exception) {
+    status = "FAILED";
     logger.error(exception.stack);
     await updateImportLog({ status: "FAILED" });
   } finally {
     logger.customTransport.setHandler(null);
+
+    try {
+      const { log } = await connection("importLog")
+        .where({ id: importLog.id })
+        .first();
+      await sendImportNotification({
+        status,
+        startTime: new Date(importLog.createdAt).toString(),
+        logs: log,
+        env: process.env,
+      });
+    } catch (exception) {
+      logger.error(`Failed to send import notification: ${exception.stack}`);
+    }
   }
 
   return true;

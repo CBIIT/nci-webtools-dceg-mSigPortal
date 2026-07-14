@@ -1,6 +1,8 @@
+import { readFile } from "fs/promises";
 import knex from "knex";
 import postgres from "pg";
 import copyStreams from "pg-copy-streams";
+import template from "lodash/template.js";
 import { S3Client } from "@aws-sdk/client-s3";
 import { LocalProvider } from "./providers/localProvider.js";
 import { S3Provider } from "./providers/s3Provider.js";
@@ -157,4 +159,9 @@ export function getSourceProvider(providerName, providerArgs) {
     default:
       throw new Error(`Unknown provider: ${providerName}`);
   }
+}
+
+export async function renderTemplate(filepath, data) {
+  const contents = await readFile(filepath, "utf8");
+  return template(contents)(data);
 }
