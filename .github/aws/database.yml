@@ -23,7 +23,7 @@ containerDefinitions:
         awslogs-create-group: "true"
 
   - name: database-import
-    image: "${DATABASE_IMAGE_LATEST}"
+    image: "${DATABASE_IMAGE_REF}"
     essential: true
     environment:
       - name: AWS_DEFAULT_REGION

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tier:
-        description: "Tier to import into"
+        description: "Import environment"
         required: true
         default: "dev"
         type: choice
@@ -21,19 +21,6 @@ on:
         options:
           - sources.js
           - sources.publications.js
-      s3_bucket:
-        description: "S3 bucket override (empty = use tier data_bucket from SSM)"
-        required: false
-        default: ""
-        type: string
-      provider:
-        description: "Source provider"
-        required: true
-        default: "s3"
-        type: choice
-        options:
-          - s3
-          - local
 
 permissions:
   id-token: write
@@ -50,7 +37,6 @@ jobs:
       AWS_REGION: us-east-1
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
       TIER: ${{ inputs.tier }}
-      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
@@ -67,12 +53,12 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
-          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-12)
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
 
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
-          echo "DATABASE_IMAGE=$REPO:$IMAGE_TIER-database-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "DATABASE_IMAGE_LATEST=$REPO:$IMAGE_TIER-database-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE=$REPO:database-$SHORT_SHA" >> $GITHUB_ENV
+          echo "DATABASE_CACHE=$REPO:database-buildcache" >> $GITHUB_ENV
           echo "DATABASE_IMPORT_TASK=${TIER}-${APP}-database-import" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
@@ -110,17 +96,20 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push database image
+        id: build-database
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/database.dockerfile
           pull: true
           push: true
-          tags: |
-            ${{ env.DATABASE_IMAGE }}
-            ${{ env.DATABASE_IMAGE_LATEST }}
-          cache-from: type=registry,ref=${{ env.DATABASE_IMAGE_LATEST }}
-          cache-to: type=inline
+          provenance: false
+          tags: ${{ env.DATABASE_IMAGE }}
+          cache-from: type=registry,ref=${{ env.DATABASE_CACHE }}
+          cache-to: type=registry,ref=${{ env.DATABASE_CACHE }},mode=max
+
+      - name: Set image digest reference
+        run: echo "DATABASE_IMAGE_REF=$IMAGE_REPOSITORY@${{ steps.build-database.outputs.digest }}" >> $GITHUB_ENV
 
       - name: Create rendered task definitions directory
         run: mkdir -p rendered
@@ -137,17 +126,14 @@ jobs:
       - name: Run database import task
         id: run-task
         run: |
-          BUCKET="${{ inputs.s3_bucket }}"
-          if [[ -z "$BUCKET" ]]; then
-            BUCKET="$DATA_BUCKET"
-          fi
+          BUCKET="$DATA_BUCKET"
 
           PREFIX="${DATA_BUCKET_PREFIX:-msigportal/Database/}"
           # Ensure prefix has a trailing slash for S3 URI construction
           PREFIX="${PREFIX%/}/"
           PROVIDER_PATH="s3://${BUCKET}/${PREFIX}"
 
-          echo "Importing with source=${{ inputs.source }} provider=${{ inputs.provider }} path=${PROVIDER_PATH}"
+          echo "Importing with source=${{ inputs.source }} provider=s3 path=${PROVIDER_PATH}"
 
           NETWORK_CONFIG=$(jq -n \
             --arg subnets "$SUBNET_IDS" \
@@ -162,7 +148,6 @@ jobs:
 
           OVERRIDES=$(jq -n \
             --arg source "${{ inputs.source }}" \
-            --arg provider "${{ inputs.provider }}" \
             --arg path "$PROVIDER_PATH" \
             '{
               containerOverrides: [{
@@ -172,7 +157,7 @@ jobs:
                   "startDatabaseImport.js",
                   "--schema", "schema.js",
                   "--sources", $source,
-                  "--provider", $provider,
+                  "--provider", "s3",
                   $path
                 ]
               }]
