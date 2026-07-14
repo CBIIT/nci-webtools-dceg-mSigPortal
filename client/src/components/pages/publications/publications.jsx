@@ -130,8 +130,6 @@ export default function Publications() {
             genomic study (manuscript in preparation).
           </p>
         </div>
-
-        <p>Last update: 23 May 2023</p>
       </div>
     </div>
   );
