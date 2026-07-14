@@ -1,0 +1,77 @@
+family: "${DATABASE_IMPORT_TASK}"
+networkMode: awsvpc
+cpu: "1024"
+memory: "4096"
+executionRoleArn: "${ROLE_ARN}"
+taskRoleArn: "${ROLE_ARN}"
+requiresCompatibilities:
+  - FARGATE
+containerDefinitions:
+  - name: logs
+    image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+    firelensConfiguration:
+      type: fluentbit
+      options:
+        enable-ecs-log-metadata: "true"
+    memoryReservation: 50
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/${TIER}/${APP}/database-import"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream-prefix: logs
+        awslogs-create-group: "true"
+
+  - name: database-import
+    image: "${DATABASE_IMAGE_LATEST}"
+    essential: true
+    environment:
+      - name: AWS_DEFAULT_REGION
+        value: "${AWS_REGION}"
+      - name: APP_NAME
+        value: "${APP}"
+      - name: APP_TIER
+        value: "${TIER}"
+    secrets:
+      - name: DATA_BUCKET
+        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
+      - name: DATA_BUCKET_PREFIX
+        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket_prefix"
+      - name: POSTGRES_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_host"
+      - name: POSTGRES_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_port"
+      - name: POSTGRES_USER
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_user"
+      - name: POSTGRES_PASS
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_pass"
+      - name: POSTGRES_DB
+        valueFrom: "/analysistools/${TIER}/${APP}/postgres_db"
+    logConfiguration:
+      logDriver: awsfirelens
+      options:
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: "${TIER}-${APP}-db-import"
+        dd_source: "nodejs"
+        dd_tags: "project:${APP} tier:${TIER}"
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/${TIER}/datadog/api_key
+tags:
+  - key: Project
+    value: "${APP}"
+  - key: ApplicationName
+    value: "${APP}"
+  - key: ResourceName
+    value: "${TIER}-${APP}-database-import-ecs-task"
+  - key: EnvironmentTier
+    value: "${ENVIRONMENT_TIER}"
+  - key: ResourceFunction
+    value: compute
+  - key: Creator
+    value: TF

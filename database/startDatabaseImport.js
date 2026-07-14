@@ -1,18 +1,21 @@
 import { fileURLToPath, pathToFileURL } from "url";
-import { createRequire } from "module";
 import { format } from "util";
 import minimist from "minimist";
 import { getLogger } from "./services/logger.js";
 import { CustomTransport } from "./services/transports.js";
-import { loadAwsCredentials, createConnection, createPostgresConnection, getSourceProvider } from "./services/utils.js";
+import {
+  getConfigFromEnv,
+  loadAwsCredentials,
+  createConnection,
+  getSourceProvider,
+} from "./services/utils.js";
 import { importDatabase } from "./importDatabase.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-const require = createRequire(import.meta.url);
 
 if (isMainModule) {
-  const config = require("./config.json");
+  const config = getConfigFromEnv();
   loadAwsCredentials(config.aws);
 
   const args = minimist(process.argv.slice(2));
@@ -34,7 +37,13 @@ if (isMainModule) {
   process.exit(0);
 }
 
-export async function importData(config, schema, sources, sourceProvider, logger) {
+export async function importData(
+  config,
+  schema,
+  sources,
+  sourceProvider,
+  logger
+) {
   const connection = createConnection(config.database);
   const importLog = await getPendingImportLog(connection);
 
@@ -43,7 +52,7 @@ export async function importData(config, schema, sources, sourceProvider, logger
   async function updateImportLog(params) {
     await connection("importLog")
       .where({ id: importLog.id })
-      .update({ ...params, updatedAt: new Date() })
+      .update({ ...params, updatedAt: new Date() });
   }
 
   async function handleLogEvent(event) {
@@ -53,15 +62,24 @@ export async function importData(config, schema, sources, sourceProvider, logger
   }
 
   async function shouldCancelImport() {
-    const results = await connection("importLog")
-      .where({ id: importLog.id, status: "CANCELLED" })
+    const results = await connection("importLog").where({
+      id: importLog.id,
+      status: "CANCELLED",
+    });
     return results.length > 0;
   }
 
   try {
     logger.customTransport.setHandler(handleLogEvent);
     await updateImportLog({ status: "IN PROGRESS" });
-    await importDatabase(config.database, schema, sources, sourceProvider, logger, shouldCancelImport);
+    await importDatabase(
+      config.database,
+      schema,
+      sources,
+      sourceProvider,
+      logger,
+      shouldCancelImport
+    );
     await updateImportLog({ status: "COMPLETED" });
   } catch (exception) {
     logger.error(exception.stack);

@@ -1,0 +1,224 @@
+name: Import Database
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to import into"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+      source:
+        description: "Sources file to import"
+        required: true
+        default: "sources.js"
+        type: choice
+        options:
+          - sources.js
+          - sources.publications.js
+      s3_bucket:
+        description: "S3 bucket override (empty = use tier data_bucket from SSM)"
+        required: false
+        default: ""
+        type: string
+      provider:
+        description: "Source provider"
+        required: true
+        default: "s3"
+        type: choice
+        options:
+          - s3
+          - local
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  import-database:
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.tier }}
+    env:
+      APP: msigportal
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: .github/aws
+      TIER: ${{ inputs.tier }}
+      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
+
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-msigportal-database-import-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 7200
+
+      - name: Set dynamic environment variables
+        run: |
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
+
+          echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE=$REPO:$IMAGE_TIER-database-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE_LATEST=$REPO:$IMAGE_TIER-database-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "DATABASE_IMPORT_TASK=${TIER}-${APP}-database-import" >> $GITHUB_ENV
+          echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+
+      - name: Retrieve SSM parameters
+        run: |
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          declare -A PARAMS=(
+            ["role_arn"]="ROLE_ARN"
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["subnet_ids"]="SUBNET_IDS"
+            ["security_group_ids"]="SECURITY_GROUP_IDS"
+            ["data_bucket"]="DATA_BUCKET"
+            ["data_bucket_prefix"]="DATA_BUCKET_PREFIX"
+          )
+
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${PARAMETER_PATH}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push database image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/database.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.DATABASE_IMAGE }}
+            ${{ env.DATABASE_IMAGE_LATEST }}
+          cache-from: type=registry,ref=${{ env.DATABASE_IMAGE_LATEST }}
+          cache-to: type=inline
+
+      - name: Create rendered task definitions directory
+        run: mkdir -p rendered
+
+      - name: Substitute database task definition variables
+        run: |
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/database.yml > rendered/database.yml
+          echo "Rendered database task definition:"
+          cat rendered/database.yml
+
+      - name: Register database import task definition
+        run: aws ecs register-task-definition --cli-input-yaml file://rendered/database.yml
+
+      - name: Run database import task
+        id: run-task
+        run: |
+          BUCKET="${{ inputs.s3_bucket }}"
+          if [[ -z "$BUCKET" ]]; then
+            BUCKET="$DATA_BUCKET"
+          fi
+
+          PREFIX="${DATA_BUCKET_PREFIX:-msigportal/Database/}"
+          # Ensure prefix has a trailing slash for S3 URI construction
+          PREFIX="${PREFIX%/}/"
+          PROVIDER_PATH="s3://${BUCKET}/${PREFIX}"
+
+          echo "Importing with source=${{ inputs.source }} provider=${{ inputs.provider }} path=${PROVIDER_PATH}"
+
+          NETWORK_CONFIG=$(jq -n \
+            --arg subnets "$SUBNET_IDS" \
+            --arg sgs "$SECURITY_GROUP_IDS" \
+            '{
+              awsvpcConfiguration: {
+                subnets: ($subnets | split(",") | map(gsub("^\\s+|\\s+$";""))),
+                securityGroups: ($sgs | split(",") | map(gsub("^\\s+|\\s+$";""))),
+                assignPublicIp: "DISABLED"
+              }
+            }')
+
+          OVERRIDES=$(jq -n \
+            --arg source "${{ inputs.source }}" \
+            --arg provider "${{ inputs.provider }}" \
+            --arg path "$PROVIDER_PATH" \
+            '{
+              containerOverrides: [{
+                name: "database-import",
+                command: [
+                  "node",
+                  "startDatabaseImport.js",
+                  "--schema", "schema.js",
+                  "--sources", $source,
+                  "--provider", $provider,
+                  $path
+                ]
+              }]
+            }')
+
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "$ECS_CLUSTER" \
+            --launch-type FARGATE \
+            --task-definition "$DATABASE_IMPORT_TASK" \
+            --network-configuration "$NETWORK_CONFIG" \
+            --overrides "$OVERRIDES" \
+            --query 'tasks[0].taskArn' \
+            --output text)
+
+          if [[ -z "$TASK_ARN" || "$TASK_ARN" == "None" ]]; then
+            echo "Failed to start ECS task"
+            exit 1
+          fi
+
+          echo "Started task: $TASK_ARN"
+          echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
+          echo "TASK_ARN=$TASK_ARN" >> $GITHUB_ENV
+
+      - name: Wait for import task to complete
+        run: |
+          echo "Waiting for task to stop: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN"
+
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster "$ECS_CLUSTER" \
+            --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[?name==`database-import`].exitCode | [0]' \
+            --output text)
+
+          STOP_REASON=$(aws ecs describe-tasks \
+            --cluster "$ECS_CLUSTER" \
+            --tasks "$TASK_ARN" \
+            --query 'tasks[0].stoppedReason' \
+            --output text)
+
+          echo "Container exit code: $EXIT_CODE"
+          echo "Stopped reason: $STOP_REASON"
+
+          if [[ "$EXIT_CODE" != "0" ]]; then
+            echo "Database import failed with exit code $EXIT_CODE"
+            exit 1
+          fi
+
+          echo "Database import completed successfully"
