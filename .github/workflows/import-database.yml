@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   import-database:
-    timeout-minutes: 180
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -49,7 +49,6 @@ jobs:
           role-to-assume: ${{ env.CICD_ROLE_ARN }}
           role-session-name: ${{ env.TIER }}-msigportal-database-import-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
-          role-duration-seconds: 7200
 
       - name: Set dynamic environment variables
         run: |
