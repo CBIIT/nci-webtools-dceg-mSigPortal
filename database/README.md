@@ -4,7 +4,15 @@
 
 ### Importing Data
 
-1. Ensure databse/config.json exists and specifies a Postgres database configuration and s3 bucket/key prefix
+1. Set Postgres and S3 configuration via environment variables (see `.env.example`). Required:
+
+```
+POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASS, POSTGRES_DB
+DATA_BUCKET, DATA_BUCKET_PREFIX
+AWS_DEFAULT_REGION
+```
+
+You can export these in your shell or `source` a local `.env` before running the scripts.
 2. If starting from a clean database, run the createDatabase.js script
 
 ```

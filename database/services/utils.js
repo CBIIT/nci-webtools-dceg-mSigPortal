@@ -1,9 +1,25 @@
+import { readFile } from "fs/promises";
 import knex from "knex";
 import postgres from "pg";
 import copyStreams from "pg-copy-streams";
+import template from "lodash/template.js";
 import { S3Client } from "@aws-sdk/client-s3";
 import { LocalProvider } from "./providers/localProvider.js";
 import { S3Provider } from "./providers/s3Provider.js";
+
+export function getConfigFromEnv(env = process.env) {
+  return {
+    aws: { region: env.AWS_DEFAULT_REGION || env.AWS_REGION },
+    data: { bucket: env.DATA_BUCKET, s3: env.DATA_BUCKET_PREFIX },
+    database: {
+      host: env.POSTGRES_HOST,
+      port: env.POSTGRES_PORT ? Number.parseInt(env.POSTGRES_PORT, 10) : 5432,
+      user: env.POSTGRES_USER,
+      password: env.POSTGRES_PASS,
+      database: env.POSTGRES_DB,
+    },
+  };
+}
 
 export function createConnection(
   args = {
@@ -61,15 +77,19 @@ export function loadAwsCredentials(config) {
 
 export async function recreateTable(connection, name, schemaFn) {
   await connection.schema.dropTableIfExists(name);
-  await connection.schema.createTable(name, (table) => schemaFn(table, connection));
+  await connection.schema.createTable(name, (table) =>
+    schemaFn(table, connection)
+  );
   return true;
 }
 
 export async function initializeSchema(connectionConfig, schema) {
   const connection = createConnection(connectionConfig);
   const tables = schema.filter(({ type }) => !type || type === "table");
-  const materializedViews = schema.filter(({ type }) => type === "materializedView");
-  const indexedTables = schema.filter(s => typeof s.index === 'function')
+  const materializedViews = schema.filter(
+    ({ type }) => type === "materializedView"
+  );
+  const indexedTables = schema.filter((s) => typeof s.index === "function");
 
   // drop tables in reverse order to avoid foreign key constraints
   for (const { name } of [...materializedViews.reverse()]) {
@@ -81,11 +101,15 @@ export async function initializeSchema(connectionConfig, schema) {
   }
 
   for (const { name, schema } of tables) {
-    await connection.schema.createTable(name, (table) => schema(table, connection));
+    await connection.schema.createTable(name, (table) =>
+      schema(table, connection)
+    );
   }
 
   for (const { name, schema } of materializedViews) {
-    await connection.schema.createMaterializedView(name, (view) => schema(view, connection));
+    await connection.schema.createMaterializedView(name, (view) =>
+      schema(view, connection)
+    );
   }
 
   for (const { name, index } of indexedTables) {
@@ -96,20 +120,25 @@ export async function initializeSchema(connectionConfig, schema) {
 }
 
 export async function initializeSchemaForImport(connection, schema, sources) {
-  const shouldRecreateTable = (table) => sources.find((s) => s.table === table.name || table.dependsOn?.includes(s.table));
+  const shouldRecreateTable = (table) =>
+    sources.find(
+      (s) => s.table === table.name || table.dependsOn?.includes(s.table)
+    );
   const importSchema = schema.filter(shouldRecreateTable);
   return await initializeSchema(connection, importSchema);
 }
 
 export function importPostgresTable(connection, inputStream, table, columns) {
   return new Promise((resolve, reject) => {
-    const columnSql = columns.map(c => `"${c}"`).join(',');
-    const copyStream = copyStreams.from(`COPY "${table}" (${columnSql}) FROM STDIN DELIMITER ',' CSV HEADER`)
-    const stream = connection.query(copyStream)
-    inputStream.on('error', reject);
-    stream.on('error', reject);
-    stream.on('finish', () => resolve(copyStream.rowCount));
-    inputStream.pipe(stream)
+    const columnSql = columns.map((c) => `"${c}"`).join(",");
+    const copyStream = copyStreams.from(
+      `COPY "${table}" (${columnSql}) FROM STDIN DELIMITER ',' CSV HEADER`
+    );
+    const stream = connection.query(copyStream);
+    inputStream.on("error", reject);
+    stream.on("error", reject);
+    stream.on("finish", () => resolve(copyStream.rowCount));
+    inputStream.pipe(stream);
   });
 }
 
@@ -130,4 +159,9 @@ export function getSourceProvider(providerName, providerArgs) {
     default:
       throw new Error(`Unknown provider: ${providerName}`);
   }
+}
+
+export async function renderTemplate(filepath, data) {
+  const contents = await readFile(filepath, "utf8");
+  return template(contents)(data);
 }

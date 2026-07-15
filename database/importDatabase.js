@@ -1,7 +1,7 @@
 import { fileURLToPath, pathToFileURL } from "url";
-import { createRequire } from "module";
 import minimist from "minimist";
 import {
+  getConfigFromEnv,
   createPostgresConnection,
   initializeSchemaForImport,
   importPostgresTable,
@@ -13,10 +13,9 @@ import { getLogger } from "./services/logger.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-const require = createRequire(import.meta.url);
 
 if (isMainModule) {
-  const { aws, database } = require("./config.json");
+  const { aws, database } = getConfigFromEnv();
   const args = minimist(process.argv.slice(2));
   const schemaPath = pathToFileURL(args.schema || "./schema.js");
   const sourcesPath = pathToFileURL(args.sources || "./sources.js");
@@ -41,7 +40,9 @@ export async function importDatabase(
   shouldCancel = async () => false
 ) {
   const tableSources = sources.filter((source) => source.table);
-  const postImportSteps = sources.filter((source) => source.type === "postImport");
+  const postImportSteps = sources.filter(
+    (source) => source.type === "postImport"
+  );
   const connection = await createPostgresConnection(connectionConfig);
   let totalCount = 0;
 
@@ -54,16 +55,21 @@ export async function importDatabase(
       if (await shouldCancel()) {
         throw new Error(`Cancelled import`);
       }
-    
+
       logger.info(`Importing ${sourcePath} => ${table} (${description})`);
 
       const { results, duration } = await withDuration(async () => {
         const inputStream = await sourceProvider.readFile(sourcePath);
-        return await importPostgresTable(connection, inputStream, table, columns);
+        return await importPostgresTable(
+          connection,
+          inputStream,
+          table,
+          columns
+        );
       });
 
       totalCount += results;
-      logger.info(getStatusMessage({results, duration}));      
+      logger.info(getStatusMessage({ results, duration }));
     }
 
     for (let postImportStep of postImportSteps) {
@@ -74,9 +80,11 @@ export async function importDatabase(
     return totalCount;
   });
 
-  logger.info(getStatusMessage({results, duration}));      
+  logger.info(getStatusMessage({ results, duration }));
 }
 
 function getStatusMessage({ results, duration }) {
-  return `Finished importing ${results} rows in ${duration.toFixed(2)}s (${Math.round(results / duration)} rows/s)`;
+  return `Finished importing ${results} rows in ${duration.toFixed(
+    2
+  )}s (${Math.round(results / duration)} rows/s)`;
 }
