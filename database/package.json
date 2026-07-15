@@ -12,6 +12,7 @@
     "knex": "^2.1.0",
     "lodash": "^4.17.21",
     "minimist": "^1.2.6",
+    "nodemailer": "^9.0.3",
     "pg": "^8.7.3",
     "pg-copy-streams": "^6.0.2",
     "winston": "^3.8.1"

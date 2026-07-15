@@ -1,18 +1,22 @@
 import { fileURLToPath, pathToFileURL } from "url";
-import { createRequire } from "module";
 import { format } from "util";
 import minimist from "minimist";
 import { getLogger } from "./services/logger.js";
 import { CustomTransport } from "./services/transports.js";
-import { loadAwsCredentials, createConnection, createPostgresConnection, getSourceProvider } from "./services/utils.js";
+import {
+  getConfigFromEnv,
+  loadAwsCredentials,
+  createConnection,
+  getSourceProvider,
+} from "./services/utils.js";
+import { sendImportNotification } from "./services/notifications.js";
 import { importDatabase } from "./importDatabase.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-const require = createRequire(import.meta.url);
 
 if (isMainModule) {
-  const config = require("./config.json");
+  const config = getConfigFromEnv();
   loadAwsCredentials(config.aws);
 
   const args = minimist(process.argv.slice(2));
@@ -30,20 +34,32 @@ if (isMainModule) {
   const { sources } = await import(sourcesPath);
   const sourceProvider = getSourceProvider(providerName, providerArgs);
   const logger = createCustomLogger("msigportal-data-import");
-  await importData(config, schema, sources, sourceProvider, logger);
-  process.exit(0);
+  try {
+    await importData(config, schema, sources, sourceProvider, logger);
+    process.exit(0);
+  } catch (exception) {
+    logger.error(exception.stack);
+    process.exit(1);
+  }
 }
 
-export async function importData(config, schema, sources, sourceProvider, logger) {
+export async function importData(
+  config,
+  schema,
+  sources,
+  sourceProvider,
+  logger
+) {
   const connection = createConnection(config.database);
   const importLog = await getPendingImportLog(connection);
+  let status = "COMPLETED";
 
   logger.info(`Started msigportal data import`);
 
   async function updateImportLog(params) {
     await connection("importLog")
       .where({ id: importLog.id })
-      .update({ ...params, updatedAt: new Date() })
+      .update({ ...params, updatedAt: new Date() });
   }
 
   async function handleLogEvent(event) {
@@ -53,21 +69,48 @@ export async function importData(config, schema, sources, sourceProvider, logger
   }
 
   async function shouldCancelImport() {
-    const results = await connection("importLog")
-      .where({ id: importLog.id, status: "CANCELLED" })
+    const results = await connection("importLog").where({
+      id: importLog.id,
+      status: "CANCELLED",
+    });
     return results.length > 0;
   }
 
   try {
     logger.customTransport.setHandler(handleLogEvent);
     await updateImportLog({ status: "IN PROGRESS" });
-    await importDatabase(config.database, schema, sources, sourceProvider, logger, shouldCancelImport);
+    await importDatabase(
+      config.database,
+      schema,
+      sources,
+      sourceProvider,
+      logger,
+      shouldCancelImport
+    );
     await updateImportLog({ status: "COMPLETED" });
   } catch (exception) {
+    status = "FAILED";
     logger.error(exception.stack);
     await updateImportLog({ status: "FAILED" });
+    throw exception;
   } finally {
     logger.customTransport.setHandler(null);
+
+    try {
+      const { log } = await connection("importLog")
+        .where({ id: importLog.id })
+        .first();
+      await sendImportNotification({
+        status,
+        startTime: new Date(importLog.createdAt).toString(),
+        logs: log,
+        env: process.env,
+      });
+    } catch (exception) {
+      logger.error(`Failed to send import notification: ${exception.stack}`);
+    } finally {
+      await connection.destroy();
+    }
   }
 
   return true;
