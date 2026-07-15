@@ -34,8 +34,13 @@ if (isMainModule) {
   const { sources } = await import(sourcesPath);
   const sourceProvider = getSourceProvider(providerName, providerArgs);
   const logger = createCustomLogger("msigportal-data-import");
-  await importData(config, schema, sources, sourceProvider, logger);
-  process.exit(0);
+  try {
+    await importData(config, schema, sources, sourceProvider, logger);
+    process.exit(0);
+  } catch (exception) {
+    logger.error(exception.stack);
+    process.exit(1);
+  }
 }
 
 export async function importData(
@@ -87,6 +92,7 @@ export async function importData(
     status = "FAILED";
     logger.error(exception.stack);
     await updateImportLog({ status: "FAILED" });
+    throw exception;
   } finally {
     logger.customTransport.setHandler(null);
 
@@ -102,6 +108,8 @@ export async function importData(
       });
     } catch (exception) {
       logger.error(`Failed to send import notification: ${exception.stack}`);
+    } finally {
+      await connection.destroy();
     }
   }
 
