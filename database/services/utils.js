@@ -13,7 +13,7 @@ export function getConfigFromEnv(env = process.env) {
     data: { bucket: env.DATA_BUCKET, s3: env.DATA_BUCKET_PREFIX },
     database: {
       host: env.POSTGRES_HOST,
-      port: env.POSTGRES_PORT,
+      port: env.POSTGRES_PORT ? Number.parseInt(env.POSTGRES_PORT, 10) : 5432,
       user: env.POSTGRES_USER,
       password: env.POSTGRES_PASS,
       database: env.POSTGRES_DB,

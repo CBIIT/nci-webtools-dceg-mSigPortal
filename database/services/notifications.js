@@ -19,7 +19,7 @@ export function getSmtpConfig(env) {
 
   let config = {
     host: EMAIL_SMTP_HOST,
-    port: EMAIL_SMTP_PORT,
+    port: EMAIL_SMTP_PORT ? Number.parseInt(EMAIL_SMTP_PORT, 10) : 25,
   };
 
   if (EMAIL_SMTP_USER && EMAIL_SMTP_PASSWORD) {
