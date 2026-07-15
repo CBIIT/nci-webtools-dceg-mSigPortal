@@ -6,3 +6,12 @@ sigProfilerPlotting==1.2.2
 pandas==1.3.5
 numpy==1.26.4
 PyPDF2==2.11.2
+
+# Security: force a patched Pillow (transitive via the SigProfiler stack).
+# >=12.2.0 clears the critical (PYSEC-2026-457) and all current Pillow highs
+# (GHSA-cfh3/pwv6/whj4). NOTE: Pillow 12 is two majors ahead of the pinned
+# scientific stack (numpy 1.26 / pandas 1.3.5 / sigProfilerPlotting 1.2.2) —
+# the Docker build MUST confirm the SigProfiler packages still resolve/run;
+# if they cap Pillow, fall back to the highest compatible >=10.3.0.
+# torch 2.9.1 retains a no-fix advisory (PYSEC-2026-139) — no patched release.
+Pillow>=12.2.0
