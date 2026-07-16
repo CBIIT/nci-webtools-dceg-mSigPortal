@@ -123,11 +123,16 @@ export default function Publications() {
         <div className="mb-4">
           <h3>Citations</h3>
           <p>
-            If you use the data from this website, please cite our paper:
+            <b>If you use data from this website, please cite:</b>
             <br />
-            Tongwu Zhang, Jian Sang, Alyssa Klein…. Maria Teresa Landi.
-            Integrative mutational signature portal (mSigPortal) for cancer
-            genomic study (manuscript in preparation).
+            <div>
+              Zhang T, Sang J, Hartman C, et al.{' '}
+              <i>
+                mSigPortal: A comprehensive platform for interactive mutational
+                signature analysis in cancer genomics.
+              </i>{' '}
+              Manuscript submitted.
+            </div>
           </p>
         </div>
       </div>
