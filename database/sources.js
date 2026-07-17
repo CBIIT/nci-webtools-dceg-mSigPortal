@@ -241,13 +241,18 @@ export const sources = [
       ];
 
       for (const view of views) {
+        const start = Date.now();
         try {
           logger.info(`Refreshing materialized view "${view}"...`);
           await connection.query(`refresh materialized view "${view}"`);
-          logger.info(`Successfully refreshed materialized view "${view}"`);
+          const duration = ((Date.now() - start) / 1000).toFixed(2);
+          logger.info(
+            `Successfully refreshed materialized view "${view}" in ${duration}s`,
+          );
         } catch (error) {
+          const duration = ((Date.now() - start) / 1000).toFixed(2);
           logger.error(
-            `Failed to refresh materialized view "${view}": ${error.message}`,
+            `Failed to refresh materialized view "${view}" after ${duration}s: ${error.message}`,
           );
           throw error;
         }

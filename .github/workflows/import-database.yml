@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   import-database:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -179,3 +179,4 @@ jobs:
           echo "Started task: $TASK_ARN"
           echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
           echo "TASK_ARN=$TASK_ARN" >> $GITHUB_ENV
+          echo "ECS import task continues in the background. Completion is emailed to the webadmin (EMAIL_ADMIN)."

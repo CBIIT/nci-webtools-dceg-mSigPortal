@@ -8,8 +8,10 @@ import {
   loadAwsCredentials,
   withDuration,
   getSourceProvider,
+  registerPgConnection,
+  clearPgConnection,
 } from "./services/utils.js";
-import { getLogger } from "./services/logger.js";
+import { createLogger } from "./services/logger.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
@@ -26,7 +28,7 @@ if (isMainModule) {
   const { schema } = await import(schemaPath);
   const { sources } = await import(sourcesPath);
   const sourceProvider = getSourceProvider(providerName, providerArgs);
-  const logger = getLogger("import");
+  const logger = createLogger("import");
   await importDatabase(database, schema, sources, sourceProvider, logger);
   process.exit(0);
 }
@@ -44,43 +46,54 @@ export async function importDatabase(
     (source) => source.type === "postImport"
   );
   const connection = await createPostgresConnection(connectionConfig);
+  registerPgConnection(connection);
   let totalCount = 0;
 
-  const { results, duration } = await withDuration(async () => {
-    await initializeSchemaForImport(connectionConfig, schema, sources);
+  try {
+    const { results, duration } = await withDuration(async () => {
+      await initializeSchemaForImport(connectionConfig, schema, sources);
 
-    for (let source of tableSources) {
-      const { description, table, columns, sourcePath } = source;
+      for (let source of tableSources) {
+        const { description, table, columns, sourcePath } = source;
 
-      if (await shouldCancel()) {
-        throw new Error(`Cancelled import`);
+        if (await shouldCancel()) {
+          throw new Error(`Cancelled import`);
+        }
+
+        logger.info(`Importing ${sourcePath} => ${table} (${description})`);
+
+        const { results, duration } = await withDuration(async () => {
+          const inputStream = await sourceProvider.readFile(sourcePath);
+          return await importPostgresTable(
+            connection,
+            inputStream,
+            table,
+            columns
+          );
+        });
+
+        totalCount += results;
+        logger.info(getStatusMessage({ results, duration }));
       }
 
-      logger.info(`Importing ${sourcePath} => ${table} (${description})`);
+      for (let postImportStep of postImportSteps) {
+        logger.info(`Running post-import step (${postImportStep.description})`);
+        await postImportStep.callback(connection, logger);
+      }
 
-      const { results, duration } = await withDuration(async () => {
-        const inputStream = await sourceProvider.readFile(sourcePath);
-        return await importPostgresTable(
-          connection,
-          inputStream,
-          table,
-          columns
-        );
-      });
+      return totalCount;
+    });
 
-      totalCount += results;
-      logger.info(getStatusMessage({ results, duration }));
+    logger.info(getStatusMessage({ results, duration }));
+  } finally {
+    clearPgConnection(connection);
+    try {
+      await connection.end();
+    } catch (error) {
+      // Expected on SIGTERM when abortActiveConnections already ended the client
+      logger.warn(`Postgres connection already closed: ${error.message}`);
     }
-
-    for (let postImportStep of postImportSteps) {
-      logger.info(`Running post-import step (${postImportStep.description})`);
-      await postImportStep.callback(connection, logger);
-    }
-
-    return totalCount;
-  });
-
-  logger.info(getStatusMessage({ results, duration }));
+  }
 }
 
 function getStatusMessage({ results, duration }) {

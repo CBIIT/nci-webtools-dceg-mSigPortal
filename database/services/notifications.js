@@ -1,8 +1,8 @@
 import { createTransport } from "nodemailer";
 import { renderTemplate } from "./utils.js";
-import { getLogger } from "./logger.js";
+import { createLogger } from "./logger.js";
 
-const logger = getLogger("notifications");
+const logger = createLogger("notifications");
 
 /**
  * Retrieves the SMTP configuration from the environment.
@@ -53,8 +53,9 @@ export async function sendImportNotification({
   const tier = (env.APP_TIER || "").toUpperCase();
   const subject = `[${tier}] mSigPortal Data Import ${succeeded ? "Succeeded" : "Failed"}`;
 
+  logger.info(`Sending import notification: ${subject}`);
   const transport = createTransport(getSmtpConfig(env));
-  return await transport.sendMail({
+  const result = await transport.sendMail({
     from: env.EMAIL_ADMIN,
     to: env.EMAIL_ADMIN,
     subject,
@@ -64,4 +65,6 @@ export async function sendImportNotification({
       logs,
     }),
   });
+  logger.info(`Sent import notification to ${env.EMAIL_ADMIN}`);
+  return result;
 }

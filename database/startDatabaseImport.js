@@ -1,19 +1,22 @@
 import { fileURLToPath, pathToFileURL } from "url";
-import { format } from "util";
 import minimist from "minimist";
-import { getLogger } from "./services/logger.js";
-import { CustomTransport } from "./services/transports.js";
+import { createLogger, formatObject } from "./services/logger.js";
 import {
   getConfigFromEnv,
   loadAwsCredentials,
   createConnection,
   getSourceProvider,
+  registerKnexConnection,
+  clearKnexConnection,
+  abortActiveConnections,
 } from "./services/utils.js";
 import { sendImportNotification } from "./services/notifications.js";
 import { importDatabase } from "./importDatabase.js";
 
 // determine if this script was launched from the command line
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
+
+let shuttingDown = false;
 
 if (isMainModule) {
   const config = getConfigFromEnv();
@@ -33,14 +36,74 @@ if (isMainModule) {
   const { schema } = await import(schemaPath);
   const { sources } = await import(sourcesPath);
   const sourceProvider = getSourceProvider(providerName, providerArgs);
-  const logger = createCustomLogger("msigportal-data-import");
+  const logger = createLogger(
+    process.env.APP_NAME ? `${process.env.APP_NAME}-data-import` : "msigportal-data-import",
+    process.env.LOG_LEVEL || "info"
+  );
+
+  const importPromise = importData(
+    config,
+    schema,
+    sources,
+    sourceProvider,
+    logger
+  );
+
+  async function handleShutdown(signal) {
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+    logger.warn(`Received ${signal}; aborting import and sending notification`);
+    await abortActiveConnections();
+    try {
+      await importPromise;
+    } catch {
+      // importData marks FAILED and sends email in finally
+    }
+    process.exit(1);
+  }
+
+  process.on("SIGTERM", () => {
+    handleShutdown("SIGTERM").catch((error) => {
+      logger.error(`Shutdown handler failed: ${error.stack}`);
+      process.exit(1);
+    });
+  });
+  process.on("SIGINT", () => {
+    handleShutdown("SIGINT").catch((error) => {
+      logger.error(`Shutdown handler failed: ${error.stack}`);
+      process.exit(1);
+    });
+  });
+
   try {
-    await importData(config, schema, sources, sourceProvider, logger);
+    await importPromise;
     process.exit(0);
   } catch (exception) {
     logger.error(exception.stack);
     process.exit(1);
   }
+}
+
+/**
+ * Wraps a winston logger so each message is also collected for the import email body.
+ */
+export function createCapturingLogger(logger, logLines) {
+  const capture =
+    (level) =>
+    (message, ...rest) => {
+      const timestamp = new Date().toISOString();
+      logLines.push(`${timestamp} [${level}] ${formatObject(message)}`);
+      return logger[level](message, ...rest);
+    };
+
+  return {
+    info: capture("info"),
+    warn: capture("warn"),
+    error: capture("error"),
+    debug: capture("debug"),
+  };
 }
 
 export async function importData(
@@ -51,10 +114,13 @@ export async function importData(
   logger
 ) {
   const connection = createConnection(config.database);
+  registerKnexConnection(connection);
   const importLog = await getPendingImportLog(connection);
   let status = "COMPLETED";
+  const logLines = [];
+  const capturingLogger = createCapturingLogger(logger, logLines);
 
-  logger.info(`Started msigportal data import`);
+  capturingLogger.info(`Started msigportal data import`);
 
   async function updateImportLog(params) {
     await connection("importLog")
@@ -62,13 +128,10 @@ export async function importData(
       .update({ ...params, updatedAt: new Date() });
   }
 
-  async function handleLogEvent(event) {
-    const logMessage = `${event.timestamp} ${format(event.message)}`;
-    const log = connection.raw(`concat("log", '\n', ?::text)`, [logMessage]);
-    await updateImportLog({ log });
-  }
-
   async function shouldCancelImport() {
+    if (shuttingDown) {
+      return true;
+    }
     const results = await connection("importLog").where({
       id: importLog.id,
       status: "CANCELLED",
@@ -77,50 +140,51 @@ export async function importData(
   }
 
   try {
-    logger.customTransport.setHandler(handleLogEvent);
     await updateImportLog({ status: "IN PROGRESS" });
     await importDatabase(
       config.database,
       schema,
       sources,
       sourceProvider,
-      logger,
+      capturingLogger,
       shouldCancelImport
     );
-    await updateImportLog({ status: "COMPLETED" });
+    if (shuttingDown) {
+      throw new Error("Import cancelled due to shutdown signal");
+    }
+    await updateImportLog({ status: "COMPLETED", log: logLines.join("\n") });
   } catch (exception) {
     status = "FAILED";
-    logger.error(exception.stack);
-    await updateImportLog({ status: "FAILED" });
+    capturingLogger.error(exception.stack);
+    try {
+      await updateImportLog({ status: "FAILED", log: logLines.join("\n") });
+    } catch (updateError) {
+      capturingLogger.error(
+        `Failed to update import log status: ${updateError.message}`
+      );
+    }
     throw exception;
   } finally {
-    logger.customTransport.setHandler(null);
-
     try {
-      const { log } = await connection("importLog")
-        .where({ id: importLog.id })
-        .first();
       await sendImportNotification({
         status,
         startTime: new Date(importLog.createdAt).toString(),
-        logs: log,
+        logs: logLines.join("\n") || null,
         env: process.env,
       });
     } catch (exception) {
       logger.error(`Failed to send import notification: ${exception.stack}`);
     } finally {
-      await connection.destroy();
+      clearKnexConnection(connection);
+      try {
+        await connection.destroy();
+      } catch {
+        // ignore destroy errors
+      }
     }
   }
 
   return true;
-}
-
-export function createCustomLogger(name) {
-  const logger = getLogger(name);
-  logger.customTransport = new CustomTransport();
-  logger.add(logger.customTransport);
-  return logger;
 }
 
 export async function getPendingImportLog(connection) {
