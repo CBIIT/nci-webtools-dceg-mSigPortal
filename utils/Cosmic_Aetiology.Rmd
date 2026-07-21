@@ -24,19 +24,35 @@ library(jsonlite)
 
 ```{r}
 ### Helper function: scrape proposed aetiology from individual COSMIC signature pages ###
+# Returns the first non-empty paragraph under section#proposed-aetiology.
 scrape_etiology <- function(sig_names, url_prefix) {
   base_url <- "https://cancer.sanger.ac.uk/signatures"
   results <- lapply(sig_names, function(sig) {
     url <- paste0(base_url, "/", url_prefix, "/", tolower(sig), "/")
     page <- tryCatch(read_html(url), error = function(e) NULL)
     etiology <- if (!is.null(page)) {
-      page %>%
-        html_element("section#proposed-aetiology p:first-of-type") %>%
+      paras <- page %>%
+        html_elements("section#proposed-aetiology p") %>%
         html_text(trim = TRUE)
+      # Skip empty paragraphs (some pages have an empty first <p>)
+      non_empty <- paras[nchar(paras) > 0]
+      if (length(non_empty) > 0) non_empty[1] else NA_character_
     } else { NA_character_ }
     tibble(Signature = sig, Etiology = ifelse(is.na(etiology), '', etiology))
   })
   bind_rows(results)
+}
+
+### Helper function: scrape CN short etiology labels from the COSMIC CN summary page ###
+# The summary page cards still carry the short group label (e.g. "Diploidy", "Chromothripsis").
+scrape_cn_etiology_labels <- function() {
+  url  <- "https://cancer.sanger.ac.uk/signatures/cn/"
+  page <- read_html(url)
+  names  <- page %>% html_elements(".signature-card-title") %>% html_text(trim = TRUE)
+  bodies <- page %>% html_elements(".signature-card-body")  %>% html_text(trim = TRUE)
+  # Strip leading "Proposed Aetiology" prefix that COSMIC injects into the card body
+  labels <- str_remove(bodies, "^Proposed Aetiology")
+  tibble(Signature = names, Etiology_short = str_trim(labels))
 }
 ```
 
@@ -83,12 +99,15 @@ cn_names <- signature_refsets %>%
   filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_CN48')), Strand_info == 'N') %>%
   distinct(Signature_name) %>% pull(Signature_name)
 
-siginfo_cn <- scrape_etiology(cn_names, "cn")
+# Short group label from summary page (e.g. "Diploidy", "Chromothripsis")
+cn_labels <- scrape_cn_etiology_labels() %>% filter(Signature %in% cn_names)
 
-# Clean up to match mSigPortal design
-siginfo_cn <- siginfo_cn %>%
-  mutate(Etiology_detail = Etiology) %>%
-  mutate(Etiology = str_remove(Etiology, " - .*")) %>%
+# Long etiology detail from individual pages
+cn_detail <- scrape_etiology(cn_names, "cn") %>% rename(Etiology_detail = Etiology)
+
+siginfo_cn <- cn_labels %>%
+  left_join(cn_detail, by = "Signature") %>%
+  rename(Etiology = Etiology_short) %>%
   mutate(Etiology = if_else(str_detect(Etiology, 'Chromothripsis'), 'Chromothripsis', Etiology)) %>%
   mutate(Etiology = if_else(Etiology %in% c('Unknown', 'Possible sequencing artefacts'), Etiology, paste0("CN:", Etiology)))
 
