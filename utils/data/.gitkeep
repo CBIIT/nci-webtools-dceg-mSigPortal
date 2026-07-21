@@ -1,0 +1,7 @@
+Place source data files here before running the R scripts in utils/.
+
+Required files:
+  - signature_refsets.RData   (COSMIC signature reference sets, all versions)
+
+These files are excluded from git (see .gitignore) due to their large size.
+Obtain them from the team SharePoint or from a colleague.

@@ -6,6 +6,9 @@ output: html_document
 
 ```{r}
 version <- "3.6"
+# Working directory should be the utils/ folder (RStudio sets this automatically when running an Rmd).
+# Source data files are expected under utils/data/ — see utils/data/.gitkeep for instructions.
+# setwd("/path/to/nci-webtools-dceg-mSigPortal/utils")
 library(tidyverse)
 library(rvest)
 library(dplyr)
