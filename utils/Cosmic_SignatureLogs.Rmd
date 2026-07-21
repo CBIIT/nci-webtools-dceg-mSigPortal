@@ -6,7 +6,6 @@ output: html_document
 
 ```{r}
 version <- "3.6"
-# setwd("path/to/your/working/directory")
 library(tidyverse)
 library(rvest)
 library(dplyr)
@@ -19,8 +18,8 @@ library(svglite)
 # Signature Log Plots ------------------------------------------------------------- 
 
 #source('Sigvisualfunc.R')
-load("signature_refsets.RData")
-#load('cn48_signature.RData')
+load("data/signature_refsets.RData")
+#load('data/cn48_signature.RData')
 
 tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
 

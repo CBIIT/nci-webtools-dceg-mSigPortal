@@ -20,4 +20,5 @@ mSigPortal-SigProfilerExtractor.py
 Sigvisualfunc.R
 config.json
 database/data
+utils/data/*.RData
 .Rproj.user
