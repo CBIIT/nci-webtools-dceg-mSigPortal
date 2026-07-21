@@ -5,10 +5,8 @@ output: html_document
 ---
 
 General Notes: 
-- Set `version` below to target a different COSMIC release (e.g. "3.6", "3.7").
-- v3.6+: COSMIC no longer lists all signature etiologies on the summary page.
-  Each signature now has its own page. This script scrapes individual pages.
-- Artefact signatures are no longer hardcoded; their etiology is scraped from COSMIC directly.
+1. Set `version` at the top of the first chunk to target a different COSMIC release (e.g. "3.5", "3.7").
+2. SBS95 "Proposed aetiology" and "Tissue Distribution" is formatted strangely in COSMIC with an extra space. Updated JSON file manually to keep consistent formatting.  
 
 
 
@@ -23,116 +21,228 @@ library(jsonlite)
 
 
 ```{r}
-### Helper function: scrape proposed aetiology from individual COSMIC signature pages ###
-# Returns the first non-empty paragraph under section#proposed-aetiology.
-scrape_etiology <- function(sig_names, url_prefix) {
-  base_url <- "https://cancer.sanger.ac.uk/signatures"
-  results <- lapply(sig_names, function(sig) {
-    url <- paste0(base_url, "/", url_prefix, "/", tolower(sig), "/")
-    page <- tryCatch(read_html(url), error = function(e) NULL)
-    etiology <- if (!is.null(page)) {
-      paras <- page %>%
-        html_elements("section#proposed-aetiology p") %>%
-        html_text(trim = TRUE)
-      # Skip empty paragraphs (some pages have an empty first <p>)
-      non_empty <- paras[nchar(paras) > 0]
-      if (length(non_empty) > 0) non_empty[1] else NA_character_
-    } else { NA_character_ }
-    tibble(Signature = sig, Etiology = ifelse(is.na(etiology), '', etiology))
-  })
-  bind_rows(results)
-}
 
-### Helper function: scrape CN short etiology labels from the COSMIC CN summary page ###
-# The summary page cards still carry the short group label (e.g. "Diploidy", "Chromothripsis").
-scrape_cn_etiology_labels <- function() {
-  url  <- "https://cancer.sanger.ac.uk/signatures/cn/"
-  page <- read_html(url)
-  names  <- page %>% html_elements(".signature-card-title") %>% html_text(trim = TRUE)
-  bodies <- page %>% html_elements(".signature-card-body")  %>% html_text(trim = TRUE)
-  # Strip leading "Proposed Aetiology" prefix that COSMIC injects into the card body
-  labels <- str_remove(bodies, "^Proposed Aetiology")
-  tibble(Signature = names, Etiology_short = str_trim(labels))
-}
-```
-
-
-```{r}
 ### SBS ###
-# Get v3.6 SBS signature names from refsets data
-load('signature_refsets.RData')
-sbs_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_SBS96')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC SBS page
+url <- paste0("https://cancer.sanger.ac.uk/signatures/sbs/")
 
-# Scrape proposed aetiology from individual COSMIC pages
-siginfo_sbs <- scrape_etiology(sbs_names, "sbs")
+# Read in the webpage
+webpage <- read_html(url)
+
+# Loop through all signature entries 
+for (i in 1:101) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
+
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
+
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_sbs <- siginfo %>% filter(str_detect(name,'^SBS')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# Combine the possible artefacts with the other signatures
+tmp <- 'Possible sequencing artefacts'
+tmp_sigs <- c("SBS27","SBS43","SBS45","SBS46","SBS47","SBS48","SBS49","SBS50","SBS51","SBS52","SBS53","SBS54","SBS55","SBS56","SBS57","SBS58","SBS59","SBS60", "SBS95")
+siginfo_sbs <- tibble(name = tmp_sigs,etiology = tmp ) %>% bind_rows(siginfo_sbs)
+
+# Change column names
 colnames(siginfo_sbs) <- c('Signature', 'Etiology')
 ```
 
 
 ```{r}
 ### DBS ###
-dbs_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_DBS78')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC DBS page
+url <- "https://cancer.sanger.ac.uk/signatures/dbs/"
 
-siginfo_dbs <- scrape_etiology(dbs_names, "dbs")
+# Read in the webpage
+webpage <- read_html(url)
+
+# Loop through all signature entries 
+for (i in 1:22) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
+
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
+
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_dbs <- siginfo %>% filter(str_detect(name,'^DBS')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# Combine the possible artefacts with the other signatures
+tmp <- 'Possible sequencing artefacts'
+tmp_sigs <- c("DBS14")
+siginfo_dbs <- tibble(name = tmp_sigs,etiology = tmp ) %>% bind_rows(siginfo_dbs)
+
+# Change column names
 colnames(siginfo_dbs) <- c('Signature', 'Etiology')
 ```
 
 
 ```{r}
 ### ID ###
-id_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_ID83')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC ID page
+url <- "https://cancer.sanger.ac.uk/signatures/id/"
 
-siginfo_id <- scrape_etiology(id_names, "id")
+# Read in the webpage
+webpage <- read_html(url)
+
+# Loop through all signature entries 
+for (i in 1:25) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
+
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
+
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_id <- siginfo %>% filter(str_detect(name,'^ID')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# no sequencing artefacts
+
+# Change column names
 colnames(siginfo_id) <- c('Signature', 'Etiology')
 ```
 
 
 ```{r}
 ### CN ###
-cn_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_CN48')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC CN page
+url <- "https://cancer.sanger.ac.uk/signatures/cn/"
 
-# Short group label from summary page (e.g. "Diploidy", "Chromothripsis")
-cn_labels <- scrape_cn_etiology_labels() %>% filter(Signature %in% cn_names)
+# Read in the webpage
+webpage <- read_html(url)
 
-# Long etiology detail from individual pages
-cn_detail <- scrape_etiology(cn_names, "cn") %>% rename(Etiology_detail = Etiology)
+# Loop through all signature entries 
+for (i in 1:26) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
 
-siginfo_cn <- cn_labels %>%
-  left_join(cn_detail, by = "Signature") %>%
-  rename(Etiology = Etiology_short) %>%
-  mutate(Etiology = if_else(str_detect(Etiology, 'Chromothripsis'), 'Chromothripsis', Etiology)) %>%
-  mutate(Etiology = if_else(Etiology %in% c('Unknown', 'Possible sequencing artefacts'), Etiology, paste0("CN:", Etiology)))
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
 
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_cn <- siginfo %>% filter(str_detect(name,'^CN')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# Combine the possible artefacts with the other signatures
+tmp <- 'Possible sequencing artefacts'
+tmp_sigs <- c("CN22", "CN23", "CN24")
+siginfo_cn <- tibble(name = tmp_sigs,etiology = tmp ) %>% bind_rows(siginfo_cn)
+
+# Clean up to match mSigPortal design
+siginfo_cn <- siginfo_cn %>% 
+  mutate(Etiology_detail=etiology) %>%
+  mutate(etiology = str_remove(etiology, " - .*")) %>% 
+  mutate(etiology = if_else(str_detect(etiology,'Chromothripsis'), 'Chromothripsis',etiology)) %>% 
+  mutate(etiology = if_else(etiology %in% c('Unknown', 'Possible sequencing artefacts'), etiology, paste0("CN:", etiology)))
+
+# Change column names
 colnames(siginfo_cn) <- c('Signature', 'Etiology', 'Etiology_detail')
 ```
 
 
 ```{r}
 ### SV ###
-sv_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh38_SV32')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC SV page
+url <- "https://cancer.sanger.ac.uk/signatures/sv/"
 
-siginfo_sv <- scrape_etiology(sv_names, "sv")
+# Read in the webpage
+webpage <- read_html(url)
+
+# Loop through all signature entries 
+for (i in 1:12) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
+
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
+
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_sv <- siginfo %>% filter(str_detect(name,'^SV')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# no sequencing artefacts
+
+# Change column names
 colnames(siginfo_sv) <- c('Signature', 'Etiology')
 ```
 
 
 ```{r}
 ### RNA-SBS ###
-rnasbs_names <- signature_refsets %>%
-  filter(str_detect(Signature_set_name, paste0('COSMIC_v', version, '_Signatures_GRCh37_RNA')), Strand_info == 'N') %>%
-  distinct(Signature_name) %>% pull(Signature_name)
+# URL of the COSMIC RNA-SBS page
+url <- "https://cancer.sanger.ac.uk/signatures/rna-sbs/"
 
-siginfo_rna_sbs <- scrape_etiology(rnasbs_names, "rna-sbs")
+# Read in the webpage
+webpage <- read_html(url)
+
+# Loop through all signature entries 
+for (i in 1:5) {
+  # Extract name for the current signature
+  name <- webpage %>%
+    html_nodes(paste0(".signature-card-title")) %>%
+    html_text(trim = TRUE)
+  
+  # Extract etiology for the current signature
+  etiology <- webpage %>%
+    html_nodes(paste0(".signature-card-body")) %>%
+    html_text(trim = TRUE)
+}
+
+# Combine names and etiologies into a data frame
+siginfo <- tibble(name, etiology)
+
+# delete 'Proposed Aetiology' from each cell under the Etiology column
+siginfo_rna_sbs <- siginfo %>% filter(str_detect(name,'^RNA-SBS')) %>%
+  mutate(etiology = str_remove(etiology, 'Proposed Aetiology'))
+
+# no sequencing artefacts
+
+# Change column names
 colnames(siginfo_rna_sbs) <- c('Signature', 'Etiology')
 ```
 
@@ -369,7 +479,6 @@ aetiology_ref %>%
 ```
 
 
-HERE!!!!
 ```{r}
 ### Signature Log Plots ###
 
