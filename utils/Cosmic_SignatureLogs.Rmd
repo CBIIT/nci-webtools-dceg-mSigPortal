@@ -1,12 +1,12 @@
 ---
-title: "Cosmic_v3.4_SignatureLogs"
-author: "Caleb Hartman"
-date: "2024-12-12"
+title: "Cosmic_SignatureLogs"
+date: "`r Sys.Date()`"
 output: html_document
 ---
 
 ```{r}
-setwd("C:/Users/hartmancas/Desktop/mSigPortal Catalog Update")
+version <- "3.6"
+# setwd("path/to/your/working/directory")
 library(tidyverse)
 library(rvest)
 library(dplyr)
@@ -22,12 +22,10 @@ library(svglite)
 load("signature_refsets.RData")
 #load('cn48_signature.RData')
 
-tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37|COSMIC_v3.4_Signatures_GRCh38_SV32'),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
-#tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37'),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
+tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
 
 for( i in tmpsigs){
-  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37|COSMIC_v3.4_Signatures_GRCh38_SV32'),Signature_name==i,Strand_info == 'N') %>%  select(MutationType,Value=Contribution)
-  #sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37'),Signature_name==i,Strand_info == 'N') %>% select(MutationType,Value=Contribution)
+  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Signature_name==i,Strand_info == 'N') %>%  select(MutationType,Value=Contribution)
   
   if(str_starts(i,'CN')){
     plot_profile_logo_cn48(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))}
