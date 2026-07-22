@@ -29,23 +29,19 @@ library(jsonlite)
 
 ### SBS ###
 # URL of the COSMIC SBS page
-url <- paste0("https://cancer.sanger.ac.uk/signatures/sbs/")
+url <- "https://cancer.sanger.ac.uk/signatures/sbs/"
 
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:101) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
@@ -61,6 +57,8 @@ siginfo_sbs <- tibble(name = tmp_sigs,etiology = tmp ) %>% bind_rows(siginfo_sbs
 
 # Change column names
 colnames(siginfo_sbs) <- c('Signature', 'Etiology')
+# Remove duplicates: artefact sigs now appear on the summary page in v3.6; keep the hardcoded standardized text (first row)
+siginfo_sbs <- siginfo_sbs %>% distinct(Signature, .keep_all = TRUE)
 ```
 
 
@@ -72,18 +70,14 @@ url <- "https://cancer.sanger.ac.uk/signatures/dbs/"
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:22) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
@@ -99,6 +93,8 @@ siginfo_dbs <- tibble(name = tmp_sigs,etiology = tmp ) %>% bind_rows(siginfo_dbs
 
 # Change column names
 colnames(siginfo_dbs) <- c('Signature', 'Etiology')
+# Remove duplicates: artefact sigs now appear on the summary page in v3.6; keep the hardcoded standardized text (first row)
+siginfo_dbs <- siginfo_dbs %>% distinct(Signature, .keep_all = TRUE)
 ```
 
 
@@ -110,18 +106,14 @@ url <- "https://cancer.sanger.ac.uk/signatures/id/"
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:25) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
@@ -145,18 +137,14 @@ url <- "https://cancer.sanger.ac.uk/signatures/cn/"
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:26) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
@@ -179,6 +167,8 @@ siginfo_cn <- siginfo_cn %>%
 
 # Change column names
 colnames(siginfo_cn) <- c('Signature', 'Etiology', 'Etiology_detail')
+# Remove duplicates: artefact sigs now appear on the summary page in v3.6; keep the hardcoded standardized text (first row)
+siginfo_cn <- siginfo_cn %>% distinct(Signature, .keep_all = TRUE)
 ```
 
 
@@ -190,18 +180,14 @@ url <- "https://cancer.sanger.ac.uk/signatures/sv/"
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:12) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
@@ -225,18 +211,14 @@ url <- "https://cancer.sanger.ac.uk/signatures/rna-sbs/"
 # Read in the webpage
 webpage <- read_html(url)
 
-# Loop through all signature entries 
-for (i in 1:5) {
-  # Extract name for the current signature
-  name <- webpage %>%
-    html_nodes(paste0(".signature-card-title")) %>%
-    html_text(trim = TRUE)
-  
-  # Extract etiology for the current signature
-  etiology <- webpage %>%
-    html_nodes(paste0(".signature-card-body")) %>%
-    html_text(trim = TRUE)
-}
+# Extract all signature names and etiologies from the summary page cards
+name <- webpage %>%
+  html_nodes(".signature-card-title") %>%
+  html_text(trim = TRUE)
+
+etiology <- webpage %>%
+  html_nodes(".signature-card-body") %>%
+  html_text(trim = TRUE)
 
 # Combine names and etiologies into a data frame
 siginfo <- tibble(name, etiology)
