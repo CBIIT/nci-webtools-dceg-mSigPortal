@@ -18,31 +18,8 @@ library(svglite)
 
 
 ```{r}
-# Signature Log Plots ------------------------------------------------------------- 
-
-#source('Sigvisualfunc.R')
+# Load signature reference data (The signature_refsets.RData was provided by Tongwu. We place it under utils/data/)
 load("data/signature_refsets.RData")
-#load('data/cn48_signature.RData')
-
-tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
-
-for( i in tmpsigs){
-  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Signature_name==i,Strand_info == 'N') %>%  select(MutationType,Value=Contribution)
-  
-  if(str_starts(i,'CN')){
-    plot_profile_logo_cn48(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
-    
-  else if(str_starts(i,'SV')){
-    plot_profile_logo_sv32(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
-  
-  else if(str_starts(i,'RNA')){
-    plot_profile_logo_rnasbs192(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
-    
-  else{
-    plot_profile_logo(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
-}
-
-
 ```
 
 
@@ -970,3 +947,24 @@ profile_format_df <- function(data,factortype=FALSE,indel_short=FALSE){
 }
 ```
 
+```{r}
+# Signature Log Plots ------------------------------------------------------------- 
+# Generate SVG plots for all signatures → saved to data/plots/
+tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
+
+for( i in tmpsigs){
+  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,paste0('COSMIC_v',version,'_Signatures_GRCh37|COSMIC_v',version,'_Signatures_GRCh38_SV32')),Signature_name==i,Strand_info == 'N') %>%  select(MutationType,Value=Contribution)
+  
+  if(str_starts(i,'CN')){
+    plot_profile_logo_cn48(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
+    
+  else if(str_starts(i,'SV')){
+    plot_profile_logo_sv32(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
+  
+  else if(str_starts(i,'RNA')){
+    plot_profile_logo_rnasbs192(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
+    
+  else{
+    plot_profile_logo(profile = sig_tmp,output_plot = paste0('data/plots/',i,'.svg'))}
+}
+```
