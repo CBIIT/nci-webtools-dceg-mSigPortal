@@ -452,7 +452,7 @@ for(i in 1:dim(tmp)[1]){
 aetiology_ref <- aetiology_ref %>%  left_join(tmp) %>% select(-Etiology_detail)
 
 # Save R object 
-saveRDS(aetiology_ref, file = paste0('cosmic_aetiology_ref_v', version, '.RDS'))
+saveRDS(aetiology_ref, file = paste0('data/cosmic_aetiology_ref_v', version, '.RDS'))
 ```
 
 ```{r}
@@ -461,7 +461,7 @@ saveRDS(aetiology_ref, file = paste0('cosmic_aetiology_ref_v', version, '.RDS'))
 aetiology_ref %>%
   select(Etiology,`Signature Name`=Signature,Study,Study_URL,`Genome Build`,`Signature Source`=Source,Source_URL=URL,Description,Tissue_Distribution) %>% 
   toJSON(pretty = TRUE, auto_unbox = TRUE) %>% 
-  write(paste0('Etiology_cosmic_v', version, '.json'))
+  write(paste0('data/Etiology_cosmic_v', version, '.json'))
   
 ```
 

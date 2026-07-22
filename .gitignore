@@ -21,4 +21,7 @@ Sigvisualfunc.R
 config.json
 database/data
 utils/data/*.RData
+utils/data/*.RDS
+utils/data/*.json
+utils/data/plots/*.svg
 .Rproj.user
