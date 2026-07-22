@@ -36,7 +36,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -72,7 +72,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -108,7 +108,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -139,7 +139,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -182,7 +182,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -213,7 +213,7 @@ webpage <- read_html(url)
 
 # Extract all signature names and etiologies from the summary page cards
 name <- webpage %>%
-  html_nodes(".signature-card-title") %>%
+  html_nodes(".signature-card-title h4") %>%
   html_text(trim = TRUE)
 
 etiology <- webpage %>%
@@ -463,30 +463,6 @@ aetiology_ref %>%
   toJSON(pretty = TRUE, auto_unbox = TRUE) %>% 
   write(paste0('Etiology_cosmic_v', version, '.json'))
   
-```
-
-
-```{r}
-### Signature Log Plots ###
-
-source('../../Codes/Sigvisualfunc.R')
-load("data/signature_refsets.RData")
-#load('data/cn48_signature.RData')
-
-
-tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.3_Signatures_GRCh37'),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
-for( i in tmpsigs){
-  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.3_Signatures_GRCh37'),Signature_name==i,Strand_info == 'N') %>% select(MutationType,Value=Contribution)
-  if(str_starts(i,'CN')){
-    plot_profile_logo_cn48(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))
-    
-  }else{
-    plot_profile_logo(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))
-  }
-}
-
-
-
 ```
 
 
