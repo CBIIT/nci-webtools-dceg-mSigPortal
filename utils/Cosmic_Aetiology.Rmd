@@ -247,7 +247,7 @@ aetiology_ref <-
   mutate(Group = factor(Group, levels = c('Mutation','CNV','SV','RNA-SBS'))) %>%           # Are these group levels ordered correctly? 
   mutate(Source = paste0('Cosmic Mutational Signatures (v', version, ')')) %>% 
   select(Group, Source, Etiology, Signature, Etiology_detail) %>% 
-  mutate(TMP=extract_numeric(Signature)) %>% 
+  mutate(TMP=readr::parse_number(Signature)) %>% 
   arrange(Group,Etiology,TMP) %>% 
   select(-Group,-TMP)
 
