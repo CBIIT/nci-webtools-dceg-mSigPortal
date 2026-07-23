@@ -1,0 +1,48 @@
+family: "${SYNC_TASK}"
+networkMode: awsvpc
+cpu: "512"
+memory: "1024"
+executionRoleArn: "${ROLE_ARN}"
+taskRoleArn: "${ROLE_ARN}"
+requiresCompatibilities:
+  - FARGATE
+volumes:
+  - name: data
+    efsVolumeConfiguration:
+      fileSystemId: "${EFS_FILESYSTEM_ID}"
+      authorizationConfig:
+        accessPointId: "${EFS_ACCESS_POINT_ID}"
+        iam: ENABLED
+      transitEncryption: ENABLED
+containerDefinitions:
+  - name: sync
+    image: public.ecr.aws/aws-cli/aws-cli:latest
+    essential: true
+    entryPoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        aws s3 sync "${DATA_S3_URI}" /data/Database/
+    mountPoints:
+      - sourceVolume: data
+        containerPath: "/data"
+        readOnly: false
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/${TIER}/${APP}/sync"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream-prefix: sync
+        awslogs-create-group: "true"
+tags:
+  - key: Project
+    value: "${APP}"
+  - key: ApplicationName
+    value: "${APP}"
+  - key: ResourceName
+    value: "${TIER}-${APP}-sync-ecs-task"
+  - key: EnvironmentTier
+    value: "${ENVIRONMENT_TIER}"
+  - key: ResourceFunction
+    value: compute
+  - key: Creator
+    value: TF
