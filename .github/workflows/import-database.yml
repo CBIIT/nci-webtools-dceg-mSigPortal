@@ -21,6 +21,7 @@ on:
         options:
           - sources.js
           - sources.publications.js
+          - sources.signatures.js
 
 permissions:
   id-token: write
