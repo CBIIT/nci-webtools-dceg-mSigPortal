@@ -1,4 +1,7 @@
 name: Deploy Web Service and Workers
+permissions:
+  id-token: write
+  contents: read
 
 on:
   workflow_dispatch:
@@ -13,10 +16,6 @@ on:
           - qa
           - stage
           - prod
-
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   deploy:
@@ -41,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout main repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout external scripts repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: xtmgah/mSigPortal
           path: python_r_script_repo
@@ -86,7 +85,7 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.CICD_ROLE_ARN }}
           role-session-name: ${{ env.TIER }}-msigportal-deploy-${{ github.run_id }}
@@ -152,7 +151,7 @@ jobs:
           mask-password: true
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Create and use a new builder instance
         run: docker buildx create --name msigportal-builder --use
@@ -166,7 +165,7 @@ jobs:
 
       # Build Backend Image
       - name: Build and push backend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/backend.dockerfile
@@ -180,7 +179,7 @@ jobs:
 
       # Build Frontend Image
       - name: Build and push frontend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/frontend.dockerfile
@@ -196,7 +195,7 @@ jobs:
 
       # Build Refitting Image
       - name: Build and push refitting image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/refitting.dockerfile
