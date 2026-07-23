@@ -251,34 +251,34 @@ export default function SignatureInfo({ data }) {
         if (category == 'Cosmic') {
       return signature.includes('RNA')
         ? {
-          signatureSetName: 'COSMIC_v3.4_Signatures_GRCh37_RNA-SBS192',
+          signatureSetName: 'COSMIC_v3.6_Signatures_GRCh37_RNA-SBS192',
           profile: 'RNA',
           matrix: '192',
         } 
         : signature.includes('SBS')
         ? {
-            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
+            signatureSetName: 'COSMIC_v3.6_Signatures_GRCh37_SBS96',
             profile: 'SBS',
             matrix: '96',
           }
         : signature.includes('DBS')
         ? {
-            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_DBS78',
+            signatureSetName: 'COSMIC_v3.6_Signatures_GRCh37_DBS78',
             profile: 'DBS',
             matrix: '78',
           }
         : signature.includes('ID')
         ? {
-            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_ID83',
+            signatureSetName: 'COSMIC_v3.6_Signatures_GRCh37_ID83',
             profile: 'ID',
             matrix: '83',
           }
         : signature.includes('CN')
         ? {
-            signatureSetName: 'COSMIC_v3.3_Signatures_GRCh37_CN48',
+            signatureSetName: 'COSMIC_v3.6_Signatures_GRCh37_CN48',
             profile: 'CN',
             matrix: '48',
-          }        
+          }
         : false;
     }
      else if (category == 'CancerSpecificSignatures_2022') {
