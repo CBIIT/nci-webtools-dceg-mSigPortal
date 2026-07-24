@@ -53,21 +53,23 @@ export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({
         params: { ...params },
       }),
       transformResponse: (data) => {
-        // console.log('ms burden');
-        // console.log(data);
-        return data
-          ? [...new Set(data.map((e) => e.signatureName))]
-              .sort((a, b) =>
-                a.localeCompare(b, undefined, {
-                  numeric: true,
-                  sensitivity: 'base',
-                })
-              )
-              .map((e) => ({
-                label: e,
-                value: e,
-              }))
-          : [];
+        if (!data) return [];
+        // keep only signatures with at least one row that has a burden value,
+        // otherwise the resulting plot renders no nodes
+        const signaturesWithBurden = new Set(
+          data.filter((e) => e.burden).map((e) => e.signatureName)
+        );
+        return [...signaturesWithBurden]
+          .sort((a, b) =>
+            a.localeCompare(b, undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            })
+          )
+          .map((e) => ({
+            label: e,
+            value: e,
+          }));
       },
     }),
   }),
