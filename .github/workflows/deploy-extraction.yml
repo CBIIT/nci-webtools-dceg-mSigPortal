@@ -182,3 +182,9 @@ jobs:
             --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
           echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
 
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tier:** ${{ env.TIER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

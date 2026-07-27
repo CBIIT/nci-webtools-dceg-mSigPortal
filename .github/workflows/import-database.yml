@@ -181,3 +181,11 @@ jobs:
           echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
           echo "TASK_ARN=$TASK_ARN" >> $GITHUB_ENV
           echo "ECS import task continues in the background. Completion is emailed to the webadmin (EMAIL_ADMIN)."
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tier:** ${{ env.TIER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source:** ${{ inputs.source }}" >> $GITHUB_STEP_SUMMARY
