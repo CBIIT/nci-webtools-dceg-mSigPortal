@@ -111,6 +111,16 @@ async function msLandscape(req, res, next) {
       columns,
       limit
     );
+    if (exposureData.length === 0) {
+      return next(
+        new Error('No exposure data available for the selected signature set.')
+      );
+    }
+    if (signatureData.length === 0) {
+      return next(
+        new Error('No signature data available for the selected signature set.')
+      );
+    }
     const seqmatrixData = await getSeqmatrixData(
       connection,
       {
@@ -125,16 +135,6 @@ async function msLandscape(req, res, next) {
       columns,
       limit
     );
-    if (exposureData.length === 0) {
-      return next(
-        new Error('No exposure data available for the selected signature set.')
-      );
-    }
-    if (signatureData.length === 0) {
-      return next(
-        new Error('No signature data available for the selected signature set.')
-      );
-    }
     if (seqmatrixData.length === 0) {
       return next(
         new Error('No seqmatrix data available for the selected study.')
@@ -181,12 +181,6 @@ async function msDecomposition(req, res, next) {
       columns,
       limit
     );
-    const seqmatrixData = await getSeqmatrixData(
-      connection,
-      { study, strategy, cancer, profile: signatureData[0].profile },
-      columns,
-      limit
-    );
     if (exposureData.length === 0) {
       return next(
         new Error('No exposure data available for the selected signature set.')
@@ -197,6 +191,12 @@ async function msDecomposition(req, res, next) {
         new Error('No signature data available for the selected signature set.')
       );
     }
+    const seqmatrixData = await getSeqmatrixData(
+      connection,
+      { study, strategy, cancer, profile: signatureData[0].profile },
+      columns,
+      limit
+    );
     if (seqmatrixData.length === 0) {
       return next(
         new Error('No seqmatrix data available for the selected parameters.')
@@ -252,7 +252,7 @@ async function cosineSimilarity(req, res, next) {
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({ stdout, ...rest });
   } catch (err) {
-    logger.error(`/msLandscape: An error occurred `);
+    logger.error(`/cosineSimilarity: An error occurred `);
     next(err);
   }
 }
