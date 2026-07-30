@@ -1,4 +1,7 @@
 name: Deploy Batch Extraction Worker
+permissions:
+  id-token: write
+  contents: read
 
 on:
   workflow_dispatch:
@@ -13,10 +16,6 @@ on:
           - qa
           - stage
           - prod
-
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   deploy-extraction:
@@ -41,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout main repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout external scripts repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: xtmgah/mSigPortal
           path: python_r_script_repo
@@ -86,7 +85,7 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.CICD_ROLE_ARN }}
           role-session-name: ${{ env.TIER }}-msigportal-extraction-deploy-${{ github.run_id }}
@@ -140,7 +139,7 @@ jobs:
           mask-password: true
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Create and use a new builder instance
         run: docker buildx create --name extraction-builder --use
@@ -151,7 +150,7 @@ jobs:
           cp python_r_script_repo/${{ env.PYTHON_EXTRACTION_SCRIPT_PATH }} extraction-service/services/python/
 
       - name: Build and push extraction image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/extraction-batch.dockerfile
@@ -181,4 +180,3 @@ jobs:
             --compute-environment ${{ env.BATCH_COMPUTE_ENVIRONMENT }} \
             --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
           echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
-
