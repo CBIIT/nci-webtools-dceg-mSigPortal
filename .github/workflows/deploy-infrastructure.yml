@@ -1,0 +1,121 @@
+name: Terraform Deploy msigportal
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Deployment tier"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+      apply:
+        description: "Apply changes (false = plan only)"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: ${{ inputs.tier }}
+    env:
+      AWS_REGION: us-east-1
+      APP: msigportal
+      TIER: ${{ inputs.tier }}
+      CICD_REPO: CBIIT/nci-softwaresolutions-CICD
+      CICD_REF: master
+      TF_PROJECT_DIR: nci-softwaresolutions-CICD/infrastructure/terraform/msigportal
+      CICD_ROLE_ARN: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
+      TF_VARS_FILE: msigportal-${{ inputs.tier }}.tfvars
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-${{ env.APP }}-terraform-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: CBIIT
+
+      - name: Checkout CICD Terraform repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.CICD_REPO }}
+          ref: ${{ env.CICD_REF }}
+          path: nci-softwaresolutions-CICD
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Validate Terraform app directory
+        run: |
+          set -euo pipefail
+          test -d "nci-softwaresolutions-CICD/infrastructure/terraform/${APP}"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4.0.1
+
+      - name: Place tier tfvars and backend config
+        run: |
+          set -euo pipefail
+          S3_PREFIX="s3://${{ vars.CICD_BUCKET }}/env/${TIER}/${APP}"
+          aws s3 cp "${S3_PREFIX}/${TF_VARS_FILE}" "${TF_PROJECT_DIR}/${TF_VARS_FILE}"
+
+      - name: Terraform init
+        run: |
+          set -euo pipefail
+          if [[ "${TIER}" == "dev" || "${TIER}" == "qa" ]]; then
+            TIER_GROUP="nonprod"
+          else
+            TIER_GROUP="prod"
+          fi
+          cd "${TF_PROJECT_DIR}"
+          terraform init --reconfigure -backend-config="msigportal-${TIER_GROUP}.tfbackend"
+
+      - name: Terraform workspace
+        run: |
+          set -euo pipefail
+          cd "${TF_PROJECT_DIR}"
+          terraform workspace select "${TIER}" || terraform workspace new "${TIER}"
+          terraform workspace list
+
+      - name: Terraform plan
+        run: |
+          set -euo pipefail
+          cd "${TF_PROJECT_DIR}"
+          terraform plan -var-file="${TF_VARS_FILE}"
+
+      - name: Terraform apply
+        if: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          cd "${TF_PROJECT_DIR}"
+          terraform apply -auto-approve -var-file="${TF_VARS_FILE}"
+
+      - name: Deployment summary
+        if: ${{ inputs.apply }}
+        run: |
+          echo "## Terraform Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tier:** ${{ env.TIER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **App:** ${{ env.APP }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **CICD Ref:** ${{ env.CICD_REF }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
