@@ -19,7 +19,7 @@ on:
 
 jobs:
   sync-s3-efs:
-    timeout-minutes: 30
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -128,7 +128,20 @@ jobs:
       - name: Wait for sync task to complete
         run: |
           echo "Waiting for task to stop: $TASK_ARN"
-          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN"
+          # `aws ecs wait tasks-stopped` is hard-capped at 100 polls x 6s = 10 min and
+          # cannot be extended via the CLI, so large syncs (qa/prod) falsely report a
+          # failed job when the task legitimately runs longer. Poll instead, bounded by
+          # this job's timeout-minutes, and judge success only by the container exit code.
+          while true; do
+            STATUS=$(aws ecs describe-tasks \
+              --cluster "$ECS_CLUSTER" \
+              --tasks "$TASK_ARN" \
+              --query 'tasks[0].lastStatus' \
+              --output text)
+            echo "$(date -u +%H:%M:%S) task status: $STATUS"
+            [[ "$STATUS" == "STOPPED" ]] && break
+            sleep 15
+          done
 
           EXIT_CODE=$(aws ecs describe-tasks \
             --cluster "$ECS_CLUSTER" \
