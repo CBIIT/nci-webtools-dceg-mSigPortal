@@ -132,6 +132,7 @@ jobs:
           # cannot be extended via the CLI, so large syncs (qa/prod) falsely report a
           # failed job when the task legitimately runs longer. Poll instead, bounded by
           # this job's timeout-minutes, and judge success only by the container exit code.
+          MISSING=0
           while true; do
             STATUS=$(aws ecs describe-tasks \
               --cluster "$ECS_CLUSTER" \
@@ -139,6 +140,19 @@ jobs:
               --query 'tasks[0].lastStatus' \
               --output text)
             echo "$(date -u +%H:%M:%S) task status: $STATUS"
+            # A missing task yields empty/None; tolerate a brief eventual-consistency
+            # window, then fail fast (with diagnostics) rather than spinning to timeout.
+            if [[ -z "$STATUS" || "$STATUS" == "None" ]]; then
+              MISSING=$((MISSING + 1))
+              if (( MISSING >= 3 )); then
+                echo "::error::describe-tasks returned no task for $TASK_ARN after $MISSING attempts — cannot determine sync status"
+                aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN" --output json || true
+                exit 1
+              fi
+              sleep 15
+              continue
+            fi
+            MISSING=0
             [[ "$STATUS" == "STOPPED" ]] && break
             sleep 15
           done
