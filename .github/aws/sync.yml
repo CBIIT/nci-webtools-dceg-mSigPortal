@@ -16,18 +16,26 @@ volumes:
       # different owner. rootDirectory keeps the mount scoped to /msigportal, so the
       # task cannot see or touch other applications' data on this shared filesystem.
       rootDirectory: "/msigportal"
+      # Keep EFS IAM authorization enabled (defense-in-depth, consistent with the
+      # other task definitions in this repo). We drop only the accessPointId so the
+      # task mounts as root; iam stays ENABLED so the mount still presents the task
+      # role's credentials on any tier whose filesystem policy enforces IAM.
+      authorizationConfig:
+        iam: ENABLED
       transitEncryption: ENABLED
 containerDefinitions:
   - name: sync
-    image: public.ecr.aws/aws-cli/aws-cli:2.36.13
+    image: public.ecr.aws/aws-cli/aws-cli:latest
     essential: true
     entryPoint: ["/bin/sh", "-c"]
     command:
-      # Sync as root, then hand ownership of the whole mSigPortal tree back to the
-      # application's POSIX identity (uid/gid 1000) so the app can read/write it.
+      # Sync as root, then hand ownership of only the synced path (Database) back to
+      # the application's POSIX identity (uid/gid 1000) so the app can read/write it.
+      # Scoped to /data/Database — the only path this task writes — to avoid
+      # traversing unrelated (and potentially large) subtrees like genomes/ on every run.
       - >-
         aws s3 sync "${DATA_S3_URI}" /data/Database/
-        && chown -R 1000:1000 /data
+        && chown -R 1000:1000 /data/Database
     mountPoints:
       - sourceVolume: data
         containerPath: "/data"
