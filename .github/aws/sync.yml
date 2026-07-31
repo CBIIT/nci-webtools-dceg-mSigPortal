@@ -33,8 +33,11 @@ containerDefinitions:
       # the application's POSIX identity (uid/gid 1000) so the app can read/write it.
       # Scoped to /data/Database — the only path this task writes — to avoid
       # traversing unrelated (and potentially large) subtrees like genomes/ on every run.
+      # --exact-timestamps forces re-download when an object's timestamp differs even
+      # if its size is unchanged; regenerated plots can keep the same byte size, and
+      # without this flag `aws s3 sync` would silently leave the stale copy on EFS.
       - >-
-        aws s3 sync "${DATA_S3_URI}" /data/Database/
+        aws s3 sync "${DATA_S3_URI}" /data/Database/ --exact-timestamps
         && chown -R 1000:1000 /data/Database
     mountPoints:
       - sourceVolume: data
