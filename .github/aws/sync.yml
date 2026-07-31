@@ -10,18 +10,24 @@ volumes:
   - name: data
     efsVolumeConfiguration:
       fileSystemId: "${EFS_FILESYSTEM_ID}"
-      authorizationConfig:
-        accessPointId: "${EFS_ACCESS_POINT_ID}"
-        iam: ENABLED
+      # Mount the mSigPortal subtree directly (confined to /msigportal) instead of
+      # through the uid-1000 access point. This lets the sync run as root so it can
+      # write into directories that were previously seeded (e.g. by DataSync) with a
+      # different owner. rootDirectory keeps the mount scoped to /msigportal, so the
+      # task cannot see or touch other applications' data on this shared filesystem.
+      rootDirectory: "/msigportal"
       transitEncryption: ENABLED
 containerDefinitions:
   - name: sync
-    image: public.ecr.aws/aws-cli/aws-cli:latest
+    image: public.ecr.aws/aws-cli/aws-cli:2.36.13
     essential: true
     entryPoint: ["/bin/sh", "-c"]
     command:
+      # Sync as root, then hand ownership of the whole mSigPortal tree back to the
+      # application's POSIX identity (uid/gid 1000) so the app can read/write it.
       - >-
         aws s3 sync "${DATA_S3_URI}" /data/Database/
+        && chown -R 1000:1000 /data
     mountPoints:
       - sourceVolume: data
         containerPath: "/data"
