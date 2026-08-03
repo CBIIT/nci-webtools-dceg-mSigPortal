@@ -35,7 +35,6 @@ jobs:
       R_SCRIPT_PATH: Rscript/Sigvisualfunc.R
       EXTRACTION_WORKER_TYPE: "batch"
       TIER: ${{ inputs.tier }}
-      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
@@ -98,13 +97,13 @@ jobs:
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
 
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "REFITTING_IMAGE=$REPO:$IMAGE_TIER-refitting-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REPO:frontend-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE=$REPO:backend-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "REFITTING_IMAGE=$REPO:refitting-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
 
-          echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ inputs.tier }}-latest" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ inputs.tier }}-latest" >> $GITHUB_ENV
-          echo "REFITTING_IMAGE_LATEST=$REPO:$IMAGE_TIER-refitting-${{ inputs.tier }}-latest" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE_LATEST=$REPO:frontend-${{ inputs.tier }}-latest" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE_LATEST=$REPO:backend-${{ inputs.tier }}-latest" >> $GITHUB_ENV
+          echo "REFITTING_IMAGE_LATEST=$REPO:refitting-${{ inputs.tier }}-latest" >> $GITHUB_ENV
 
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 

@@ -97,8 +97,8 @@ jobs:
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
 
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
-          echo "BATCH_EXTRACTION_IMAGE=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
-          echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:$IMAGE_TIER-batch-extraction-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE=$REPO:batch-extraction-${{ inputs.tier }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BATCH_EXTRACTION_IMAGE_LATEST=$REPO:batch-extraction-${{ inputs.tier }}-latest" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
