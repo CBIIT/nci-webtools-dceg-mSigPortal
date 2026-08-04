@@ -836,7 +836,9 @@ msigportal.msLandscape <- function(args, ...) {
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
   signatureData <- args$signatureData %>%
+    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
+    distinct() %>%
     pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
     arrange(MutationType) # have to sort the mutationtype
 
@@ -915,7 +917,9 @@ msigportal.msDecomposition <- function(args, ...) {
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
   signatureData <- args$signatureData %>%
+    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
+    distinct() %>%
     pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
     arrange(MutationType) # have to sort the mutationtype
 
@@ -969,11 +973,15 @@ msigportal.cosineSimilarity <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 
   signatureData1 <- args$signatureData1 %>%
+    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
+    distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   signatureData2 <- args$signatureData2 %>%
+    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
+    distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   cosSim <- cos_sim_df(signatureData1, signatureData2)

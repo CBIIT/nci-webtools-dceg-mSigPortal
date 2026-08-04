@@ -192,6 +192,7 @@ export const schema = [
     name: 'signature',
     schema: (table) => {
       table.increments('id');
+      table.string('study');
       table.string('source');
       table.string('strategy');
       table.string('profile');
@@ -205,6 +206,7 @@ export const schema = [
     },
     index: (table) => {
       table.index([
+        'study',
         'source',
         'strategy',
         'profile',

@@ -103,6 +103,31 @@ combineSignatureFiles <- function(x) {
         )
 }
 
+combineStudySignatureFiles <- function(x) {
+    x %>%
+        mutate(
+            study = sub("_.*", "", basename(filepath)),
+            profile = regex_extract(Profile, "^[A-Z]+"),
+            matrix = regex_extract(Profile, "[0-9]+$"),
+            Contribution = as.numeric(Contribution),
+            .before = Profile
+        ) %>%
+        rename(
+            source = Source,
+            signatureSetName = Signature_set_name,
+            strategy = Dataset,
+            strandInfo = Strand_info,
+            strand = Strand,
+            signatureName = Signature_name,
+            mutationType = MutationType,
+            contribution = Contribution
+        ) %>%
+        select(
+            source, profile, matrix, signatureSetName, strategy,
+            strandInfo, strand, signatureName, mutationType, contribution, study
+        )
+}
+
 signatureSummary <- function(x) {
     x %>%
         mutate(
