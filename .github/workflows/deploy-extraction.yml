@@ -28,14 +28,12 @@ jobs:
       AWS_REGION: us-east-1
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
       BACKEND_CONTAINER_PORT: 9000
-      BATCH_INSTANCE_TYPE: "g5.12xlarge"
       BATCH_CPU_UNITS: 48
       BATCH_GPU_UNITS: 4
       BATCH_MEMORY_UNITS: 190000
       EXTRACTION_WORKER_TYPE: "batch"
       PYTHON_EXTRACTION_SCRIPT_PATH: mSigPortal-SigProfilerExtractor.py
       TIER: ${{ inputs.tier }}
-      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
@@ -173,13 +171,6 @@ jobs:
 
       - name: Register batch extraction job definition
         run: aws batch register-job-definition --cli-input-yaml file://rendered/batch-extraction-worker.yml
-
-      - name: Update batch compute environment instance type
-        run: |
-          aws batch update-compute-environment \
-            --compute-environment ${{ env.BATCH_COMPUTE_ENVIRONMENT }} \
-            --compute-resources "instanceTypes=${{ env.BATCH_INSTANCE_TYPE }}"
-          echo "Updated batch compute environment instance type to: ${{ env.BATCH_INSTANCE_TYPE }}"
 
       - name: Deployment summary
         run: |
