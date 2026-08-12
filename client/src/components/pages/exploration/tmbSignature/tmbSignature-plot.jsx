@@ -5,7 +5,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 export default function TmbSignaturePlot({ state }) {
   const [params, setParams] = useState('');
-  const { data, error, isFetching } = useTmbSignaturesPlotQuery(params, {
+  const { currentData, error, isFetching } = useTmbSignaturesPlotQuery(params, {
     skip: !params,
   });
   const { study, strategy, signatureSetName, cancer, id } = state;
@@ -21,7 +21,7 @@ export default function TmbSignaturePlot({ state }) {
       });
     }
   }, [study]);
-  // query after project id is recieved from user form
+  // query after project id is received from user form
   useEffect(() => {
     if (id) setParams({ userId: id });
   }, [id]);
@@ -33,12 +33,12 @@ export default function TmbSignaturePlot({ state }) {
       <h5 className="d-flex justify-content-center">
         Tumor Mutational Burden Separated by Signatures
       </h5>
-      {data && !error ? (
+      {currentData && !error ? (
         <Plotly
           className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
+          data={currentData.traces}
+          layout={currentData.layout}
+          config={currentData.config}
         />
       ) : (
         <div className="text-center my-4">No data available</div>

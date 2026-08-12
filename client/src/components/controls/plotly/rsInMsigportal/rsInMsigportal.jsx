@@ -1,512 +1,181 @@
 import { groupBy } from 'lodash';
+
 export default function RsInMsigportal(rawData) {
-  const profile_order_0 = [
-    'SBS96',
-    'SBS192',
-    'SBS288',
-    'SBS1536',
-    'DBS78',
-    'ID29',
-    'ID83',
-    'CN48',
-    'RS32',
-    'RNA192',
+  const COL_START = 0.02; // left edge of the first column
+  const COL_PITCH = 0.138; // horizontal distance between adjacent column left edges
+  const PIE_W = 0.096; // width of each pie's x-domain
+  const ROW_H = 0.25; // vertical distance between rows
+  const PIE_PAD = 0.02; // vertical padding inside each row
+  const TITLE_PAD = 0.015; // gap between a pie's top and its profile title
+  const ROWS_PER_COL = 4; // rows before wrapping into the next column
+
+  const colX = (g) => [
+    COL_START + g * COL_PITCH,
+    COL_START + g * COL_PITCH + PIE_W,
   ];
-  const profile_order_1 = ['SBS96', 'DBS78', 'ID83'];
-  const groupBySpecies = groupBy(rawData, (item) => `${item.species}`);
-  console.log("groupBySpecies ", groupBySpecies)
-  console.log("rawData in RsInMsigportal: ", rawData);
-  const groupByignatureSetName = groupBy(
-    rawData,
-    (item) => `${item.signatureSetName}`
-  );
+  const colCenter = (g) => COL_START + g * COL_PITCH + PIE_W / 2;
+  const rowY = (r) => [1 - (r + 1) * ROW_H + PIE_PAD, 1 - r * ROW_H - PIE_PAD];
+  const titleY = (r) => 1 - r * ROW_H - TITLE_PAD;
 
-  console.log("groupByignatureSetName ", groupByignatureSetName);
+  // ---- species layout config (display order, left -> right) ----
+  // `match` is the binomial name so it is robust to genome-assembly suffix
+  const SPECIES = [
+    {
+      match: 'Homo sapiens',
+      profileOrder: [
+        'SBS96',
+        'SBS192',
+        'SBS288',
+        'SBS1536',
+        'DBS78',
+        'ID29',
+        'ID83',
+        'CN48',
+        'RS32',
+        'RNA192',
+      ],
+      startCol: 0,
+      cols: 3,
+      titlePad: 8,
+    },
+    {
+      match: 'Mus musculus',
+      profileOrder: ['SBS96', 'DBS78', 'ID83'],
+      startCol: 3,
+      cols: 1,
+      titlePad: 7,
+    },
+    {
+      match: 'Rattus',
+      profileOrder: ['SBS96', 'DBS78'],
+      startCol: 4,
+      cols: 1,
+      titlePad: 7,
+    },
+    {
+      match: 'Gallus',
+      profileOrder: ['SBS96'],
+      startCol: 5,
+      cols: 1,
+      titlePad: 7,
+    },
+    {
+      match: 'Caenorhabditis',
+      profileOrder: ['SBS96'],
+      startCol: 6,
+      cols: 1,
+      titlePad: 7,
+    },
+  ];
 
-  const signatureSetName = Object.keys(groupByignatureSetName).map((e) => e);
-  console.log("signatureSetName ", signatureSetName);
+  const HOVER =
+    '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>';
 
-  var randomColors = [];
-  while (randomColors.length < signatureSetName.length) {
+  const bySpecies = groupBy(rawData, (d) => `${d.species}`);
+  const setNames = [...new Set(rawData.map((d) => d.signatureSetName))];
+  const colors = {};
+  const usedColors = new Set();
+  setNames.forEach((name) => {
+    let hex;
     do {
-      var color = Math.floor(Math.random() * 10000000000 + 1);
-    } while (randomColors.indexOf(color) >= 0);
-    randomColors.push('#' + ('000000' + color.toString(16)).slice(-6));
-  }
-  let colors = {};
-  Object.keys(groupByignatureSetName).map((e, i) => {
-    colors[e] = randomColors[i];
-  });
-  let dataHuman = [];
-  let dataMm9 = [];
-  let dataRn6 = [];
-  let dataGallus = [];
-  let dataCaenorhabditis = [];
-  Object.entries(groupBySpecies).map(([key, val], index) => {
-    if (key.includes('(GRCh37/38)')) {
-      dataHuman.push(val);
-    } else if (key.includes('(mm9/10)')) {
-      dataMm9.push(val);
-    } else if (key.includes('(rn6)')) {
-      dataRn6.push(val);
-    } else if (key.includes('GRCg7b')){  
-       dataGallus.push(val);
-    } else {
-      dataCaenorhabditis.push(val);
-    }
+      hex =
+        '#' +
+        ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(
+          -6
+        );
+    } while (usedColors.has(hex));
+    usedColors.add(hex);
+    colors[name] = hex;
   });
 
-  console.log("groupBySpecies ", groupBySpecies);
-  console.log("dataHuman ", dataHuman);
-  console.log("dataMm9 ", dataMm9);
-  console.log("dataRn6 ", dataRn6);
-  console.log("dataGallus ", dataGallus);
+  const traces = [];
+  const annotations = [];
+  const shapes = [];
 
-  dataHuman = dataHuman.flat();
-  dataMm9 = dataMm9.flat();
-  dataRn6 = dataRn6.flat();
-  dataGallus = dataGallus.flat();
-  dataCaenorhabditis = dataCaenorhabditis.flat();
+  SPECIES.forEach((cfg, si) => {
+    // the actual species key may carry an assembly suffix; match on the binomial
+    const speciesKey = Object.keys(bySpecies).find((k) =>
+      k.includes(cfg.match)
+    );
+    const endCol = cfg.startCol + cfg.cols - 1;
 
-  const groupedHuman = groupBy(
-    dataHuman,
-    (item) => `${item.profile}${item.matrix}`
-  );
-  const groupedMm9 = groupBy(
-    dataMm9,
-    (item) => `${item.profile}${item.matrix}`
-  );
-  const groupedRn6 = groupBy(
-    dataRn6,
-    (item) => `${item.profile}${item.matrix}`
-  );
-  const groupedGallus = groupBy(
-    dataGallus,
-    (item) => `${item.profile}${item.matrix}`
-  );
-  const groupCaenorhabditis = groupBy(
-    dataCaenorhabditis,
-    (item) => `${item.profile}${item.matrix}`
-  );
+    if (speciesKey) {
+      const byProfile = groupBy(
+        bySpecies[speciesKey],
+        (d) => `${d.profile}${d.matrix}`
+      );
+      const order =
+        cfg.profileOrder && cfg.profileOrder.length
+          ? cfg.profileOrder
+          : Object.keys(byProfile);
 
-  const groupedHuman_sorted = profile_order_0.map((key) => groupedHuman[key]);
-  console.log("groupedHuman_sorted ", groupedHuman_sorted);
-  const groupedMm9_sorted = profile_order_1.map((key) => groupedMm9[key]);
-  const tracePies0 = Object.entries(groupedHuman_sorted).map(
-    ([key, element], index, array) => ({
-      type: 'pie',
-      marker: {
-        color: element.map((e) => colors[e.signatureSetName]),
-        line: {
-          color: 'black',
-          width: 1,
-        },
-      },
-      textposition: 'inside',
-      labels: element.map((e) => e.signatureSetName),
-      values: element.map((e) => parseInt(e.count)),
-      texttemplate: '%{value}',
-      direction: 'clockwise',
-      index: index,
-      name: array[index][1][0].profile + array[index][1][0].matrix,
-      domain: {
-        x: [
-          index < 4 ? 0.02 : index < 8 ? 0.158 : 0.296,
-          index < 4 ? 0.116 : index < 8 ? 0.254 : 0.392,
-        ],
-        y: [
-          index < 4 
-            ? 1 - ((index + 1) * 0.25) + 0.02
-            : index < 8
-            ? 1 - ((index - 3) * 0.25) + 0.02
-            : 1 - ((index - 7) * 0.25) + 0.02,
-          index < 4 
-            ? 1 - (index * 0.25) - 0.02
-            : index < 8
-            ? 1 - ((index - 4) * 0.25) - 0.02
-            : 1 - ((index - 8) * 0.25) - 0.02,
-        ],
-      },
-      hovertemplate:
-        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
-    })
-  );
-  console.log("tracePies0 ", tracePies0);
-  const tracePies1 = Object.entries(groupedMm9_sorted).map(
-    ([key, element], index, array) => ({
-      type: 'pie',
-      e: element,
-      marker: {
-        color: element.map((e) => colors[e.signatureSetName]),
-        line: {
-          color: 'black',
-          width: 1,
-        },
-      },
-      textposition: 'inside',
-      labels: element.map((e) => e.signatureSetName),
-      values: element.map((e) => parseInt(e.count)),
-      texttemplate: '%{value}',
-      direction: 'clockwise',
-      name: key,
-      domain: {
-        x: [0.434, 0.53],
-        y: [
-          1 - ((index + 1) * 0.25) + 0.02,
-          1 - (index * 0.25) - 0.02,
-        ],
-      },
-      hovertemplate:
-        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
-    })
-  );
+      order.forEach((profileKey, idx) => {
+        const rows = byProfile[profileKey];
+        if (!rows || !rows.length) return;
 
-  const tracePies2 = Object.entries(groupedRn6).map(
-    ([key, element], index, array) => ({
-      type: 'pie',
-      e: element,
-      marker: {
-        color: element.map((e) => colors[e.signatureSetName]),
-        line: {
-          color: 'black',
-          width: 1,
-        },
-      },
-      textposition: 'inside',
-      labels: element.map((e) => e.signatureSetName),
-      values: element.map((e) => parseInt(e.count)),
-      texttemplate: '%{value}',
-      direction: 'clockwise',
-      name: key,
-      domain: {
-        x: [0.572, 0.668],
-        y: [
-          1 - ((index + 1) * 0.25) + 0.02,
-          1 - (index * 0.25) - 0.02,
-        ],
-      },
-      hovertemplate:
-        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
-    })
-  );
-  const tracePies3 = Object.entries(groupedGallus).map(
-    ([key, element], index, array) => ({
-      type: 'pie',
-      e: element,
-      marker: {
-        color: element.map((e) => colors[e.signatureSetName]),
-        line: {
-          color: 'black',
-          width: 1,
-        },
-      },
-      textposition: 'inside',
-      labels: element.map((e) => e.signatureSetName),
-      values: element.map((e) => parseInt(e.count)),
-      texttemplate: '%{value}',
-      direction: 'clockwise',
-      name: key,
-      domain: {
-        x: [0.710, 0.806],
-        y: [
-          1 - ((index + 1) * 0.25) + 0.02,
-          1 - (index * 0.25) - 0.02,
-        ],
-      },
-      hovertemplate:
-        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
-    })
-  );
+        const g = cfg.startCol + Math.floor(idx / ROWS_PER_COL);
+        const r = idx % ROWS_PER_COL;
 
-  const tracePies4 = Object.entries(groupCaenorhabditis).map(
-    ([key, element], index, array) => ({
-      type: 'pie',
-      e: element,
-      marker: {
-        color: element.map((e) => colors[e.signatureSetName]),
-        line: {
-          color: 'black',
-          width: 1,
-        },
-      },
-      textposition: 'inside',
-      labels: element.map((e) => e.signatureSetName),
-      values: element.map((e) => parseInt(e.count)),
-      texttemplate: '%{value}',
-      direction: 'clockwise',
-      name: key,
-      domain: {
-        x: [0.848, 0.944],
-        y: [
-          1 - ((index + 1) * 0.25) + 0.02,
-          1 - (index * 0.25) - 0.02,
-        ],
-      },
-      hovertemplate:
-        '<b>%{label}</b> <br>%{percent} </br> %{value}  <extra></extra>',
-    })
-  );
+        traces.push({
+          type: 'pie',
+          marker: {
+            color: rows.map((e) => colors[e.signatureSetName]),
+            line: { color: 'black', width: 1 },
+          },
+          textposition: 'inside',
+          labels: rows.map((e) => e.signatureSetName),
+          values: rows.map((e) => parseInt(e.count, 10)),
+          texttemplate: '%{value}',
+          direction: 'clockwise',
+          name: profileKey,
+          domain: { x: colX(g), y: rowY(r) },
+          hovertemplate: HOVER,
+        });
 
-  function indexPos(index) {
-    let indexPosition;
-    if (index === 0) {
-      indexPosition = 1/12; // Center of first column (0 to 1/6)
-    } else if (index === 1) {
-      indexPosition = 3/12; // Center of second column (1/6 to 2/6)
-    } else if (index === 2) {
-      indexPosition = 5/12; // Center of third column (2/6 to 3/6)
-    } else if (index === 3) {
-      indexPosition = 7/12; // Center of fourth column (3/6 to 4/6)
-    } else if (index === 4) {
-      indexPosition = 9/12; // Center of fifth column (4/6 to 5/6)
-    } else if (index === 5) {
-      indexPosition = 11/12; // Center of sixth column (5/6 to 1)
-    } else if (index === 6) {
-      indexPosition = 1/12;
-    } else if (index === 7) {
-      indexPosition = 3/12;
-    } else if (index === 8){
-      indexPosition = 5/12;
+        annotations.push({
+          xref: 'paper',
+          yref: 'paper',
+          xanchor: 'center',
+          yanchor: 'bottom',
+          showarrow: false,
+          text: profileKey.padStart(cfg.titlePad, ' '),
+          align: 'center',
+          font: { weight: 'bold' },
+          x: colCenter(g),
+          y: titleY(r),
+        });
+      });
+
+      // species header centered over its column span (assembly on its own line)
+      annotations.push({
+        xref: 'paper',
+        yref: 'paper',
+        xanchor: 'center',
+        yanchor: 'bottom',
+        showarrow: false,
+        text: speciesKey.replace(/\s*\(([^)]+)\)/, '<br>($1)'),
+        font: { size: 14, weight: 'bold' },
+        x: (colCenter(cfg.startCol) + colCenter(endCol)) / 2,
+        y: 1.02,
+      });
     }
-     else {
-      indexPosition = 7/12;
+
+    // vertical separator to the right of this species (not after the last one)
+    if (si < SPECIES.length - 1) {
+      const sepX = (colX(endCol)[1] + colX(endCol + 1)[0]) / 2;
+      shapes.push({
+        type: 'line',
+        xref: 'paper',
+        yref: 'paper',
+        x0: sepX,
+        y0: 0,
+        x1: sepX,
+        y1: 1,
+        line: { color: 'lightgray', width: 2, dash: 'solid' },
+      });
     }
-    return indexPosition;
-  }
+  });
 
-  const pieTitles0 = Object.entries(groupedHuman_sorted).map(
-    ([key, element], index, array) => ({
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'bottom',
-      showarrow: false,
-      index: index,
-      text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
-        8,
-        ' '
-      ),
-      align: 'center',
-      font: {
-        weight: 'bold',
-      },
-      x: index < 4 ? 0.068 : index < 8 ? 0.206 : 0.344,
-      y: index < 4 
-        ? 1 - (index * 0.25) - 0.015
-        : index < 8
-        ? 1 - ((index - 4) * 0.25) - 0.015
-        : 1 - ((index - 8) * 0.25) - 0.015,
-    })
-  );
-  console.log("pieTitles0 ", pieTitles0);
-  const pieTitles1 = Object.entries(groupedMm9_sorted).map(
-    ([key, element], index, array) => ({
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'bottom',
-      showarrow: false,
-      text: (array[index][1][0].profile + array[index][1][0].matrix).padStart(
-        7,
-        ' '
-      ),
-      align: 'center',
-      font: {
-        weight: 'bold',
-      },
-      x: 0.482, // Center of fourth column
-      y: 1 - (index * 0.25) - 0.015,
-    })
-  );
-
-  const pieTitles2 = Object.entries(groupedRn6).map(
-    ([key, element], index, array) => ({
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'bottom',
-      showarrow: false,
-      text: key.padStart(7, ' '),
-      align: 'center',
-      font: {
-        weight: 'bold',
-      },
-      x: 0.620, // Center of fifth column
-      y: 1 - (index * 0.25) - 0.015,
-    })
-  );
-
-  const pieTitles3 = Object.entries(groupedGallus).map(
-    ([key, element], index, array) => ({
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'bottom',
-      showarrow: false,
-      text: key.padStart(7, ' '),
-      align: 'center',
-      font: {
-        weight: 'bold',
-      },
-      x: 0.758, // Center of sixth column
-      y: 1 - (index * 0.25) - 0.015,
-    })
-  );
-  const pieTitles4 = Object.entries(groupCaenorhabditis).map(
-    ([key, element], index, array) => ({
-      xref: 'paper',
-      yref: 'paper',
-      xanchor: 'center',
-      yanchor: 'bottom',
-      showarrow: false,
-      text: key.padStart(7, ' '),
-      align: 'center',
-      font: {
-        weight: 'bold',
-      },
-      x: 0.896, // Center of seventh column
-      y: 1 - (index * 0.25) - 0.01,
-    })
-  );
-  const annotationTitle0 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'bottom',
-    showarrow: false,
-    text: Object.keys(groupBySpecies)[0].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
-    font: {
-      size: 14,
-      weight: 'bold',
-    },
-    x: 0.206, // Center of all three columns
-    y: 1.02,
-  };
-
-  const annotationTitle1 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'bottom',
-    showarrow: false,
-    text: Object.keys(groupBySpecies)[1].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
-    font: {
-      size: 14,
-      weight: 'bold',
-    },
-    x: 0.482, // Center of fourth column
-    y: 1.02,
-  };
-
-  const annotationTitle2 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'bottom',
-    showarrow: false,
-    text: Object.keys(groupBySpecies)[2].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
-    font: {
-      size: 14,
-      weight: 'bold',
-    },
-    x: 0.620, // Center of fifth column
-    y: 1.02,
-  };
-
-  const annotationTitle3 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'bottom',
-    showarrow: false,
-    text: Object.keys(groupBySpecies)[3].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
-    font: {
-      size: 14,
-      weight: 'bold',
-    },
-    x: 0.758, // Center of sixth column
-    y: 1.02,
-  };
-
-  const annotationTitle4 = {
-    xref: 'paper',
-    yref: 'paper',
-    xanchor: 'center',
-    yanchor: 'bottom',
-    showarrow: false,
-    text: Object.keys(groupBySpecies)[4].replace(/\s*\(([^)]+)\)/, '<br>($1)'),
-    font: {
-      size: 14,
-      weight: 'bold',
-    },
-    x: 0.896, // Center of seventh column
-    y: 1.02,
-  };
-
-  const shapes = [
-    // Vertical line between Homo sapiens and Mus musculus
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 0.412,
-      y0: 0,
-      x1: 0.412,
-      y1: 1,
-      line: {
-        color: 'lightgray',
-        width: 2,
-        dash: 'solid',
-      },
-    },
-    // Vertical line between Mus musculus and Rattus norvegicus
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 0.550,
-      y0: 0,
-      x1: 0.550,
-      y1: 1,
-      line: {
-        color: 'lightgray',
-        width: 2,
-        dash: 'solid',
-      },
-    },
-    // Vertical line between Rattus norvegicus and Gallus gallus
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 0.688,
-      y0: 0,
-      x1: 0.688,
-      y1: 1,
-      line: {
-        color: 'lightgray',
-        width: 2,
-        dash: 'solid',
-      },
-    },
-    // Vertical line between Gallus gallus and Caenorhabditis elegans
-    {
-      type: 'line',
-      xref: 'paper',
-      yref: 'paper',
-      x0: 0.826,
-      y0: 0,
-      x1: 0.826,
-      y1: 1,
-      line: {
-        color: 'lightgray',
-        width: 2,
-        dash: 'solid',
-      },
-    },
-  ];
-
-  const traces = [...tracePies0, ...tracePies1, ...tracePies2, ...tracePies3, ...tracePies4];
   const layout = {
     hoverlabel: { bgcolor: '#FFF' },
     height: 920,
@@ -530,23 +199,12 @@ export default function RsInMsigportal(rawData) {
       xanchor: 'right',
       y: 0,
     },
-    annotations: [
-      ...pieTitles0,
-      ...pieTitles1,
-      ...pieTitles2,
-      ...pieTitles3,
-      ...pieTitles4,
-      annotationTitle0,
-      annotationTitle1,
-      annotationTitle2,
-      annotationTitle3,
-      annotationTitle4
-    ],
-    shapes: [...shapes],
+    annotations,
+    shapes,
   };
   const config = {
     responsive: true,
     displayModeBar: true,
   };
-  return { traces: traces, layout: layout, config };
+  return { traces, layout, config };
 }

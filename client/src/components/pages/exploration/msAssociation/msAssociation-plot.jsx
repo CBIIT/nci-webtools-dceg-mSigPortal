@@ -13,10 +13,10 @@ export default function MsAssociationPlot({ state, form }) {
   const { study, strategy, signatureSetName, cancer, useAllCancer, id, id2 } =
     state;
 
-  const { data, error, isFetching } = useMsAssociationQuery(params, {
+  const { currentData, error, isFetching } = useMsAssociationQuery(params, {
     skip: !params,
   });
-  const { data: data2, error: error2 } = useMsAssociation2SourceQuery(params2, {
+  const { data: currentData2, error: error2 } = useMsAssociation2SourceQuery(params2, {
     skip: !params2,
   });
 
@@ -52,8 +52,8 @@ export default function MsAssociationPlot({ state, form }) {
     }
   }, [signatureName1, signatureName2, both]);
 
-  const plotError = error || error2 || data?.error || data2?.error;
-  const plotData = data || data2;
+  const plotError = error || error2 || currentData?.error || currentData2?.error;
+  const plotData = currentData || currentData2;
   console.log('plotError', plotError);
   console.log('plotData', plotData);
   return (

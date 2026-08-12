@@ -1,0 +1,972 @@
+---
+title: "Cosmic_v3.4_SignatureLogs"
+author: "Caleb Hartman"
+date: "2024-12-12"
+output: html_document
+---
+
+```{r}
+setwd("C:/Users/hartmancas/Desktop/mSigPortal Catalog Update")
+library(tidyverse)
+library(rvest)
+library(dplyr)
+library(jsonlite)
+library(svglite)
+```
+
+
+```{r}
+# Signature Log Plots ------------------------------------------------------------- 
+
+#source('Sigvisualfunc.R')
+load("signature_refsets.RData")
+#load('cn48_signature.RData')
+
+tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37|COSMIC_v3.4_Signatures_GRCh38_SV32'),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
+#tmpsigs <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37'),Strand_info == 'N') %>% count(Signature_name) %>% pull(Signature_name)
+
+for( i in tmpsigs){
+  sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37|COSMIC_v3.4_Signatures_GRCh38_SV32'),Signature_name==i,Strand_info == 'N') %>%  select(MutationType,Value=Contribution)
+  #sig_tmp <- signature_refsets %>% filter(str_detect(Signature_set_name,'COSMIC_v3.4_Signatures_GRCh37'),Signature_name==i,Strand_info == 'N') %>% select(MutationType,Value=Contribution)
+  
+  if(str_starts(i,'CN')){
+    plot_profile_logo_cn48(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))}
+    
+  else if(str_starts(i,'SV')){
+    plot_profile_logo_sv32(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))}
+  
+  else if(str_starts(i,'RNA')){
+    plot_profile_logo_rnasbs192(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))}
+    
+  else{
+    plot_profile_logo(profile = sig_tmp,output_plot = paste0('tmp/Profile_logo/',i,'.svg' ))}
+}
+
+
+```
+
+
+
+```{r}
+# Plot_Profile_Logo -------------------------------------------------------
+
+plot_profile_logo <- function (profile, colors = NULL, condensed = FALSE, output_plot = NULL, plot_width=NULL, plot_height=NULL) 
+{
+  ## profile 1 and profile 2 will be the dataframe with two columns: MutationType and value
+  colnames(profile) <- c('MutationType','Value')
+  
+  COLORS2 = c('#1B4564','#D03D32')
+  COLORS6 = c("#03BCEE", "#010101", "#E32926", "#CAC9C9", "#A1CE63", "#EBC6C4")
+  COLORS10 = c("#03BCEE", "#0366CB", "#A1CE63", "#016601", "#FE9898", "#E32926", "#FEB166", "#FE8001", "#CB98FE", "#4C0198")
+  COLORS16=c("#FCBD6F", "#FE8002", "#AFDC8A", "#36A02E", "#FCC9B4", "#FB896A", "#F04432", "#BB191A", "#CFE0F1", "#93C3DE", "#4A97C8", "#1764AA", "#E1E1EE", "#B5B5D7", "#8582BC", "#62409A")
+  
+  typelength = dim(profile)[1]
+  if (is.null(colors)) {
+    if(typelength == 192){colors = COLORS2;}
+    if(typelength == 96){colors = COLORS6;}
+    if(typelength == 78){colors = COLORS10;}
+    if(typelength == 83){colors = COLORS16;}
+  }
+  
+  ## make sure the order profile 1 and profile 2 are the same order
+  
+  indel_short <-  FALSE
+  if(typelength == 83) {indel_short = TRUE}
+  profile <- profile_format_df(profile,factortype = TRUE,indel_short = indel_short) 
+  
+  if(typelength == 192){
+    names(colors) <- levels(profile$Strand) 
+    profile[,5] <- profile[,5]/sum(profile[,5])  
+    plot <- ggplot(data = profile, aes(x = SubType, y = Value,  fill = Strand, width = 0.5)) + 
+      geom_bar(stat = "identity", position = "dodge", colour = NA, size = 0) + 
+      scale_fill_manual(values = colors) + 
+      facet_grid(. ~ Type, scales = "free",space = "free_x") +
+      guides(fill = "none") + 
+      scale_x_discrete(expand = expansion(add = 0))+
+      scale_y_continuous(expand = expansion(mult = c(0,0.1)))+
+      theme(axis.ticks = element_blank(),axis.title = element_blank(), axis.text = element_blank(),panel.background = element_blank(),panel.grid = element_blank(),strip.text.x = element_blank(),panel.spacing.x = unit(0, "lines"),axis.line.x = element_line(colour = 'black',size = 0.05))
+    
+  
+  # SBS96 & DBS78  
+  }else{
+    names(colors) <- levels(profile$Type)
+    profile[,4] <- profile[,4]/sum(profile[,4])  
+    plot <- ggplot(data = profile, aes(x = SubType, y = Value,  fill = Type, width = 0.5)) + 
+      geom_bar(stat = "identity", position = "identity", colour = NA, size = 0) + 
+      scale_fill_manual(values = colors) + 
+      facet_grid(. ~ Type, scales = "free",space = "free_x") +
+      guides(fill = "none") + 
+      scale_x_discrete(expand = expansion(add = 0))+
+      scale_y_continuous(expand = expansion(mult = c(0,0.1)))+
+      theme(axis.ticks = element_blank(),axis.title = element_blank(), axis.text = element_blank(),panel.background = element_blank(),panel.grid = element_blank(),strip.text.x = element_blank(),panel.spacing.x = unit(0, "lines"),axis.line.x = element_line(colour = 'black',size = 0.05))
+  }
+  
+  
+
+  if(is.null(output_plot)){
+    return(plot)
+  }else{
+    xleng <- 2
+    yleng <- 0.8
+    if(is.null(plot_width)){ plot_width <-  xleng}
+    if(is.null(plot_height)){ plot_height <-  yleng}
+    
+    ggsave(filename = output_plot,plot = plot,width = plot_width,height = plot_height)
+  }
+  
+}
+```
+
+
+
+
+```{r}
+# COSMIC CN48 logo -----------------------------------------------------------------------------
+
+cn48_mutationtype <- c(
+  '0:homdel:0-100kb',
+  '0:homdel:100kb-1Mb',
+  '0:homdel:>1Mb',
+  '1:LOH:0-100kb',
+  '1:LOH:100kb-1Mb',
+  '1:LOH:1Mb-10Mb',
+  '1:LOH:10Mb-40Mb',
+  '1:LOH:>40Mb',
+  '2:LOH:0-100kb',
+  '2:LOH:100kb-1Mb',
+  '2:LOH:1Mb-10Mb',
+  '2:LOH:10Mb-40Mb',
+  '2:LOH:>40Mb',
+  '3-4:LOH:0-100kb',
+  '3-4:LOH:100kb-1Mb',
+  '3-4:LOH:1Mb-10Mb',
+  '3-4:LOH:10Mb-40Mb',
+  '3-4:LOH:>40Mb',
+  '5-8:LOH:0-100kb',
+  '5-8:LOH:100kb-1Mb',
+  '5-8:LOH:1Mb-10Mb',
+  '5-8:LOH:10Mb-40Mb',
+  '5-8:LOH:>40Mb',
+  '9+:LOH:0-100kb',
+  '9+:LOH:100kb-1Mb',
+  '9+:LOH:1Mb-10Mb',
+  '9+:LOH:10Mb-40Mb',
+  '9+:LOH:>40Mb',
+  '2:het:0-100kb',
+  '2:het:100kb-1Mb',
+  '2:het:1Mb-10Mb',
+  '2:het:10Mb-40Mb',
+  '2:het:>40Mb',
+  '3-4:het:0-100kb',
+  '3-4:het:100kb-1Mb',
+  '3-4:het:1Mb-10Mb',
+  '3-4:het:10Mb-40Mb',
+  '3-4:het:>40Mb',
+  '5-8:het:0-100kb',
+  '5-8:het:100kb-1Mb',
+  '5-8:het:1Mb-10Mb',
+  '5-8:het:10Mb-40Mb',
+  '5-8:het:>40Mb',
+  '9+:het:0-100kb',
+  '9+:het:100kb-1Mb',
+  '9+:het:1Mb-10Mb',
+  '9+:het:10Mb-40Mb',
+  '9+:het:>40Mb'
+)
+
+
+cn48_color_mapping = c('0:0-100kb'='#F0F8FF', '0:100kb-1Mb'='#787CE6', '0:>1Mb'='#0000CD', 
+                       '1:0-100kb'='#EBEBEB', '1:100kb-1Mb'='#C5C5C5', '1:1Mb-10Mb'='#9F9F9F', '1:10Mb-40Mb'='#797979', 
+                       '1:>40Mb'='#545454', '2:0-100kb'='#F5FFFA', '2:100kb-1Mb'='#C0E2C3', 
+                       '2:1Mb-10Mb'='#8BC48E', '2:10Mb-40Mb'='#56A858', '2:>40Mb'='#228B22', 
+                       '3-4:0-100kb'='#FFF0F5', '3-4:100kb-1Mb'='#DEBDEB', '3-4:1Mb-10Mb'='#BE8BE1', 
+                       '3-4:10Mb-40Mb'='#9D58D7', '3-4:>40Mb'='#7D26CD', '5-8:0-100kb'='#FFFAF0', 
+                       '5-8:100kb-1Mb'='#F2DCB3', '5-8:1Mb-10Mb'='#E6BF78', '5-8:10Mb-40Mb'='#D9A23C', 
+                       '5-8:>40Mb'='#CD8500', '9+:0-100kb'='#FFE4E1', '9+:100kb-1Mb'='#E2ADBC', 
+                       '9+:1Mb-10Mb'='#C47798', '9+:10Mb-40Mb'='#A84074', '9+:>40Mb'='#8B0A50')
+
+#colors = ['#0000CD', '#545454', '#228B22', '#7D26CD','#CD8500', '#8B0A50']
+
+cn48_mutationtype
+cn48_signature <- tibble(MutationType=cn48_mutationtype) %>% 
+  mutate(tmp=MutationType) %>% 
+  separate(col = tmp,into = c('a','b','c'),sep = ':') %>% 
+  mutate(key=paste0(a,":",c)) %>% 
+  select(MutationType,Class=b,Type=a,SubType=c,key) %>% mutate(color=NA_character_)
+cn48_signature$color <- cn48_color_mapping[cn48_signature$key]
+cn48_signature <- cn48_signature %>% select(-key) 
+
+cn48_signature_color <- cn48_signature$color
+names(cn48_signature_color) <- cn48_signature$MutationType
+
+#------------------------------------------------------------------------------------
+### CN48 logo function ###
+
+plot_profile_logo_cn48 <- function (profile, output_plot = NULL,plot_width=NULL, plot_height=NULL) 
+{
+  ## profile 1 and profile 2 will be the dataframe with two columns: MutationType and value
+  colnames(profile) <- c('MutationType','Value')
+  
+  profile <- cn48_signature %>% left_join(profile) %>% mutate(MutationType = fct_inorder(MutationType))
+  
+  #profile[,2] <- profile[,2]/sum(profile[,2])  
+  plot <- 
+    ggplot(data = profile, aes(x = MutationType, y = Value,  fill = MutationType, width = 0.7)) + 
+    geom_bar(stat = "identity", position = "identity", colour = 'black', size = 0.05) + 
+    scale_fill_manual(values = cn48_signature_color) + 
+    #facet_grid(. ~ Type, scales = "free",space = "free_x") +
+    guides(fill = "none") + 
+    scale_x_discrete(expand = expansion(add = 0))+
+    scale_y_continuous(expand = expansion(mult = c(0,0.1)))+
+    theme(axis.ticks = element_blank(),axis.title = element_blank(), axis.text = element_blank(),panel.background = element_blank(),panel.grid = element_blank(),strip.text.x = element_blank(),panel.spacing.x = unit(0, "lines"),axis.line.x = element_line(colour = 'black',size = 0.05))
+  
+  # 
+  if(is.null(output_plot)){
+    return(plot)
+  }else{
+    xleng <- 2
+    yleng <- 0.8
+    if(is.null(plot_width)){ plot_width <-  xleng}
+    if(is.null(plot_height)){ plot_height <-  yleng}
+    
+    ggsave(filename = output_plot,plot = plot,width = plot_width,height = plot_height)
+  }
+  
+}
+```
+
+
+```{r}
+# COSMIC SV32 logo ----------------------------------------------------------
+
+sv32_mutationtype <- c(
+  'clustered_del_1-10Kb',           
+  'clustered_del_10-100Kb',
+  'clustered_del_100Kb-1Mb',  
+  'clustered_del_1Mb-10Mb',  
+  'clustered_del_>10Mb',
+  
+  'clustered_tds_1-10Kb',                           
+  'clustered_tds_10-100Kb',
+  'clustered_tds_100Kb-1Mb',  
+  'clustered_tds_1Mb-10Mb',  
+  'clustered_tds_>10Mb',
+  
+  'clustered_inv_1-10Kb',
+  'clustered_inv_10-100Kb',
+  'clustered_inv_100Kb-1Mb',  
+  'clustered_inv_1Mb-10Mb',  
+  'clustered_inv_>10Mb',
+  
+  'clustered_trans',
+  
+  'non-clustered_del_1-10Kb',           
+  'non-clustered_del_10-100Kb',
+  'non-clustered_del_100Kb-1Mb',  
+  'non-clustered_del_1Mb-10Mb',  
+  'non-clustered_del_>10Mb',
+
+  'non-clustered_tds_1-10Kb',                           
+  'non-clustered_tds_10-100Kb',
+  'non-clustered_tds_100Kb-1Mb',  
+  'non-clustered_tds_1Mb-10Mb',  
+  'non-clustered_tds_>10Mb',
+
+  'non-clustered_inv_1-10Kb',
+  'non-clustered_inv_10-100Kb',
+  'non-clustered_inv_100Kb-1Mb',  
+  'non-clustered_inv_1Mb-10Mb',  
+  'non-clustered_inv_>10Mb',
+
+  'non-clustered_trans'
+  
+)
+
+
+sv32_color_mapping <- c(
+  # Clustered Deletions                          
+  'clustered_del_1-10Kb'='#e7cdb3',    
+  'clustered_del_10-100Kb'='#d0ab8b',  
+  'clustered_del_100Kb-1Mb'='#b98862',   
+  'clustered_del_1Mb-10Mb'='#a2663a',    
+  'clustered_del_>10Mb'='#8b4513',       
+
+  # Clustered Tandem Duplications 
+  'clustered_tds_1-10Kb'='#efcec6',    
+  'clustered_tds_10-100Kb'='#e0a39d',  
+  'clustered_tds_100Kb-1Mb'='#d07874',   
+  'clustered_tds_1Mb-10Mb'='#c14d4b',    
+  'clustered_tds_>10Mb'='#b22222',       
+
+  # Clustered Inversions 
+  'clustered_inv_1-10Kb'='#c0e2e7',    
+  'clustered_inv_10-100Kb'='#90ccd0',  
+  'clustered_inv_100Kb-1Mb'='#5fb6b9',   
+  'clustered_inv_1Mb-10Mb'='#30a0a2',    
+  'clustered_inv_>10Mb'='#008b8b',       
+
+  # Clustered Translocations
+  'clustered_trans'='#698b69',         
+
+  # Non-Clustered Deletions 
+  'non-clustered_del_1-10Kb'='#e7cdb3',
+  'non-clustered_del_10-100Kb'='#d0ab8b',
+  'non-clustered_del_100Kb-1Mb'='#b98862',
+  'non-clustered_del_1Mb-10Mb'='#a2663a',
+  'non-clustered_del_>10Mb'='#8b4513',
+
+  # Non-Clustered Tandem Duplications 
+  'non-clustered_tds_1-10Kb'='#efcec6',
+  'non-clustered_tds_10-100Kb'='#e0a39d',
+  'non-clustered_tds_100Kb-1Mb'='#d07874',
+  'non-clustered_tds_1Mb-10Mb'='#c14d4b',
+  'non-clustered_tds_>10Mb'='#b22222',
+
+  # Non-Clustered Inversions 
+  'non-clustered_inv_1-10Kb'='#c0e2e7',
+  'non-clustered_inv_10-100Kb'='#90ccd0',
+  'non-clustered_inv_100Kb-1Mb'='#5fb6b9',
+  'non-clustered_inv_1Mb-10Mb'='#30a0a2',
+  'non-clustered_inv_>10Mb'='#008b8b',
+
+  # Non-Clustered Translocations
+  'non-clustered_trans'='#698b69'
+)
+
+sv32_mutationtype
+
+  # Step 1: Initialize the tibble
+  sv32_signature <- tibble(MutationType = sv32_mutationtype) %>%
+  # Step 2: Duplicate the column for separation
+  mutate(tmp = MutationType) %>%
+  # Step 3: Split the tmp column into three parts
+  separate(col = tmp, into = c('a', 'b', 'c'), sep = '_', fill = "right") %>%
+  # Step 4: Create a key for color mapping
+  #mutate(key = paste0(a, "_", b, "_", c)) %>%
+  mutate(c = ifelse(is.na(c), "", c),                # Replace NA in 'c' with an empty string
+       key = ifelse(c == "", paste0(a, "_", b),      # If 'c' is empty, only paste 'a' and 'b'
+                    paste0(a, "_", b, "_", c))) %>%
+  # Step 5: Select and rename columns
+  select(MutationType, Class = a, Type = b, SubType = c, key) %>%
+  # Step 6: Add an empty color column
+  mutate(color = NA_character_)
+
+# Step 7: Map the colors using sv32_color_mapping
+sv32_signature$color <- sv32_color_mapping[sv32_signature$key]
+
+# Step 8: Drop the key column
+sv32_signature <- sv32_signature %>% select(-key)
+
+# View the resulting tibble
+print(sv32_signature)
+
+
+sv32_signature_color <- sv32_signature$color
+names(sv32_signature_color) <- sv32_signature$MutationType
+
+#---------------------------------------------------------------------------------------------
+
+### SV32 logo function ###
+plot_profile_logo_sv32 <- function(profile, output_plot = NULL, plot_width = NULL, plot_height = NULL) {
+  # Ensure that the profile has two columns: MutationType and Value
+  colnames(profile) <- c('MutationType', 'Value')
+  
+  # Join the profile with sv32_signature to get colors and other details
+  profile <- sv32_signature %>%
+    left_join(profile) %>%
+    mutate(MutationType = fct_inorder(MutationType))
+  
+  # Create the plot
+  plot <- ggplot(data = profile, aes(x = MutationType, y = Value, fill = MutationType, width = 0.7)) +
+    geom_bar(stat = "identity", position = "identity", colour = 'black', size = 0.05) +
+    scale_fill_manual(values = sv32_signature_color) +
+    guides(fill = "none") +
+    scale_x_discrete(expand = expansion(add = 0)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    theme(axis.ticks = element_blank(),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          panel.background = element_blank(),
+          panel.grid = element_blank(),
+          strip.text.x = element_blank(),
+          panel.spacing.x = unit(0, "lines"),
+          axis.line.x = element_line(colour = 'black', size = 0.05))
+  
+  # Save or return the plot
+  if (is.null(output_plot)) {
+    return(plot)
+  } else {
+    xleng <- 2
+    yleng <- 0.8
+    if (is.null(plot_width)) plot_width <- xleng
+    if (is.null(plot_height)) plot_height <- yleng
+    
+    ggsave(filename = output_plot, plot = plot, width = plot_width, height = plot_height)
+  }
+}
+
+
+
+```
+
+```{r}
+# COSMIC RNA-SBS192 logo -----------------------------------------------------------------------------------
+
+rnasbs192_mutationtype <- c(
+  'A[C>A]A',           
+  'A[C>A]C',
+  'A[C>A]G',  
+  'A[C>A]T',  
+  'C[C>A]A',
+  'C[C>A]C',
+  'C[C>A]G',
+  'C[C>A]T',
+  'G[C>A]A',
+  'G[C>A]C',
+  'G[C>A]G',
+  'G[C>A]T',
+  'T[C>A]A',
+  'T[C>A]C',
+  'T[C>A]G',
+  'T[C>A]T',
+  
+  'A[C>G]A',           
+  'A[C>G]C',
+  'A[C>G]G',  
+  'A[C>G]T',  
+  'C[C>G]A',
+  'C[C>G]C',
+  'C[C>G]G',
+  'C[C>G]T',
+  'G[C>G]A',
+  'G[C>G]C',
+  'G[C>G]G',
+  'G[C>G]T',
+  'T[C>G]A',
+  'T[C>G]C',
+  'T[C>G]G',
+  'T[C>G]T',
+  
+  'A[C>T]A',           
+  'A[C>T]C',
+  'A[C>T]G',  
+  'A[C>T]T',  
+  'C[C>T]A',
+  'C[C>T]C',
+  'C[C>T]G',
+  'C[C>T]T',
+  'G[C>T]A',
+  'G[C>T]C',
+  'G[C>T]G',
+  'G[C>T]T',
+  'T[C>T]A',
+  'T[C>T]C',
+  'T[C>T]G',
+  'T[C>T]T',
+  
+  'A[T>A]A',           
+  'A[T>A]C',
+  'A[T>A]G',  
+  'A[T>A]T',  
+  'C[T>A]A',
+  'C[T>A]C',
+  'C[T>A]G',
+  'C[T>A]T',
+  'G[T>A]A',
+  'G[T>A]C',
+  'G[T>A]G',
+  'G[T>A]T',
+  'T[T>A]A',
+  'T[T>A]C',
+  'T[T>A]G',
+  'T[T>A]T',
+  
+  'A[T>C]A',           
+  'A[T>C]C',
+  'A[T>C]G',  
+  'A[T>C]T',  
+  'C[T>C]A',
+  'C[T>C]C',
+  'C[T>C]G',
+  'C[T>C]T',
+  'G[T>C]A',
+  'G[T>C]C',
+  'G[T>C]G',
+  'G[T>C]T',
+  'T[T>C]A',
+  'T[T>C]C',
+  'T[T>C]G',
+  'T[T>C]T',
+  
+  'A[T>G]A',           
+  'A[T>G]C',
+  'A[T>G]G',  
+  'A[T>G]T',  
+  'C[T>G]A',
+  'C[T>G]C',
+  'C[T>G]G',
+  'C[T>G]T',
+  'G[T>G]A',
+  'G[T>G]C',
+  'G[T>G]G',
+  'G[T>G]T',
+  'T[T>G]A',
+  'T[T>G]C',
+  'T[T>G]G',
+  'T[T>G]T',
+  
+  'A[G>T]A',           
+  'A[G>T]C',
+  'A[G>T]G',  
+  'A[G>T]T',  
+  'C[G>T]A',
+  'C[G>T]C',
+  'C[G>T]G',
+  'C[G>T]T',
+  'G[G>T]A',
+  'G[G>T]C',
+  'G[G>T]G',
+  'G[G>T]T',
+  'T[G>T]A',
+  'T[G>T]C',
+  'T[G>T]G',
+  'T[G>T]T',
+  
+  'A[G>C]A',           
+  'A[G>C]C',
+  'A[G>C]G',  
+  'A[G>C]T',  
+  'C[G>C]A',
+  'C[G>C]C',
+  'C[G>C]G',
+  'C[G>C]T',
+  'G[G>C]A',
+  'G[G>C]C',
+  'G[G>C]G',
+  'G[G>C]T',
+  'T[G>C]A',
+  'T[G>C]C',
+  'T[G>C]G',
+  'T[G>C]T',
+  
+  'A[G>A]A',           
+  'A[G>A]C',
+  'A[G>A]G',  
+  'A[G>A]T',  
+  'C[G>A]A',
+  'C[G>A]C',
+  'C[G>A]G',
+  'C[G>A]T',
+  'G[G>A]A',
+  'G[G>A]C',
+  'G[G>A]G',
+  'G[G>A]T',
+  'T[G>A]A',
+  'T[G>A]C',
+  'T[G>A]G',
+  'T[G>A]T',
+  
+  'A[A>T]A',           
+  'A[A>T]C',
+  'A[A>T]G',  
+  'A[A>T]T',  
+  'C[A>T]A',
+  'C[A>T]C',
+  'C[A>T]G',
+  'C[A>T]T',
+  'G[A>T]A',
+  'G[A>T]C',
+  'G[A>T]G',
+  'G[A>T]T',
+  'T[A>T]A',
+  'T[A>T]C',
+  'T[A>T]G',
+  'T[A>T]T',
+  
+  'A[A>G]A',           
+  'A[A>G]C',
+  'A[A>G]G',  
+  'A[A>G]T',  
+  'C[A>G]A',
+  'C[A>G]C',
+  'C[A>G]G',
+  'C[A>G]T',
+  'G[A>G]A',
+  'G[A>G]C',
+  'G[A>G]G',
+  'G[A>G]T',
+  'T[A>G]A',
+  'T[A>G]C',
+  'T[A>G]G',
+  'T[A>G]T',
+  
+  'A[A>C]A',           
+  'A[A>C]C',
+  'A[A>C]G',  
+  'A[A>C]T',  
+  'C[A>C]A',
+  'C[A>C]C',
+  'C[A>C]G',
+  'C[A>C]T',
+  'G[A>C]A',
+  'G[A>C]C',
+  'G[A>C]G',
+  'G[A>C]T',
+  'T[A>C]A',
+  'T[A>C]C',
+  'T[A>C]G',
+  'T[A>C]T'
+)
+  
+
+
+rnasbs192_color_mapping <- c(
+  'A[C>A]A'= '#1ebef0',           
+  'A[C>A]C'= '#1ebef0',
+  'A[C>A]G'= '#1ebef0',  
+  'A[C>A]T'= '#1ebef0',  
+  'C[C>A]A'= '#1ebef0',
+  'C[C>A]C'= '#1ebef0',
+  'C[C>A]G'= '#1ebef0',
+  'C[C>A]T'= '#1ebef0',
+  'G[C>A]A'= '#1ebef0',
+  'G[C>A]C'= '#1ebef0',
+  'G[C>A]G'= '#1ebef0',
+  'G[C>A]T'= '#1ebef0',
+  'T[C>A]A'= '#1ebef0',
+  'T[C>A]C'= '#1ebef0',
+  'T[C>A]G'= '#1ebef0',
+  'T[C>A]T'= '#1ebef0',
+  
+  'A[C>G]A'= '#060709',           
+  'A[C>G]C'= '#060709',
+  'A[C>G]G'= '#060709',  
+  'A[C>G]T'= '#060709',  
+  'C[C>G]A'= '#060709',
+  'C[C>G]C'= '#060709',
+  'C[C>G]G'= '#060709',
+  'C[C>G]T'= '#060709',
+  'G[C>G]A'= '#060709',
+  'G[C>G]C'= '#060709',
+  'G[C>G]G'= '#060709',
+  'G[C>G]T'= '#060709',
+  'T[C>G]A'= '#060709',
+  'T[C>G]C'= '#060709',
+  'T[C>G]G'= '#060709',
+  'T[C>G]T'= '#060709',
+  
+  'A[C>T]A'= '#e52727',           
+  'A[C>T]C'= '#e52727',
+  'A[C>T]G'= '#e52727',  
+  'A[C>T]T'= '#e52727',  
+  'C[C>T]A'= '#e52727',
+  'C[C>T]C'= '#e52727',
+  'C[C>T]G'= '#e52727',
+  'C[C>T]T'= '#e52727',
+  'G[C>T]A'= '#e52727',
+  'G[C>T]C'= '#e52727',
+  'G[C>T]G'= '#e52727',
+  'G[C>T]T'= '#e52727',
+  'T[C>T]A'= '#e52727',
+  'T[C>T]C'= '#e52727',
+  'T[C>T]G'= '#e52727',
+  'T[C>T]T'= '#e52727',
+  
+  'A[T>A]A'= '#cacaca',           
+  'A[T>A]C'= '#cacaca',
+  'A[T>A]G'= '#cacaca',  
+  'A[T>A]T'= '#cacaca',  
+  'C[T>A]A'= '#cacaca',
+  'C[T>A]C'= '#cacaca',
+  'C[T>A]G'= '#cacaca',
+  'C[T>A]T'= '#cacaca',
+  'G[T>A]A'= '#cacaca',
+  'G[T>A]C'= '#cacaca',
+  'G[T>A]G'= '#cacaca',
+  'G[T>A]T'= '#cacaca',
+  'T[T>A]A'= '#cacaca',
+  'T[T>A]C'= '#cacaca',
+  'T[T>A]G'= '#cacaca',
+  'T[T>A]T'= '#cacaca',
+  
+  'A[T>C]A'= '#a1cf63',           
+  'A[T>C]C'= '#a1cf63',
+  'A[T>C]G'= '#a1cf63',  
+  'A[T>C]T'= '#a1cf63',  
+  'C[T>C]A'= '#a1cf63',
+  'C[T>C]C'= '#a1cf63',
+  'C[T>C]G'= '#a1cf63',
+  'C[T>C]T'= '#a1cf63',
+  'G[T>C]A'= '#a1cf63',
+  'G[T>C]C'= '#a1cf63',
+  'G[T>C]G'= '#a1cf63',
+  'G[T>C]T'= '#a1cf63',
+  'T[T>C]A'= '#a1cf63',
+  'T[T>C]C'= '#a1cf63',
+  'T[T>C]G'= '#a1cf63',
+  'T[T>C]T'= '#a1cf63',
+  
+  'A[T>G]A'= '#eec8c5',           
+  'A[T>G]C'= '#eec8c5',
+  'A[T>G]G'= '#eec8c5',  
+  'A[T>G]T'= '#eec8c5',  
+  'C[T>G]A'= '#eec8c5',
+  'C[T>G]C'= '#eec8c5',
+  'C[T>G]G'= '#eec8c5',
+  'C[T>G]T'= '#eec8c5',
+  'G[T>G]A'= '#eec8c5',
+  'G[T>G]C'= '#eec8c5',
+  'G[T>G]G'= '#eec8c5',
+  'G[T>G]T'= '#eec8c5',
+  'T[T>G]A'= '#eec8c5',
+  'T[T>G]C'= '#eec8c5',
+  'T[T>G]G'= '#eec8c5',
+  'T[T>G]T'= '#eec8c5',
+  
+  'A[G>T]A'= '#95d6e8',           
+  'A[G>T]C'= '#95d6e8',
+  'A[G>T]G'= '#95d6e8',  
+  'A[G>T]T'= '#95d6e8',  
+  'C[G>T]A'= '#95d6e8',
+  'C[G>T]C'= '#95d6e8',
+  'C[G>T]G'= '#95d6e8',
+  'C[G>T]T'= '#95d6e8',
+  'G[G>T]A'= '#95d6e8',
+  'G[G>T]C'= '#95d6e8',
+  'G[G>T]G'= '#95d6e8',
+  'G[G>T]T'= '#95d6e8',
+  'T[G>T]A'= '#95d6e8',
+  'T[G>T]C'= '#95d6e8',
+  'T[G>T]G'= '#95d6e8',
+  'T[G>T]T'= '#95d6e8',
+  
+  'A[G>C]A'= '#5d6164',           
+  'A[G>C]C'= '#5d6164',
+  'A[G>C]G'= '#5d6164',  
+  'A[G>C]T'= '#5d6164',  
+  'C[G>C]A'= '#5d6164',
+  'C[G>C]C'= '#5d6164',
+  'C[G>C]G'= '#5d6164',
+  'C[G>C]T'= '#5d6164',
+  'G[G>C]A'= '#5d6164',
+  'G[G>C]C'= '#5d6164',
+  'G[G>C]G'= '#5d6164',
+  'G[G>C]T'= '#5d6164',
+  'T[G>C]A'= '#5d6164',
+  'T[G>C]C'= '#5d6164',
+  'T[G>C]G'= '#5d6164',
+  'T[G>C]T'= '#5d6164',
+  
+  'A[G>A]A'= '#e06d14',           
+  'A[G>A]C'= '#e06d14',
+  'A[G>A]G'= '#e06d14',  
+  'A[G>A]T'= '#e06d14',  
+  'C[G>A]A'= '#e06d14',
+  'C[G>A]C'= '#e06d14',
+  'C[G>A]G'= '#e06d14',
+  'C[G>A]T'= '#e06d14',
+  'G[G>A]A'= '#e06d14',
+  'G[G>A]C'= '#e06d14',
+  'G[G>A]G'= '#e06d14',
+  'G[G>A]T'= '#e06d14',
+  'T[G>A]A'= '#e06d14',
+  'T[G>A]C'= '#e06d14',
+  'T[G>A]G'= '#e06d14',
+  'T[G>A]T'= '#e06d14',
+  
+  'A[A>T]A'= '#eae8eb',           
+  'A[A>T]C'= '#eae8eb',
+  'A[A>T]G'= '#eae8eb',  
+  'A[A>T]T'= '#eae8eb',  
+  'C[A>T]A'= '#eae8eb',
+  'C[A>T]C'= '#eae8eb',
+  'C[A>T]G'= '#eae8eb',
+  'C[A>T]T'= '#eae8eb',
+  'G[A>T]A'= '#eae8eb',
+  'G[A>T]C'= '#eae8eb',
+  'G[A>T]G'= '#eae8eb',
+  'G[A>T]T'= '#eae8eb',
+  'T[A>T]A'= '#eae8eb',
+  'T[A>T]C'= '#eae8eb',
+  'T[A>T]G'= '#eae8eb',
+  'T[A>T]T'= '#eae8eb',
+  
+  'A[A>G]A'= '#dbf578',           
+  'A[A>G]C'= '#dbf578',
+  'A[A>G]G'= '#dbf578',  
+  'A[A>G]T'= '#dbf578',  
+  'C[A>G]A'= '#dbf578',
+  'C[A>G]C'= '#dbf578',
+  'C[A>G]G'= '#dbf578',
+  'C[A>G]T'= '#dbf578',
+  'G[A>G]A'= '#dbf578',
+  'G[A>G]C'= '#dbf578',
+  'G[A>G]G'= '#dbf578',
+  'G[A>G]T'= '#dbf578',
+  'T[A>G]A'= '#dbf578',
+  'T[A>G]C'= '#dbf578',
+  'T[A>G]G'= '#dbf578',
+  'T[A>G]T'= '#dbf578',
+  
+  'A[A>C]A'= '#f5dbda',           
+  'A[A>C]C'= '#f5dbda',
+  'A[A>C]G'= '#f5dbda',  
+  'A[A>C]T'= '#f5dbda',  
+  'C[A>C]A'= '#f5dbda',
+  'C[A>C]C'= '#f5dbda',
+  'C[A>C]G'= '#f5dbda',
+  'C[A>C]T'= '#f5dbda',
+  'G[A>C]A'= '#f5dbda',
+  'G[A>C]C'= '#f5dbda',
+  'G[A>C]G'= '#f5dbda',
+  'G[A>C]T'= '#f5dbda',
+  'T[A>C]A'= '#f5dbda',
+  'T[A>C]C'= '#f5dbda',
+  'T[A>C]G'= '#f5dbda',
+  'T[A>C]T'= '#f5dbda'
+)
+
+
+rnasbs192_mutationtype
+
+# Initialize the tibble with mutation types
+rnasbs192_signature <- tibble(MutationType = rnasbs192_mutationtype) %>%
+  # Extract parts from MutationType like T[A>C]T
+  mutate(
+    Class = substr(MutationType, 1, 1),                     # First nucleotide
+    Type = gsub(".*\\[(.*)\\].*", "\\1", MutationType),     # Mutation type inside brackets
+    SubType = substr(MutationType, nchar(MutationType), nchar(MutationType)) # Last nucleotide
+  ) %>%
+  # Create a key for color mapping
+  mutate(key = paste0(Class, "[", Type, "]", SubType)) %>%
+  # Add an empty color column
+  mutate(color = NA_character_)
+
+# Map the colors using rnasbs192_color_mapping
+rnasbs192_signature <- rnasbs192_signature %>%
+  mutate(color = rnasbs192_color_mapping[key])
+
+# Drop the key column
+rnasbs192_signature <- rnasbs192_signature %>% select(-key)
+
+# Create a named vector for colors
+rnasbs192_signature_color <- rnasbs192_signature$color
+names(rnasbs192_signature_color) <- rnasbs192_signature$MutationType
+
+# View the resulting tibble
+print(rnasbs192_signature)
+
+
+
+#---------------------------------------------------------------------------------------------
+
+### rnasbs192 logo function ###
+plot_profile_logo_rnasbs192 <- function(profile, output_plot = NULL, plot_width = NULL, plot_height = NULL) {
+  # Ensure that the profile has two columns: MutationType and Value
+  colnames(profile) <- c('MutationType', 'Value')
+  
+  # Join the profile with rnasbs192_signature to get colors and other details
+  profile <- rnasbs192_signature %>%
+    left_join(profile) %>%
+    mutate(MutationType = fct_inorder(MutationType))
+  
+  # Create the plot
+  plot <- ggplot(data = profile, aes(x = MutationType, y = Value, fill = MutationType, width = 0.7)) +
+    geom_bar(stat = "identity", position = "identity", colour = 'black', size = 0.05) +
+    scale_fill_manual(values = rnasbs192_signature_color) +
+    guides(fill = "none") +
+    scale_x_discrete(expand = expansion(add = 0)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    theme(axis.ticks = element_blank(),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          panel.background = element_blank(),
+          panel.grid = element_blank(),
+          strip.text.x = element_blank(),
+          panel.spacing.x = unit(0, "lines"),
+          axis.line.x = element_line(colour = 'black', size = 0.05))
+  
+  # Save or return the plot
+  if (is.null(output_plot)) {
+    return(plot)
+  } else {
+    xleng <- 2
+    yleng <- 0.8
+    if (is.null(plot_width)) plot_width <- xleng
+    if (is.null(plot_height)) plot_height <- yleng
+    
+    ggsave(filename = output_plot, plot = plot, width = plot_width, height = plot_height)
+  }
+}
+```
+
+
+```{r}
+# Mutational Pattern functions ---------------------------------------------
+
+profile_format_df <- function(data,factortype=FALSE,indel_short=FALSE){
+  # format, sorting and factor the signature dataframe for SBS96,DBS78 and ID83
+  
+  if(dim(data)[1]==96){
+    data <- data %>% mutate(Type=str_sub(MutationType,3,5),SubType=paste0(str_sub(MutationType,1,1),str_sub(MutationType,3,3),str_sub(MutationType,7,7))) %>% select(Type,SubType,MutationType,everything()) %>% arrange(Type,SubType)
+  }
+  
+  if(dim(data)[1]==78){
+    data <- data %>% mutate(Type=paste0(str_sub(MutationType,1,3),"NN"),SubType=str_sub(MutationType,4,5)) %>% select(Type,SubType,MutationType,everything()) %>% arrange(Type,SubType)
+  }
+  
+  if(dim(data)[1]==83){
+    idtypeorder <- c("1:Del:C","1:Del:T","1:Ins:C","1:Ins:T","2:Del:R","3:Del:R","4:Del:R","5:Del:R","2:Ins:R","3:Ins:R","4:Ins:R","5:Ins:R","2:Del:M","3:Del:M","4:Del:M","5:Del:M")
+    data <- data %>% mutate(Type=str_sub(MutationType,1,7),SubType=str_sub(MutationType,9,9)) %>% select(Type,SubType,MutationType,everything()) %>% mutate(Type=factor(Type,levels = idtypeorder)) %>% arrange(Type,SubType) %>% mutate(Type=as.character(Type))
+  }
+  
+  if(dim(data)[1]==68){
+    idtypeorder <- c("0:homdel","1:LOH","2:LOH","3-4:LOH","5-8:LOH","9+:LOH","2:het","3-4:het","5-8:het","9+:het")
+    idsubtypeorder <- c('0-1kb','1-10kb','10-100kb','100kb-1Mb','>1Mb','1-10Mb','10-40Mb','>40Mb')
+    idsubtypelabel <- c('0-1kb','1kb-10kb','10kb-100kb','100kb-1Mb','>1Mb','1Mb-10Mb','10Mb-40Mb','>40Mb')
+    data <- data %>% mutate(tmp=MutationType) %>% separate(tmp,into = c('a','b','c'),sep = ':') %>% mutate(Type=paste0(a,":",b)) %>% select(-a,-b) %>% select(Type,SubType=c,MutationType,everything()) %>% mutate(Type=factor(Type,levels = idtypeorder),SubType=factor(SubType,levels = idsubtypeorder,labels=idsubtypelabel)) %>% arrange(Type,SubType) %>% mutate(Type=as.character(Type))
+  }
+  
+  if(dim(data)[1]==38){
+    idtypeorder <- c("DEL:clustered",'DUP:clustered','INV:clustered','TLOC:clustered',"DEL:unclustered",'DUP:unclustered','INV:unclustered','TLOC:unclustered')
+    idsubtypeorder <-  c('NA','<1kb','1-10kb','10-100kb','100kb-1Mb','1Mb-10Mb','>10Mb')
+    idsubtypelabel <-  c('','<1kb','1kb-10kb','10kb-100kb','100kb-1Mb','1Mb-10Mb','>10Mb')
+    data <- data %>% mutate(Type=str_replace(MutationType,":.*:",":"),SubType=str_remove(str_remove(MutationType,":[^:]*$"),'^.*:')) %>% select(Type,SubType,MutationType,everything()) %>% mutate(Type=factor(Type,levels = idtypeorder),SubType=factor(SubType,levels = idsubtypeorder,labels=idsubtypelabel)) %>% arrange(Type,SubType) %>% mutate(Type=as.character(Type))
+  }
+  
+  if(dim(data)[1]==192){
+    data <- data %>% separate(MutationType,into = c('Strand','MutationType'),sep = ':')%>% mutate(Type=str_sub(MutationType,3,5),SubType=paste0(str_sub(MutationType,1,1),str_sub(MutationType,3,3),str_sub(MutationType,7,7))) %>% select(Type,SubType,MutationType,everything()) %>% arrange(Type,SubType)
+  }
+  
+  if(factortype){
+    
+    if(dim(data)[1]==83){
+      tmplev <- idtypeorder
+      tmplab <- str_replace(tmplev,"5","5+")
+      
+      if(indel_short){
+        tmplab = if_else(tmplab %in% c('2:Del:M','3:Del:M','4:Del:M'),str_remove(tmplab,":.*"),tmplab)
+      }
+      
+      data <- data %>% 
+        mutate(Type=factor(Type,levels = tmplev,labels = tmplab)) %>% 
+        mutate(SubType = if_else(str_detect(Type,'Del') & !str_detect(Type,"M"),as.character(as.integer(SubType)+1L),SubType)) %>% 
+        mutate(SubType = if_else(str_detect(Type,'Del') & !str_detect(Type,"M"), str_replace(SubType,"6","6+"),str_replace(SubType,"5","5+")))
+    }else {
+      tmplev <- unique(data$Type)
+      data <- data %>% mutate(Type=factor(Type,levels = tmplev))
+    }
+    
+    if(dim(data)[1]==192){ data <- data %>% mutate(Strand=factor(Strand, levels = c('T','U')))}
+    
+    #tmplev <- unique(data$SubType)
+    #data <- data %>% mutate(SubType=factor(SubType,levels = tmplev))
+    tmplev <- unique(data$MutationType)
+    data <- data %>% mutate(MutationType=factor(MutationType,levels = tmplev))
+  }
+  
+  return(data)
+  
+}
+```
+

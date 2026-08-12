@@ -6,7 +6,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 export default function MsDecompositionPlot({ state }) {
   const [params, setParams] = useState('');
 
-  const { data, error, isFetching } = useMsDecompositionQuery(params, {
+  const { currentData, error, isFetching } = useMsDecompositionQuery(params, {
     skip: !params,
   });
 
@@ -28,12 +28,12 @@ export default function MsDecompositionPlot({ state }) {
     <>
       <LoadingOverlay active={isFetching} />
       {error && <p className="p-3 text-danger">Plot is unavailable</p>}
-      {data && !error ? (
+      {currentData && !error ? (
         <Plotly
           className="w-100"
-          data={data.traces}
-          layout={data.layout}
-          config={data.config}
+          data={currentData.traces}
+          layout={currentData.layout}
+          config={currentData.config}
         />
       ) : (
         <div className="text-center my-4">No data available</div>

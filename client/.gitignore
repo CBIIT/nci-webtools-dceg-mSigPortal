@@ -23,3 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 junit.xml
+
+# production (vite)
+/dist

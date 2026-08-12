@@ -10,8 +10,17 @@ volumes:
   - name: data
     efsVolumeConfiguration:
       fileSystemId: "${EFS_FILESYSTEM_ID}"
+      # Mount the mSigPortal subtree directly (confined to /msigportal) instead of
+      # through the uid-1000 access point. This lets the sync run as root so it can
+      # write into directories that were previously seeded (e.g. by DataSync) with a
+      # different owner. rootDirectory keeps the mount scoped to /msigportal, so the
+      # task cannot see or touch other applications' data on this shared filesystem.
+      rootDirectory: "/msigportal"
+      # Keep EFS IAM authorization enabled (defense-in-depth, consistent with the
+      # other task definitions in this repo). We drop only the accessPointId so the
+      # task mounts as root; iam stays ENABLED so the mount still presents the task
+      # role's credentials on any tier whose filesystem policy enforces IAM.
       authorizationConfig:
-        accessPointId: "${EFS_ACCESS_POINT_ID}"
         iam: ENABLED
       transitEncryption: ENABLED
 containerDefinitions:
@@ -20,8 +29,16 @@ containerDefinitions:
     essential: true
     entryPoint: ["/bin/sh", "-c"]
     command:
+      # Sync as root, then hand ownership of only the synced path (Database) back to
+      # the application's POSIX identity (uid/gid 1000) so the app can read/write it.
+      # Scoped to /data/Database — the only path this task writes — to avoid
+      # traversing unrelated (and potentially large) subtrees like genomes/ on every run.
+      # --exact-timestamps forces re-download when an object's timestamp differs even
+      # if its size is unchanged; regenerated plots can keep the same byte size, and
+      # without this flag `aws s3 sync` would silently leave the stale copy on EFS.
       - >-
-        aws s3 sync "${DATA_S3_URI}" /data/Database/
+        aws s3 sync "${DATA_S3_URI}" /data/Database/ --exact-timestamps
+        && chown -R 1000:1000 /data/Database
     mountPoints:
       - sourceVolume: data
         containerPath: "/data"

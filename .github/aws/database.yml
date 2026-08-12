@@ -13,7 +13,18 @@ containerDefinitions:
       type: fluentbit
       options:
         enable-ecs-log-metadata: "true"
+        config-file-type: file
+        config-file-value: /fluent-bit/configs/output-metrics-healthcheck.conf
     memoryReservation: 50
+    stopTimeout: 120
+    healthCheck:
+      command:
+        - CMD-SHELL
+        - "curl -f http://127.0.0.1:2020/api/v1/uptime || exit 1"
+      interval: 5
+      timeout: 2
+      retries: 3
+      startPeriod: 10
     logConfiguration:
       logDriver: awslogs
       options:
@@ -25,6 +36,9 @@ containerDefinitions:
   - name: database-import
     image: "${DATABASE_IMAGE_REF}"
     essential: true
+    dependsOn:
+      - containerName: logs
+        condition: HEALTHY
     environment:
       - name: AWS_DEFAULT_REGION
         value: "${AWS_REGION}"

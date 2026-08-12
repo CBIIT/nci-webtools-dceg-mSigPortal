@@ -111,6 +111,16 @@ async function msLandscape(req, res, next) {
       columns,
       limit
     );
+    if (exposureData.length === 0) {
+      return next(
+        new Error('No exposure data available for the selected signature set.')
+      );
+    }
+    if (signatureData.length === 0) {
+      return next(
+        new Error('No signature data available for the selected signature set.')
+      );
+    }
     const seqmatrixData = await getSeqmatrixData(
       connection,
       {
@@ -125,8 +135,14 @@ async function msLandscape(req, res, next) {
       columns,
       limit
     );
+    if (seqmatrixData.length === 0) {
+      return next(
+        new Error('No seqmatrix data available for the selected study.')
+      );
+    }
+
     const fn = 'msLandscape';
-    const args = { exposureData, signatureData, seqmatrixData };
+    const args = { exposureData, signatureData, seqmatrixData, study };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
@@ -165,14 +181,30 @@ async function msDecomposition(req, res, next) {
       columns,
       limit
     );
+    if (exposureData.length === 0) {
+      return next(
+        new Error('No exposure data available for the selected signature set.')
+      );
+    }
+    if (signatureData.length === 0) {
+      return next(
+        new Error('No signature data available for the selected signature set.')
+      );
+    }
     const seqmatrixData = await getSeqmatrixData(
       connection,
       { study, strategy, cancer, profile: signatureData[0].profile },
       columns,
       limit
     );
+    if (seqmatrixData.length === 0) {
+      return next(
+        new Error('No seqmatrix data available for the selected parameters.')
+      );
+    }
+
     const fn = 'msDecomposition';
-    const args = { exposureData, signatureData, seqmatrixData };
+    const args = { exposureData, signatureData, seqmatrixData, study };
     const id = userId || randomUUID();
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
@@ -193,7 +225,7 @@ async function msDecomposition(req, res, next) {
 async function cosineSimilarity(req, res, next) {
   const { logger } = req.app.locals;
   try {
-    const { signatureSetName, userId, ...params } = req.query;
+    const { signatureSetName, userId, study, ...params } = req.query;
     const connection = userId
       ? req.app.locals.sqlite(userId, 'local')
       : req.app.locals.connection;
@@ -212,7 +244,7 @@ async function cosineSimilarity(req, res, next) {
       limit
     );
     const fn = 'cosineSimilarity';
-    const args = { signatureData1, signatureData2 };
+    const args = { signatureData1, signatureData2, study };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
@@ -220,7 +252,7 @@ async function cosineSimilarity(req, res, next) {
     const { stdout, ...rest } = JSON.parse(wrapper);
     res.json({ stdout, ...rest });
   } catch (err) {
-    logger.error(`/msLandscape: An error occurred `);
+    logger.error(`/cosineSimilarity: An error occurred `);
     next(err);
   }
 }

@@ -85,38 +85,42 @@ export async function recreateTable(connection, name, schemaFn) {
 
 export async function initializeSchema(connectionConfig, schema) {
   const connection = createConnection(connectionConfig);
-  const tables = schema.filter(({ type }) => !type || type === "table");
-  const materializedViews = schema.filter(
-    ({ type }) => type === "materializedView"
-  );
-  const indexedTables = schema.filter((s) => typeof s.index === "function");
-
-  // drop tables in reverse order to avoid foreign key constraints
-  for (const { name } of [...materializedViews.reverse()]) {
-    await connection.schema.dropMaterializedViewIfExists(name);
-  }
-
-  for (const { name } of [...tables].reverse()) {
-    await connection.schema.dropTableIfExists(name);
-  }
-
-  for (const { name, schema } of tables) {
-    await connection.schema.createTable(name, (table) =>
-      schema(table, connection)
+  try {
+    const tables = schema.filter(({ type }) => !type || type === "table");
+    const materializedViews = schema.filter(
+      ({ type }) => type === "materializedView"
     );
-  }
+    const indexedTables = schema.filter((s) => typeof s.index === "function");
 
-  for (const { name, schema } of materializedViews) {
-    await connection.schema.createMaterializedView(name, (view) =>
-      schema(view, connection)
-    );
-  }
+    // drop tables in reverse order to avoid foreign key constraints
+    for (const { name } of [...materializedViews.reverse()]) {
+      await connection.schema.dropMaterializedViewIfExists(name);
+    }
 
-  for (const { name, index } of indexedTables) {
-    await connection.schema.table(name, index);
-  }
+    for (const { name } of [...tables].reverse()) {
+      await connection.schema.dropTableIfExists(name);
+    }
 
-  return true;
+    for (const { name, schema } of tables) {
+      await connection.schema.createTable(name, (table) =>
+        schema(table, connection)
+      );
+    }
+
+    for (const { name, schema } of materializedViews) {
+      await connection.schema.createMaterializedView(name, (view) =>
+        schema(view, connection)
+      );
+    }
+
+    for (const { name, index } of indexedTables) {
+      await connection.schema.table(name, index);
+    }
+
+    return true;
+  } finally {
+    await connection.destroy();
+  }
 }
 
 export async function initializeSchemaForImport(connection, schema, sources) {
@@ -164,4 +168,43 @@ export function getSourceProvider(providerName, providerArgs) {
 export async function renderTemplate(filepath, data) {
   const contents = await readFile(filepath, "utf8");
   return template(contents)(data);
+}
+
+/** Active connections used for graceful shutdown (SIGTERM/SIGINT). */
+let activePgConnection = null;
+let activeKnexConnection = null;
+
+export function registerPgConnection(client) {
+  activePgConnection = client;
+}
+
+export function clearPgConnection(client) {
+  if (activePgConnection === client) {
+    activePgConnection = null;
+  }
+}
+
+export function registerKnexConnection(connection) {
+  activeKnexConnection = connection;
+}
+
+export function clearKnexConnection(connection) {
+  if (activeKnexConnection === connection) {
+    activeKnexConnection = null;
+  }
+}
+
+export async function abortActiveConnections() {
+  // Only abort the raw pg client (unblocks long-running COPY/REFRESH).
+  // Leave knex open so importData can mark FAILED, read logs, and send email.
+  const pg = activePgConnection;
+  activePgConnection = null;
+
+  if (pg) {
+    try {
+      await pg.end();
+    } catch {
+      // connection may already be closed
+    }
+  }
 }
