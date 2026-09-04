@@ -440,6 +440,66 @@ async function getPublicTreeLeafData(req, res, next) {
   }
 }
 
+async function getUserTreeLeafData(req, res, next) {
+  try {
+    const { userId, profile = 'SBS', matrix = 96 } = req.body;
+    if (!userId) {
+      throw new Error('Missing userId for user tree leaf data');
+    }
+
+    const connection = req.app.locals.sqlite(userId, 'local');
+    const seqmatrixData = await connection
+      .select(
+        '*',
+        connection.raw("profile || matrix as profileMatrix")
+      )
+      .from('seqmatrix')
+      .where({ profile })
+      .andWhere(function () {
+        // matrix may be stored as integer or string depending on import path
+        this.where('matrix', matrix).orWhere('matrix', String(matrix));
+      });
+
+    console.log(
+      `[treeLeaf/user] userId=${userId} profile=${profile} matrix=${matrix} rows=${seqmatrixData?.length || 0}`
+    );
+
+    if (!seqmatrixData?.length) {
+      throw new Error(
+        `No SBS96 seqmatrix data found for user session ${userId}`
+      );
+    }
+
+    const results = await wrapper('wrapper', {
+      fn: 'getTreeLeafUser',
+      args: { seqmatrixData },
+    });
+
+    if (results?.output?.error || results?.output?.uncaughtError) {
+      console.log(
+        `[treeLeaf/user] R error for userId=${userId}:`,
+        results.output.error || results.output.uncaughtError
+      );
+    }
+
+    results.output.params = { userId, profile, matrix };
+    res.json(results);
+  } catch (error) {
+    console.log(
+      `[treeLeaf/user] failed userId=${req.body?.userId} profile=${req.body?.profile} matrix=${req.body?.matrix}`,
+      error
+    );
+    next(error);
+  }
+}
+
+async function getTreeLeafData(req, res, next) {
+  if (req.body.userId || req.body.source === 'user') {
+    return getUserTreeLeafData(req, res, next);
+  }
+  return getPublicTreeLeafData(req, res, next);
+}
+
 const router = Router();
 router.post('/submitVisualization/:id?', submit);
 router.post('/getResults', getResults);
@@ -452,7 +512,7 @@ router.post(
   createCacheMiddleware((req) =>
     [
       'treeLeaf',
-      req.body.study,
+      req.body.userId || req.body.study,
       req.body.strategy,
       req.body.cancer,
       req.body.signatureSetName,
@@ -460,7 +520,7 @@ router.post(
       req.body.matrix,
     ].join(':')
   ),
-  getPublicTreeLeafData
+  getTreeLeafData
 );
 
 export {

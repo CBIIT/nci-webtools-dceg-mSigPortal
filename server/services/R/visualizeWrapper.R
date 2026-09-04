@@ -1187,3 +1187,60 @@ msigportal.getTreeLeaf <- function(args, config) {
 
   return(list(hierarchy = as.radialNetwork(hc), attributes = mdatax))
 }
+
+# Seqmatrix-only tree/leaf for user-uploaded data (no exposure/signature activities).
+# Leaf attributes: Sample, Dmut (dominant mutation), Mutations.
+msigportal.getTreeLeafUser <- function(args, config) {
+  library(TreeAndLeaf)
+  library(igraph)
+  library(networkD3)
+
+  source("services/R/Sigvisualfunc.R")
+
+  seqmatrix_refdata <- args$seqmatrixData
+
+  if (is.null(seqmatrix_refdata) || nrow(seqmatrix_refdata) == 0) {
+    stop("No seqmatrix data provided")
+  }
+
+  seqmatrix_refdata_ratio <- seqmatrix_refdata %>%
+    group_by(sample, profileMatrix) %>%
+    mutate(mutations = mutations / sum(mutations)) %>%
+    ungroup()
+
+  # determine dominant mutation (SBS96: A[C>A]A -> C>A)
+  dmdata <- seqmatrix_refdata %>%
+    mutate(type = str_sub(mutationType, 3, 5)) %>%
+    group_by(sample, type) %>%
+    summarise(value = sum(mutations), .groups = "drop_last") %>%
+    mutate(value = value / (sum(value))) %>%
+    arrange(desc(value)) %>%
+    slice(1) %>%
+    ungroup() %>%
+    rename(Dmut = type, Dmvalue = value)
+
+  mdata <- seqmatrix_refdata_ratio %>%
+    select(mutationType, mutations, sample) %>%
+    pivot_wider(names_from = mutationType, values_from = mutations)
+
+  mdata0 <- as.matrix(mdata[, -1])
+  rownames(mdata0) <- mdata$sample
+
+  mdatax <- mdata %>%
+    select(sample) %>%
+    left_join(dmdata, by = "sample") %>%
+    left_join(
+      seqmatrix_refdata %>%
+        group_by(sample) %>%
+        summarise(mutations = sum(mutations), .groups = "drop") %>%
+        ungroup(),
+      by = "sample"
+    ) %>%
+    mutate(Cancer_Type = "Input") %>%
+    rename(Sample = sample, Mutations = mutations) %>%
+    group_by(row_number())
+
+  hc <- hclust(dist(mdata0), "ward.D")
+
+  return(list(hierarchy = as.radialNetwork(hc), attributes = mdatax))
+}
