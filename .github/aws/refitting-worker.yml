@@ -61,8 +61,6 @@ containerDefinitions:
         valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
       - name: DATA_BUCKET_PREFIX
         valueFrom: "/analysistools/${TIER}/${APP}/data_bucket_prefix"
-      - name: IO_BUCKET
-        valueFrom: "/analysistools/${TIER}/${APP}/data_bucket"
       - name: INPUT_KEY_PREFIX
         valueFrom: "/analysistools/${TIER}/${APP}/input_key_prefix"
       - name: OUTPUT_KEY_PREFIX
