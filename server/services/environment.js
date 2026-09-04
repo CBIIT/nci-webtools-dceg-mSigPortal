@@ -10,7 +10,6 @@ export const required = [
   'OUTPUT_FOLDER',
   'DATA_BUCKET',
   'DATA_BUCKET_PREFIX',
-  'IO_BUCKET',
   'INPUT_KEY_PREFIX',
   'OUTPUT_KEY_PREFIX',
   'EMAIL_ADMIN',
