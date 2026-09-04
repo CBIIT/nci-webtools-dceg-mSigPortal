@@ -1,9 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import cloneDeep from 'lodash/cloneDeep';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { formState, graphDataSelector, treeLeafDataState } from './treeLeaf.state';
+import {
+  formState,
+  graphDataSelector,
+  treeLeafDataState,
+} from './treeLeaf.state';
 import { groupBy, createPromiseWorker } from './treeLeaf.utils';
 
 export default function D3TreeLeaf({
@@ -11,28 +14,51 @@ export default function D3TreeLeaf({
   width = 1000,
   height = 1000,
   onSelect,
+  state = {},
   ...props
 }) {
   const plotRef = useRef(null);
   const form = useRecoilValue(formState);
-  const publicForm = useSelector((state) => state.visualization.publicForm);
+  const publicForm = useSelector((store) => store.visualization.publicForm);
+  const { id: sessionId, source } = state;
+  const isUser = source === 'user';
   const study = publicForm?.study?.value ?? 'PCAWG';
   const strategy = publicForm?.strategy?.value ?? 'WGS';
   const signatureSetName = form?.signatureSetName;
-  const profile = form?.profile;
-  const matrix = form?.matrix;
+  const profile = form?.profile || 'SBS';
+  const matrix = form?.matrix || 96;
   const cancer = form?.cancerType?.value;
-  const params = { study, strategy, signatureSetName, profile, matrix, cancer };
-  const { hierarchy, attributes, params: parameters } = useRecoilValue(graphDataSelector(params));
+  const params = isUser
+    ? { userId: sessionId, source: 'user', profile: 'SBS', matrix: 96 }
+    : { study, strategy, signatureSetName, profile, matrix, cancer };
+  const graphData = useRecoilValue(graphDataSelector(params));
+  if (graphData?.error) {
+    throw new Error(graphData.error);
+  }
+  // Trigger ErrorBoundary when the request fails or returns no data
+  if (graphData === null && !(isUser && !sessionId)) {
+    throw new Error(
+      isUser
+        ? 'Failed to load Tree and Leaf data for this user session.'
+        : 'Failed to load Tree and Leaf data for the selected study.'
+    );
+  }
+  const { hierarchy, attributes, params: parameters } = graphData || {};
   // const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!hierarchy || !attributes) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     // use sessionCache as a temporary cache to allow storing objects with circular references (eg: hierarchy)
     window.sessionCache = window.sessionCache || {};
-    const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
+    const worker = createPromiseWorker('./workers/treeLeaf.js', {
+      type: 'module',
+    });
     const params = {
       data: hierarchy,
       attributes: groupBy(attributes, 'Sample'),
@@ -45,17 +71,19 @@ export default function D3TreeLeaf({
       setTreeLeafData(sessionTreeLeafData);
       setLoading(false);
     } else {
-      worker.submit(params).then(data => {
-        setTreeLeafData(data);
-        window.sessionCache[key] = data;
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      worker
+        .submit(params)
+        .then((data) => {
+          setTreeLeafData(data);
+          window.sessionCache[key] = data;
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
 
     return () => worker?.terminate();
   }, [hierarchy, attributes, width, height, setTreeLeafData, setLoading]);
-  
+
   useEffect(() => {
     if (plotRef.current && hierarchy && attributes && parameters) {
       const plotData = {
@@ -66,9 +94,15 @@ export default function D3TreeLeaf({
         links: treeLeafData.links,
       };
 
-      let plotTitle = `${publicForm?.study?.label} - ${form.color.label}`;
+      let plotTitle = isUser
+        ? `User Data - ${form.color.label}`
+        : `${publicForm?.study?.label} - ${form.color.label}`;
 
-      if (form.color.label === 'Dominant Signature' && parameters.signatureSetName) {
+      if (
+        !isUser &&
+        form.color.label === 'Dominant Signature' &&
+        parameters.signatureSetName
+      ) {
         plotTitle += ' - ' + parameters.signatureSetName;
       }
 
@@ -89,12 +123,27 @@ export default function D3TreeLeaf({
     } else {
       plotRef.current?.replaceChildren(null);
     }
-  }, [plotRef, attributes, form, hierarchy, id, width, height, publicForm?.study?.label, form.color.label, onSelect, treeLeafData]);
+  }, [
+    plotRef,
+    attributes,
+    form,
+    hierarchy,
+    id,
+    width,
+    height,
+    publicForm?.study?.label,
+    form.color.label,
+    onSelect,
+    treeLeafData,
+    isUser,
+  ]);
 
   return (
     <div className="border rounded p-3 position-relative" {...props}>
-      <div hidden={!loading}>Please wait one minute while your plot is being rendered...</div>
-      <div hidden={loading} ref={plotRef}  />
+      <div hidden={!loading}>
+        Please wait one minute while your plot is being rendered...
+      </div>
+      <div hidden={loading} ref={plotRef} />
     </div>
   );
 }
@@ -119,7 +168,7 @@ function createForceDirectedTree(
       height - marginTop - marginBottom
     ) / 2, // outer radius
     fill = form.color.continuous
-      ? d3.scaleSequential(d3.interpolateRgb("white", "steelblue"))
+      ? d3.scaleSequential(d3.interpolateRgb('white', 'steelblue'))
       : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
     stroke = '#666', // stroke for links
     strokeWidth = 0.3, // stroke width for links
@@ -128,29 +177,27 @@ function createForceDirectedTree(
     strokeLinecap, // stroke line cap for links
     plotTitle,
   },
-  { onClick },
+  { onClick }
 ) {
-  const range = {
-    xMin: 0,
-    xMax: 0,
-    yMin: 0,
-    yMax: 0,
-  };
+  // Include circle radii so few-node plots don't scale based only on centers
+  // (which makes leaf circles explode and clip the viewBox edges).
+  const xMin = d3.min(nodes, (d) => d.x - (d.r || 0));
+  const xMax = d3.max(nodes, (d) => d.x + (d.r || 0));
+  const yMin = d3.min(nodes, (d) => d.y - (d.r || 0));
+  const yMax = d3.max(nodes, (d) => d.y + (d.r || 0));
+  const bboxW = Math.max(xMax - xMin, 1);
+  const bboxH = Math.max(yMax - yMin, 1);
+  const cx = (xMin + xMax) / 2;
+  const cy = (yMin + yMax) / 2;
 
-  nodes.forEach((d) => {
-    if (d.x < range.xMin) range.xMin = d.x;
-    if (d.x > range.xMax) range.xMax = d.x;
-    if (d.y < range.yMin) range.yMin = d.y;
-    if (d.y > range.yMax) range.yMax = d.y;
-  });
-
-  const treeScale = Math.min(
-    Math.log2(Object.keys(attributes).length),
-    Math.max(
-      width / (range.xMax - range.xMin),
-      height / (range.yMax - range.yMin)
-    )
-  ) * 1.05;
+  // Fit the node bounding box into the viewBox and leave a margin (fillFactor).
+  // Large trees are essentially unchanged (radii are tiny vs spread); few-node
+  // plots scale up without clipping because radii are part of the bbox.
+  const viewBoxScale = 1.3;
+  const fillFactor = 0.7;
+  const treeScale =
+    fillFactor *
+    Math.min((width * viewBoxScale) / bboxW, (height * viewBoxScale) / bboxH);
 
   // gather range of attributes
   const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
@@ -161,8 +208,7 @@ function createForceDirectedTree(
     : fill.domain(colorValues);
 
   const zoom = d3.zoom().on('zoom', zoomed);
-  const viewBoxScale = 1.3;
-  const container = d3.create('div');
+  const container = d3.create('div').style('position', 'relative');
   const svg = container
     .append('svg')
     .attr('id', id)
@@ -184,20 +230,28 @@ function createForceDirectedTree(
 
   // add zoom reset control
   const zoomReset = container
-      .append('button')
-      .attr('id', 'treeleaf-zoom-reset')
-      .attr('class', 'btn btn-outline-secondary btn-sm')
-      .attr('style', 'position: absolute; top: 10px; left: 10px;')
-      .text('Reset Zoom')
-      .on('click', () => svg.transition().duration(250).call(zoom.transform,d3.zoomIdentity));
+    .append('button')
+    .attr('id', 'treeleaf-zoom-reset')
+    .attr('class', 'btn btn-outline-secondary btn-sm')
+    .attr('style', 'position: absolute; top: 10px; left: 10px;')
+    .text('Reset Zoom')
+    .on('click', () =>
+      svg.transition().duration(250).call(zoom.transform, d3.zoomIdentity)
+    );
 
   // add tree container
-  const treeZoomContainer = svg.append('g')
-    .attr('id', 'treeleaf-zoom-container')
+  const treeZoomContainer = svg
+    .append('g')
+    .attr('id', 'treeleaf-zoom-container');
 
-  const treeGroup = treeZoomContainer.append('g')
+  // Center the bounding box at the viewBox origin, then scale to fill.
+  const treeGroup = treeZoomContainer
+    .append('g')
     .attr('id', 'treeleaf-tree')
-    .attr('transform', `translate(0, 0) scale(${treeScale})`);
+    .attr(
+      'transform',
+      `translate(${-cx * treeScale}, ${-cy * treeScale}) scale(${treeScale})`
+    );
 
   // add lines
   const link = treeGroup
@@ -267,10 +321,7 @@ function createForceDirectedTree(
   if (title != null) node.append('title').text((d) => title(d.data, d));
 
   function zoomed({ transform }) {
-    d3.selectAll('#treeleaf-zoom-container').attr(
-      'transform',
-      transform
-    );
+    d3.selectAll('#treeleaf-zoom-container').attr('transform', transform);
   }
 
   // add tooltips
@@ -278,6 +329,7 @@ function createForceDirectedTree(
     .append('div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
+    .style('pointer-events', 'none')
     .attr('class', 'bg-light border rounded p-1');
 
   function mouseover() {
@@ -290,20 +342,24 @@ function createForceDirectedTree(
 
   function mousemove(e, d) {
     const sample = d.data.name;
-    const data = attributes[sample];
+    const data = attributes[sample] || {};
+    const cosine =
+      data.Cosine_similarity != null && !Number.isNaN(+data.Cosine_similarity)
+        ? (+data.Cosine_similarity).toFixed(3)
+        : 'Unavailable';
+    const [px, py] = d3.pointer(e, container.node());
     tooltip
       .html(
         `<div class="text-start">
           <div>Sample: ${sample ?? 'Unavailable'}</div>
           <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
-          <div>Cosine Similarity: ${
-            data.Cosine_similarity.toFixed(3) || 'Unavailable'
-          }</div>
-          <div>Mutations: ${data.Mutations || 'Unavailable'}</div>
+          <div>Cosine Similarity: ${cosine}</div>
+          <div>Dominant Mutation: ${data.Dmut ?? 'Unavailable'}</div>
+          <div>Mutations: ${data.Mutations ?? 'Unavailable'}</div>
         </div>`
       )
-      .style('left', e.layerX + 'px')
-      .style('top', e.layerY + 'px');
+      .style('left', px + 12 + 'px')
+      .style('top', py + 12 + 'px');
   }
 
   function click(e, d) {

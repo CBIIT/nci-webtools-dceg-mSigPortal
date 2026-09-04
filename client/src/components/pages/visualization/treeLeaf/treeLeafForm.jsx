@@ -3,39 +3,72 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
-import { formState, graphDataSelector, colorOptions, defaultFormState } from './treeLeaf.state';
+import {
+  formState,
+  graphDataSelector,
+  colorOptions,
+  userColorOptions,
+  defaultFormState,
+  defaultUserFormState,
+} from './treeLeaf.state';
 import { useEffect } from 'react';
 
-export default function TreeLeafForm() {
-  const store = useSelector((state) => state.visualization);
-  const study = store?.publicForm?.study?.value || 'PCAWG';
-  const strategy = store?.publicForm?.strategy?.value || 'WGS';
-  const cancers = store?.publicForm?.cancers?.filter(c => c.value !== '*ALL') || [];
+export default function TreeLeafForm({ state = {} }) {
+  const { id, source } = state;
+  const isUser = source === 'user';
+
+  const publicForm = useSelector((store) => store.visualization.publicForm);
+  const study = publicForm?.study?.value || 'PCAWG';
+  const strategy = publicForm?.strategy?.value || 'WGS';
+  const cancerValue = publicForm?.cancer?.value ?? '';
+  const cancers = publicForm?.cancers?.filter((c) => c.value !== '*ALL') || [];
   const cancerTypes = [{ label: 'All', value: '' }].concat(cancers);
   const [form, setForm] = useRecoilState(formState);
   const signatureSetName = form?.signatureSetName;
-  const profile = form?.profile;
-  const matrix = form?.matrix;
-  const defaultCancer = cancerTypes.find(c => c.value === store?.publicForm?.cancer.value) || cancerTypes[0];
+  const profile = form?.profile || 'SBS';
+  const matrix = form?.matrix || 96;
+  const defaultCancer =
+    cancerTypes.find((c) => c.value === cancerValue) || cancerTypes[0];
   const cancer = form?.cancerType?.value;
-  const params = { study, strategy,  signatureSetName, profile, matrix, cancer };
-  const { attributes } = useRecoilValue(graphDataSelector(params));
-  const mergeForm = (state) => setForm({ ...form, ...state });
-  useEffect(() => setForm({...defaultFormState, cancerType: defaultCancer}), [setForm, study, defaultCancer]); // reset form when study changes
 
-  function handleChange(event) {
-    let { name, value, checked, type } = event.target;
-    mergeForm({
-      [name]: type === 'checkbox' ? checked : value,
-    });
+  const params = isUser
+    ? { userId: id, source: 'user', profile: 'SBS', matrix: 96 }
+    : { study, strategy, signatureSetName, profile, matrix, cancer };
+
+  const graphData = useRecoilValue(graphDataSelector(params));
+  if (graphData?.error) {
+    throw new Error(graphData.error);
   }
+  if (graphData === null && !(isUser && !id)) {
+    throw new Error(
+      isUser
+        ? 'Failed to load Tree and Leaf data for this user session.'
+        : 'Failed to load Tree and Leaf data for the selected study.'
+    );
+  }
+  const { attributes } = graphData || {};
+  const mergeForm = (next) => setForm({ ...form, ...next });
+  const leafColorOptions = isUser ? userColorOptions : colorOptions;
+
+  // Reset form when source/study/session changes. Depend on primitive values only —
+  // object identities like defaultCancer change every render and would loop setForm.
+  useEffect(() => {
+    if (isUser) {
+      setForm({ ...defaultUserFormState });
+      return;
+    }
+    const cancerOption = [{ label: 'All', value: '' }]
+      .concat((publicForm?.cancers || []).filter((c) => c.value !== '*ALL'))
+      .find((c) => c.value === cancerValue) || { label: 'All', value: '' };
+    setForm({ ...defaultFormState, cancerType: cancerOption });
+  }, [setForm, study, cancerValue, isUser, id]);
 
   function handleSearch(e) {
     mergeForm({ searchSamples: e });
   }
 
   function filterSampleOptions(inputValue = '', limit = 100) {
-    return attributes
+    return (attributes || [])
       .filter(
         (g) =>
           !inputValue ||
@@ -52,25 +85,27 @@ export default function TreeLeafForm() {
   return (
     <Form>
       <Row>
-        <Col md="auto">
-          <Form.Group controlId="cancerType" className="mb-3">
-            <Form.Label>Cancer Type</Form.Label>
-            <Select
-              name="cancerType"
-              defaultValue={defaultCancer}
-              options={cancerTypes}
-              onChange={(e) => mergeForm({ cancerType: e })}
-              aria-label="Cancer Type Selector"
-            />
-          </Form.Group>
-        </Col>        
+        {!isUser && (
+          <Col md="auto">
+            <Form.Group controlId="cancerType" className="mb-3">
+              <Form.Label>Cancer Type</Form.Label>
+              <Select
+                name="cancerType"
+                value={form.cancerType || defaultCancer}
+                options={cancerTypes}
+                onChange={(e) => mergeForm({ cancerType: e })}
+                aria-label="Cancer Type Selector"
+              />
+            </Form.Group>
+          </Col>
+        )}
         <Col md="auto">
           <Form.Group controlId="color" className="mb-3">
             <Form.Label>Leaf Property</Form.Label>
             <Select
               name="color"
-              defaultValue={colorOptions[0]}
-              options={colorOptions}
+              value={form.color}
+              options={leafColorOptions}
               onChange={(e) => mergeForm({ color: e })}
               aria-label="Leaf Property Selector"
             />
