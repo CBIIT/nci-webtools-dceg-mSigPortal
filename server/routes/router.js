@@ -1,5 +1,4 @@
-import express from 'express';
-import Router from 'express-promise-router';
+import express, { Router } from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import {xss} from 'express-xss-sanitizer';
