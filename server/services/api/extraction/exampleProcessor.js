@@ -96,7 +96,7 @@ export async function exampleProcessor(
   if (inputFolderId.startsWith('Example_')) {
     const parts = inputFolderId.split('_');
     if (parts.length >= 2) {
-      const match = parts[1].match(/([A-Za-z]+)(\d+)/);
+      const match = parts[1].slice(0, 64).match(/^([A-Za-z]+?)(\d+)$/);
       if (match) {
         const profileType = match[1];
         const matrixSize = match[2];

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { mkdirs, writeJson, readJson } from '../../utils.js';
+import { mkdirs, writeJson, readJson, isValidId, resolveWithin } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 import { exampleProcessor } from './exampleProcessor.js';
 import fs from 'fs';
@@ -102,10 +102,13 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
+    if (!isValidId(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
     const uuid = randomUUID();
     const dataFolder = path.resolve(env.DATA_FOLDER);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, uuid);
-    const exampleFolderPath = path.resolve(
+    const exampleFolderPath = resolveWithin(
       dataFolder,
       'examples',
       'extraction',

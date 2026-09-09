@@ -7,7 +7,7 @@ import Papa from 'papaparse';
 import rWrapper from 'r-wrapper';
 import Router from 'express-promise-router';
 import archiver from 'archiver';
-import { mkdirs } from '../utils.js';
+import { mkdirs, resolveWithin, sanitizeFilename } from '../utils.js';
 const r = rWrapper.async;
 import { getObjectBuffer } from '../s3.js';
 const env = process.env;
@@ -48,10 +48,10 @@ export function parseTSV(filepath) {
 function upload(req, res, next) {
   const { logger } = req.app.locals;
   const { id } = req.params;
-  if (!validate(id)) next(new Error('Invalid ID'));
+  if (!validate(id)) return next(new Error('Invalid ID'));
 
   const form = formidable({
-    uploadDir: path.resolve(env.INPUT_FOLDER, id),
+    uploadDir: resolveWithin(env.INPUT_FOLDER, id),
     multiples: true,
   });
 
@@ -60,8 +60,14 @@ function upload(req, res, next) {
 
   form
     .on('fileBegin', (field, file) => {
-      const destination = path.resolve(form.uploadDir, file.originalFilename);
-      file.filepath = destination;
+      try {
+        file.filepath = resolveWithin(
+          form.uploadDir,
+          sanitizeFilename(file.originalFilename)
+        );
+      } catch (err) {
+        form.emit('error', err);
+      }
     })
     .on('error', (err) => {
       logger.info('/UPLOAD: An error occurred\n' + err);

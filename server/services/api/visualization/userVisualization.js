@@ -8,7 +8,7 @@ import { parseCSV } from '../general.js';
 import { getExposureData, getSignatureData } from '../../query.js';
 import { createCacheMiddleware } from '../../cache.js';
 import isUUID from 'validator/lib/isUUID.js';
-import { mkdirs, writeJson } from '../../utils.js';
+import { mkdirs, writeJson, isValidId, resolveWithin } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 
 const r = rWrapper.async;
@@ -174,10 +174,12 @@ async function getResultsFiles(resultsPath, id = '') {
 
 async function getResults(req, res, next) {
   const { logger } = req.app.locals;
-  logger.info(`/getResults: Retrieving Results for ${req.body.id}`);
-  const userResults = path.resolve(env.OUTPUT_FOLDER, req.body.id, 'results');
+  const { id } = req.body;
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  logger.info(`/getResults: Retrieving Results for ${id}`);
+  const userResults = resolveWithin(env.OUTPUT_FOLDER, id, 'results');
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
-    res.json(await getResultsFiles(userResults, req.body.id));
+    res.json(await getResultsFiles(userResults, id));
   } else {
     logger.info('/getResults: Results not found');
     res.status(500).json('Results not found');
@@ -190,6 +192,10 @@ async function wrapper(fn, args) {
 async function visualizationWrapper(req, res, next) {
   const { logger } = req.app.locals;
   const { fn, args, id = randomUUID() } = req.body;
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  if (typeof fn !== 'string' || !/^[A-Za-z0-9_]+$/.test(fn)) {
+    return res.status(400).json('Invalid function name');
+  }
 
   // config info for R functions
   const rConfig = {
@@ -200,7 +206,7 @@ async function visualizationWrapper(req, res, next) {
 
   // create directory for results if needed
   const savePath = path.join('output', id, 'results', fn, '/');
-  await mkdirs([path.resolve(rConfig.wd, savePath)]);
+  await mkdirs([resolveWithin(rConfig.wd, savePath)]);
 
   try {
     const { scriptOutput, ...rest } = await wrapper('wrapper', {
@@ -289,7 +295,8 @@ async function downloadWorkspace(req, res, next) {
   const { logger } = req.app.locals;
   logger.info(`/visualization/downloadWorkspace`);
   const { state, id } = req.body;
-  const session = path.resolve(env.OUTPUT_FOLDER, id);
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  const session = resolveWithin(env.OUTPUT_FOLDER, id);
   const archive = archiver('zip', {
     zlib: { level: 6 }, // Sets the compression level.
   });
@@ -441,6 +448,7 @@ async function getPublicTreeLeafData(req, res, next) {
 }
 
 async function getUserTreeLeafData(req, res, next) {
+  const { logger } = req.app.locals;
   try {
     const { userId, profile = 'SBS', matrix = 96 } = req.body;
     if (!userId) {
@@ -460,9 +468,12 @@ async function getUserTreeLeafData(req, res, next) {
         this.where('matrix', matrix).orWhere('matrix', String(matrix));
       });
 
-    console.log(
-      `[treeLeaf/user] userId=${userId} profile=${profile} matrix=${matrix} rows=${seqmatrixData?.length || 0}`
-    );
+    logger.info('[treeLeaf/user] request', {
+      userId,
+      profile,
+      matrix,
+      rows: seqmatrixData?.length || 0,
+    });
 
     if (!seqmatrixData?.length) {
       throw new Error(
@@ -476,19 +487,21 @@ async function getUserTreeLeafData(req, res, next) {
     });
 
     if (results?.output?.error || results?.output?.uncaughtError) {
-      console.log(
-        `[treeLeaf/user] R error for userId=${userId}:`,
-        results.output.error || results.output.uncaughtError
-      );
+      logger.error('[treeLeaf/user] R error', {
+        userId,
+        error: results.output.error || results.output.uncaughtError,
+      });
     }
 
     results.output.params = { userId, profile, matrix };
     res.json(results);
   } catch (error) {
-    console.log(
-      `[treeLeaf/user] failed userId=${req.body?.userId} profile=${req.body?.profile} matrix=${req.body?.matrix}`,
-      error
-    );
+    logger.error('[treeLeaf/user] failed', {
+      userId: req.body?.userId,
+      profile: req.body?.profile,
+      matrix: req.body?.matrix,
+      error,
+    });
     next(error);
   }
 }
