@@ -545,7 +545,7 @@ async function getTreeLeafData(req, res, next) {
 }
 
 const router = Router();
-router.post('/submitVisualization/:id?', submit);
+router.post('/submitVisualization{/:id}', submit);
 router.post('/getResults', getResults);
 router.post('/visualizationWrapper', visualizationWrapper);
 router.get('/visualization/download', visualizationDownload);

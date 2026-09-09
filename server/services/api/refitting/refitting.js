@@ -1,4 +1,4 @@
-import Router from 'express-promise-router';
+import { Router } from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import { v4 as uuid, validate as validateUUID } from 'uuid';

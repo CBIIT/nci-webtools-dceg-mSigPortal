@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import Papa from 'papaparse';
 import rWrapper from 'r-wrapper';
-import Router from 'express-promise-router';
+import { Router } from 'express';
 import archiver from 'archiver';
 import {
   mkdirs,
@@ -168,7 +168,7 @@ export async function downloadOutput(req, res, next) {
 }
 
 const router = Router();
-router.post('/upload/:id?', upload);
+router.post('/upload{/:id}', upload);
 router.get('/downloadOutput/:id', downloadOutput);
 router.post('/getFileS3', getFileS3);
 router.post('/associationWrapper', associationWrapper);

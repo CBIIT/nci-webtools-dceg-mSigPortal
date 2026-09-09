@@ -153,14 +153,14 @@ const minMaxValidation = (param, min, max) =>
 const router = Router();
 
 router.post(
-  '/submitExtraction/:id?',
+  '/submitExtraction{/:id}',
   Object.entries(EXTRACTION_FORM_LIMIT).map(([arg, [min, max]]) =>
     minMaxValidation(`args.${arg}`, min, max)
   ),
   handleValidationErrors,
   submit
 );
-router.get('/refreshExtraction/:id?', refresh);
+router.get('/refreshExtraction{/:id}', refresh);
 router.post('/refreshExtractionMulti', refreshMulti);
 router.get('/extractionExample/:id', extractionExample);
 
