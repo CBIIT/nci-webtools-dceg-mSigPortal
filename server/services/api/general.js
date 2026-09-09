@@ -7,7 +7,12 @@ import Papa from 'papaparse';
 import rWrapper from 'r-wrapper';
 import Router from 'express-promise-router';
 import archiver from 'archiver';
-import { mkdirs, resolveWithin, sanitizeFilename } from '../utils.js';
+import {
+  mkdirs,
+  resolveWithin,
+  sanitizeFilename,
+  isValidId,
+} from '../utils.js';
 const r = rWrapper.async;
 import { getObjectBuffer } from '../s3.js';
 const env = process.env;
@@ -97,10 +102,15 @@ async function associationWrapper(req, res, next) {
   };
 
   // create directory for results if needed
-  const savePath = sessionId
-    ? path.join('output', sessionId, 'results', fn, '/')
-    : '';
-  if (sessionId) await mkdirs([path.join(rConfig.wd, savePath)]);
+  if (!isValidId(sessionId)) return next(new Error('Invalid session ID'));
+  const savePath = path.join(
+    'output',
+    sessionId,
+    'results',
+    sanitizeFilename(fn),
+    '/'
+  );
+  await mkdirs([resolveWithin(rConfig.wd, savePath)]);
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
@@ -126,16 +136,22 @@ async function associationWrapper(req, res, next) {
 
 async function getFileS3(req, res, next) {
   // serve static files from s3
-  const { path } = req.body;
-  if (path) {
-    const file = await getObjectBuffer(
-      `msigportal/Database/${path}`,
-      env.DATA_BUCKET
-    );
-    res.send(file);
-  } else {
-    next('Missing path to file');
+  const { path: filePath } = req.body;
+  if (!filePath) return next('Missing path to file');
+  // reject traversal so the request cannot escape the Database prefix
+  if (
+    typeof filePath !== 'string' ||
+    filePath.includes('\0') ||
+    filePath.includes('..') ||
+    filePath.startsWith('/')
+  ) {
+    return next('Invalid path to file');
   }
+  const file = await getObjectBuffer(
+    `msigportal/Database/${filePath}`,
+    env.DATA_BUCKET
+  );
+  res.send(file);
 }
 
 export async function downloadOutput(req, res, next) {

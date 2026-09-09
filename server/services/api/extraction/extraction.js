@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { mkdirs, writeJson, readJson, isValidId, resolveWithin } from '../../utils.js';
+import {
+  mkdirs,
+  writeJson,
+  readJson,
+  isValidId,
+  resolveWithin,
+} from '../../utils.js';
 import { getWorker } from '../../workers.js';
 import { exampleProcessor } from './exampleProcessor.js';
 import fs from 'fs';
@@ -24,10 +30,10 @@ const EXTRACTION_FORM_LIMIT = env.EXTRACTION_FORM_LIMIT
 
 export async function submit(req, res, next) {
   const id = req.params.id;
-  if (!validate(id)) res.status(500).json('Invalid ID');
+  if (!validate(id)) return res.status(500).json('Invalid ID');
 
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const statusFilePath = path.resolve(outputFolder, 'status.json');
   await mkdirs([inputFolder, outputFolder]);
@@ -54,8 +60,8 @@ async function getJobStatus(id) {
     return `${id} is not a valid ID`;
   }
   try {
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+    const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
 
     const paramsFilePath = path.resolve(inputFolder, 'params.json');
     const statusFilePath = path.resolve(outputFolder, 'status.json');
