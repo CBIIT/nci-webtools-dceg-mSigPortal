@@ -6,9 +6,60 @@ import { promisify } from 'util';
 import { execFile } from 'child_process';
 import template from 'lodash/template.js';
 import { pickBy } from 'lodash-es';
+import { validate as validateUuid } from 'uuid';
 
 // promisified executeFile
 export const execFileAsync = promisify(execFile);
+
+/**
+ * Validates that an identifier is safe to use in a filesystem path.
+ * Accepts UUIDs or a strict allowlist of filename-safe characters.
+ * @param {unknown} id
+ * @returns {boolean}
+ */
+export function isValidId(id) {
+  if (typeof id !== 'string' || id.length === 0 || id.length > 255) return false;
+  return validateUuid(id) || /^[A-Za-z0-9_-]+$/.test(id);
+}
+
+/**
+ * Reduces a user-supplied name to a safe basename, rejecting traversal.
+ * @param {unknown} name
+ * @returns {string} A safe filename
+ * @throws {Error} If the name is missing or resolves to a traversal segment
+ */
+export function sanitizeFilename(name) {
+  if (typeof name !== 'string' || name.includes('\0')) {
+    throw new Error('Invalid filename');
+  }
+  const base = path.basename(name);
+  if (!base || base === '.' || base === '..') {
+    throw new Error('Invalid filename');
+  }
+  return base;
+}
+
+/**
+ * Resolves path segments against a base directory and guarantees the result
+ * stays within that base, preventing path traversal.
+ * @param {string} base Base directory
+ * @param {...string} segments Path segments to join
+ * @returns {string} The contained, resolved path
+ * @throws {Error} If any segment contains a null byte or escapes the base
+ */
+export function resolveWithin(base, ...segments) {
+  const resolvedBase = path.resolve(base);
+  for (const segment of segments) {
+    if (typeof segment !== 'string' || segment.includes('\0')) {
+      throw new Error('Invalid path segment');
+    }
+  }
+  const target = path.resolve(resolvedBase, ...segments);
+  if (target !== resolvedBase && !target.startsWith(resolvedBase + path.sep)) {
+    throw new Error('Resolved path escapes base directory');
+  }
+  return target;
+}
 
 /**
  * Checks if the current module is the main module.
@@ -38,6 +89,9 @@ export async function mkdirs(dirs) {
  * @returns {Promise<void>} fulfilled when the file is written
  */
 export async function writeJson(filepath, data) {
+  if (typeof filepath !== 'string' || filepath.includes('\0')) {
+    throw new Error('Invalid filepath');
+  }
   return await writeFile(filepath, JSON.stringify(data), 'utf-8');
 }
 
@@ -48,6 +102,9 @@ export async function writeJson(filepath, data) {
  */
 export async function readJson(filepath) {
   try {
+    if (typeof filepath !== 'string' || filepath.includes('\0')) {
+      throw new Error('Invalid filepath');
+    }
     const data = await readFile(filepath, 'utf8');
     return JSON.parse(data);
   } catch (e) {
@@ -56,6 +113,9 @@ export async function readJson(filepath) {
 }
 
 export async function renderTemplate(filepath, data) {
+  if (typeof filepath !== 'string' || filepath.includes('\0')) {
+    throw new Error('Invalid filepath');
+  }
   const templateContents = await readFile(filepath, 'utf8');
   return template(templateContents)(data);
 }
@@ -67,6 +127,7 @@ export async function renderTemplate(filepath, data) {
  */
 export function coalesceFilePaths(filePaths) {
   for (const filePath of filePaths) {
+    if (typeof filePath !== 'string' || filePath.includes('\0')) continue;
     if (existsSync(filePath)) {
       return filePath;
     }
