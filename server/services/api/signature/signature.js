@@ -28,8 +28,19 @@ async function querySignature(req, res, next) {
     );
     const signatureName = req.query.signatureName;
     if (scalarValue) {
+      if (typeof scalarValue !== 'string' || typeof signatureName !== 'string') {
+        return res.status(400).json('Invalid scalarValue or signatureName');
+      }
       const scalarArray = scalarValue.split(';');
       const signatureNameArray = signatureName.split(';');
+      // one entry per signature in a set; largest COSMIC sets are < 100
+      const MAX_SIGNATURES = 128;
+      if (
+        scalarArray.length !== signatureNameArray.length ||
+        signatureNameArray.length > MAX_SIGNATURES
+      ) {
+        return res.status(400).json('Invalid scalarValue or signatureName');
+      }
       for (var i = 0; i < signatureNameArray.length; i++) {
         for (var j = 0; j < data.length; j++) {
           if (data[j].signatureName === signatureNameArray[i]) {
