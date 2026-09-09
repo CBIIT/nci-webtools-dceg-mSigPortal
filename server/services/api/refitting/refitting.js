@@ -44,10 +44,10 @@ router.post(
       });
     }
 
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-    const paramsFilePath = path.resolve(inputFolder, 'params.json');
-    const statusFilePath = path.resolve(outputFolder, 'status.json');
+    const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+    const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
+    const paramsFilePath = resolveWithin(inputFolder, 'params.json');
+    const statusFilePath = resolveWithin(outputFolder, 'status.json');
     await mkdirs([inputFolder, outputFolder]);
 
     const status = {
@@ -118,10 +118,13 @@ router.get('/refitting/run/:id', async (req, res) => {
   }
 
   try {
-    const inputPath = path.join(env.INPUT_FOLDER || './data/input', jobId);
-    const outputPath = path.join(env.OUTPUT_FOLDER || './data/output', jobId);
+    const inputPath = resolveWithin(env.INPUT_FOLDER || './data/input', jobId);
+    const outputPath = resolveWithin(
+      env.OUTPUT_FOLDER || './data/output',
+      jobId
+    );
 
-    const paramsFile = path.join(inputPath, 'params.json');
+    const paramsFile = resolveWithin(inputPath, 'params.json');
     if (!fs.existsSync(paramsFile)) {
       return res.status(404).json({
         success: false,
@@ -154,9 +157,15 @@ router.get('/refitting/run/:id', async (req, res) => {
       });
     }
 
-    const mafFilePath = path.join(inputPath, mafFile);
-    const genomicFilePath = path.join(inputPath, genomicFile);
-    const clinicalFilePath = path.join(inputPath, clinicalFile);
+    const mafFilePath = resolveWithin(inputPath, sanitizeFilename(mafFile));
+    const genomicFilePath = resolveWithin(
+      inputPath,
+      sanitizeFilename(genomicFile)
+    );
+    const clinicalFilePath = resolveWithin(
+      inputPath,
+      sanitizeFilename(clinicalFile)
+    );
 
     // Start the refitting process asynchronously
     startRefittingJob({
@@ -194,12 +203,12 @@ async function getJobStatus(id) {
   }
 
   try {
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+    const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
 
-    const paramsFilePath = path.resolve(inputFolder, 'params.json');
-    const statusFilePath = path.resolve(outputFolder, 'status.json');
-    const manifestFilePath = path.resolve(outputFolder, 'manifest.json');
+    const paramsFilePath = resolveWithin(inputFolder, 'params.json');
+    const statusFilePath = resolveWithin(outputFolder, 'status.json');
+    const manifestFilePath = resolveWithin(outputFolder, 'manifest.json');
 
     const params = await readJson(paramsFilePath);
     const status = await readJson(statusFilePath);
@@ -244,7 +253,7 @@ async function startRefittingJob({
   params,
   logger,
 }) {
-  const statusFile = path.join(outputPath, 'status.json');
+  const statusFile = resolveWithin(outputPath, 'status.json');
 
   try {
     // Update status to processing
@@ -292,10 +301,10 @@ async function startRefittingJob({
       timeout: 30 * 60 * 1000, // 30 minutes timeout
     });
 
-    console.log(`[${jobId}] Refitting service completed!`);
-    console.log(`[${jobId}] STDOUT:`, stdout);
+    logger.info(`[${jobId}] Refitting service completed!`);
+    logger.info('[%s] STDOUT: %s', jobId, stdout);
     if (stderr) {
-      console.log(`[${jobId}] STDERR:`, stderr);
+      logger.info('[%s] STDERR: %s', jobId, stderr);
     }
 
     logger.info(`Refitting job ${jobId} completed successfully`);
@@ -306,7 +315,7 @@ async function startRefittingJob({
       completedAt: new Date().toISOString(),
       files: [params.outputFilename],
     };
-    const manifestFile = path.join(outputPath, 'manifest.json');
+    const manifestFile = resolveWithin(outputPath, 'manifest.json');
     await writeJson(manifestFile, manifestData);
 
     // Update status to completed
