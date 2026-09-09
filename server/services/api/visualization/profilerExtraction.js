@@ -6,7 +6,14 @@ import isUUID from 'validator/lib/isUUID.js';
 import mapValues from 'lodash/mapValues.js';
 import { parseCSV, parseTSV } from '../general.js';
 import { schema } from './userSchema.js';
-import { readJson, writeJson, mkdirs, getFiles } from '../../utils.js';
+import {
+  readJson,
+  writeJson,
+  mkdirs,
+  getFiles,
+  isValidId,
+  resolveWithin,
+} from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
 import { sendNotification } from '../../notifications.js';
 import { formatObject } from '../../logger.js';
@@ -222,11 +229,12 @@ export async function profilerExtraction(
  */
 export async function getPaths(args, env = process.env) {
   const id = args.Project_ID;
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-  const paramsFile = path.resolve(inputFolder, 'params.json');
-  const statusFile = path.resolve(outputFolder, 'status.json');
-  const manifestFile = path.resolve(outputFolder, 'manifest.json');
+  if (!isValidId(id)) throw new Error('Invalid id');
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
+  const paramsFile = resolveWithin(inputFolder, 'params.json');
+  const statusFile = resolveWithin(outputFolder, 'status.json');
+  const manifestFile = resolveWithin(outputFolder, 'manifest.json');
   // const databaseFile = path.resolve(outputFolder, 'results.db');
 
   return {
