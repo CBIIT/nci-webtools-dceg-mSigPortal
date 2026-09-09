@@ -39,8 +39,6 @@ containerDefinitions:
     environment:
       - name: API_BASE_URL
         value: http://localhost:${BACKEND_CONTAINER_PORT}
-      - name: API_EXTRACTION_URL
-        value: http://localhost:${BACKEND_CONTAINER_PORT}
     secrets:
       - name: APP_PATH
         valueFrom: "/analysistools/${TIER}/${APP}/application_path"
