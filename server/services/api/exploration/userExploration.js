@@ -4,7 +4,7 @@ import path from 'path';
 import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
 import { getSignatureData } from '../../query.js';
-import { mkdirs } from '../../utils.js';
+import { mkdirs, resolveWithin, sanitizeFilename } from '../../utils.js';
 import { sqliteImport } from '../../sqlite.js';
 
 const env = process.env;
@@ -12,16 +12,19 @@ const env = process.env;
 async function submit(req, res, next) {
   const { logger } = req.app.locals;
   const id = req.params.id;
-  if (!validate(id)) res.status(500).json('Invalid ID');
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+  if (!validate(id)) return res.status(500).json('Invalid ID');
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
   await mkdirs([inputFolder, outputFolder]);
   const { exposureFile, matrixFile, signatureFile, signatureSetName } =
     req.body;
-  const exposurePath = path.resolve(inputFolder, exposureFile);
-  const matrixPath = path.resolve(inputFolder, matrixFile);
+  const exposurePath = resolveWithin(
+    inputFolder,
+    sanitizeFilename(exposureFile)
+  );
+  const matrixPath = resolveWithin(inputFolder, sanitizeFilename(matrixFile));
   const signaturePath = signatureFile
-    ? path.resolve(inputFolder, signatureFile)
+    ? resolveWithin(inputFolder, sanitizeFilename(signatureFile))
     : '';
   const exposureData = await parseCSV(exposurePath);
   const matrixData = await parseCSV(matrixPath);
