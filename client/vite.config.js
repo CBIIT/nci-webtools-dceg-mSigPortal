@@ -33,10 +33,6 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:8330',
           rewrite: (path) => path.replace(BASE_URL, ''),
         },
-        [`${BASE_URL}/extraction`]: {
-          target: 'http://localhost:8332',
-          rewrite: (path) => path.replace(BASE_URL, ''),
-        },
 
         [`/api`]: {
           target: 'http://localhost:8330',
@@ -44,10 +40,6 @@ export default defineConfig(({ mode }) => {
         },
         [`/data`]: {
           target: 'http://localhost:8330',
-          rewrite: (path) => path.replace(BASE_URL, ''),
-        },
-        [`/extraction`]: {
-          target: 'http://localhost:8332',
           rewrite: (path) => path.replace(BASE_URL, ''),
         },
       },
