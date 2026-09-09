@@ -7,7 +7,7 @@ import { randomUUID } from 'crypto';
 import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
-import { mkdirs, writeJson, readJson } from '../../utils.js';
+import { mkdirs, writeJson, readJson, isValidId, resolveWithin } from '../../utils.js';
 import { getSignatureData, getSeqmatrixData } from '../../query.js';
 import { parseCSV } from '../general.js';
 
@@ -518,12 +518,13 @@ export async function exampleProcessor(
 
 async function getPaths(params, exampleId, randomID, env = process.env) {
   const { id, args } = params;
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-  const paramsFile = path.resolve(inputFolder, 'params.json');
-  const statusFile = path.resolve(outputFolder, 'status.json');
-  const manifestFile = path.resolve(outputFolder, 'manifest.json');
-  const databaseFile = path.resolve(outputFolder, 'results.db');
+  if (!isValidId(id)) throw new Error('Invalid id');
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
+  const paramsFile = resolveWithin(inputFolder, 'params.json');
+  const statusFile = resolveWithin(outputFolder, 'status.json');
+  const manifestFile = resolveWithin(outputFolder, 'manifest.json');
+  const databaseFile = resolveWithin(outputFolder, 'results.db');
 
   // map files to be used as input for exploration module
   const solutionsFolder = path.resolve(
