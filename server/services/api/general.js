@@ -156,12 +156,14 @@ async function getFileS3(req, res, next) {
 
 export async function downloadOutput(req, res, next) {
   const { id } = req.params;
-  const output = path.resolve(env.OUTPUT_FOLDER, id);
+
+  if (!validate(id)) return res.status(500).json(`${id} is not a valid ID`);
+
+  const output = resolveWithin(env.OUTPUT_FOLDER, id);
+  if (!fs.existsSync(output))
+    return res.status(500).json(`${id} does not exist`);
+
   const archive = archiver('zip', { zlib: { level: 6 } });
-
-  if (!validate(id)) res.status(500).json(`${id} is not a valid ID`);
-  if (!fs.existsSync(output)) res.status(500).json(`${id} does not exist`);
-
   res.attachment(`${id}.zip`);
   archive.directory(output, false).pipe(res);
   archive.finalize();
