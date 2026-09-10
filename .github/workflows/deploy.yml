@@ -158,8 +158,8 @@ jobs:
       # Copy scripts for backend image build
       - name: Copy Python Profiler Extraction Script for backend
         run: |
+          mkdir -p server/services/R server/services/python
           cp python_r_script_repo/${{ env.PYTHON_SCRIPT_PATH }} server/services/python/
-          mkdir -p server/services/R
           cp python_r_script_repo/${{ env.R_SCRIPT_PATH }} server/services/R/
 
       # Build Backend Image
