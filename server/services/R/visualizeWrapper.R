@@ -1189,7 +1189,7 @@ msigportal.getTreeLeaf <- function(args, config) {
 }
 
 # Seqmatrix-only tree/leaf for user-uploaded data (no exposure/signature activities).
-# Leaf attributes: Sample, Dmut (dominant mutation), Mutations.
+# Leaf attributes: Sample (leaf key), SampleName, Filter, Dmut (dominant mutation), Mutations.
 msigportal.getTreeLeafUser <- function(args, config) {
   library(TreeAndLeaf)
   library(igraph)
@@ -1203,15 +1203,35 @@ msigportal.getTreeLeafUser <- function(args, config) {
     stop("No seqmatrix data provided")
   }
 
+  if (!"filter" %in% names(seqmatrix_refdata)) {
+    seqmatrix_refdata$filter <- ""
+  }
+  seqmatrix_refdata <- seqmatrix_refdata %>%
+    mutate(
+      filter = ifelse(is.na(filter), "", filter),
+      leafKey = ifelse(filter == "", sample, paste(sample, filter, sep = "@"))
+    )
+
+  # drop leaves with no mutations to avoid divide-by-zero (NaN) when computing ratios
+  nonzero_leaves <- seqmatrix_refdata %>%
+    group_by(leafKey) %>%
+    summarise(total = sum(mutations), .groups = "drop") %>%
+    filter(total > 0)
+  seqmatrix_refdata <- semi_join(seqmatrix_refdata, nonzero_leaves, by = "leafKey")
+
+  if (nrow(nonzero_leaves) < 2) {
+    stop("Too few samples with mutations for the Tree and Leaf plot")
+  }
+
   seqmatrix_refdata_ratio <- seqmatrix_refdata %>%
-    group_by(sample, profileMatrix) %>%
+    group_by(leafKey, profileMatrix) %>%
     mutate(mutations = mutations / sum(mutations)) %>%
     ungroup()
 
-  # determine dominant mutation (SBS96: A[C>A]A -> C>A)
+  # determine dominant mutation per leaf (SBS96: A[C>A]A -> C>A)
   dmdata <- seqmatrix_refdata %>%
     mutate(type = str_sub(mutationType, 3, 5)) %>%
-    group_by(sample, type) %>%
+    group_by(leafKey, type) %>%
     summarise(value = sum(mutations), .groups = "drop_last") %>%
     mutate(value = value / (sum(value))) %>%
     arrange(desc(value)) %>%
@@ -1220,24 +1240,26 @@ msigportal.getTreeLeafUser <- function(args, config) {
     rename(Dmut = type, Dmvalue = value)
 
   mdata <- seqmatrix_refdata_ratio %>%
-    select(mutationType, mutations, sample) %>%
-    pivot_wider(names_from = mutationType, values_from = mutations)
+    select(mutationType, mutations, leafKey) %>%
+      pivot_wider(names_from = mutationType, values_from = mutations, values_fn = sum, values_fill = 0)
 
   mdata0 <- as.matrix(mdata[, -1])
-  rownames(mdata0) <- mdata$sample
+  rownames(mdata0) <- mdata$leafKey
+  mdata0[!is.finite(mdata0)] <- 0
 
   mdatax <- mdata %>%
-    select(sample) %>%
-    left_join(dmdata, by = "sample") %>%
+    select(leafKey) %>%
+    left_join(distinct(seqmatrix_refdata, leafKey, sample, filter), by = "leafKey") %>%
+    left_join(dmdata, by = "leafKey") %>%
     left_join(
       seqmatrix_refdata %>%
-        group_by(sample) %>%
+        group_by(leafKey) %>%
         summarise(mutations = sum(mutations), .groups = "drop") %>%
         ungroup(),
-      by = "sample"
+      by <- "leafKey"
     ) %>%
     mutate(Cancer_Type = "Input") %>%
-    rename(Sample = sample, Mutations = mutations) %>%
+    rename(Sample = leafKey, SampleName = sample, Filter = filter, Mutations = mutations) %>%
     group_by(row_number())
 
   hc <- hclust(dist(mdata0), "ward.D")
