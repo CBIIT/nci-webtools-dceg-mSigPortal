@@ -34,7 +34,8 @@ export default function TreeAndLeaf({ state = {}, ...props }) {
             openSidebar: false,
           },
           mutationalProfiles: {
-            sample: event.Sample,
+            sample: event.SampleName ?? event.Sample,
+            filter: event.Filter ?? '',
           },
         })
       );
