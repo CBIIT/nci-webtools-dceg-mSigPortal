@@ -40,7 +40,16 @@ wrapper <- function(fn, args, config = list()) {
 
 # load public seqmatrix data from S3
 # Returns list with either 'data' on success or 'error' on failure
+# PanCancer ("*ALL") loads the full study file across all cancer types; requires experimentalStrategy
 load_public_seqmatrix_data <- function(study, cancerType, experimentalStrategy = NULL, config, subset_files) {
+  if (cancerType %in% c("*ALL", "PanCancer")) {
+    if (is.null(experimentalStrategy)) {
+      return(list(error = paste0("Experimental strategy required for PanCancer data. Study: ", study)))
+    }
+    data <- s3load_as(paste0(config$prefix, "Seqmatrix/", study, "_", experimentalStrategy, "_seqmatrix_refdata.RData"), config$bucket)
+    return(list(data = data))
+  }
+
   # Build filter based on whether Dataset is provided
   if (is.null(experimentalStrategy)) {
     publicDataFile <- subset_files %>%
@@ -663,15 +672,11 @@ msigportal.mutationalPatternPublic <- function(args, config) {
     {
       barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
 
-      if (args$cancerType != "PanCancer") {
-        result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
-        if (!is.null(result$error)) {
-          return(result)
-        }
-        seqmatrix_refdata <- result$data %>% filter(Study == args$study)
-      } else {
-        s3load(paste0(config$prefix, "Seqmatrix/", args$study, "_", args$experimentalStrategy, "_seqmatrix_refdata.RData"), config$bucket)
+      result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
+      if (!is.null(result$error)) {
+        return(result)
       }
+      seqmatrix_refdata <- result$data %>% filter(Study == args$study)
 
       data_input <- seqmatrix_refdata %>%
         filter(Profile == "SBS96") %>%
