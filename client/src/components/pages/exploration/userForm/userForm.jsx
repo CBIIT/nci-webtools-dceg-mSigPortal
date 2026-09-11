@@ -98,8 +98,83 @@ export default function PublicForm() {
         }))
     : [];
 
+  async function readFirstColumns(file) {
+    const text = await file.text();
+    const firstLine = text.split(/\r?\n/).find((l) => l.trim() !== '');
+    if (!firstLine) return [];
+    const delimiter = firstLine.includes('\t') ? '\t' : ',';
+    return firstLine
+      .replace(/^\uFEFF/, '')
+      .split(delimiter)
+      .map((c) => c.trim());
+  }
+
+  // verify first-column headers (case-insensitive) before uploading
+  async function validateExplorationHeaders(exposure, matrix, signature) {
+    if (!exposure || !matrix)
+      return { isValid: false, error: 'Please upload the required input files.' };
+    try {
+      const exposureCols = await readFirstColumns(exposure);
+      if ((exposureCols[0] || '').toLowerCase() !== 'samples')
+        return {
+          isValid: false,
+          error: `The exposure/activity file's first column must be "Samples" (found "${
+            exposureCols[0] || ''
+          }").`,
+        };
+      if (exposureCols.length < 2)
+        return {
+          isValid: false,
+          error: 'The exposure/activity file must include at least one signature column.',
+        };
+      const matrixCols = await readFirstColumns(matrix);
+      if ((matrixCols[0] || '').toLowerCase() !== 'mutationtype')
+        return {
+          isValid: false,
+          error: `The mutation matrix file's first column must be "MutationType" (found "${
+            matrixCols[0] || ''
+          }").`,
+        };
+      if (matrixCols.length < 2)
+        return {
+          isValid: false,
+          error: 'The mutation matrix file must include at least one sample column.',
+        };
+      if (signature) {
+        const signatureCols = await readFirstColumns(signature);
+        if ((signatureCols[0] || '').toLowerCase() !== 'mutationtype')
+          return {
+            isValid: false,
+            error: `The signature-profile file's first column must be "MutationType" (found "${
+              signatureCols[0] || ''
+            }").`,
+          };
+        if (signatureCols.length < 2)
+          return {
+            isValid: false,
+            error: 'The signature-profile file must include at least one signature column.',
+          };
+      }
+      return { isValid: true };
+    } catch (e) {
+      return {
+        isValid: false,
+        error: 'Error reading an input file. Please check the file format.',
+      };
+    }
+  }
+
   async function onSubmit(data) {
     try {
+      const validation = await validateExplorationHeaders(
+        data.exposureFile,
+        data.matrixFile,
+        usePublicSignature ? null : data.signatureFile
+      );
+      if (!validation.isValid) {
+        mergeError(validation.error);
+        return;
+      }
       mergeMain({ submitted: true, loading: true });
       mergeForm(data);
 

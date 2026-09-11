@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
-import path from 'path';
 import { parseCSV } from '../general.js';
 import { schema } from './userSchema.js';
 import { getSignatureData } from '../../query.js';
@@ -29,6 +28,53 @@ async function submit(req, res, next) {
   const exposureData = await parseCSV(exposurePath);
   const matrixData = await parseCSV(matrixPath);
   const signatureData = signaturePath ? await parseCSV(signaturePath) : '';
+
+  // validate first-column headers (case-insensitive) before importing
+  const normalize = (s) =>
+    (s || '')
+      .replace(/^\uFEFF/, '')
+      .trim()
+      .toLowerCase();
+  const exposureCols = exposureData.length ? Object.keys(exposureData[0]) : [];
+  const matrixCols = matrixData.length ? Object.keys(matrixData[0]) : [];
+  if (normalize(exposureCols[0]) !== 'samples')
+    return res.status(400).json({
+      error: `The exposure/activity file's first column must be "Samples" (found "${
+        exposureCols[0] ?? ''
+      }").`,
+    });
+  if (exposureCols.length < 2)
+    return res.status(400).json({
+      error:
+        'The exposure/activity file must include at least one signature column.',
+    });
+  if (normalize(matrixCols[0]) !== 'mutationtype')
+    return res.status(400).json({
+      error: `The mutation matrix file's first column must be "MutationType" (found "${
+        matrixCols[0] ?? ''
+      }").`,
+    });
+  if (matrixCols.length < 2)
+    return res.status(400).json({
+      error:
+        'The mutation matrix file must include at least one sample column.',
+    });
+  if (signatureData) {
+    const signatureCols = signatureData.length
+      ? Object.keys(signatureData[0])
+      : [];
+    if (normalize(signatureCols[0]) !== 'mutationtype')
+      return res.status(400).json({
+        error: `The signature-profile file's first column must be "MutationType" (found "${
+          signatureCols[0] ?? ''
+        }").`,
+      });
+    if (signatureCols.length < 2)
+      return res.status(400).json({
+        error:
+          'The signature-profile file must include at least one signature column.',
+      });
+  }
 
   // transform input data into format suitable for db import
   const transformExposure = exposureData

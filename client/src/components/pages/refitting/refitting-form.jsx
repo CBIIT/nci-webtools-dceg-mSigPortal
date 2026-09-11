@@ -157,6 +157,34 @@ export default function RefittingForm() {
     }
   };
 
+  // verify a tab-delimited file's header contains the required columns (case-insensitive)
+  const validateHeaderColumns = async (file, requiredColumns, fileLabel) => {
+    if (!file) return { isValid: true };
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter((line) => line.trim());
+      if (lines.length < 2)
+        return { isValid: false, error: `${fileLabel} appears to be empty or invalid` };
+      const header = lines[0].toLowerCase();
+      const missingColumns = requiredColumns.filter(
+        (col) => !header.includes(col)
+      );
+      if (missingColumns.length > 0)
+        return {
+          isValid: false,
+          error: `${fileLabel} missing required columns: ${missingColumns.join(
+            ', '
+          )}`,
+        };
+      return { isValid: true };
+    } catch (error) {
+      return {
+        isValid: false,
+        error: `Error reading ${fileLabel}. Please check the file format.`,
+      };
+    }
+  };
+
   const onSubmit = async (data) => {
     // Validate required files and fields
     if (!data.mafFile || !data.genomicFile || !data.clinicalFile) {
@@ -178,6 +206,27 @@ export default function RefittingForm() {
     );
     if (!mafValidation.isValid) {
       setError(mafValidation.error);
+      return;
+    }
+
+    // Validate genomic and clinical file headers
+    const genomicValidation = await validateHeaderColumns(
+      data.genomicFile,
+      ['chromosome', 'start_position', 'end_position', 'seq_assay_id'],
+      'Genomic file'
+    );
+    if (!genomicValidation.isValid) {
+      setError(genomicValidation.error);
+      return;
+    }
+
+    const clinicalValidation = await validateHeaderColumns(
+      data.clinicalFile,
+      ['sample_id', 'seq_assay_id', 'cancer_type'],
+      'Clinical file'
+    );
+    if (!clinicalValidation.isValid) {
+      setError(clinicalValidation.error);
       return;
     }
 

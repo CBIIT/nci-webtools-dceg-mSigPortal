@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Table, Alert } from 'react-bootstrap';
 import { useExampleHeaderQuery } from './userForm/apiSlice';
+import { renderInlineCode } from '../../controls/utils/renderInlineCode';
 
 export default function Instructions() {
   const { inputFormat } = useSelector((state) => state.visualization.userForm);
@@ -94,8 +95,8 @@ export default function Instructions() {
         },
       ],
       fileFormat:
-        'Tab-delimited VCF v4.x; use .vcf or .vcf.gz. ## metadata lines may appear before the #CHROM header. Include one variant and one ALT allele per record.',
-      example: 'demo_input_multi.vcf or demo_input_multi.vcf.gz',
+        'Tab-delimited VCF v4.x; use `.vcf` or `.vcf.gz`. `##` metadata lines may appear before the `#CHROM` header. Include one variant and one ALT allele per record.',
+      example: '`demo_input_multi.vcf` or `demo_input_multi.vcf.gz`',
     },
     maf: {
       description:
@@ -142,10 +143,10 @@ export default function Instructions() {
         },
       ],
       optionalColumns:
-        'Additional standard MAF annotation fields are allowed and are not used to generate the mutational profile. Examples include Hugo_Symbol, Entrez_Gene_Id, Center, NCBI_Build, Strand, Variant_Classification, Variant_Type, dbSNP_RS, dbSNP_Val_Status, and Matched_Norm_Sample_Barcode.',
+        'Additional standard MAF annotation fields are allowed and are not used to generate the mutational profile. Examples include `Hugo_Symbol`, `Entrez_Gene_Id`, `Center`, `NCBI_Build`, `Strand`, `Variant_Classification`, `Variant_Type`, `dbSNP_RS`, `dbSNP_Val_Status`, and `Matched_Norm_Sample_Barcode`.',
       fileFormat:
-        'Tab-delimited text; use .maf or .txt. Include one variant per row. Coordinates and alleles should follow standard MAF representation and must match the reference genome selected in the form.',
-      example: 'demo_input_multi_MAF.txt',
+        'Tab-delimited text; use `.maf` or `.txt`. Include one variant per row. Coordinates and alleles should follow standard MAF representation and must match the reference genome selected in the form.',
+      example: '`demo_input_multi_MAF.txt`',
     },
     csv: {
       description:
@@ -188,9 +189,9 @@ export default function Instructions() {
         },
       ],
       fileFormat:
-        'Comma-delimited text; use .csv. Do not add annotation columns, embedded commas, or blank lines. Include one variant and one ALT allele per row.',
-      requiredHeader: 'SAMPLE,CHROM,START,END,REF,ALT,FILTER',
-      example: 'demo_input_multi.csv',
+        'Comma-delimited text; use `.csv`. Do not add annotation columns, embedded commas, or blank lines. Include one variant and one ALT allele per row.',
+      requiredHeader: '`SAMPLE,CHROM,START,END,REF,ALT,FILTER`',
+      example: '`demo_input_multi.csv`',
     },
     tsv: {
       description:
@@ -233,10 +234,10 @@ export default function Instructions() {
         },
       ],
       fileFormat:
-        'Tab-delimited text; use .tsv. Do not add annotation columns, embedded tabs, or blank lines. Include one variant and one ALT allele per row.',
+        'Tab-delimited text; use `.tsv`. Do not add annotation columns, embedded tabs, or blank lines. Include one variant and one ALT allele per row.',
       requiredHeader:
-        'SAMPLE<TAB>CHROM<TAB>START<TAB>END<TAB>REF<TAB>ALT<TAB>FILTER',
-      example: 'demo_input_multi.tsv',
+        '`SAMPLE<TAB>CHROM<TAB>START<TAB>END<TAB>REF<TAB>ALT<TAB>FILTER`',
+      example: '`demo_input_multi.tsv`',
     },
     catalog_csv: {
       description:
@@ -256,11 +257,11 @@ export default function Instructions() {
         },
       ],
       fileFormat:
-        'Comma-delimited text; use .csv. Do not include annotation or metadata columns, blank cells, NA, negative values, or nonnumeric values.',
+        'Comma-delimited text; use `.csv`. Do not include annotation or metadata columns, blank cells, `NA`, negative values, or nonnumeric values.',
       notes: [
         'The file must contain the complete mutation-category set for one supported context. Do not combine different contexts in one matrix. The detected context is shown during validation.',
       ],
-      example: 'demo_input_catalog.csv',
+      example: '`demo_input_catalog.csv`',
     },
     catalog_tsv: {
       description:
@@ -280,11 +281,11 @@ export default function Instructions() {
         },
       ],
       fileFormat:
-        'Tab-delimited text; use .tsv. Do not include annotation or metadata columns, blank cells, NA, negative values, or nonnumeric values.',
+        'Tab-delimited text; use `.tsv`. Do not include annotation or metadata columns, blank cells, `NA`, negative values, or nonnumeric values.',
       notes: [
         'The file must contain the complete mutation-category set for one supported context. Do not combine different contexts in one matrix. The detected context is shown during validation.',
       ],
-      example: 'demo_input_catalog.tsv',
+      example: '`demo_input_catalog.tsv`',
     },
   };
 
@@ -350,7 +351,7 @@ export default function Instructions() {
           {requirements ? (
             <>
               <b>{inputFormat.label}</b>
-              <p>{requirements.description}</p>
+              <p>{renderInlineCode(requirements.description)}</p>
               <Table striped bordered size="sm" responsive>
                 <thead>
                   <tr>
@@ -362,9 +363,7 @@ export default function Instructions() {
                 <tbody>
                   {requirements.columns.map((col) => (
                     <tr key={col.column}>
-                      <td>
-                        <code>{col.column}</code>
-                      </td>
+                      <td>{col.column}</td>
                       <td>{col.status}</td>
                       <td>{col.requirement}</td>
                     </tr>
@@ -373,23 +372,24 @@ export default function Instructions() {
               </Table>
               {requirements.optionalColumns && (
                 <p>
-                  <b>Optional columns:</b> {requirements.optionalColumns}
+                  <b>Optional columns:</b>{' '}
+                  {renderInlineCode(requirements.optionalColumns)}
                 </p>
               )}
               <p>
-                <b>File format:</b> {requirements.fileFormat}
+                <b>File format:</b> {renderInlineCode(requirements.fileFormat)}
               </p>
               {requirements.requiredHeader && (
                 <p>
                   <b>Required header:</b>{' '}
-                  <code>{requirements.requiredHeader}</code>
+                  {renderInlineCode(requirements.requiredHeader)}
                 </p>
               )}
               {requirements.notes?.map((note, index) => (
-                <p key={index}>{note}</p>
+                <p key={index}>{renderInlineCode(note)}</p>
               ))}
               <p>
-                <b>Example:</b> <code>{requirements.example}</code> in{' '}
+                <b>Example:</b> {renderInlineCode(requirements.example)} in{' '}
                 <b>Download Example Data</b>.
               </p>
             </>
