@@ -33,6 +33,8 @@ export default function ExtractionForm({ formLimits }) {
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
   const mergeSuccess = (msg) =>
     dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
@@ -418,7 +420,43 @@ export default function ExtractionForm({ formLimits }) {
     dispatch(resetExtractionApi);
   }
 
+  // verify the user matrix has a MutationType first column and >=1 sample column
+  async function validateMatrixHeader(file) {
+    if (!file) return { isValid: false, error: 'Please upload a data file.' };
+    try {
+      const text = await file.text();
+      const firstLine = text.split(/\r?\n/).find((l) => l.trim() !== '');
+      if (!firstLine)
+        return { isValid: false, error: 'The uploaded matrix file appears to be empty.' };
+      const delimiter = firstLine.includes('\t') ? '\t' : ',';
+      const cols = firstLine
+        .replace(/^\uFEFF/, '')
+        .split(delimiter)
+        .map((c) => c.trim());
+      if (cols[0].toLowerCase() !== 'mutationtype')
+        return {
+          isValid: false,
+          error: `The first column of the matrix must be "MutationType" (found "${cols[0]}").`,
+        };
+      if (cols.length < 2)
+        return {
+          isValid: false,
+          error: 'The matrix must include at least one sample column after MutationType.',
+        };
+      return { isValid: true };
+    } catch (e) {
+      return { isValid: false, error: 'Error reading the matrix file. Please check the file format.' };
+    }
+  }
+
   async function onSubmit(data) {
+    if (source === 'user') {
+      const matrixValidation = await validateMatrixHeader(data.inputFile);
+      if (!matrixValidation.isValid) {
+        mergeError(matrixValidation.error);
+        return;
+      }
+    }
     mergeState({ submitted: true });
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);

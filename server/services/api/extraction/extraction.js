@@ -28,6 +28,40 @@ const EXTRACTION_FORM_LIMIT = env.EXTRACTION_FORM_LIMIT
       nmf_test_conv: [1, 10000],
     };
 
+// validate that a user matrix has a MutationType first column and at least one sample column
+function validateMatrixHeader(filePath) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(65536);
+    const bytes = fs.readSync(fd, buffer, 0, 65536, 0);
+    fs.closeSync(fd);
+    const firstLine = buffer
+      .toString('utf8', 0, bytes)
+      .split(/\r?\n/)
+      .find((l) => l.trim() !== '');
+    if (!firstLine)
+      return { valid: false, error: 'The uploaded matrix file appears to be empty.' };
+    const delimiter = firstLine.includes('\t') ? '\t' : ',';
+    const cols = firstLine
+      .replace(/^\uFEFF/, '')
+      .split(delimiter)
+      .map((c) => c.trim());
+    if (cols[0].toLowerCase() !== 'mutationtype')
+      return {
+        valid: false,
+        error: `The first column of the matrix must be "MutationType" (found "${cols[0]}").`,
+      };
+    if (cols.length < 2)
+      return {
+        valid: false,
+        error: 'The matrix must include at least one sample column after MutationType.',
+      };
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, error: 'Unable to read the uploaded matrix file.' };
+  }
+}
+
 export async function submit(req, res, next) {
   const id = req.params.id;
   if (!validate(id)) return res.status(500).json('Invalid ID');
@@ -37,6 +71,12 @@ export async function submit(req, res, next) {
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const statusFilePath = path.resolve(outputFolder, 'status.json');
   await mkdirs([inputFolder, outputFolder]);
+
+  if (req.body?.form?.source === 'user' && req.body?.args?.input_data) {
+    const matrixPath = resolveWithin(inputFolder, req.body.args.input_data);
+    const headerCheck = validateMatrixHeader(matrixPath);
+    if (!headerCheck.valid) return res.status(400).json({ error: headerCheck.error });
+  }
 
   const status = {
     id,
