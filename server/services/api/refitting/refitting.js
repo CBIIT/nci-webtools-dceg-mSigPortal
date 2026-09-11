@@ -6,6 +6,7 @@ import { execa } from 'execa';
 import { body, validationResult } from 'express-validator';
 import { getWorker } from '../../workers.js';
 import { mkdirs, writeJson, readJson } from '../../utils.js';
+import { resolveWithin } from '../../utils.js';
 
 export const router = Router();
 const env = process.env;
