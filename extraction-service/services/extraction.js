@@ -318,8 +318,12 @@ export async function extraction(
       denovoId = denovoExploration.data;
     } catch (error) {
       logger.error('Denovo Exploration Error');
-      console.log(error);
-      throw error.data;
+      logger.error(
+        `status=${error.response?.status} data=${JSON.stringify(
+          error.response?.data
+        )} message=${error.message}`
+      );
+      throw error.response?.data ?? error;
     }
 
     try {
@@ -367,7 +371,12 @@ export async function extraction(
       decomposedId = decomposedExploration.data;
     } catch (error) {
       logger.error('Decomposed Exploration Error');
-      throw error.data;
+      logger.error(
+        `status=${error.response?.status} data=${JSON.stringify(
+          error.response?.data
+        )} message=${error.message}`
+      );
+      throw error.response?.data ?? error;
     }
 
     // add exploration ids to manifest
