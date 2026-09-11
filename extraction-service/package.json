@@ -17,6 +17,7 @@
     "nodemailer": "^9.1.1",
     "papaparse": "^5.7.0",
     "pg": "^8.23.0",
+    "validator": "^13.15.35",
     "winston": "^3.19.0"
   },
   "prettier": {
