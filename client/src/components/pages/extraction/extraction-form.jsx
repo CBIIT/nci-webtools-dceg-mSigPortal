@@ -312,7 +312,8 @@ export default function ExtractionForm({ formLimits }) {
               .map((e) => ({ label: e, value: e })),
           ]
         : [];
-    } if (signatureOptions && seqmatrixOptions && study?.value) {
+    }
+    if (signatureOptions && seqmatrixOptions && study?.value) {
       const sigProfiles = [
         ...new Set(signatureOptions.map((e) => e.profile + e.matrix)),
       ];
@@ -332,8 +333,8 @@ export default function ExtractionForm({ formLimits }) {
       const sortedOptions = commonProfiles
         .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
         .map((e) => ({ label: e, value: e }));
-      
-        // Only add 'default' if SBS96 is present in common profiles
+
+      // Only add 'default' if SBS96 is present in common profiles
       const hasSBS96 = commonProfiles.includes('SBS96');
       return hasSBS96
         ? [{ label: 'default', value: 'default' }, ...sortedOptions]
@@ -344,7 +345,6 @@ export default function ExtractionForm({ formLimits }) {
     } else {
       return [];
     }
-  
   })();
 
   // update url with id
@@ -377,30 +377,30 @@ export default function ExtractionForm({ formLimits }) {
       const selectedContext = hasDefault
         ? contextTypeOptions[0]
         : contextTypeOptions[0]; // fallback to first available even if no 'default'
-  
+
       // Only reset if it's not already set
-      if (!context_type || !contextTypeOptions.find(o => o.value === context_type.value)) {
+      if (
+        !context_type ||
+        !contextTypeOptions.find((o) => o.value === context_type.value)
+      ) {
         setValue('context_type', selectedContext);
-  
+
         let filteredOptions;
         if (selectedContext.value !== 'default') {
           setIsDefaultContext(false);
           filteredOptions = signatureSetOptions
-            .filter((option) =>
-              option.value.includes(selectedContext.value)
-            )
+            .filter((option) => option.value.includes(selectedContext.value))
             .sort((a, b) => a.value.localeCompare(b.value));
         } else {
           setIsDefaultContext(true);
           filteredOptions = signatureSetOptions;
         }
-  
+
         setFilteredSignatureSetOptions(filteredOptions);
-  
+
         if (selectedContext.value === 'SBS96') {
           const cosmicOption = filteredOptions.find(
-            (option) =>
-              option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
+            (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
           );
           setValue('signatureSetName', cosmicOption);
         } else {
@@ -409,9 +409,6 @@ export default function ExtractionForm({ formLimits }) {
       }
     }
   }, [study, contextTypeOptions, context_type]);
-  
-  
-  
 
   function handleReset() {
     history.push('/extraction');
@@ -427,7 +424,10 @@ export default function ExtractionForm({ formLimits }) {
       const text = await file.text();
       const firstLine = text.split(/\r?\n/).find((l) => l.trim() !== '');
       if (!firstLine)
-        return { isValid: false, error: 'The uploaded matrix file appears to be empty.' };
+        return {
+          isValid: false,
+          error: 'The uploaded matrix file appears to be empty.',
+        };
       const delimiter = firstLine.includes('\t') ? '\t' : ',';
       const cols = firstLine
         .replace(/^\uFEFF/, '')
@@ -441,11 +441,15 @@ export default function ExtractionForm({ formLimits }) {
       if (cols.length < 2)
         return {
           isValid: false,
-          error: 'The matrix must include at least one sample column after MutationType.',
+          error:
+            'The matrix must include at least one sample column after MutationType.',
         };
       return { isValid: true };
     } catch (e) {
-      return { isValid: false, error: 'Error reading the matrix file. Please check the file format.' };
+      return {
+        isValid: false,
+        error: 'Error reading the matrix file. Please check the file format.',
+      };
     }
   }
 
@@ -541,12 +545,13 @@ export default function ExtractionForm({ formLimits }) {
     localStorage.setItem('jobs', JSON.stringify([...jobs, id]));
   }
 
-  const handleSelectChange = (selectedOptions) => {
-    const isAllOptionSelected = selectedOptions.some(
-      (option) => option.value === 'all'
-    );
+  const handleSelectChange = (selectedOptions, actionMeta) => {
+    // if the user just picked 'all', collapse to only 'all'
+    const justSelectedAll =
+      actionMeta?.action === 'select-option' &&
+      actionMeta?.option?.value === 'all';
 
-    if (isAllOptionSelected) {
+    if (justSelectedAll) {
       // Clear the warning when 'all' is selected and unselect individual signatures
       setWarning('');
       selectedOptions = [{ value: 'all', label: 'all' }];
@@ -762,8 +767,6 @@ export default function ExtractionForm({ formLimits }) {
             name="signatureSetName"
             label="Reference Signature Set"
             disabled={submitted || id}
-            //options={signatureSetOptions}
-            //options={filteredSignatureSetOptions}
             options={
               isDefaultContext
                 ? signatureSetOptions
@@ -779,48 +782,6 @@ export default function ExtractionForm({ formLimits }) {
             options={signatureNameOptions(signatureSetName)}
             control={control}
             onChange={handleSelectChange}
-            // onChange={(selectedOptions) => {
-            //   // Check if the 'all' option is selected
-            //   const isAllOptionSelected = selectedOptions.some(
-            //     (option) => option.value === 'all'
-            //   );
-            //   if (!isAllOptionSelected) {
-            //     // Filter out the 'all' option if it exists in selectedOptions
-            //     selectedOptions = selectedOptions.filter(
-            //       (option) => option.value !== 'all'
-            //     );
-
-            //     if (selectedOptions.length === 1) {
-            //       // Show a warning message if only one option (other than 'all') is selected
-            //       setWarning('More than one signature is required as input');
-            //     } else {
-            //       // Clear the warning if multiple options are selected
-            //       setWarning('');
-            //     }
-            //   } else {
-            //     // Clear the warning when 'all' is selected
-            //     setWarning('');
-            //     setValue('signatureName', [{ value: 'all', label: 'all' }]);
-            //   }
-
-            //   // Update the form values with the modified selectedOptions
-            //   setValue('signatureName', selectedOptions);
-            // }}
-            // onChange={(values, e) => {
-            //   // remove "all" option if a specific signature is selected
-            //   // remove other options if "all" is selected
-            //   console.log('e', e);
-            //   if (e.action === 'select-option') {
-            //     if (e.option.value !== 'all') {
-            //       setValue(
-            //         'signatureName',
-            //         values.filter((e) => e.value !== 'all')
-            //       );
-            //     } else if (e.option.value === 'all') {
-            //       setValue('signatureName', [e.option]);
-            //     }
-            //   } else setValue('signatureName', values);
-            // }}
             isMulti
           />
           <SelectForm
