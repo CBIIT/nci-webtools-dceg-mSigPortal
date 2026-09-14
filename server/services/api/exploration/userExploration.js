@@ -63,9 +63,11 @@ async function submit(req, res, next) {
     const signatureCols = signatureData.length
       ? Object.keys(signatureData[0])
       : [];
-    if (normalize(signatureCols[0]) !== 'mutationtype')
+    // COSMIC/decomposed signature files use "Type"; de novo files use "MutationType"
+    const signatureFirstCol = normalize(signatureCols[0]);
+    if (signatureFirstCol !== 'mutationtype' && signatureFirstCol !== 'type')
       return res.status(400).json({
-        error: `The signature-profile file's first column must be "MutationType" (found "${
+        error: `The signature-profile file's first column must be "MutationType" or "Type" (found "${
           signatureCols[0] ?? ''
         }").`,
       });
