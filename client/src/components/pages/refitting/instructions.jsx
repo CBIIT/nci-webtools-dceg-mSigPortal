@@ -31,6 +31,11 @@ export default function Instructions() {
         </a>
         . Use the panel on the left to configure the remaining required inputs.
       </p>
+      <p>
+        Upload three tab-delimited text files: a mutation MAF file, a
+        genomic/panel-region file, and a clinical file. All three files are
+        required and must contain a header row.
+      </p>
       <hr />
       <div className="mt-2">
         <h1 className="h4-title">Signature Type</h1>

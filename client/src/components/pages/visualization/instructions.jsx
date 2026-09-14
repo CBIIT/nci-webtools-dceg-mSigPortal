@@ -329,6 +329,23 @@ export default function Instructions() {
         <>
           <hr />
           <h4>File requirements</h4>
+          <p>
+            Visualization accepts six primary formats: VCF, MAF, CSV, TSV,
+            CATALOG CSV, and CATALOG TSV. VCF, MAF, CSV, and TSV contain
+            individual variants. CATALOG CSV and CATALOG TSV contain a
+            precomputed mutational-count matrix.
+          </p>
+          <p>
+            For VCF, MAF, CSV, or TSV, select the reference genome build that
+            matches the uploaded coordinates. Do not mix genome builds or
+            chromosome-naming styles within a file. Reference-genome and
+            experimental-strategy settings do not apply to catalog matrices.
+          </p>
+          <p>
+            Under <b>Data Source: User</b>, choose a file format to view an
+            example header. See the format-specific requirements below for
+            required, optional, and sample-specific columns.
+          </p>
           <Alert variant="info" className="mb-3">
             <ul
               className="mb-0 pl-3"
