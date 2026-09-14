@@ -45,13 +45,17 @@ export default function Instructions({ props, loading }) {
       <hr />
       <div className="mt-2">
         <h4>User data file requirements</h4>
-        <Alert variant="info" className="mb-3">
+        <p>
           Exploration requires an exposure/activity file and a mutational-count
           matrix. A signature-profile file is also required when{' '}
-          <b>Use Public Signature Data</b> is turned off. Use tab-delimited
-          plain-text files with {renderInlineCode('`.tsv` or `.txt`')}{' '}
-          extensions. Column names are case-insensitive; if a column name does
-          not match the required name, an error is shown.
+          <b>Use Public Signature Data</b> is turned off. All primary files must
+          describe the same mutation context.
+        </p>
+        <Alert variant="info" className="mb-3">
+          Use tab-delimited plain-text files with{' '}
+          {renderInlineCode('`.tsv` or `.txt`')} extensions. Column names are
+          case-insensitive; if a column name does not match the required name,
+          an error is shown.
         </Alert>
 
         <h6>Exposure/activity file</h6>
@@ -168,6 +172,10 @@ export default function Instructions({ props, loading }) {
             The matrix and signature-profile files should contain the same
             mutation-channel set, and all files should represent the same
             context (such as SBS96).
+          </li>
+          <li>
+            Select the genome and public signature set that correspond to that
+            context.
           </li>
           <li>
             Samples, signatures, or mutation channels that do not match across

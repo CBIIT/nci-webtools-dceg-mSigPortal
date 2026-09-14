@@ -96,6 +96,12 @@ export default function Instructions({ formLimits }) {
       <hr />
       <div className="mt-2">
         <h4>User matrix file requirements</h4>
+        <p>
+          The Extraction user-data workflow accepts a mutational-count matrix,
+          not raw VCF or MAF files. If starting from individual variants, first
+          generate a matrix for the required mutation context and then upload
+          that matrix.
+        </p>
         <Alert variant="info" className="mb-3">
           Column names are case-insensitive. If a column name does not match the
           required name, an error is shown.
