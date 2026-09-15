@@ -332,7 +332,7 @@ export default function Univariable() {
           >
             <Col md="auto" lg="auto">
               <CustomSelect
-                disabled={!!!(
+                disabled={!!(
                   loadingData ||
                   loadingParams ||
                   loadingCalculate ||
@@ -523,7 +523,7 @@ export default function Univariable() {
                   <CustomSelect
                     aria-label="Method"
                     className="mb-0"
-                    disabled={!!!(
+                    disabled={!!(
                       loadingData ||
                       loadingParams ||
                       loadingCalculate ||
