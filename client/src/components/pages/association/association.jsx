@@ -8,7 +8,6 @@ import {
 import Instructions from '../association/instructions';
 import Univariable from './univariable';
 import Multivariable from './multivariable';
-// import UserForm from './userForm';
 import PublicForm from './publicForm/publicForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '../../../services/store/association';

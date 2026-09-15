@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions as associationActions } from '../../../services/store/association';
+import { getEmptyAssocVar } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
 import CustomSelect from '../../controls/select/select-old';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
@@ -187,20 +188,7 @@ export default function Multivariable() {
 
   function handleReset() {
     mergeState({
-      associationVars: [
-        {
-          source: '',
-          type: '',
-          tmpName: '',
-          sourceOptions: [],
-          typeOptions: [],
-          nameOptions: [],
-          filter: '',
-          log2: false,
-          collapse: '',
-          collapseOptions: [],
-        },
-      ],
+      associationVars: [getEmptyAssocVar()],
       id: '',
       plotPath: '',
       dataPath: '',
@@ -244,7 +232,7 @@ export default function Multivariable() {
                 cancer: cancer.value,
                 testType: testType,
                 signature: signature,
-                xlab: xlab || associationVars.name,
+                xlab: xlab || associationVars[0].name,
                 ylab: ylab || exposureVar.name,
                 associationVars: associationVars.map(
                   ({
@@ -316,18 +304,7 @@ export default function Multivariable() {
   function addParam() {
     if (associationVars.length < 10) {
       let newParams = associationVars.slice();
-      newParams.push({
-        source: '',
-        type: '',
-        tmpName: '',
-        sourceOptions: [],
-        typeOptions: [],
-        nameOptions: [],
-        filter: '',
-        log2: false,
-        collapse: '',
-        collapseOptions: [],
-      });
+      newParams.push(getEmptyAssocVar());
       mergeState({ associationVars: newParams });
     } else {
       showWarnLimit(true);
@@ -358,7 +335,7 @@ export default function Multivariable() {
           }
           data={assocVarData}
           columns={[
-            ...new Set(...assocVarData.map((row) => Object.keys(row))),
+            ...new Set(assocVarData.flatMap((row) => Object.keys(row))),
           ].reduce(reducer, [])}
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}

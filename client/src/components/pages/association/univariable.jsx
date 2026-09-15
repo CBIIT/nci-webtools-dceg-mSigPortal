@@ -40,6 +40,9 @@ export default function Univariable() {
     assocTable,
   } = useSelector((state) => state.association.main);
 
+  const univariableState = useSelector(
+    (state) => state.association.univariable
+  );
   const {
     loadingParams,
     loadingCalculate,
@@ -58,7 +61,7 @@ export default function Univariable() {
     associationVar,
     exposureVar,
     resultsTable,
-  } = useSelector((state) => state.association.univariable);
+  } = univariableState;
 
   const [invalidAssocFilter, setInvalidAssocFilter] = useState(false);
   const [invalidExpFilter, setInvalidExpFilter] = useState(false);
@@ -299,7 +302,7 @@ export default function Univariable() {
           }
           data={assocVarData}
           columns={[
-            ...new Set(...assocVarData.map((row) => Object.keys(row))),
+            ...new Set(assocVarData.flatMap((row) => Object.keys(row))),
           ].reduce(reducer, [])}
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}
@@ -318,7 +321,7 @@ export default function Univariable() {
           </p>
 
           <AssocVarParams
-            hostState={useSelector((state) => state.association.univariable)}
+            hostState={univariableState}
             paramState={associationVar}
             mergeState={(e) => mergeState({ associationVar: e })}
             invalidFilter={invalidAssocFilter}
