@@ -1,6 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { mergeObject } from './utils';
 
+export const getEmptyAssocVar = () => ({
+  source: '',
+  type: '',
+  name: '',
+  tmpName: '',
+  filter: '',
+  log2: false,
+  collapse: '',
+  collapseOptions: [],
+});
+
 export const getInitialState = () => ({
   publicForm: {
     study: '',
@@ -50,19 +61,7 @@ export const getInitialState = () => ({
     testType: 'nonparametric',
     xlab: '',
     ylab: '',
-    associationVar: {
-      source: '',
-      type: '',
-      name: '',
-      tmpName: '',
-      sourceOptions: [],
-      typeOptions: [],
-      nameOptions: [],
-      filter: '',
-      log2: false,
-      collapse: '',
-      collapseOptions: [],
-    },
+    associationVar: getEmptyAssocVar(),
     exposureVar: {
       name: '',
       // tmpName: '',
@@ -94,21 +93,7 @@ export const getInitialState = () => ({
     signature: '',
     signatureOptions: [],
     testType: 'lm',
-    associationVars: [
-      {
-        source: '',
-        type: '',
-        name: '',
-        tmpName: '',
-        sourceOptions: [],
-        typeOptions: [],
-        nameOptions: [],
-        filter: '',
-        log2: false,
-        collapse: '',
-        collapseOptions: [],
-      },
-    ],
+    associationVars: [getEmptyAssocVar()],
     exposureVar: {
       name: '',
       // tmpName: '',

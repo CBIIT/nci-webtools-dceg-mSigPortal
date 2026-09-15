@@ -4,6 +4,7 @@ import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import CustomSelect from '../../controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../services/store/association';
+import { getEmptyAssocVar } from '../../../services/store/association';
 import { actions as modalActions } from '../../../services/store/modal';
 import { getJSON } from '../../../services/utils';
 
@@ -145,6 +146,14 @@ export default function UserForm() {
         expVarList,
         submitted: true,
       });
+      // reset variable selection so defaults repopulate from the new dataset
+      const emptyAssocVar = getEmptyAssocVar();
+      dispatch(
+        actions.mergeAssociation({
+          univariable: { associationVar: emptyAssocVar },
+          multivariable: { associationVars: [emptyAssocVar] },
+        })
+      );
     } catch (error) {
       mergeError(error);
     }

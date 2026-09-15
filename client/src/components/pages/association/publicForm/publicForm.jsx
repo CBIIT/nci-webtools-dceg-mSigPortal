@@ -6,6 +6,7 @@ import Select from '../../../controls/select/selectHookForm';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as associationActions } from '../../../../services/store/association';
+import { getEmptyAssocVar } from '../../../../services/store/association';
 import { actions as modalActions } from '../../../../services/store/modal';
 import {
   resetAssociationApi,
@@ -118,7 +119,14 @@ export default function PublicForm() {
         displayTab: 'univariable',
         openSidebar: false,
       });
-      dispatch(actions.mergeAssociation({ univariable: { id } }));
+      // reset variable selection so defaults repopulate from the new dataset
+      const emptyAssocVar = getEmptyAssocVar();
+      dispatch(
+        actions.mergeAssociation({
+          univariable: { id, associationVar: emptyAssocVar },
+          multivariable: { associationVars: [emptyAssocVar] },
+        })
+      );
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeState({

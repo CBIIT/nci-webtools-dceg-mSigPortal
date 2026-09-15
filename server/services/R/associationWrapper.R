@@ -115,7 +115,12 @@ msigportal.loadCollapse <- function(args, config) {
   vardata_refdata_selected <- vardata_refdata_selected %>%
     filter(data_source == args$source, data_type == args$type, variable_name == args$assocName)
 
-  if (unique(vardata_refdata_selected$variable_value_type) == "numeric") {
+  # no rows means the selected variable has no samples overlapping the signature-set exposures
+  if (nrow(vardata_refdata_selected) == 0) {
+    known_error(paste0("mSigPortal Association failed: the selected variable name ", args$assocName, " has no samples overlapping the selected signature set exposures. Please select another variable."))
+  }
+
+  if (isTRUE(unique(vardata_refdata_selected$variable_value_type) == "numeric")) {
     vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value)
   }
 
@@ -196,7 +201,12 @@ msigportal.univariable <- function(args, config) {
   vardata_refdata_selected <- vardata_refdata_selected %>%
     filter(data_source == args$associationVar$source, data_type == args$associationVar$type, variable_name == args$associationVar$name)
 
-  if (unique(vardata_refdata_selected$variable_value_type) == "numeric") { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
+  # no rows means the selected variable has no samples overlapping the signature-set exposures
+  if (nrow(vardata_refdata_selected) == 0) {
+    known_error(paste0("mSigPortal Association failed: the selected variable name ", args$associationVar$name, " has no samples overlapping the selected signature set exposures. Please select another variable."))
+  }
+
+  if (isTRUE(unique(vardata_refdata_selected$variable_value_type) == "numeric")) { vardata_refdata_selected$variable_value <- as.numeric(vardata_refdata_selected$variable_value) }
 
   vardata_refdata_selected <- vardata_refdata_selected %>%
     pivot_wider(id_cols = Sample, names_from = variable_name, values_from = variable_value)
