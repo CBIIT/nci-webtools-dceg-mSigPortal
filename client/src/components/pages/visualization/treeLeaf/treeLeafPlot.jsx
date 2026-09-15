@@ -141,7 +141,7 @@ export default function D3TreeLeaf({
   return (
     <div className="border rounded p-3 position-relative" {...props}>
       <div hidden={!loading}>
-        Please wait one minute while your plot is being rendered...
+        Please wait while your plot is being rendered...
       </div>
       <div hidden={loading} ref={plotRef} />
     </div>
