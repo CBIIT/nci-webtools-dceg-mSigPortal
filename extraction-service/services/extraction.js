@@ -436,11 +436,11 @@ export async function extraction(
   } catch (error) {
     // send error notification if email was provided
     logger.error(`[${id}] Sending error notification`);
-    logger.error(error);
+    logger.error(formatObject(error));
     await writeJson(paths.statusFile, {
       ...(await readJson(paths.statusFile)),
       status: 'FAILED',
-      error: { ...error },
+      error: formatObject(error),
       stopped: new Date(),
     });
 
