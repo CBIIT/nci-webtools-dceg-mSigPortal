@@ -456,10 +456,14 @@ async function getPublicTreeLeafData(req, res, next) {
       !seqmatrixData?.length ||
       !signatureData?.length
     ) {
-      console.log('exposureData', exposureData[0], exposureData?.length);
-      console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
-      console.log('signatureData', signatureData[0], signatureData?.length);
-      throw new Error('No data found');
+      const missing = [
+        !exposureData?.length && 'exposure',
+        !seqmatrixData?.length && 'seqmatrix',
+        !signatureData?.length && 'signature',
+      ].filter(Boolean);
+      throw new Error(
+        `The selected study does not provide ${missing.join(' and ')} data`
+      );
     }
     const args = { exposureData, seqmatrixData, signatureData };
     const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
