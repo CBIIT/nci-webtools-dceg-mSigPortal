@@ -314,7 +314,7 @@ msigportal.loadCollapseMulti <- function(args, config) {
   vardata_refdata_selected <- vardata_refdata_selected %>% filter(Sample %in% osamples)
   exposure_refdata_selected <- exposure_refdata_selected %>% filter(Sample %in% osamples)
 
-  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$exposureVar$name)
+  exposure_refdata_selected <- exposure_refdata_selected %>% select(Sample, Signature_name, args$expName)
 
   ### add more parameters according to user's input
   vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
