@@ -405,17 +405,26 @@ export default function Multivariable() {
                         <p className="mb-2">
                           <b>Signature_exposure</b> and{' '}
                           <b>Signature_exposure_ratio</b> are numeric
-                          (continuous).
+                          (continuous) variables.
                         </p>
                         <p className="mb-2">
-                          <b>Signature_exposure_cat</b> is categorical (Observed
-                          / Not_observed).
+                          <b>Signature_exposure_cat</b> is a categorical
+                          variable with two levels: Observed and Not_observed.
                         </p>
                         <p className="mb-0">
-                          The multivariable analysis is a regression, so choose
-                          a numeric (continuous) exposure such as{' '}
-                          <b>Signature_exposure</b> or{' '}
-                          <b>Signature_exposure_ratio</b>.
+                          The multivariable analysis uses regression modeling.
+                          The regression method is selected according to the
+                          type of outcome variable:
+                        </p>
+                        <ul>
+                          <li>Continuous outcome: linear regression.</li>
+                          <li>
+                            Binary categorical outcome: logistic regression.
+                          </li>
+                        </ul>
+                        <p>
+                          Multiple covariates can be included in the regression
+                          model to estimate adjusted associations.
                         </p>
                       </Popover.Content>
                     </Popover>

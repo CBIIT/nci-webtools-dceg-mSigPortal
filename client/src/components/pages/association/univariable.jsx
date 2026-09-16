@@ -349,18 +349,30 @@ export default function Univariable() {
                         <p className="mb-2">
                           <b>Signature_exposure</b> and{' '}
                           <b>Signature_exposure_ratio</b> are numeric
-                          (continuous).
+                          (continuous) variables.
                         </p>
                         <p className="mb-2">
-                          <b>Signature_exposure_cat</b> is categorical (Observed
-                          / Not_observed).
+                          <b>Signature_exposure_cat</b> is a categorical
+                          variable with two levels: Observed and Not_observed.
                         </p>
                         <p className="mb-0">
-                          Pair a numeric exposure with a numeric association
-                          variable (correlation), or a categorical exposure with
-                          a categorical association variable (contingency test).
-                          Mixed types run a group comparison.
+                          The statistical test is selected based on the variable
+                          types:
                         </p>
+                        <ul>
+                          <li>
+                            Numeric exposure + numeric association variable:
+                            correlation analysis.
+                          </li>
+                          <li>
+                            Categorical exposure + categorical association
+                            variable: contingency table test.
+                          </li>
+                          <li>
+                            Mixed variable types (numeric + categorical): group
+                            comparison.
+                          </li>
+                        </ul>
                       </Popover.Content>
                     </Popover>
                   }
