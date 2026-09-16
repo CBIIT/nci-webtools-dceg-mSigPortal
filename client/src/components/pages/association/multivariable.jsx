@@ -145,10 +145,10 @@ export default function Multivariable() {
             body: JSON.stringify({
               fn: 'loadCollapseMulti',
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
                 expName: exposureVar.name,
                 associationVars: associationVars.map(
                   ({
