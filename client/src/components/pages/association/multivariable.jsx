@@ -165,20 +165,29 @@ export default function Multivariable() {
           })
         ).json();
 
-        mergeState({
-          associationVars: associationVars.map((assocVar, i) => ({
-            ...assocVar,
-            name: assocVar.tmpName,
-            collapse: Array.isArray(collapseData[i + 1])
-              ? collapseData[i + 1][0]
-              : '',
-            collapseOptions: Array.isArray(collapseData[i + 1])
-              ? collapseData[i + 1]
-              : [],
-            id: sessionId,
-          })),
-          // exposureVar: { name: expVarList[0] },
-        });
+        if (collapseData?.error || collapseData?.uncaughtError) {
+          mergeState({
+            error:
+              collapseData.error ||
+              collapseData.uncaughtError ||
+              'An error has occurred. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
+        } else {
+          mergeState({
+            associationVars: associationVars.map((assocVar, i) => ({
+              ...assocVar,
+              name: assocVar.tmpName,
+              collapse: Array.isArray(collapseData[i + 1])
+                ? collapseData[i + 1][0]
+                : '',
+              collapseOptions: Array.isArray(collapseData[i + 1])
+                ? collapseData[i + 1]
+                : [],
+              id: sessionId,
+            })),
+            // exposureVar: { name: expVarList[0] },
+          });
+        }
       } catch (error) {
         mergeError(error);
       }
@@ -274,6 +283,11 @@ export default function Multivariable() {
               uncaughtError ||
               'An error has occurred. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
           });
+        } else if (!Array.isArray(dataTable) || dataTable.length === 0) {
+          mergeState({
+            error:
+              'No association results were produced for the selected variables. The multivariable analysis is a regression, so the Signature Exposure Variable must be continuous (e.g. Signature_exposure or Signature_exposure_ratio) rather than categorical.',
+          });
         } else {
           mergeState({
             id,
@@ -286,7 +300,7 @@ export default function Multivariable() {
           });
         }
       } catch (error) {
-        mergeState({ error: error });
+        mergeState({ error: error.message || String(error) });
       }
       mergeState({
         loadingCalculate: false,
@@ -378,19 +392,61 @@ export default function Multivariable() {
             style={{ maxWidth: '1720px' }}
           >
             <Col md="auto" lg="auto">
-              <CustomSelect
-                disabled={
-                  loadingData ||
-                  loadingParams ||
-                  loadingCalculate ||
-                  resultsTable.data.length
-                }
-                id="expVariable"
-                label="Signature Exposure Variable"
-                value={exposureVar.name}
-                options={expVarList}
-                onChange={(e) => mergeState({ exposureVar: { name: e } })}
-              />
+              <div className="d-flex align-items-center">
+                <OverlayTrigger
+                  trigger="click"
+                  placement="top"
+                  overlay={
+                    <Popover id="expVar-info" style={{ maxWidth: '420px' }}>
+                      <Popover.Title as="h6" className="font-weight-bold">
+                        Signature Exposure Variable
+                      </Popover.Title>
+                      <Popover.Content>
+                        <p className="mb-2">
+                          <b>Signature_exposure</b> and{' '}
+                          <b>Signature_exposure_ratio</b> are numeric
+                          (continuous).
+                        </p>
+                        <p className="mb-2">
+                          <b>Signature_exposure_cat</b> is categorical (Observed
+                          / Not_observed).
+                        </p>
+                        <p className="mb-0">
+                          The multivariable analysis is a regression, so choose
+                          a numeric (continuous) exposure such as{' '}
+                          <b>Signature_exposure</b> or{' '}
+                          <b>Signature_exposure_ratio</b>.
+                        </p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                  rootClose
+                >
+                  <Button
+                    aria-label="signature exposure variable info"
+                    variant="link"
+                    className="p-0 font-weight-bold mr-1"
+                  >
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      style={{ verticalAlign: 'baseline' }}
+                    />
+                  </Button>
+                </OverlayTrigger>
+                <CustomSelect
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
+                  id="expVariable"
+                  label="Signature Exposure Variable"
+                  value={exposureVar.name}
+                  options={expVarList}
+                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
+                />
+              </div>
             </Col>
             <Col md="auto">
               {warnDupe.length > 0 && (
@@ -568,7 +624,9 @@ export default function Multivariable() {
               </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
-                  <legend id="testType-label" className="font-weight-bold">Method</legend>
+                  <legend id="testType-label" className="font-weight-bold">
+                    Method
+                  </legend>
                   <CustomSelect
                     className="mb-0"
                     disabled={
@@ -629,7 +687,7 @@ export default function Multivariable() {
                   data={resultsTable.data}
                   columns={[
                     ...new Set(
-                      ...resultsTable.data.map((row) => Object.keys(row))
+                      resultsTable.data.flatMap((row) => Object.keys(row))
                     ),
                   ]
                     .reduce(reducer, [])

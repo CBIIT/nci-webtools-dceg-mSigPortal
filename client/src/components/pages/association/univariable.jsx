@@ -260,6 +260,11 @@ export default function Univariable() {
               uncaughtError ||
               'An error has occurred. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
           });
+        } else if (!Array.isArray(dataTable) || dataTable.length === 0) {
+          mergeState({
+            error:
+              'No association results were produced for the selected variables. Please review your selections and try again.',
+          });
         } else {
           mergeState({
             id,
@@ -272,7 +277,7 @@ export default function Univariable() {
           });
         }
       } catch (error) {
-        mergeState({ error: error });
+        mergeState({ error: error.message || String(error) });
       }
       mergeState({
         loadingCalculate: false,
@@ -331,19 +336,63 @@ export default function Univariable() {
             style={{ maxWidth: '1720px' }}
           >
             <Col md="auto" lg="auto">
-              <CustomSelect
-                disabled={!!(
-                  loadingData ||
-                  loadingParams ||
-                  loadingCalculate ||
-                  resultsTable.data.length
-                )}
-                id="expVariable"
-                label="Signature Exposure Variable"
-                value={exposureVar.name}
-                options={expVarList}
-                onChange={(e) => mergeState({ exposureVar: { name: e } })}
-              />
+              <div className="d-flex align-items-center">
+                <OverlayTrigger
+                  trigger="click"
+                  placement="top"
+                  overlay={
+                    <Popover id="expVar-info" style={{ maxWidth: '420px' }}>
+                      <Popover.Title as="h6" className="font-weight-bold">
+                        Signature Exposure Variable
+                      </Popover.Title>
+                      <Popover.Content>
+                        <p className="mb-2">
+                          <b>Signature_exposure</b> and{' '}
+                          <b>Signature_exposure_ratio</b> are numeric
+                          (continuous).
+                        </p>
+                        <p className="mb-2">
+                          <b>Signature_exposure_cat</b> is categorical (Observed
+                          / Not_observed).
+                        </p>
+                        <p className="mb-0">
+                          Pair a numeric exposure with a numeric association
+                          variable (correlation), or a categorical exposure with
+                          a categorical association variable (contingency test).
+                          Mixed types run a group comparison.
+                        </p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                  rootClose
+                >
+                  <Button
+                    aria-label="signature exposure variable info"
+                    variant="link"
+                    className="p-0 font-weight-bold mr-1"
+                  >
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      style={{ verticalAlign: 'baseline' }}
+                    />
+                  </Button>
+                </OverlayTrigger>
+                <CustomSelect
+                  disabled={
+                    !!(
+                      loadingData ||
+                      loadingParams ||
+                      loadingCalculate ||
+                      resultsTable.data.length
+                    )
+                  }
+                  id="expVariable"
+                  label="Signature Exposure Variable"
+                  value={exposureVar.name}
+                  options={expVarList}
+                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
+                />
+              </div>
             </Col>
             <Col md="auto">
               <Button
@@ -523,12 +572,14 @@ export default function Univariable() {
                   <CustomSelect
                     aria-label="Method"
                     className="mb-0"
-                    disabled={!!(
-                      loadingData ||
-                      loadingParams ||
-                      loadingCalculate ||
-                      resultsTable.data.length
-                    )}
+                    disabled={
+                      !!(
+                        loadingData ||
+                        loadingParams ||
+                        loadingCalculate ||
+                        resultsTable.data.length
+                      )
+                    }
                     id="testType"
                     label=""
                     value={testType}
@@ -586,7 +637,7 @@ export default function Univariable() {
                   data={resultsTable.data}
                   columns={[
                     ...new Set(
-                      ...resultsTable.data.map((row) => Object.keys(row))
+                      resultsTable.data.flatMap((row) => Object.keys(row))
                     ),
                   ]
                     .reduce(reducer, [])
