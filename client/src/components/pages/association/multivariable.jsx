@@ -286,7 +286,7 @@ export default function Multivariable() {
         } else if (!Array.isArray(dataTable) || dataTable.length === 0) {
           mergeState({
             error:
-              'No association results were produced for the selected variables. The multivariable analysis is a regression, so the Signature Exposure Variable must be continuous (e.g. Signature_exposure or Signature_exposure_ratio) rather than categorical.',
+              'No association results were produced for the selected variables.',
           });
         } else {
           mergeState({
