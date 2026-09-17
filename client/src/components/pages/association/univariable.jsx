@@ -263,7 +263,7 @@ export default function Univariable() {
         } else if (!Array.isArray(dataTable) || dataTable.length === 0) {
           mergeState({
             error:
-              'No association results were produced for the selected variables. Please review your selections and try again.',
+              'No association results were produced for the selected variables.',
           });
         } else {
           mergeState({
