@@ -365,12 +365,18 @@ msigportal.multivariable <- function(args, config) {
   vardata_refdata_selected <- multivariable_inputs(vardata_refdata_selected, associationVars)
   data_input <- left_join(exposure_refdata_selected, vardata_refdata_selected) %>% select(-Sample)
 
-  ## change variable name if detected special chacters ##
-  colnames(data_input)[-c(1:2)] <- str_replace_all(str_replace(str_replace_all(colnames(data_input)[-c(1:2)], "[^[:alnum:]_ ]*", ""), "^[^[:alpha:]]*", ""), "  *", "_")
+  ## Sanitize predictor names for model fitting; keep a map so we can restore
+  orig_names <- colnames(data_input)[-c(1:2)]
+  safe_names <- make.names(orig_names, unique = TRUE)
+  colnames(data_input)[-c(1:2)] <- safe_names
+  name_map <- setNames(orig_names, safe_names)  # safe -> original
 
   rformula = paste0(args$exposureVar$name, " ~ ", paste0(colnames(data_input)[-c(1:2)], collapse = ' + '))
   ## regressionby group of signature name
   assocTable <- mSigPortal_associaiton_group(data = data_input, Group_Var = "Signature_name", type = args$testType, regression = TRUE, formula = rformula)
+  if ("term" %in% colnames(assocTable)) {
+    assocTable <- assocTable %>% mutate(term = restore_var_names(term, name_map))
+  }
   assocTable %>% write_delim(file = assocTablePath, delim = '\t', col_names = T, na = '')
   # put result as a short table above the figure
 
@@ -378,9 +384,11 @@ msigportal.multivariable <- function(args, config) {
   signature_name_input <- if_else(args$signature != '', args$signature, signature_name_list[1]) ## by default, select the first signature name
   data_input <- data_input %>% filter(Signature_name == signature_name_input) %>% select(-Signature_name)
 
-  mSigPortal_associaiton(data = data_input, type = args$testType, regression = TRUE, formula = rformula, output_plot = plotPath)
+  mSigPortal_associaiton(data = data_input, type = args$testType, regression = TRUE, formula = rformula, name_map = name_map, output_plot = plotPath)
 
-  data_input %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
+  dl <- data_input
+  colnames(dl) <- restore_var_names(colnames(dl), name_map)
+  dl %>% write_delim(file = dataPath, delim = '\t', col_names = T, na = '')
 
   return(list(plotPath = plotPath, dataPath = dataPath, assocTablePath = assocTablePath, dataTable = assocTable, signatureOptions = signature_name_list))
 }
