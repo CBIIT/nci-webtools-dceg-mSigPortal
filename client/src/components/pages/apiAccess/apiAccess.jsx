@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Accordion, Card } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import SwaggerUI from 'swagger-ui-react';
 import SwaggerLabelInjector from './swagger-ui/swagger-injecttion.js';
 import SwaggerColorCustomizer from './swagger-ui/swagger-color-customizer.js';
@@ -7,6 +10,8 @@ import SwaggerScrollablePreEnhancer from './swagger-ui//swagger-scrollable.js';
 import './styles.scss';
 
 export default function APIAccess() {
+  const [open, setOpen] = useState(false);
+
   const rExample = `library(httr)
 library(jsonlite)
 
@@ -54,10 +59,12 @@ print(data)`;
               <Accordion.Toggle
                 as={Card.Header}
                 eventKey="0"
-                className="font-weight-bold"
+                className="font-weight-bold d-flex justify-content-between"
                 style={{ cursor: 'pointer' }}
+                onClick={() => setOpen(!open)}
               >
                 Usage Example
+                <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
               </Accordion.Toggle>
               <Accordion.Collapse eventKey="0">
                 <Card.Body>
