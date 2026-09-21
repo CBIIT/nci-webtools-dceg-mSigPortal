@@ -42,7 +42,7 @@ print(data)`;
               parameters, then select "Try it out" to send a live request and
               view the response.
             </p>
-            <p className="text-muted small mb-0">
+            <p className="mb-0">
               Requests are rate limited to 3,000 requests per 15 minutes per IP
               address. Exceeding this limit returns an HTTP 429 response;
               remaining quota is reported in the standard <code>RateLimit</code>{' '}
