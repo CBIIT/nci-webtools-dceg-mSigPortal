@@ -163,7 +163,7 @@ export default function Instructions({ formLimits }) {
           </li>
         </ul>
         <p>
-          <b>Examples:</b>
+          <b>Examples: </b>
           {renderInlineCode(
             '`extraction_sample_SBS96.all` for SBS96 and `extraction_sample_DBS78.all` for DBS78.'
           )}
