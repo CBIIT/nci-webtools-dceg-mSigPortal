@@ -1,4 +1,4 @@
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 import ClusteredPlot from './clustered-plot';
 import ClusteredForm from './clustered-form';

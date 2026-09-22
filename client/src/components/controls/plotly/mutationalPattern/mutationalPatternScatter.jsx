@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { mutationalPatternColors } from '../../utils/colors';
+import { mutationalPatternColors } from '@/components/controls/utils/colors';
 
 export default function mutationalPatternScatter(inputData, arg) {
   const { pattern } = arg;

@@ -1,13 +1,13 @@
-import { catalogApiSlice } from '../../../../../services/store/rootApi';
+import { catalogApiSlice } from '@/services/store/rootApi';
 import { groupBy } from 'lodash';
-import SBS96 from '../../../../controls/plotly/rsProfile/sbs96';
-import SBS192 from '../../../../controls/plotly/rsProfile/sbs192';
-import SBS288 from '../../../../controls/plotly/rsProfile/sbs288';
-import SBS1536 from '../../../../controls/plotly/rsProfile/sbs1536';
-import DBS78 from '../../../../controls/plotly/rsProfile/dbs78';
-import ID83 from '../../../../controls/plotly/rsProfile/id83';
-import RS32 from '../../../../controls/plotly/rsProfile/rs32';
-import CN48 from '../../../../controls/plotly/rsProfile/cn48';
+import SBS96 from '@/components/controls/plotly/rsProfile/sbs96';
+import SBS192 from '@/components/controls/plotly/rsProfile/sbs192';
+import SBS288 from '@/components/controls/plotly/rsProfile/sbs288';
+import SBS1536 from '@/components/controls/plotly/rsProfile/sbs1536';
+import DBS78 from '@/components/controls/plotly/rsProfile/dbs78';
+import ID83 from '@/components/controls/plotly/rsProfile/id83';
+import RS32 from '@/components/controls/plotly/rsProfile/rs32';
+import CN48 from '@/components/controls/plotly/rsProfile/cn48';
 
 export const rsProfileApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

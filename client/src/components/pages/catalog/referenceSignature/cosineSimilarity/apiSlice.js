@@ -1,5 +1,5 @@
-import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import CosineSimilarity from '../../../../controls/plotly/cosineSimilarity/cosineSimilarity';
+import { catalogApiSlice } from '@/services/store/rootApi';
+import CosineSimilarity from '@/components/controls/plotly/cosineSimilarity/cosineSimilarity';
 
 export const cosineSimilarityApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

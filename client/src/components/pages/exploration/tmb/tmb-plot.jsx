@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useTmbPlotQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function TmbPlot({ state }) {
   const [params, setParams] = useState('');

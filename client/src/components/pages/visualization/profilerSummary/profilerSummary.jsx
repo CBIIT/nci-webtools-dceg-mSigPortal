@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { Container, Form, Row, Col } from 'react-bootstrap';
-import Plotly from '../../../controls/plotly/plot/plot';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Description from '../../../controls/description/description';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Description from '@/components/controls/description/description';
 import { useProfilerSummaryQuery } from './apiSlice';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
 
 export default function ProfilerSummary({ state }) {
   const { source, study, cancer, strategy, id } = state;

@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import ReferenceSignature from './referenceSignature/referenceSignatures';
 import Etiology from './etiology/etiology';
 import STS from './sts/sts';
-import { actions } from '../../../services/store/catalog';
+import { actions } from '@/services/store/catalog';
 
 export default function Explore() {
   const dispatch = useDispatch();

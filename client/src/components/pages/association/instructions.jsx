@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function Instructions({ loading }) {
   return (

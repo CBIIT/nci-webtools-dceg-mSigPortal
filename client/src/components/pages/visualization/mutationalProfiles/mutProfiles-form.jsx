@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import Select from '../../../controls/select/selectHookForm';
-import Description from '../../../controls/description/description';
+import Select from '@/components/controls/select/selectHookForm';
+import Description from '@/components/controls/description/description';
 import {
   defaultProfile2,
   defaultMatrix2,
   defaultFilter2,
-} from '../../../../services/utils';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+} from '@/services/utils';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
 
 export default function MutationalProfilesForm({ state, form, mergeForm }) {
   const {

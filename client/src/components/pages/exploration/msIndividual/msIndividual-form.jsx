@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useMsIndividualOptionQuery } from './apiSlice';
 
 

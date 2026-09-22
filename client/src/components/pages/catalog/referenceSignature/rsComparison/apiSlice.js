@@ -1,8 +1,8 @@
-import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import sbs96 from '../../../../controls/plotly/profileComparison/sbs96';
-import sbs192 from '../../../../controls/plotly/profileComparison/sbs192';
-import dbs78 from '../../../../controls/plotly/profileComparison/dbs78';
-import id83 from '../../../../controls/plotly/profileComparison/id83';
+import { catalogApiSlice } from '@/services/store/rootApi';
+import sbs96 from '@/components/controls/plotly/profileComparison/sbs96';
+import sbs192 from '@/components/controls/plotly/profileComparison/sbs192';
+import dbs78 from '@/components/controls/plotly/profileComparison/dbs78';
+import id83 from '@/components/controls/plotly/profileComparison/id83';
 
 export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

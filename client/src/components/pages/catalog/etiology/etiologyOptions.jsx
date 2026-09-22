@@ -1,8 +1,8 @@
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../services/store/modal';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { actions as catalogActions } from '@/services/store/catalog';
+import { actions as modalActions } from '@/services/store/modal';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const actions = { ...catalogActions, ...modalActions };
 

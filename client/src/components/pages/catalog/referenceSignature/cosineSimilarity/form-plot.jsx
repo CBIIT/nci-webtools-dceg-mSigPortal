@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import Plotly from '../../../../controls/plotly/plot/plot';
-import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
-import Select from '../../../../controls/select/selectHookForm';
-import { actions as catalogActions } from '../../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../../services/store/modal';
-import { useSignatureOptionsQuery } from '../../../../../services/store/rootApi';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
+import { actions as catalogActions } from '@/services/store/catalog';
+import { actions as modalActions } from '@/services/store/modal';
+import { useSignatureOptionsQuery } from '@/services/store/rootApi';
 import { useCosineSimilarityQuery } from './apiSlice';
 
 const actions = { ...catalogActions, ...modalActions };

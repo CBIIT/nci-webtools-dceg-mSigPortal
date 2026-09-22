@@ -1,6 +1,6 @@
 import { Container, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { renderInlineCode } from '../../controls/utils/renderInlineCode';
+import { renderInlineCode } from '@/components/controls/utils/renderInlineCode';
 
 export default function Instructions() {
   const { signatureType } = useSelector((state) => state.refitting.userForm);

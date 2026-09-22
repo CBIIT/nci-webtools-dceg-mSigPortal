@@ -1,7 +1,7 @@
 import { Container } from 'react-bootstrap';
 import MsLandscapeForm from './msLandscape-form';
 import MsLandscapePlot from './msLandscape-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { useForm } from 'react-hook-form';
 
 export default function MsLandscape({ state }) {

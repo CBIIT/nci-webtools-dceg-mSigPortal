@@ -2,14 +2,14 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as exposureActions } from '@/services/store/exploration';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExplorationApi,
   useSignatureOptionsQuery,
-} from '../../../../services/store/rootApi';
+} from '@/services/store/rootApi';
 import {
   useUploadExplorationMutation,
   useSubmitExplorationMutation,

@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap';
 import { NavHashLink } from 'react-router-hash-link';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import MutationalPatternPlot from './mutPattern-plot';
 
 export default function MutationalPattern({ state }) {

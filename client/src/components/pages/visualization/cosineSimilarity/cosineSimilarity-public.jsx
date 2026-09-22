@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useCosinePublicQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import Description from '../../../controls/description/description';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import SvgContainer from '@/components/controls/svgContainer/svgContainer';
+import Description from '@/components/controls/description/description';
 import {
   defaultMatrix2,
   defaultMatrix,
   defaultProfile2,
   getErrorMessage,
-} from '../../../../services/utils';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { useMatrixListQuery } from '../userForm/apiSlice';
+} from '@/services/utils';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
+import { useMatrixListQuery } from '@/components/pages/visualization/userForm/apiSlice';
 
 export default function CsPublic({ state }) {
   const { id } = state;

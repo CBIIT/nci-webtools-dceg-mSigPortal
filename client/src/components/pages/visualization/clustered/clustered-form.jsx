@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectHookForm';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+import Select from '@/components/controls/select/selectHookForm';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
 
 export default function ClusteredForm({ state, form, setForm }) {
   const { id } = state;

@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsLandscape from '../../../controls/plotly/msLandscape/msLandscape';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import MsLandscape from '@/components/controls/plotly/msLandscape/msLandscape';
 
 export const msLandscapeApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

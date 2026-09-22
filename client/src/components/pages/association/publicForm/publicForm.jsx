@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
-import Select from '../../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as associationActions } from '../../../../services/store/association';
-import { getEmptyAssocVar } from '../../../../services/store/association';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as associationActions } from '@/services/store/association';
+import { getEmptyAssocVar } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetAssociationApi,
   useAssociationOptionsQuery,
   useExposureOptionsQuery,
-} from '../../../../services/store/rootApi';
+} from '@/services/store/rootApi';
 import { useAssociationPublicMutation } from './apiSlice';
 
 const actions = { ...associationActions, ...modalActions };

@@ -14,7 +14,7 @@ import {
   faMinus,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import CustomSelect from '../../controls/select/select-old';
+import CustomSelect from '@/components/controls/select/select-old';
 
 const { Group, Label, Check, Control } = Form;
 

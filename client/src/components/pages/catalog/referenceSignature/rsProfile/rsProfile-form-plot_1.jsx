@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
-import Plotly from '../../../../controls/plotly/plot/plot';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../../services/store/modal';
+import { actions as catalogActions } from '@/services/store/catalog';
+import { actions as modalActions } from '@/services/store/modal';
 import { useForm, useFieldArray } from 'react-hook-form';
-import Select from '../../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,
@@ -16,7 +16,7 @@ import {
   defaultSignatureSet2,
   defaultStrategy,
   defaultSignatureName,
-} from '../../../../../services/utils';
+} from '@/services/utils';
 
 const actions = { ...catalogActions, ...modalActions };
 

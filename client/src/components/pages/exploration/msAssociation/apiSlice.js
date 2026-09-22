@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsAssociation from '../../../controls/plotly/msAssociation/msAssociation';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import MsAssociation from '@/components/controls/plotly/msAssociation/msAssociation';
 
 export const msAssociationApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

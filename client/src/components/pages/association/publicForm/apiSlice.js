@@ -1,4 +1,4 @@
-import { associationApiSlice } from '../../../../services/store/rootApi';
+import { associationApiSlice } from '@/services/store/rootApi';
 
 export const publicFormApiSlice = associationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

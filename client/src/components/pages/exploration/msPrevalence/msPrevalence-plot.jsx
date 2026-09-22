@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsPrevelencePlotQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function MsPrevalancePlot({ form, state }) {
   const [params, setParams] = useState('');

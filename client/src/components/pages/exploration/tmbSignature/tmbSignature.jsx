@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap';
 import TmbSigPlot from './tmbSignature-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 
 export default function TmbSignature({ state }) {
   return (

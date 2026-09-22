@@ -1,4 +1,4 @@
-import Description from '../../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import RsComparisonPlot from './form-plot';
 
 export default function RsComparison() {

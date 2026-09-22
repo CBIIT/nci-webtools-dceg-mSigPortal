@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { actions } from '../../../services/store/modal';
-import { getErrorMessage } from '../../../services/utils';
+import { actions } from '@/services/store/modal';
+import { getErrorMessage } from '@/services/utils';
 
 export function ErrorModal(props) {
   const dispatch = useDispatch();

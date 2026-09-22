@@ -5,7 +5,7 @@ import RsProfile from './rsProfile/rsProfile';
 import CosineSimilarity from './cosineSimilarity/cosineSimilarity';
 import RsComparison from './rsComparison/rsComparison';
 import Download from './download';
-import { actions } from '../../../../services/store/catalog';
+import { actions } from '@/services/store/catalog';
 
 export default function ReferenceSignature() {
   const dispatch = useDispatch();

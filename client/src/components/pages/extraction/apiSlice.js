@@ -1,4 +1,4 @@
-import { extractionApiSlice } from '../../../services/store/rootApi';
+import { extractionApiSlice } from '@/services/store/rootApi';
 import { groupBy } from 'lodash';
 
 export const inputFormApiSlice = extractionApiSlice.injectEndpoints({

@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsDecomposition from '../../../controls/plotly/msDecomposition/msDecomposition';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import MsDecomposition from '@/components/controls/plotly/msDecomposition/msDecomposition';
 
 export const msDecompositionApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

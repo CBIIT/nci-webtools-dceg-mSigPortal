@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useProfileComparisonReferenceQuery } from './apiSlice';
-import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { defaultMatrix } from '../../../../services/utils';
-import Plotly from '../../../controls/plotly/plot/plot';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { defaultProfile2 } from '../../../../services/utils';
+import { useSignatureOptionsQuery } from '@/services/store/rootApi';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { defaultMatrix } from '@/services/utils';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
+import { defaultProfile2 } from '@/services/utils';
 
 export default function PcReference({ state }) {
   const [params, setParams] = useState(null);

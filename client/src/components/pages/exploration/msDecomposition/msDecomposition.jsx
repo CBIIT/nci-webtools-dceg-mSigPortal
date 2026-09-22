@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap';
 import MsDecompositionPlot from './msDecomposition-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 
 export default function MsDecomposition({ state }) {

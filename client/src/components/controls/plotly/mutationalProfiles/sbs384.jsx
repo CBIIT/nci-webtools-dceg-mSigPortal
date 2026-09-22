@@ -1,4 +1,4 @@
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '@/components/controls/utils/colors';
 import { createSampleAnnotation } from './utils';
 export default function SBS384(data, title = '') {
   const colors = sbsColor;

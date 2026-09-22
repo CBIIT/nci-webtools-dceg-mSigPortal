@@ -2,27 +2,27 @@ import { useCallback, useEffect } from 'react';
 import { Button, Nav, Form, Row, Col, Alert } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { actions as extractionActions } from '../../../services/store/extraction';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as extractionActions } from '@/services/store/extraction';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 import Status from './status';
 import SignatureMap from './signatureMap';
-import TMB from '../exploration/tmb/tmb';
-import TmbSignature from '../exploration/tmbSignature/tmbSignature';
-import MsBurden from '../exploration/msBurden/msBurden';
-import MsDecomposition from '../exploration/msDecomposition/msDecomposition';
-import MsAssociation from '../exploration/msAssociation/msAssociation';
-import MsLandscape from '../exploration/msLandscape/msLandscape';
-import MsPrevalence from '../exploration/msPrevalence/msPrevalence';
-import MsIndividual from '../exploration/msIndividual/msIndividual';
+import TMB from '@/components/pages/exploration/tmb/tmb';
+import TmbSignature from '@/components/pages/exploration/tmbSignature/tmbSignature';
+import MsBurden from '@/components/pages/exploration/msBurden/msBurden';
+import MsDecomposition from '@/components/pages/exploration/msDecomposition/msDecomposition';
+import MsAssociation from '@/components/pages/exploration/msAssociation/msAssociation';
+import MsLandscape from '@/components/pages/exploration/msLandscape/msLandscape';
+import MsPrevalence from '@/components/pages/exploration/msPrevalence/msPrevalence';
+import MsIndividual from '@/components/pages/exploration/msIndividual/msIndividual';
 import { useRefreshQuery } from './apiSlice';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const actions = { ...extractionActions, ...modalActions };
 

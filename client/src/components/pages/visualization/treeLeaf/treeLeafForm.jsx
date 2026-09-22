@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Form, Row, Col } from 'react-bootstrap';
-import MultiSelect from '../../../controls/select/multiSelect';
+import MultiSelect from '@/components/controls/select/multiSelect';
 import { colorOptions, userColorOptions } from './treeLeaf.state';
 
 export default function TreeLeafForm({ isUser, form, onChange, attributes }) {

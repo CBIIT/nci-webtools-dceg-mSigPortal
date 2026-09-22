@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/catalog';
+import { actions } from '@/services/store/catalog';
 import {
   useEtiologyDistribtuionQuery,
   useEtiologySignatureQuery,
   useEtiologyOrganTableQuery,
 } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plotly from '../../../controls/plotly/plot/plot';
-import Table from '../../../controls/table/table2';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import Table from '@/components/controls/table/table2';
 import SATSSection from './SATSSection';
 
 export default function SignatureInfo({ data }) {

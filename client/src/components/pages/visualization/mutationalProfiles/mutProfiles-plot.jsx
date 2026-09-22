@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMutationalProfilesQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function MutProfilePlot({ state, form }) {
   const { sample, profile, matrix, filter } = form;

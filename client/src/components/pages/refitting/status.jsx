@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import Table from '../../controls/table/table2';
+import Table from '@/components/controls/table/table2';
 import { useMultiJobStatusQuery } from './apiSlice';
 import moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';

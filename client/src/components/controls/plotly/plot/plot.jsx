@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { saveAs } from 'file-saver';
-import { handleSaveCSV } from '../../../controls/table/table2';
+import { handleSaveCSV } from '@/components/controls/table/table2';
 
 import './plot.scss';
 

@@ -1,5 +1,5 @@
-import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import RsInMsigportal from '../../../../controls/plotly/rsInMsigportal/rsInMsigportal';
+import { catalogApiSlice } from '@/services/store/rootApi';
+import RsInMsigportal from '@/components/controls/plotly/rsInMsigportal/rsInMsigportal';
 
 export const rsInMsigportalApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

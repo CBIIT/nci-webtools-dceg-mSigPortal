@@ -1,5 +1,5 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import { parseCSV } from '../../../../services/utils';
+import { visualizationApiSlice } from '@/services/store/rootApi';
+import { parseCSV } from '@/services/utils';
 
 export const userFormApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

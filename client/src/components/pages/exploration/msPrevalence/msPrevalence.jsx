@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Container } from 'react-bootstrap';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import MsPrevalencePlot from './msPrevalence-plot';
 import MsPrevalenceForm from './msPrevalence-form';
 

@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
-import Table from '../../../controls/table/table2';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Table from '@/components/controls/table/table2';
+import Plotly from '@/components/controls/plotly/plot/plot';
 
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useClusteredQuery } from './apiSlice';
 
 export default function ClusteredPlot({ state, form }) {

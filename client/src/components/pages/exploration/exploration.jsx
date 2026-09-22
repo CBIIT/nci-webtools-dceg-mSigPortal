@@ -15,13 +15,13 @@ import MsLandscape from './msLandscape/msLandscape';
 import MsPrevalence from './msPrevalence/msPrevalence';
 import MsIndividual from './msIndividual/msIndividual';
 import Download from './download';
-import { actions as exposureActions } from '../../../services/store/exploration';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as exposureActions } from '@/services/store/exploration';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Check } = Form;

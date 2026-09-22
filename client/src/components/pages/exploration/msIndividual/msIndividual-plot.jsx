@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMsIndividualQuery } from './apiSlice';
-import Plotly from '../../../controls/plotly/plot/plot';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { NavHashLink } from 'react-router-hash-link';
 
 export default function MsIndividualPlot({ state, form }) {

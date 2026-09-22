@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import TMBSignature from '../../../controls/plotly/tmb/tmb';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import TMBSignature from '@/components/controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
 export const tmbSignatureApiSlice = explorationApiSlice.injectEndpoints({

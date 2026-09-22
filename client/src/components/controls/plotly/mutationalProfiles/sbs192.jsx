@@ -5,7 +5,7 @@ import {
   createMutationShapes,
   createMutationAnnotations,
 } from './utils';
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '@/components/controls/utils/colors';
 
 export default function SBS192(apiData, title = '') {
   const colors = sbsColor;

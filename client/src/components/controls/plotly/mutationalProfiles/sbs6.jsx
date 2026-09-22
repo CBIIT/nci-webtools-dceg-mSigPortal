@@ -1,4 +1,4 @@
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '@/components/controls/utils/colors';
 export default function SBS6(data) {
   const colors = sbsColor;
 

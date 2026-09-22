@@ -1,16 +1,16 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import SBS6 from '../../../controls/plotly/mutationalProfiles/sbs6';
-import SBS24 from '../../../controls/plotly/mutationalProfiles/sbs24';
-import SBS96 from '../../../controls/plotly/mutationalProfiles/sbs96';
-import SBS192 from '../../../controls/plotly/mutationalProfiles/sbs192';
-import SBS288 from '../../../controls/plotly/mutationalProfiles/sbs288';
-import SBS384 from '../../../controls/plotly/mutationalProfiles/sbs384';
-import SBS1536 from '../../../controls/plotly/mutationalProfiles/sbs1536';
-import DBS78 from '../../../controls/plotly/mutationalProfiles/dbs78';
-import DBS186 from '../../../controls/plotly/mutationalProfiles/dbs186';
-import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
-import ID28 from '../../../controls/plotly/mutationalProfiles/id28';
-import ID415 from '../../../controls/plotly/mutationalProfiles/id415';
+import { visualizationApiSlice } from '@/services/store/rootApi';
+import SBS6 from '@/components/controls/plotly/mutationalProfiles/sbs6';
+import SBS24 from '@/components/controls/plotly/mutationalProfiles/sbs24';
+import SBS96 from '@/components/controls/plotly/mutationalProfiles/sbs96';
+import SBS192 from '@/components/controls/plotly/mutationalProfiles/sbs192';
+import SBS288 from '@/components/controls/plotly/mutationalProfiles/sbs288';
+import SBS384 from '@/components/controls/plotly/mutationalProfiles/sbs384';
+import SBS1536 from '@/components/controls/plotly/mutationalProfiles/sbs1536';
+import DBS78 from '@/components/controls/plotly/mutationalProfiles/dbs78';
+import DBS186 from '@/components/controls/plotly/mutationalProfiles/dbs186';
+import ID83 from '@/components/controls/plotly/mutationalProfiles/id83';
+import ID28 from '@/components/controls/plotly/mutationalProfiles/id28';
+import ID415 from '@/components/controls/plotly/mutationalProfiles/id415';
 
 export const mutationalProfilesApiSlice = visualizationApiSlice.injectEndpoints(
   {

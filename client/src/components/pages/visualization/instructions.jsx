@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Table, Alert } from 'react-bootstrap';
 import { useExampleHeaderQuery } from './userForm/apiSlice';
-import { renderInlineCode } from '../../controls/utils/renderInlineCode';
+import { renderInlineCode } from '@/components/controls/utils/renderInlineCode';
 
 export default function Instructions() {
   const { inputFormat } = useSelector((state) => state.visualization.userForm);

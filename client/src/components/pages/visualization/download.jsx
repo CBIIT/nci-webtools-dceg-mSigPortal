@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { saveAs } from 'file-saver';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../services/store/modal';
+import { actions } from '@/services/store/modal';
 
 export default function Download() {
   const dispatch = useDispatch();

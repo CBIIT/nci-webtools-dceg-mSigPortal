@@ -1,7 +1,7 @@
 import { Container } from 'react-bootstrap';
 import MsAssociationForm from './msAssociation-form';
 import MsAssociationPlot from './msAssociation-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { useState } from 'react';
 
 export default function MsAssociation({ state }) {

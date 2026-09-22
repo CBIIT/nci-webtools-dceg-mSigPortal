@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
+import { actions as catalogActions } from '@/services/store/catalog';
 import CategoryOptions from './categoryOptions';
 import EtiologyOptions from './etiologyOptions';
 import SignatureOptions from './signatureOptions';
 import SignatureInfo from './signatureInfo';
 import { useEtiologyOptionsQuery } from './apiSlice';
 import './etiology.scss';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const actions = { ...catalogActions };
 
