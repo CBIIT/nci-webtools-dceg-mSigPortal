@@ -4,6 +4,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { actions } from '../../../services/store/modal';
+import { getErrorMessage } from '../../../services/utils';
 
 export function ErrorModal(props) {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ export function ErrorModal(props) {
       </Modal.Header>
 
       <Modal.Body style={{ backgroundColor: '#fafafa' }}>
-        <div className="w-100">{message}</div>
+        <div className="w-100">{getErrorMessage(message, '')}</div>
         <br />
         <p>
           An error has occurred. If the issue persists, please contact an admin

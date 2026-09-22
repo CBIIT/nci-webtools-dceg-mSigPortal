@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Plotly from '../../../controls/plotly/plot/plot';
 import { useMsBurdenQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { getErrorMessage } from '../../../../services/utils';
 
 export default function MsBurdenPlot({ state, form }) {
   const [params, setParams] = useState('');
@@ -36,7 +37,7 @@ export default function MsBurdenPlot({ state, form }) {
       <h5 className="d-flex justify-content-center">
         Mutational Signature Burden Across Cancer Types
       </h5>
-      {error && <p className="p-3 text-danger">{error}</p>}
+      {error && <p className="p-3 text-danger">{getErrorMessage(error)}</p>}
       {currentData && (
         <Plotly
           className="w-100"
