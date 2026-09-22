@@ -4,15 +4,13 @@ import { Form, Row, Col } from 'react-bootstrap';
 import MultiSelect from '../../../controls/select/multiSelect';
 import { colorOptions, userColorOptions } from './treeLeaf.state';
 
-export default function TreeLeafForm({
-  isUser,
-  form,
-  onChange,
-  attributes,
-}) {
+export default function TreeLeafForm({ isUser, form, onChange, attributes }) {
   const publicForm = useSelector((store) => store.visualization.publicForm);
   const cancers = publicForm?.cancers?.filter((c) => c.value !== '*ALL') || [];
-  const cancerTypes = [{ label: 'All', value: '' }].concat(cancers);
+  // only show "All" option if the study doesn't already have an "ALL" cancer type
+  const cancerTypes = cancers.some((c) => c.label === 'ALL')
+    ? cancers
+    : [{ label: 'All', value: '' }].concat(cancers);
   const selectedCancer =
     cancerTypes.find((c) => c.value === form.cancer) ?? cancerTypes[0];
   const leafColorOptions = isUser ? userColorOptions : colorOptions;
