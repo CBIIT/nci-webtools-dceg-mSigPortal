@@ -1,4 +1,4 @@
-import { visualizationApiSlice } from '../../../services/store/rootApi';
+import { visualizationApiSlice } from '@/services/store/rootApi';
 import { groupBy, startCase } from 'lodash';
 
 export const publicationsSlice = visualizationApiSlice.injectEndpoints({

@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
-import SelectForm from '../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import SelectForm from '@/components/controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as extractionActions } from '../../../services/store/extraction';
+import { actions as extractionActions } from '@/services/store/extraction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExtractionApi,
   useSeqmatrixOptionsQuery,
   useSignatureOptionsQuery,
   useRefGenomeQuery,
-} from '../../../services/store/rootApi';
+} from '@/services/store/rootApi';
 import {
   useUploadMutation,
   useSubmitMutation,

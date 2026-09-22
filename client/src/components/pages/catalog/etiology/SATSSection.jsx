@@ -3,7 +3,7 @@ import { Row, Col, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
 import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery, useSatsExampleDataQuery } from './satsApiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function SATSSection({ selectedSignature }) {
 

@@ -6,7 +6,7 @@ import {
   createMutationAnnotations,
   getTotalMutations,
 } from './utils';
-import {rnaSBS192Color } from '../../utils/colors';
+import {rnaSBS192Color } from '@/components/controls/utils/colors';
 
 export default function RNASBS192(apiData, title = '') {
   const colors = rnaSBS192Color;

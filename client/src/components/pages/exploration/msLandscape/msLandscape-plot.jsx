@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsLandscapePlotQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { readFile, parseMatrix } from '../../../controls/utils/utils';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { readFile, parseMatrix } from '@/components/controls/utils/utils';
 
 export default function MsLandscapePlot({ state, variableFile }) {
   const [params, setParams] = useState('');

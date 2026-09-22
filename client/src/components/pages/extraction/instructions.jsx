@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { Container, Table, Alert } from 'react-bootstrap';
 import { useExampleQuery } from './apiSlice';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { renderInlineCode } from '../../controls/utils/renderInlineCode';
+import { renderInlineCode } from '@/components/controls/utils/renderInlineCode';
 
 export default function Instructions({ formLimits }) {
   const examples = [

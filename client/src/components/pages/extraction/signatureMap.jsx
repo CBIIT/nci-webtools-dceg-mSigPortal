@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Select from '../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import {
   useSignatureMapTableQuery,
   useSignatureMapPlotsQuery,
 } from './apiSlice';
-import Plotly from '../../controls/plotly/plot/plot';
-import Table from '../../controls/table/table2';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import Table from '@/components/controls/table/table2';
 
 export default function SignatureMap({ state }) {
   const { id, params, manifest } = state;

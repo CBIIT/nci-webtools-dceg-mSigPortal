@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap';
 import TmbPlot from './tmb-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 
 export default function TMB({ state }) {
   return (

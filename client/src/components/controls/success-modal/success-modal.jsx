@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import { actions } from '../../../services/store/modal';
+import { actions } from '@/services/store/modal';
 
 export function SuccessModal(props) {
   const dispatch = useDispatch();

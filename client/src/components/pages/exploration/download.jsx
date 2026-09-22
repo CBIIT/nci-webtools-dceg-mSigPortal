@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { saveAs } from 'file-saver';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../services/store/modal';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions } from '@/services/store/modal';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function Download({ exposureDownload }) {
   const [downloading, setDownload] = useState(false);

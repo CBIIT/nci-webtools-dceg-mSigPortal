@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { usePcaPublicQuery } from './apiSlice';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { useMatrixListQuery } from '../userForm/apiSlice';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import SvgContainer from '@/components/controls/svgContainer/svgContainer';
+import { useMatrixListQuery } from '@/components/pages/visualization/userForm/apiSlice';
 import {
   defaultProfile2,
   defaultMatrix2,
   getErrorMessage,
-} from '../../../../services/utils';
+} from '@/services/utils';
 
 export default function PcaPublic({ state }) {
   const [params, setParams] = useState('');

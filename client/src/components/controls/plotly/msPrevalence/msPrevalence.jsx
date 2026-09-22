@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { colorPallet } from '../../utils/colors';
+import { colorPallet } from '@/components/controls/utils/colors';
 
 export default function MSPrevalence(data, minimum) {
   // calculate median burden across cancer types

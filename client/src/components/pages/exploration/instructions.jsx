@@ -1,6 +1,6 @@
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { Container, Table, Alert } from 'react-bootstrap';
-import { renderInlineCode } from '../../controls/utils/renderInlineCode';
+import { renderInlineCode } from '@/components/controls/utils/renderInlineCode';
 
 export default function Instructions({ props, loading }) {
   const examples = [

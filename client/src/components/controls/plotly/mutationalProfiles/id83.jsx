@@ -5,7 +5,7 @@ import {
   groupDataByMutation,
 } from './utils';
 
-import { id83Color } from '../../utils/colors';
+import { id83Color } from '@/components/controls/utils/colors';
 export default function ID83(apiData, title = '') {
   const colors = id83Color;
 

@@ -5,10 +5,10 @@ import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 import UserForm from './userForm/userForm';
 import PublicForm from './publicForm/publicForm';
-import Instructions from '../visualization/instructions';
+import Instructions from '@/components/pages/visualization/instructions';
 import ProfilerSummary from './profilerSummary/profilerSummary';
 import MutationalProfiles from './mutationalProfiles/mutProfiles';
 import TreeAndLeaf from './treeLeaf/treeLeaf';
@@ -18,10 +18,10 @@ import ProfileComparison from './profileComparison/profileComparison';
 import PCA from './pca/pca';
 import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/visualization';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as visualizationActions } from '@/services/store/visualization';
+import { actions as modalActions } from '@/services/store/modal';
 import './visualization.scss';
 import { useRefreshQuery } from './userForm/apiSlice';
 

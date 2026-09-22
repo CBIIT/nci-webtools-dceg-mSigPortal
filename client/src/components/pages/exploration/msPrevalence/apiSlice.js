@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsPrevalence from '../../../controls/plotly/msPrevalence/msPrevalence';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import MsPrevalence from '@/components/controls/plotly/msPrevalence/msPrevalence';
 
 export const msPrevalenceApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

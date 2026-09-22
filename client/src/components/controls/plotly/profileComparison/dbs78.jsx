@@ -1,5 +1,5 @@
 import { compareProfiles } from './profileComparison';
-import { MsIndividualComparison } from '../msIndividual/msIndividual';
+import { MsIndividualComparison } from '@/components/controls/plotly/msIndividual/msIndividual';
 
 export default function dbs78(data1, data2, tab) {
   const colors = {

@@ -3,8 +3,8 @@ import {
   useMsAssociationQuery,
   useMsAssociation2SourceQuery,
 } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plotly from '../../../controls/plotly/plot/plot';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Plotly from '@/components/controls/plotly/plot/plot';
 
 export default function MsAssociationPlot({ state, form }) {
   const [params, setParams] = useState('');

@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
-import { round, arrayContainsTerms } from '../../utils/utils';
-import { colorPallet, colorPallet1 } from '../../utils/colors';
+import { round, arrayContainsTerms } from '@/components/controls/utils/utils';
+import { colorPallet, colorPallet1 } from '@/components/controls/utils/colors';
 
 import {
   groupDataByMutation,
@@ -10,7 +10,7 @@ import {
   getCosineSimilarity,
   getRss,
   findMaxAbsoluteYValue,
-} from '../profileComparison/profileComparison';
+} from '@/components/controls/plotly/profileComparison/profileComparison';
 
 export function MsIndividualComparison(
   data,

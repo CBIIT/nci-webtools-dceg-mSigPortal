@@ -1,14 +1,14 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as exposureActions } from '@/services/store/exploration';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExplorationApi,
   useExposureOptionsQuery,
-} from '../../../../services/store/rootApi';
+} from '@/services/store/rootApi';
 
 const actions = { ...exposureActions, ...modalActions };
 

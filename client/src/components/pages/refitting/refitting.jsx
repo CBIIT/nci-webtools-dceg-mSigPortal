@@ -2,18 +2,18 @@ import React, { useCallback, useEffect } from 'react';
 import { Button, Nav, Alert } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { actions as refittingActions } from '../../../services/store/refitting';
+import { actions as refittingActions } from '@/services/store/refitting';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 import Instructions from './instructions';
 import Status from './status';
 import Results from './results';
 import RefittingForm from './refitting-form';
 import { useRefittingStatusQuery } from './apiSlice';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 export default function Refitting() {
   const { displayTab, openSidebar, ...state } = useSelector(

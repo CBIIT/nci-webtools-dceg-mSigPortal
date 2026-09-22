@@ -4,14 +4,14 @@ import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
-import Instructions from '../association/instructions';
+} from '@/components/controls/sidebar-container/sidebar-container';
+import Instructions from '@/components/pages/association/instructions';
 import Univariable from './univariable';
 import Multivariable from './multivariable';
 import PublicForm from './publicForm/publicForm';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as visualizationActions } from '../../../services/store/association';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as visualizationActions } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
 import './association.scss';
 
 const actions = { ...visualizationActions, ...modalActions };

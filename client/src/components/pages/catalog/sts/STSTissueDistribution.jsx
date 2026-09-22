@@ -2,8 +2,8 @@ import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery, useSatsExampleDataQuery } from '../etiology/satsApiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useSatsDataBySignatureQuery, useSatsEtiologyLookupQuery, useSatsExampleDataQuery } from '@/components/pages/catalog/etiology/satsApiSlice';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 // Component to render a single SATS plot without header
 function SATSPlot({ signatureName, signatureSetName, useExampleData, plotTitle, yAxisLabel }) {

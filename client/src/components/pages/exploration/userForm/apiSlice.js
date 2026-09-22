@@ -1,4 +1,4 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
+import { explorationApiSlice } from '@/services/store/rootApi';
 
 export const userFormApiSlice = explorationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

@@ -10,14 +10,14 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { actions as associationActions } from '../../../services/store/association';
-import { getEmptyAssocVar } from '../../../services/store/association';
-import { actions as modalActions } from '../../../services/store/modal';
-import CustomSelect from '../../controls/select/select-old';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as associationActions } from '@/services/store/association';
+import { getEmptyAssocVar } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
+import CustomSelect from '@/components/controls/select/select-old';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
-import SvgContainer from '../../controls/svgContainer/svgContainer';
-import Table from '../../controls/table/table';
+import SvgContainer from '@/components/controls/svgContainer/svgContainer';
+import Table from '@/components/controls/table/table';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group, Label, Check, Control } = Form;

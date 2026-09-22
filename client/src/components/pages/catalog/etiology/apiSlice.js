@@ -1,14 +1,14 @@
-import { catalogApiSlice } from '../../../../services/store/rootApi';
+import { catalogApiSlice } from '@/services/store/rootApi';
 import { groupBy } from 'lodash';
-import TMB from '../../../controls/plotly/tmb/tmb';
-import SBS96 from '../../../controls/plotly/mutationalProfiles/sbs96';
-import SBS192 from '../../../controls/plotly/mutationalProfiles/sbs192';
-import DBS78 from '../../../controls/plotly/mutationalProfiles/dbs78';
-import ID83 from '../../../controls/plotly/mutationalProfiles/id83';
-import CN48 from '../../../controls/plotly/mutationalProfiles/cn48';
-import ID29 from '../../../controls/plotly/mutationalProfiles/id29';
-import RS32 from '../../../controls/plotly/mutationalProfiles/rs32';
-import RNASBS192 from '../../../controls/plotly/mutationalProfiles/rnasbs192';
+import TMB from '@/components/controls/plotly/tmb/tmb';
+import SBS96 from '@/components/controls/plotly/mutationalProfiles/sbs96';
+import SBS192 from '@/components/controls/plotly/mutationalProfiles/sbs192';
+import DBS78 from '@/components/controls/plotly/mutationalProfiles/dbs78';
+import ID83 from '@/components/controls/plotly/mutationalProfiles/id83';
+import CN48 from '@/components/controls/plotly/mutationalProfiles/cn48';
+import ID29 from '@/components/controls/plotly/mutationalProfiles/id29';
+import RS32 from '@/components/controls/plotly/mutationalProfiles/rs32';
+import RNASBS192 from '@/components/controls/plotly/mutationalProfiles/rnasbs192';
 
 export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

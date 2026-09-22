@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsBurdenQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { getErrorMessage } from '../../../../services/utils';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { getErrorMessage } from '@/services/utils';
 
 export default function MsBurdenPlot({ state, form }) {
   const [params, setParams] = useState('');

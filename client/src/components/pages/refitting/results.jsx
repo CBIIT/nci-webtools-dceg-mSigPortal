@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Alert } from 'react-bootstrap';
-import { parseCSV } from '../../../services/utils';
-import Table from '../../controls/table/table2';
+import { parseCSV } from '@/services/utils';
+import Table from '@/components/controls/table/table2';
 
 export default function TargetedSequencing({ jobId }) {
   const [selectedMetric, setSelectedMetric] = useState('h_est');

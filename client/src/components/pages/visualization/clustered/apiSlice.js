@@ -1,5 +1,5 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import Rainfall from '../../../controls/plotly/clusteredIdentification/rainfall';
+import { visualizationApiSlice } from '@/services/store/rootApi';
+import Rainfall from '@/components/controls/plotly/clusteredIdentification/rainfall';
 
 export const clusteredApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

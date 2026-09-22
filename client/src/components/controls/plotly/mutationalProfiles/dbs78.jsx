@@ -1,4 +1,4 @@
-import { dbs78Color } from '../../utils/colors';
+import { dbs78Color } from '@/components/controls/utils/colors';
 import {
   createSampleAnnotation,
   getTotalMutations,

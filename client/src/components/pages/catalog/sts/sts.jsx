@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
+import { actions as catalogActions } from '@/services/store/catalog';
 import STSEtiologyOptions from './stsEtiologyOptions';
 import STSSignatureOptions from './stsSignatureOptions';
 import STSSignatureInfo from './stsSignatureInfo';
 import STSTissueDistribution from './STSTissueDistribution';
-import { useEtiologyOptionsQuery } from '../etiology/apiSlice';
-import '../etiology/etiology.scss';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { useEtiologyOptionsQuery } from '@/components/pages/catalog/etiology/apiSlice';
+import '@/components/pages/catalog/etiology/etiology.scss';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const actions = { ...catalogActions };
 

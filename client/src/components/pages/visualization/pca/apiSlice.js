@@ -1,4 +1,4 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
+import { visualizationApiSlice } from '@/services/store/rootApi';
 
 export const pcaApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

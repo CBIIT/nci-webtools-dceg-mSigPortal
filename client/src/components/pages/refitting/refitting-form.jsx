@@ -4,8 +4,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useUploadMutation, useSubmitRefittingMutation } from './apiSlice';
-import { actions as modalActions } from '../../../services/store/modal';
-import { actions as refittingActions } from '../../../services/store/refitting';
+import { actions as modalActions } from '@/services/store/modal';
+import { actions as refittingActions } from '@/services/store/refitting';
 
 export default function RefittingForm() {
   const { submitted, ...state } = useSelector((state) => state.refitting.main);

@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { rs32Color } from '../../utils/colors';
+import { rs32Color } from '@/components/controls/utils/colors';
 export default function RS32(rawData, sample) {
   const colors = rs32Color;
 

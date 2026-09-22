@@ -1,7 +1,7 @@
 import { Container } from 'react-bootstrap';
 import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { useState } from 'react';
 
 export default function MsBurden({ state }) {

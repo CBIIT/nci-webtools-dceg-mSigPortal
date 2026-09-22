@@ -11,11 +11,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
-import Select from '../../../controls/select/selectHookForm';
-import MultiSelect from '../../../controls/select/multiSelect';
-import { actions as visualizationActions } from '../../../../services/store/visualization';
-import { actions as modalActions } from '../../../../services/store/modal';
-import { resetVisualizationApi } from '../../../../services/store/rootApi';
+import Select from '@/components/controls/select/selectHookForm';
+import MultiSelect from '@/components/controls/select/multiSelect';
+import { actions as visualizationActions } from '@/services/store/visualization';
+import { actions as modalActions } from '@/services/store/modal';
+import { resetVisualizationApi } from '@/services/store/rootApi';
 import {
   useUploadMutation,
   useSubmitMutation,

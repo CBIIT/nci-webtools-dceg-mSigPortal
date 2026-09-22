@@ -3,7 +3,7 @@ import { Nav, Tab } from 'react-bootstrap';
 import PcaWithin from './pca-within';
 import PcaPublic from './pca-public';
 
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 
 export default function PCA({ state }) {
   const { source } = state;
