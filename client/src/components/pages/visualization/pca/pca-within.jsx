@@ -5,7 +5,11 @@ import { useForm } from 'react-hook-form';
 import { usePcaWithinQuery, usePcaSignatureSetsQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix, defaultProfile2 } from '../../../../services/utils';
+import {
+  defaultMatrix,
+  defaultProfile2,
+  getErrorMessage,
+} from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { useMatrixListQuery } from '../userForm/apiSlice';
 
@@ -138,10 +142,11 @@ export default function PcaWithin({ state }) {
         <>
           <hr />
           <p className="p-3">
-            {error ||
-              data?.output?.error ||
-              data?.output?.uncaughtError ||
-              'An error has occurred. Please verify your input.'}
+            {error
+              ? getErrorMessage(error)
+              : data?.output?.error ||
+                data?.output?.uncaughtError ||
+                'An error has occurred. Please verify your input.'}
           </p>
         </>
       )}

@@ -7,7 +7,11 @@ import { useCosineWithinQuery } from './apiSlice';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
 import Description from '../../../controls/description/description';
-import { defaultMatrix2, defaultProfile2 } from '../../../../services/utils';
+import {
+  defaultMatrix2,
+  defaultProfile2,
+  getErrorMessage,
+} from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { useMatrixListQuery } from '../userForm/apiSlice';
 
@@ -164,10 +168,11 @@ export default function CsWithin({ state }) {
           <>
             <hr />
             <p className="p-3">
-              {error ||
-                data?.output?.error ||
-                data?.output?.uncaughtError ||
-                'An error has occurred. Please verify your input.'}
+              {error
+                ? getErrorMessage(error)
+                : data?.output?.error ||
+                  data?.output?.uncaughtError ||
+                  'An error has occurred. Please verify your input.'}
             </p>
           </>
         )}

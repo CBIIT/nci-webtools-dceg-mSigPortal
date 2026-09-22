@@ -151,3 +151,16 @@ export function parseCSV(data) {
     });
   });
 }
+
+// normalizes RTK Query errors, Error objects, and plain strings into a
+// renderable string, so error values are never passed directly as React children
+export function getErrorMessage(
+  error,
+  fallback = 'An error has occurred. Please verify your input.'
+) {
+  if (!error) return fallback;
+  if (typeof error === 'string') return error;
+  const { data } = error;
+  if (typeof data === 'string') return data;
+  return data?.error || data?.message || error.error || error.message || fallback;
+}

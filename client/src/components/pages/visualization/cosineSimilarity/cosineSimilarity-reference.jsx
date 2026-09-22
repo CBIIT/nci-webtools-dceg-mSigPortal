@@ -10,7 +10,11 @@ import {
 import Description from '../../../controls/description/description';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultProfile2, defaultMatrix } from '../../../../services/utils';
+import {
+  defaultProfile2,
+  defaultMatrix,
+  getErrorMessage,
+} from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { useMatrixListQuery } from '../userForm/apiSlice';
 
@@ -100,7 +104,7 @@ export default function CsReference({ state }) {
               cancerType: cancer.value,
               experimentalStrategy: strategy.value,
             },
-            id,
+            id: id || crypto.randomUUID(),
             cacheBust,
           };
     setParams(params);
@@ -169,10 +173,11 @@ export default function CsReference({ state }) {
           <>
             <hr />
             <p className="p-3">
-              {error ||
-                data?.output?.error ||
-                data?.output?.uncaughtError ||
-                'An error has occurred. Please verify your input.'}
+              {error
+                ? getErrorMessage(error)
+                : data?.output?.error ||
+                  data?.output?.uncaughtError ||
+                  'An error has occurred. Please verify your input.'}
             </p>
           </>
         )}

@@ -11,6 +11,7 @@ import {
   defaultMatrix2,
   defaultMatrix,
   defaultProfile2,
+  getErrorMessage,
 } from '../../../../services/utils';
 import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
 import { useMatrixListQuery } from '../userForm/apiSlice';
@@ -212,10 +213,11 @@ export default function CsPublic({ state }) {
           <>
             <hr />
             <p className="p-3">
-              {error ||
-                data?.output?.error ||
-                data?.output?.uncaughtError ||
-                'An error has occurred. Please verify your input.'}
+              {error
+                ? getErrorMessage(error)
+                : data?.output?.error ||
+                  data?.output?.uncaughtError ||
+                  'An error has occurred. Please verify your input.'}
             </p>
           </>
         )}

@@ -191,7 +191,8 @@ async function wrapper(fn, args) {
 // Visualization Calculation functions
 async function visualizationWrapper(req, res, next) {
   const { logger } = req.app.locals;
-  const { fn, args, id = randomUUID() } = req.body;
+  const id = req.body.id || randomUUID();
+  const { fn, args } = req.body;
   if (!isValidId(id)) return res.status(400).json('Invalid ID');
   if (typeof fn !== 'string' || !/^[A-Za-z0-9_]+$/.test(fn)) {
     return res.status(400).json('Invalid function name');
