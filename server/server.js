@@ -36,8 +36,7 @@ async function createApp(env) {
   const { APP_NAME, LOG_LEVEL } = env;
   const app = express();
 
-  // if behind a proxy, use the first x-forwarded-for address as the client's ip address
-  app.set('trust proxy', true);
+  app.set('trust proxy', 2);
   app.set('json spaces', 2);
   app.set('x-powered-by', false);
 
