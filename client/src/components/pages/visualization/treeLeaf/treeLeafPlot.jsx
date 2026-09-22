@@ -1,12 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  formState,
-  graphDataSelector,
-  treeLeafDataState,
-} from './treeLeaf.state';
+import { useRecoilState } from 'recoil';
+import { treeLeafDataState } from './treeLeaf.state';
 import { groupBy, createPromiseWorker } from './treeLeaf.utils';
 
 export default function D3TreeLeaf({
@@ -14,35 +10,13 @@ export default function D3TreeLeaf({
   width = 1000,
   height = 1000,
   onSelect,
-  state = {},
+  isUser = false,
+  graphData,
+  form,
   ...props
 }) {
   const plotRef = useRef(null);
-  const form = useRecoilValue(formState);
   const publicForm = useSelector((store) => store.visualization.publicForm);
-  const { id: sessionId, source } = state;
-  const isUser = source === 'user';
-  const study = publicForm?.study?.value ?? 'PCAWG';
-  const strategy = publicForm?.strategy?.value ?? 'WGS';
-  const signatureSetName = form?.signatureSetName;
-  const profile = form?.profile || 'SBS';
-  const matrix = form?.matrix || 96;
-  const cancer = form?.cancerType?.value;
-  const params = isUser
-    ? { userId: sessionId, source: 'user', profile: 'SBS', matrix: 96 }
-    : { study, strategy, signatureSetName, profile, matrix, cancer };
-  const graphData = useRecoilValue(graphDataSelector(params));
-  if (graphData?.error) {
-    throw new Error(graphData.error);
-  }
-  // Trigger ErrorBoundary when the request fails or returns no data
-  if (graphData === null && !(isUser && !sessionId)) {
-    throw new Error(
-      isUser
-        ? 'Failed to load Tree and Leaf data for this user session.'
-        : 'Failed to load Tree and Leaf data for the selected study.'
-    );
-  }
   const { hierarchy, attributes, params: parameters } = graphData || {};
   // const { hierarchy, attributes } = cloneDeep(graphData) || {};
   const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);

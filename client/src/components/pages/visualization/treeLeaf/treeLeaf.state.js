@@ -33,32 +33,27 @@ export const userColorOptions = [
   },
 ];
 
-export const defaultFormState = {
-  cancerType: null,
-  showLabels: false,
-  color: {
-    label: 'Cosine Similarity',
-    value: 'Cosine_similarity',
-    continuous: true,
-  },
-  signatureSetName: 'COSMIC_v3_Signatures_GRCh37_SBS96',
-  profile: 'SBS',
-  matrix: 96,
-};
+export const SIGNATURE_SET_NAME = 'COSMIC_v3_Signatures_GRCh37_SBS96';
+export const PROFILE = 'SBS';
+export const MATRIX = 96;
 
-export const defaultUserFormState = {
-  cancerType: null,
-  showLabels: false,
-  color: userColorOptions[0],
-  signatureSetName: null,
-  profile: 'SBS',
-  matrix: 96,
-};
-
-export const formState = atom({
-  key: 'treeLeaf.formState',
-  default: defaultFormState,
-});
+/**
+ * Builds the initial Tree and Leaf form state synchronously from the sidebar form
+ */
+export function getInitialFormState({ isUser, publicForm }) {
+  if (isUser) {
+    return { color: userColorOptions[0], searchSamples: [] };
+  }
+  const value = publicForm?.cancer?.value;
+  const known = (publicForm?.cancers || []).some(
+    (c) => c.value === value && c.value !== '*ALL'
+  );
+  return {
+    color: colorOptions[0],
+    searchSamples: [],
+    cancer: known ? value : '',
+  };
+}
 
 export const defaultTreeLeafData = { links: [], nodes: [] };
 
@@ -78,12 +73,13 @@ export const graphDataSelector = selectorFamily({
         }
         const response = await axios.post('api/treeLeaf', params);
         const data = response.data.output;
-        if (data?.error || data?.uncaughtError) {
+        if (data?.error) {
           return {
-            error:
-              data.error ||
-              data.uncaughtError ||
-              'Tree and Leaf calculation failed.',
+            error: data.error,
+          };
+        } else if (data?.uncaughtError) {
+          return {
+            error: `An error occurred with the selected study: ${data.uncaughtError}`,
           };
         }
         return data;
