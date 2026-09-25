@@ -37,24 +37,6 @@ export const sources = [
   },
 
   {
-    sourcePath: "Exposure/studySignaturesData.csv",
-    table: "signature",
-    description: "signature data from Exposure/Study_Signatures/",
-    columns: [
-      "source",
-      "profile",
-      "matrix",
-      "signatureSetName",
-      "strategy",
-      "strandInfo",
-      "strand",
-      "signatureName",
-      "mutationType",
-      "contribution",
-    ],
-  },
-
-  {
     sourcePath: "Signature/summary.csv",
     table: "signatureSummary",
     description: "signature summary",
