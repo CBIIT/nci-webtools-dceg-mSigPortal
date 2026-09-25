@@ -1,3 +1,5 @@
+import { backfillReferenceSignatureStudy } from "./services/signatures.js";
+
 export const sources = [
   {
     sourcePath: "Association/data.csv",
@@ -228,6 +230,8 @@ export const sources = [
     description: "genome - chromosome sizes",
     columns: ["genome", "chr", "len", "start", "end"],
   },
+
+  backfillReferenceSignatureStudy,
 
   {
     description: "Refresh materialized views",
