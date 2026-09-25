@@ -94,6 +94,7 @@ msigportal.getSignaturesR <- function(args, config) {
   signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSetName)
   refsig <- signature_refsets_input %>%
     select(Signature_name, MutationType, Contribution) %>%
+    distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
   signatures <- str_sort(colnames(refsig[1, -1]), numeric = TRUE)
 
@@ -269,6 +270,7 @@ msigportal.cosineSimilarityRefSig <- function(args, config) {
   signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
   refsig <- signature_refsets_data %>%
     select(Signature_name, MutationType, Contribution) %>%
+    distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   data_input <- read_delim(args$matrixFile, delim = "\t")
@@ -294,15 +296,17 @@ msigportal.cosineSimilarityRefSigPublic <- function(args, config) {
   setwd(config$wd)
 
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
-  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
+  signature_refsets <- load_signature_refsets(config, args$study, args$experimentalStrategy)
 
   plotPath <- paste0(config$savePath, "cos_sim_refsig.svg")
   txtPath <- paste0(config$savePath, "cos_sim_refsig.txt")
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
   signature_refsets_data <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
+  assert_signature_set(signature_refsets_data, args$signatureSet, profile_name, args$study)
   refsig <- signature_refsets_data %>%
     select(Signature_name, MutationType, Contribution) %>%
+    distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   result <- load_public_seqmatrix_data(args$study, args$cancerType, args$experimentalStrategy, config, seqmatrix_refdata_subset_files)
@@ -463,7 +467,9 @@ msigportal.profileComparisonRefSig <- function(args, config) {
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
-  signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
+  signature_refsets_input <- signature_refsets %>%
+    filter(Profile == profile_name, Signature_set_name == args$signatureSet) %>%
+    distinct(Signature_set_name, Signature_name, MutationType, Contribution)
   refsig <- signature_refsets_input %>%
     select(Signature_name, MutationType, Contribution) %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -500,7 +506,7 @@ msigportal.profileComparisonRefSigPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
 
-  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
+  signature_refsets <- load_signature_refsets(config, args$study, args$experimentalStrategy)
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
   plotPath <- paste0(config$savePath, "pro_com_refsig.svg")
@@ -508,7 +514,10 @@ msigportal.profileComparisonRefSigPublic <- function(args, config) {
 
   profile_name <- if_else(args$profileType == "SBS", "SBS96", if_else(args$profileType == "DBS", "DBS78", if_else(args$profileType == "ID", "ID83", NA_character_)))
 
-  signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
+  signature_refsets_input <- signature_refsets %>%
+    filter(Profile == profile_name, Signature_set_name == args$signatureSet) %>%
+    distinct(Signature_set_name, Signature_name, MutationType, Contribution)
+  assert_signature_set(signature_refsets_input, args$signatureSet, profile_name, args$study)
   refsig <- signature_refsets_input %>%
     select(Signature_name, MutationType, Contribution) %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
@@ -771,6 +780,7 @@ msigportal.pca <- function(args, config) {
         signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
         sigref_data <- signature_refsets_input %>%
           select(Signature_name, MutationType, Contribution) %>%
+          distinct() %>%
           pivot_wider(names_from = Signature_name, values_from = Contribution)
 
         ## heatmap between PCs and signatures
@@ -807,7 +817,7 @@ msigportal.pcaPublic <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
   setwd(config$wd)
   print(config)
-  s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
+  signature_refsets <- load_signature_refsets(config, args$study, args$experimentalStrategy)
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
   pca1 <- paste0(config$savePath, "pca1.svg")
@@ -883,14 +893,17 @@ msigportal.pcaPublic <- function(args, config) {
       ## only work if the profile included in singatures dataset
       if (profile_name %in% unique(signature_refsets$Profile)) {
         signature_refsets_input <- signature_refsets %>% filter(Profile == profile_name, Signature_set_name == args$signatureSet)
+        assert_signature_set(signature_refsets_input, args$signatureSet, profile_name, args$study)
         sigref_data <- signature_refsets_input %>%
           select(Signature_name, MutationType, Contribution) %>%
+          distinct() %>%
           pivot_wider(names_from = Signature_name, values_from = Contribution)
 
         ## heatmap between PCs and signatures
         sigpca_data <- res.pca$rotation %>%
           as.data.frame() %>%
           rownames_to_column(var = "MutationType")
+
         cos_sim_res4 <- cos_sim_df(sigpca_data, sigref_data)
         # put this heatmap on the web
         plot_cosine_heatmap_df(cos_sim_res4, cluster_rows = TRUE, plot_values = FALSE, output_plot = heatmap)
@@ -1246,7 +1259,7 @@ msigportal.getTreeLeafUser <- function(args, config) {
 
   mdata <- seqmatrix_refdata_ratio %>%
     select(mutationType, mutations, leafKey) %>%
-      pivot_wider(names_from = mutationType, values_from = mutations, values_fn = sum, values_fill = 0)
+    pivot_wider(names_from = mutationType, values_from = mutations, values_fn = sum, values_fill = 0)
 
   mdata0 <- as.matrix(mdata[, -1])
   rownames(mdata0) <- mdata$leafKey
