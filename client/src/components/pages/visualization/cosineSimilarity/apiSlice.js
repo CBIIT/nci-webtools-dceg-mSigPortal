@@ -24,9 +24,21 @@ export const cosineSimilarityApiSlice = visualizationApiSlice.injectEndpoints({
       }),
     }),
     cosineSignatureSets: builder.query({
-      query: (params) => ({ url: 'mutational_signature_options', params }),
-      transformResponse: (data) =>
-        [...new Set(data.map((e) => e.signatureSetName))]
+      query: ({ strategy, ...params }) => ({
+        url: 'mutational_signature_options',
+        params,
+      }),
+      transformResponse: (data, meta, arg) =>
+        [
+          ...new Set(
+            data
+              // a de novo set is only valid for the strategy its file was built from
+              .filter(
+                (e) => e.study === 'Reference' || e.strategy === arg.strategy
+              )
+              .map((e) => e.signatureSetName)
+          ),
+        ]
           .sort((a, b) =>
             a.localeCompare(b, undefined, {
               numeric: true,

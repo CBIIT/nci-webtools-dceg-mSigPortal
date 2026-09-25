@@ -13,15 +13,12 @@ import { useRsComparisonQuery } from './apiSlice';
 
 const actions = { ...catalogActions, ...modalActions };
 
-
 export default function RsComparisonPlot() {
   const dispatch = useDispatch();
   const mergeState = (state) =>
-    dispatch(actions.mergeCatalog({ cosineSimilarity: state }));
+    dispatch(actions.mergeCatalog({ rsComparison: state }));
 
-  const cosineSimilarityStore = useSelector(
-    (state) => state.catalog.cosineSimilarity
-  );
+  const rsComparisonStore = useSelector((state) => state.catalog.rsComparison);
 
   const [params, setParams] = useState(false);
   const initialized = useRef(false);
@@ -40,7 +37,7 @@ export default function RsComparisonPlot() {
   } = useRsComparisonQuery(params, { skip: !params });
 
   const { control, setValue, watch, handleSubmit } = useForm({
-    defaultValues: cosineSimilarityStore,
+    defaultValues: rsComparisonStore,
   });
 
   const { profile, matrix, signatureSet1, signatureSet2 } = watch();
@@ -75,18 +72,31 @@ export default function RsComparisonPlot() {
   const signatureSetOptions = (profile, matrix) =>
     data && profile
       ? [
-          ...new Set(
+          ...new Map(
             data
               .filter(
-                (e) => e.profile == profile.value && e.matrix == matrix.value
+                (e) =>
+                  e.profile == profile.value &&
+                  e.matrix == matrix.value &&
+                  // a de novo set with no study can never be resolved back to a query, so hide it
+                  (e.source !== 'Study_signatures' || e.study)
               )
-              .map((e) => e.signatureSetName)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-          ),
-        ].map((e) => ({
-          label: e,
-          value: e,
-        }))
+              .map((e) => [`${e.signatureSetName}\0${e.study}`, e])
+          ).values(),
+        ]
+          .sort((a, b) =>
+            a.signatureSetName.localeCompare(b.signatureSetName, undefined, {
+              numeric: true,
+            })
+          )
+          .map((e) => ({
+            label:
+              e.source === 'Study_signatures'
+                ? `${e.signatureSetName} — ${e.study}`
+                : e.signatureSetName,
+            value: e.signatureSetName,
+            study: e.study,
+          }))
       : [];
 
   const signatureNameOptions = (profile, matrix, signatureSet) =>
@@ -98,7 +108,8 @@ export default function RsComparisonPlot() {
                 (e) =>
                   e.profile == profile.value &&
                   e.matrix == matrix.value &&
-                  e.signatureSetName == signatureSet.value
+                  e.signatureSetName == signatureSet.value &&
+                  e.study == signatureSet.study
               )
               .map((e) => e.signatureName)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -114,45 +125,47 @@ export default function RsComparisonPlot() {
   //   if (!profile && profileOptions.length) handleProfile(profileOptions[0]);
   // }, [profile, profileOptions]);
   useEffect(() => {
-  if (initialized.current || !data || !data.length) return;
+    if (initialized.current || !data || !data.length) return;
 
-  const supportedProfiles = ['SBS', 'DBS', 'ID'];
-  const profileOptions = [...new Set(data.map((e) => e.profile))]
-    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    .filter((e) => supportedProfiles.includes(e))
-    .map((e) => ({ label: e, value: e }));
+    const supportedProfiles = ['SBS', 'DBS', 'ID'];
+    const profileOptions = [...new Set(data.map((e) => e.profile))]
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      .filter((e) => supportedProfiles.includes(e))
+      .map((e) => ({ label: e, value: e }));
 
-  if (profileOptions.length === 0) return;
+    if (profileOptions.length === 0) return;
 
-  const initialProfile = profileOptions.find(p => p.value === 'SBS') || profileOptions[0];
-  const matrices = matrixOptions(initialProfile);
-  const initialMatrix = matrices[0];
+    const initialProfile =
+      profileOptions.find((p) => p.value === 'SBS') || profileOptions[0];
+    const matrices = matrixOptions(initialProfile);
+    const initialMatrix = matrices[0];
 
-  setValue('profile', initialProfile);
-  setValue('matrix', initialMatrix);
+    setValue('profile', initialProfile);
+    setValue('matrix', initialMatrix);
 
-  const signatureSets = signatureSetOptions(initialProfile, initialMatrix);
-  const expectedValue = `COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}${initialMatrix.value}`;
-  const preferredSet = signatureSets.find(
-    (e) =>
-      e.value === expectedValue ||
-      e.label === expectedValue ||
-      e.value?.includes(`COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`) ||
-      e.label?.includes(`COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`)
-  );
+    const signatureSets = signatureSetOptions(initialProfile, initialMatrix);
+    const expectedValue = `COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}${initialMatrix.value}`;
+    const preferredSet = signatureSets.find(
+      (e) =>
+        e.value === expectedValue ||
+        e.label === expectedValue ||
+        e.value?.includes(
+          `COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`
+        ) ||
+        e.label?.includes(
+          `COSMIC_v3.4_Signatures_GRCh38_${initialProfile.value}`
+        )
+    );
 
-  const sigSet1 = preferredSet || signatureSets[0];
-  handleSignatureSet(initialProfile, initialMatrix, sigSet1, 1);
+    const sigSet1 = preferredSet || signatureSets[0];
+    handleSignatureSet(initialProfile, initialMatrix, sigSet1, 1);
 
-  const sigSet2 = signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
-  handleSignatureSet(initialProfile, initialMatrix, sigSet2, 2);
+    const sigSet2 =
+      signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
+    handleSignatureSet(initialProfile, initialMatrix, sigSet2, 2);
 
-  initialized.current = true; // <- prevent re-initializing on future renders
-}, [data]);
-
-
-
-
+    initialized.current = true; // <- prevent re-initializing on future renders
+  }, [data]);
 
   function handleProfile(profile) {
     const matrices = matrixOptions(profile);
@@ -170,7 +183,8 @@ export default function RsComparisonPlot() {
         e.label?.startsWith('COSMIC_v3.4_Signatures_GRCh38_')
     );
     const sigSet1 = preferredSet || signatureSets[0];
-    const sigSet2 = signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
+    const sigSet2 =
+      signatureSets.find((e) => e.value !== sigSet1.value) || sigSet1;
 
     setValue('matrix', matrix);
     handleSignatureSet(profile, matrix, sigSet1, 1);
@@ -185,11 +199,15 @@ export default function RsComparisonPlot() {
   }
 
   function onSubmit(data) {
+    const { study: study1 } = data.signatureSet1;
+    const { study: study2 } = data.signatureSet2;
     const params = {
       profile: data.profile.value,
       matrix: data.matrix.value,
       signatureSetName: `${data.signatureSet1.value};${data.signatureSet2.value}`,
       signatureName: `${data.signatureName1.value};${data.signatureName2.value}`,
+      // a de novo set name can be reused by other studies, so scope each side by its own study
+      ...(study1 && study2 && { study: `${study1};${study2}` }),
     };
     setParams(params);
     mergeState(data);
@@ -225,6 +243,7 @@ export default function RsComparisonPlot() {
               name="signatureSet1"
               label="Reference Signature Set 1"
               options={signatureSetOptions(profile, matrix)}
+              getOptionValue={(e) => e.label}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleSignatureSet(profile, matrix, e, 1)}
               control={control}
@@ -244,6 +263,7 @@ export default function RsComparisonPlot() {
               name="signatureSet2"
               label="Reference Signature Set 2"
               options={signatureSetOptions(profile, matrix)}
+              getOptionValue={(e) => e.label}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleSignatureSet(profile, matrix, e, 2)}
               control={control}
@@ -303,7 +323,13 @@ export default function RsComparisonPlot() {
                 mutational signatures will have RSS = 0 and Cosine similarity =
                 1. For additional information about RSS and cosine similarity,
                 click{' '}
-                <NavHashLink to="/faq#cosine-similarity" className="accessible-link">here</NavHashLink>.
+                <NavHashLink
+                  to="/faq#cosine-similarity"
+                  className="accessible-link"
+                >
+                  here
+                </NavHashLink>
+                .
               </p>
             </div>
           </>

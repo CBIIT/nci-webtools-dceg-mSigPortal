@@ -1,3 +1,6 @@
+import { backfillReferenceSignatureStudy } from "./services/signatures.js";
+import { clearResponseCache } from "./services/cache.js";
+
 export const sources = [
   {
     sourcePath: "Association/data.csv",
@@ -229,6 +232,8 @@ export const sources = [
     columns: ["genome", "chr", "len", "start", "end"],
   },
 
+  backfillReferenceSignatureStudy,
+
   {
     description: "Refresh materialized views",
     type: "postImport",
@@ -260,4 +265,6 @@ export const sources = [
       }
     },
   },
+
+  clearResponseCache,
 ];

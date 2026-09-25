@@ -36,7 +36,7 @@ export default function PublicForm() {
     data: signatureOptions,
     isFetching,
     isError,
-  } = useSignatureOptionsQuery();
+  } = useSignatureOptionsQuery({ study: 'Reference' });
   const [handleUpload, { isLoading: isUploading }] =
     useUploadExplorationMutation();
   const [submitExploration, { isLoading: loadingUserExposure }] =

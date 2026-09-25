@@ -120,7 +120,7 @@ async function submit(req, res, next) {
         .flat()
     : await getSignatureData(
         req.app.locals.connection,
-        { signatureSetName },
+        { signatureSetName, study: 'Reference' },
         ['signatureName', 'mutationType', 'contribution'],
         false
       );

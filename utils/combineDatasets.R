@@ -23,6 +23,14 @@ regex_group <- function(str, pattern) {
     regmatches(str, regexec(pattern, str))[[1]][2]
 }
 
+# study names may contain underscores; strip the known suffix first, then take the
+# trailing underscore-delimited token as strategy so the rest of the name is preserved as study
+study_from_filename <- function(filepath, suffix) {
+    stem <- sub(paste0(suffix, "$"), "", basename(filepath))
+    strategy <- sub(".*_", "", stem)
+    sub(paste0("_", strategy, "$"), "", stem)
+}
+
 combineAssociationFiles <- function(x) {
     if (!"icgc_specimen_id" %in% names(x)) x$icgc_specimen_id <- NA_character_
     if (!"icgc_donor_id" %in% names(x)) x$icgc_donor_id <- NA_character_
@@ -68,7 +76,7 @@ combineSeqmatrixFiles <- function(x) {
         mutate(
             profile = regex_extract(Profile, "^[A-Z]+"),
             matrix = regex_extract(Profile, "[0-9]+$"),
-            study = sub("_.*", "", basename(filepath))
+            study = study_from_filename(filepath, "_seqmatrix_refdata.RData")
         ) %>%
         rename(
             cancer = Cancer_Type,
@@ -106,7 +114,7 @@ combineSignatureFiles <- function(x) {
 combineStudySignatureFiles <- function(x) {
     x %>%
         mutate(
-            study = sub("_.*", "", basename(filepath)),
+            study = study_from_filename(filepath, "_signature_refsets.RData"),
             profile = regex_extract(Profile, "^[A-Z]+"),
             matrix = regex_extract(Profile, "[0-9]+$"),
             Contribution = as.numeric(Contribution),
