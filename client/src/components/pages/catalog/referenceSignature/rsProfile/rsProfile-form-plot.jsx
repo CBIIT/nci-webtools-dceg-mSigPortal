@@ -361,7 +361,7 @@ export default function ProfileFormPlot() {
           signatureSetName: e.signatureSetName.value,
           strategy: e.strategy.value,
           signatureName: e.signatureName.value,
-          study: e.signatureSetName.study,
+          ...(e.signatureSetName.study && { study: e.signatureSetName.study }),
         }));
       setParams({ params });
     }

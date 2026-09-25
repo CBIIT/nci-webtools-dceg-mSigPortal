@@ -7,7 +7,13 @@ import { randomUUID } from 'crypto';
 import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
-import { mkdirs, writeJson, readJson, isValidId, resolveWithin } from '../../utils.js';
+import {
+  mkdirs,
+  writeJson,
+  readJson,
+  isValidId,
+  resolveWithin,
+} from '../../utils.js';
 import { getSignatureData, getSeqmatrixData } from '../../query.js';
 import { parseCSV } from '../general.js';
 
@@ -42,6 +48,7 @@ export async function exampleProcessor(
       signatureSetName: 'COSMIC_v3_Signatures_GRCh37_DBS78',
       profile: 'DBS',
       matrix: '78',
+      study: 'Reference',
     },
     seqmatrixQuery: {
       study: 'Sherlock-Lung-232',
@@ -282,7 +289,11 @@ export async function exampleProcessor(
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
     } else {
-      seqmatrixFilePath = path.resolve(outputFolder, args.context_type, args.input_data);
+      seqmatrixFilePath = path.resolve(
+        outputFolder,
+        args.context_type,
+        args.input_data
+      );
     }
 
     // modify and include parameters
