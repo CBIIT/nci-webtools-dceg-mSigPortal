@@ -67,7 +67,8 @@ export const etiologyApiSlice = catalogApiSlice.injectEndpoints({
     etiologySignature: builder.query({
       query: (params) => ({
         url: 'mutational_signature',
-        params,
+        // callers pass hardcoded reference set names, so scope out any reused de novo name
+        params: { ...params, study: 'Reference' },
       }),
       transformResponse: (data, _, params) => {
         const profileMatrix = params.profile + params.matrix;
