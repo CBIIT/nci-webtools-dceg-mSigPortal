@@ -55,7 +55,7 @@ export default function ExtractionForm({ formLimits }) {
     data: signatureOptions,
     error: signatureError,
     isFetching: fetchingSignatureOptions,
-  } = useSignatureOptionsQuery();
+  } = useSignatureOptionsQuery({ study: 'Reference' });
   const {
     data: genomeData,
     error: genomeError,
@@ -511,6 +511,8 @@ export default function ExtractionForm({ formLimits }) {
       signatureSetName,
       profile,
       matrix,
+      // extraction decomposes against the reference catalog, not the seqmatrix study above
+      study: 'Reference',
       ...(data.signatureName[0].value != 'all' && {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),

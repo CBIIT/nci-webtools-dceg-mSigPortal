@@ -43,6 +43,7 @@ export default function MsIndividualPlot({ state, form }) {
       params_signature = {
         strategy: strategy.value,
         signatureSetName: signatureSetName.value,
+        study: `Reference;${study.value}`,
       };
       params_spectrum = {
         study: study.value,

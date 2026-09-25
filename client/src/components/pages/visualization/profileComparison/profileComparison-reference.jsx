@@ -25,7 +25,12 @@ export default function PcReference({ state }) {
     { skip: source == 'user' ? !id : !study }
   );
   const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
-    useSignatureOptionsQuery();
+    useSignatureOptionsQuery(
+      source == 'public'
+        ? { study: `Reference;${study.value}` }
+        : { study: 'Reference' },
+      { skip: source == 'public' ? !study : false }
+    );
   // query plot
   const {
     data: plot,
@@ -165,6 +170,8 @@ export default function PcReference({ state }) {
       signatureSetName: signatureSet.value,
       signatureName,
       scalarValue,
+      // a de novo set name can be reused by other studies, so scope by study like every other query
+      study: source == 'public' ? `Reference;${study.value}` : 'Reference',
     };
 
     setParams({ spectrumQueryParams, signatureQueryParams });
@@ -362,7 +369,13 @@ export default function PcReference({ state }) {
                 are. For example, two identical mutational profiles will have
                 RSS = 0 and Cosine similarity = 1. For additional information
                 about RSS and cosine similarity, click{' '}
-                <NavHashLink to="/faq#cosine-similarity" className="accessible-link">here</NavHashLink>.
+                <NavHashLink
+                  to="/faq#cosine-similarity"
+                  className="accessible-link"
+                >
+                  here
+                </NavHashLink>
+                .
               </p>
             </div>
           </>
