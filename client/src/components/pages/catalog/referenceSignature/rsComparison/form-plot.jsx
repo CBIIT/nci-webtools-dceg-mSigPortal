@@ -75,18 +75,31 @@ export default function RsComparisonPlot() {
   const signatureSetOptions = (profile, matrix) =>
     data && profile
       ? [
-          ...new Set(
+          ...new Map(
             data
               .filter(
-                (e) => e.profile == profile.value && e.matrix == matrix.value
+                (e) =>
+                  e.profile == profile.value &&
+                  e.matrix == matrix.value &&
+                  // a de novo set with no study can never be resolved back to a query, so hide it
+                  (e.source !== 'Study_signatures' || e.study)
               )
-              .map((e) => e.signatureSetName)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-          ),
-        ].map((e) => ({
-          label: e,
-          value: e,
-        }))
+              .map((e) => [`${e.signatureSetName}\0${e.study}`, e])
+          ).values(),
+        ]
+          .sort((a, b) =>
+            a.signatureSetName.localeCompare(b.signatureSetName, undefined, {
+              numeric: true,
+            })
+          )
+          .map((e) => ({
+            label:
+              e.source === 'Study_signatures'
+                ? `${e.signatureSetName} — ${e.study}`
+                : e.signatureSetName,
+            value: e.signatureSetName,
+            study: e.study,
+          }))
       : [];
 
   const signatureNameOptions = (profile, matrix, signatureSet) =>
@@ -98,7 +111,8 @@ export default function RsComparisonPlot() {
                 (e) =>
                   e.profile == profile.value &&
                   e.matrix == matrix.value &&
-                  e.signatureSetName == signatureSet.value
+                  e.signatureSetName == signatureSet.value &&
+                  e.study == signatureSet.study
               )
               .map((e) => e.signatureName)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -190,6 +204,8 @@ export default function RsComparisonPlot() {
       matrix: data.matrix.value,
       signatureSetName: `${data.signatureSet1.value};${data.signatureSet2.value}`,
       signatureName: `${data.signatureName1.value};${data.signatureName2.value}`,
+      // a de novo set name can be reused by other studies, so scope each side by its own study
+      study: `${data.signatureSet1.study};${data.signatureSet2.study}`,
     };
     setParams(params);
     mergeState(data);
@@ -225,6 +241,7 @@ export default function RsComparisonPlot() {
               name="signatureSet1"
               label="Reference Signature Set 1"
               options={signatureSetOptions(profile, matrix)}
+              getOptionValue={(e) => e.label}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleSignatureSet(profile, matrix, e, 1)}
               control={control}
@@ -244,6 +261,7 @@ export default function RsComparisonPlot() {
               name="signatureSet2"
               label="Reference Signature Set 2"
               options={signatureSetOptions(profile, matrix)}
+              getOptionValue={(e) => e.label}
               disabled={fetchingOptions || fetchingPlot}
               onChange={(e) => handleSignatureSet(profile, matrix, e, 2)}
               control={control}

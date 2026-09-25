@@ -28,7 +28,7 @@ export default function CosineSimilarityPlot() {
     data,
     error,
     isFetching: fetchingOptions,
-  } = useSignatureOptionsQuery();
+  } = useSignatureOptionsQuery({ study: 'Reference' });
   // query data and generate plot after submit
   const {
     data: plot,

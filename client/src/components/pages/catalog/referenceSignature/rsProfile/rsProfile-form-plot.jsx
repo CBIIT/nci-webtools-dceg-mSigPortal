@@ -7,8 +7,8 @@ import Plotly from '@/components/controls/plotly/plot/plot';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as catalogActions } from '@/services/store/catalog';
 import { actions as modalActions } from '@/services/store/modal';
-import { useForm } from 'react-hook-form';
-import Select from '@/components/controls/select/selectForm';
+import { useForm, useFieldArray } from 'react-hook-form';
+import Select from '@/components/controls/select/selectHookForm';
 import { useRsProfileOptionsQuery, useRsProfilePlotQuery } from './apiSlice';
 import {
   defaultProfile2,
@@ -20,41 +20,32 @@ import {
 
 const actions = { ...catalogActions, ...modalActions };
 
-export default function ProfileFormPlot({ options, index }) {
+export default function ProfileFormPlot() {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.catalog);
+  const { plots: storePlots } = useSelector(
+    (state) => state.catalog.rSProfiles
+  );
 
-  const mergeRsProfiles = (state) =>
+  const mergeState = (state) =>
     dispatch(actions.mergeCatalog({ rSProfiles: state }));
-
-  const mergeState = (state) => {
-    let newPlot = plots.slice();
-    newPlot[index] = { ...newPlot[index], ...state };
-    mergeRsProfiles({ plots: newPlot });
-  };
-
-  const mergeError = (msg) =>
-    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
-
-  const { matrixList, id } = store.main;
-  const { refSigData, sample } = store.referenceSignature;
-
-  const { plots, err, loading } = store.rSProfiles;
 
   const [params, setParams] = useState(null);
 
-  const defaultValues = {
-    source: '',
-    profile: '',
-    matrix: '',
-    signatureSetName: '',
-    strategy: '',
-    signatureName: '',
-  };
-  const { control, setValue, watch } = useForm({ defaultValues: plots[index] });
-  //const { control, setValue, watch } = useForm({ defaultValues });
-  const { source, profile, matrix, signatureSetName, strategy, signatureName } =
-    watch();
+  const { control, setValue, watch, handleSubmit } = useForm({
+    defaultValues: { plotForms: storePlots },
+  });
+
+  const {
+    fields: plotsFields,
+    append: addPlots,
+    remove: removePlots,
+    update: updatePlots,
+  } = useFieldArray({
+    control,
+    name: 'plotForms',
+  });
+
+  const { plotForms } = watch();
 
   const supportMatrix = {
     SBS: [6, 24, 96, 192, 288, 384, 1536],
@@ -78,9 +69,9 @@ export default function ProfileFormPlot({ options, index }) {
           value: e,
         }))
     : [];
-
   const profileOptions = (source) =>
-    signatureOptions && source
+    //source && signatureOptions.length
+    source
       ? [
           ...new Set(
             signatureOptions
@@ -92,7 +83,7 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const matrixOptions = (source, profile) =>
-    signatureOptions && source && profile
+    source && profile && signatureOptions.length
       ? [
           ...new Set(
             signatureOptions
@@ -109,24 +100,32 @@ export default function ProfileFormPlot({ options, index }) {
       : [];
 
   const referenceSignatureSetOption = (source, profile, matrix) =>
-    signatureOptions && source && profile && matrix
+    source && profile && matrix && signatureOptions.length
       ? [
-          ...new Set(
+          ...new Map(
             signatureOptions
               .filter(
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value
+                  e.matrix == matrix.value &&
+                  // a de novo set with no study can never be resolved back to a query, so hide it
+                  (e.source !== 'Study_signatures' || e.study)
               )
-              .map((e) => e.signatureSetName)
-              .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-          ),
-        ].map((e) => ({ label: e, value: e }))
+              .map((e) => [`${e.signatureSetName}\0${e.study}`, e])
+          ).values(),
+        ].map((e) => ({
+          label:
+            e.source === 'Study_signatures'
+              ? `${e.signatureSetName} — ${e.study}`
+              : e.signatureSetName,
+          value: e.signatureSetName,
+          study: e.study,
+        }))
       : [];
 
   const strategyOptions = (source, profile, matrix, signatureSetName) =>
-    signatureOptions && source && profile && matrix && signatureSetName
+    source && profile && matrix && signatureSetName && signatureOptions.length
       ? [
           ...new Set(
             signatureOptions
@@ -134,8 +133,9 @@ export default function ProfileFormPlot({ options, index }) {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
-                  e.signatureSetName === signatureSetName.value
+                  e.matrix == matrix.value &&
+                  e.signatureSetName === signatureSetName.value &&
+                  e.study === signatureSetName.study
               )
               .map((e) => e.strategy)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -150,12 +150,12 @@ export default function ProfileFormPlot({ options, index }) {
     signatureSetName,
     strategy
   ) =>
-    signatureOptions &&
     source &&
     profile &&
     matrix &&
     signatureSetName &&
-    strategy
+    strategy &&
+    signatureOptions.length
       ? [
           ...new Set(
             signatureOptions
@@ -163,9 +163,10 @@ export default function ProfileFormPlot({ options, index }) {
                 (e) =>
                   e.source === source.value &&
                   e.profile === profile.value &&
-                  e.matrix === matrix.value &&
+                  e.matrix == matrix.value &&
                   e.signatureSetName === signatureSetName.value &&
-                  e.strategy === strategy.value
+                  e.strategy === strategy.value &&
+                  e.study === signatureSetName.study
               )
               .map((e) => e.signatureName)
               .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -173,7 +174,7 @@ export default function ProfileFormPlot({ options, index }) {
         ].map((e) => ({ label: e, value: e }))
       : [];
 
-  function handleSource(source) {
+  function handleSource(source, index) {
     const profiles = profileOptions(source);
     const profile = defaultProfile2(profiles);
     const matrices = matrixOptions(source, profile);
@@ -200,23 +201,11 @@ export default function ProfileFormPlot({ options, index }) {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('source', source);
-    setValue('profile', profile);
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      source: source,
-      profile: profile,
-      matrix: matrix,
-      signatureSetName: signatureSetName,
-      strategy: strategy,
-      signatureName: signatureName,
-    });
+    setValue(`plotForms[${index}].source`, source);
+    handleProfile(source, profile, index);
   }
 
-  function handleProfile(profile) {
+  function handleProfile(source, profile, index) {
     const matrices = matrixOptions(source, profile);
     const matrix = defaultMatrix2(profile, matrices);
     const signatureSetNames = referenceSignatureSetOption(
@@ -241,21 +230,11 @@ export default function ProfileFormPlot({ options, index }) {
     );
     const signatureName = defaultSignatureName(signatureNames);
 
-    setValue('profile', profile);
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      profile,
-      matrix,
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    setValue(`plotForms[${index}].profile`, profile);
+    handleMatrix(source, profile, matrix, index);
   }
 
-  function handleMatrix(matrix) {
+  function handleMatrix(source, profile, matrix, index) {
     const signatureSetNames = referenceSignatureSetOption(
       source,
       profile,
@@ -277,20 +256,11 @@ export default function ProfileFormPlot({ options, index }) {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-
-    setValue('matrix', matrix);
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-    mergeState({
-      matrix,
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    setValue(`plotForms[${index}].matrix`, matrix);
+    handleSet(source, profile, matrix, signatureSetName, index);
   }
 
-  function handleSet(signatureSetName) {
+  function handleSet(source, profile, matrix, signatureSetName, index) {
     const strategies = strategyOptions(
       source,
       profile,
@@ -306,19 +276,18 @@ export default function ProfileFormPlot({ options, index }) {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-
-    setValue('signatureSetName', signatureSetName);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
-
-    mergeState({
-      signatureSetName,
-      strategy,
-      signatureName,
-    });
+    setValue(`plotForms[${index}].signatureSetName`, signatureSetName);
+    handleStrategy(source, profile, matrix, signatureSetName, strategy, index);
   }
 
-  function handleStrategy(strategy) {
+  function handleStrategy(
+    source,
+    profile,
+    matrix,
+    signatureSetName,
+    strategy,
+    index
+  ) {
     const signatureNames = signatureNameOptions(
       source,
       profile,
@@ -327,49 +296,76 @@ export default function ProfileFormPlot({ options, index }) {
       strategy
     );
     const signatureName = defaultSignatureName(signatureNames);
-    setValue('strategy', strategy);
-    setValue('signatureName', signatureName);
 
-    mergeState({
+    setValue(`plotForms[${index}].strategy`, strategy);
+    handleName(
+      source,
+      profile,
+      matrix,
+      signatureSetName,
       strategy,
       signatureName,
-    });
+      index
+    );
+    setValue(`plotForms[${index}].signatureName`, signatureName);
   }
 
-  function handleName(signatureName) {
-    setValue('signatureName', signatureName);
-    mergeState({
-      signatureName,
-    });
+  function handleName(
+    source,
+    profile,
+    matrix,
+    signatureSetName,
+    strategy,
+    signatureName,
+    index
+  ) {
+    setValue(`plotForms[${index}].signatureName`, signatureName);
   }
   // set inital source
+  // useEffect(() => {
+  //   if (!plotForms[0].source && signatureSourceOptions.length)
+  //     handleSource(signatureSourceOptions[0], plotForms.length - 1);
+  // }, [signatureSourceOptions]);
   useEffect(() => {
-    if (!source && signatureSourceOptions.length)
-      handleSource(signatureSourceOptions[0]);
-  }, [signatureSourceOptions]);
+    const firstSource = plotForms?.[0]?.source;
+
+    if ((!firstSource || !firstSource.value) && signatureSourceOptions.length) {
+      const defaultSource = signatureSourceOptions.find(
+        (opt) => opt.value === 'Reference_signatures'
+      );
+      if (defaultSource) {
+        handleSource(defaultSource, 0); // set for index 0
+      } else {
+        handleSource(signatureSourceOptions[0], 0);
+      }
+    }
+  }, [plotForms, signatureSourceOptions]);
 
   // get data on form change
   useEffect(() => {
-    if (
-      source?.value &&
-      profile?.value &&
-      matrix?.value &&
-      signatureSetName?.value &&
-      strategy?.value &&
-      signatureName?.value
-    ) {
-      const params = {
-        source: source.value,
-        profile: profile.value,
-        matrix: matrix.value,
-        signatureSetName: signatureSetName.value,
-        strategy: strategy.value,
-        signatureName: signatureName.value,
-      };
-
-      setParams(params);
+    if (plotForms.length) {
+      const params = plotForms
+        .filter(
+          (e) =>
+            e?.source.value &&
+            e?.profile.value &&
+            e?.matrix.value &&
+            e?.signatureSetName.value &&
+            e?.strategy.value &&
+            e?.signatureName.value
+        )
+        .map((e) => ({
+          source: e.source.value,
+          profile: e.profile.value,
+          matrix: e.matrix.value,
+          signatureSetName: e.signatureSetName.value,
+          strategy: e.strategy.value,
+          signatureName: e.signatureName.value,
+          study: e.signatureSetName.study,
+        }));
+      setParams({ params });
     }
-  }, [source, profile, matrix, signatureSetName, strategy, signatureName]);
+  }, [plotForms]);
 
   const {
     data: plotdata,
@@ -379,220 +375,207 @@ export default function ProfileFormPlot({ options, index }) {
     skip: !params,
   });
 
-  // function addPlots() {
-  //   mergeRsProfiles({
-  //     plots: [
-  //       ...plots,
-  //       {
-  //         source: '',
-  //         profile: '',
-  //         matrix: '',
-  //         signatureSetName: '',
-  //         strategy: '',
-  //         signatureName: '',
-  //       },
-  //     ],
-  //   });
-  // }
-  //console.log(refSigData);
-  function addPlots() {
-    const signatureSource = {
-      label: 'Reference_signatures',
-      value: 'Reference_signatures',
-    };
-    const profiles = profileOptions(signatureSource);
-
-    const profile = defaultProfile2(profiles);
-
-    const matrices = matrixOptions(source, profile);
-    const matrix = defaultMatrix2(profile, matrices);
-    const signatureSetNames = referenceSignatureSetOption(
-      source,
-      profile,
-      matrix
-    );
-    const signatureSetName = defaultSignatureSet2(signatureSetNames);
-    const strategies = strategyOptions(
-      source,
-      profile,
-      matrix,
-      signatureSetName
-    );
-    const strategy = defaultStrategy(strategies);
-    const signatureNames = signatureNameOptions(
-      source,
-      profile,
-      matrix,
-      signatureSetName,
-      strategy
-    );
-    const signatureName = defaultSignatureName(signatureNames);
-
-    mergeRsProfiles({
-      plots: [
-        ...plots,
-        {
-          source: signatureSource,
-          profile: profile,
-          matrix: matrix,
-          signatureSetName: signatureSetName,
-          strategy: strategy,
-          signatureName: signatureName,
-          index: plots.length,
-        },
-      ],
-    });
-  }
-
-  function removePlots(index) {
-    //if (plots[index.plotURL]) Object.revokeObjectURL(plots[index].plotURL);
-
-    let newPlots = plots.slice();
-
-    //newPlots.splice(index, 1);
-
-    const removed = newPlots.splice(index, 1);
-
-    mergeRsProfiles({ plots: newPlots });
-  }
-
   return (
     <div>
-      <Form className="p-3">
-        <LoadingOverlay active={loading} />
-        <Row className="">
-          <Col lg="auto">
-            <Select
-              name="source"
-              label="Signature Source"
-              value={source}
-              options={signatureSourceOptions}
-              control={control}
-              onChange={handleSource}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="profile"
-              label="Profile Name"
-              value={profile}
-              options={profileOptions(source)}
-              control={control}
-              onChange={handleProfile}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="matrix"
-              label="Matrix"
-              value={matrix}
-              options={matrixOptions(source, profile)}
-              control={control}
-              onChange={handleMatrix}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="signatureSetName"
-              label="Reference Signature Set"
-              value={signatureSetName}
-              options={referenceSignatureSetOption(source, profile, matrix)}
-              control={control}
-              onChange={handleSet}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="strategy"
-              label="Experimental Strategy"
-              value={strategy}
-              options={strategyOptions(
-                source,
-                profile,
-                matrix,
-                signatureSetName
-              )}
-              control={control}
-              onChange={handleStrategy}
-            />
-          </Col>
-          <Col lg="auto">
-            <Select
-              name="signatureName"
-              label="Signature Name"
-              value={signatureName}
-              options={signatureNameOptions(
-                source,
-                profile,
-                matrix,
-                signatureSetName,
-                strategy
-              )}
-              control={control}
-              onChange={handleName}
-            />
-          </Col>
-        </Row>
-        {/* <AdditionalControls /> */}
-        <Row className="mt-3">
-          {index != 0 ? (
-            <Col md="auto" className="d-flex">
-              <Button
-                className="ml-auto"
-                variant="link"
-                onClick={() => removePlots(index)}
-                title={'Remove Plot ' + (parseInt(index) + 1)}
-                style={{ textDecoration: 'none' }}
-              >
-                <span className="text-nowrap" title="Remove Plot">
-                  <FontAwesomeIcon icon={faMinus} /> Remove Plot
-                </span>{' '}
-                {/* {parseInt(index) + 1} */}
-              </Button>
-            </Col>
-          ) : (
-            <Col md="auto" className="d-flex"></Col>
-          )}
-        </Row>
-      </Form>
+      {plotsFields.map((item, index) => (
+        <div key={item.id}>
+          <Form className="p-3">
+            <LoadingOverlay active={plotFetching} />
 
-      <div id="plot">
-        <div style={{ display: err ? 'block' : 'none' }}>
-          <p>An error has occurred. Please verify your input.</p>
+            <Row className="">
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].source`}
+                  label="Signature Source"
+                  options={signatureSourceOptions}
+                  control={control}
+                  onChange={(e) => handleSource(e, index)}
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].profile`}
+                  label="Profile Name"
+                  options={profileOptions(plotForms[index].source)}
+                  control={control}
+                  onChange={(e) =>
+                    handleProfile(plotForms[index].source, e, index)
+                  }
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].matrix`}
+                  label="Matrix"
+                  options={matrixOptions(
+                    plotForms[index].source,
+                    plotForms[index].profile
+                  )}
+                  control={control}
+                  onChange={(e) =>
+                    handleMatrix(
+                      plotForms[index].source,
+                      plotForms[index].profile,
+                      e,
+                      index
+                    )
+                  }
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].signatureSetName`}
+                  label="Reference Signature Set"
+                  options={referenceSignatureSetOption(
+                    plotForms[index].source,
+                    plotForms[index].profile,
+                    plotForms[index].matrix
+                  )}
+                  getOptionValue={(e) => e.label}
+                  control={control}
+                  onChange={(e) =>
+                    handleSet(
+                      plotForms[index].source,
+                      plotForms[index].profile,
+                      plotForms[index].matrix,
+                      e,
+                      index
+                    )
+                  }
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].strategy`}
+                  label="Experimental Strategy"
+                  //value={strategy}
+                  options={strategyOptions(
+                    plotForms[index].source,
+                    plotForms[index].profile,
+                    plotForms[index].matrix,
+                    plotForms[index].signatureSetName
+                  )}
+                  control={control}
+                  onChange={(e) =>
+                    handleStrategy(
+                      plotForms[index].source,
+                      plotForms[index].profile,
+                      plotForms[index].matrix,
+                      plotForms[index].signatureSetName,
+                      e,
+                      index
+                    )
+                  }
+                />
+              </Col>
+              <Col lg="auto">
+                <Select
+                  name={`plotForms[${index}].signatureName`}
+                  label="Signature Name"
+                  options={signatureNameOptions(
+                    plotForms[index].source,
+                    plotForms[index].profile,
+                    plotForms[index].matrix,
+                    plotForms[index].signatureSetName,
+                    plotForms[index].strategy
+                  )}
+                  control={control}
+                  onChange={(e) =>
+                    handleName(
+                      plotForms[index].source,
+                      plotForms[index].profile,
+                      plotForms[index].matrix,
+                      plotForms[index].signatureSetName,
+                      plotForms[index].strategy,
+                      e,
+                      index
+                    )
+                  }
+                />
+              </Col>
+              <Col lg="auto" className="d-flex justify-content-end">
+                <Button
+                  className="mt-auto mb-3"
+                  variant="primary"
+                  onClick={() => updatePlots()}
+                >
+                  Calculate
+                </Button>
+              </Col>
+            </Row>
+            {/* <AdditionalControls /> */}
+            <Row className="mt-3">
+              {index != 0 ? (
+                <Col md="auto" className="d-flex">
+                  <Button
+                    className="ml-auto"
+                    variant="link"
+                    onClick={() => removePlots(index)}
+                    title={'Remove Plot ' + (parseInt(index) + 1)}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <span className="text-nowrap" title="Remove Plot">
+                      <FontAwesomeIcon icon={faMinus} /> Remove Plot
+                    </span>{' '}
+                    {/* {parseInt(index) + 1} */}
+                  </Button>
+                </Col>
+              ) : (
+                <Col md="auto" className="d-flex"></Col>
+              )}
+            </Row>
+          </Form>
+
+          <div id={`plotForms[${index}]`}>
+            <div
+              style={{ display: plotError || optionError ? 'block' : 'none' }}
+            >
+              <p>An error has occurred. Please verify your input.</p>
+            </div>
+
+            {plotdata && plotdata[index] && (
+              <Plotly
+                data={plotdata[index].traces}
+                layout={plotdata[index].layout}
+                //config={plotdata[index].data.config}
+                divId="mutationalProfilePlot"
+                filename={plotForms[index].source.value || 'Mutational Profile'}
+              />
+            )}
+            <Row className="mr-3">
+              {index === plotsFields.length - 1 ? (
+                <Col className="d-flex justify-content-end">
+                  <Button
+                    className="ml-auto"
+                    variant="link"
+                    onClick={() =>
+                      addPlots({
+                        source: '',
+                        profile: '',
+                        matrix: '',
+                        signatureSetName: '',
+                        strategy: '',
+                        signatureName: '',
+                      })
+                    }
+                    title="Add Plot"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <span className="text-nowrap" title="Add Plot">
+                      <FontAwesomeIcon icon={faPlus} /> Add Plot
+                    </span>
+                  </Button>
+                </Col>
+              ) : (
+                <Col></Col>
+              )}
+            </Row>
+          </div>
+
+          <hr></hr>
+          {/* {additionalPlots()} */}
         </div>
-
-        {plotdata && (
-          <Plotly
-            data={plotdata.traces}
-            layout={plotdata.layout}
-            config={plotdata.config}
-            divId="mutationalProfilePlot"
-            filename={source?.value || 'Mutational Profile'}
-          />
-        )}
-        <Row className="mr-3">
-          {index === plots.length - 1 ? (
-            <Col className="d-flex justify-content-end">
-              <Button
-                className="ml-auto"
-                variant="link"
-                onClick={() => addPlots()}
-                title="Add Plot"
-                style={{ textDecoration: 'none' }}
-              >
-                <span className="text-nowrap" title="Add Plot">
-                  <FontAwesomeIcon icon={faPlus} /> Add Plot
-                </span>
-              </Button>
-            </Col>
-          ) : (
-            <Col></Col>
-          )}
-        </Row>
-      </div>
-
-      <hr></hr>
-      {/* {additionalPlots()} */}
+      ))}
     </div>
   );
 }

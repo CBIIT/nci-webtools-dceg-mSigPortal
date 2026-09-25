@@ -1,10 +1,6 @@
-import Description from '@/components/controls/description/description';
-import RsProfileFormPlot from '@/components/pages/catalog/referenceSignature/rsProfile/rsProfile-form-plot_1';
-import { useSelector, useDispatch } from 'react-redux';
+import RsProfileFormPlot from '@/components/pages/catalog/referenceSignature/rsProfile/rsProfile-form-plot';
 
 export default function RsProfile() {
-  const store = useSelector((state) => state.catalog);
-  const { plots } = store.rSProfiles;
   return (
     <div>
       <div className="p-3">
@@ -13,10 +9,6 @@ export default function RsProfile() {
         mutational signature profile.
       </div>
       <hr />
-      {/* {plots.map((e, i) => (
-        <RsProfileFormPlot options={e} index={i} />
-      ))} */}
-      {/* New RS plot */}
       <RsProfileFormPlot />
     </div>
   );
