@@ -1,4 +1,5 @@
 import { backfillReferenceSignatureStudy } from "./services/signatures.js";
+import { clearResponseCache } from "./services/cache.js";
 
 export const sources = [
   {
@@ -72,4 +73,6 @@ export const sources = [
       }
     },
   },
+
+  clearResponseCache,
 ];
