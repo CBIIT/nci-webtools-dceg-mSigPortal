@@ -72,6 +72,28 @@ export const getInitialState = () => ({
       label: 'Signature_1A',
     },
   },
+  rsComparison: {
+    profile: { value: 'SBS', label: 'SBS' },
+    matrix: { value: '96', label: '96' },
+    signatureSet1: {
+      value: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      label: 'COSMIC_v3.3_Signatures_GRCh38_SBS96',
+      study: 'Reference',
+    },
+    signatureName1: {
+      value: 'SBS1',
+      label: 'SBS1',
+    },
+    signatureSet2: {
+      value: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+      label: 'COSMIC_v1_Signatures_GRCh37_SBS96',
+      study: 'Reference',
+    },
+    signatureName2: {
+      value: 'Signature_1A',
+      label: 'Signature_1A',
+    },
+  },
   sigMutationalSigComparison: {
     profileName: { value: 'SBS', label: 'SBS' },
     profileNameOptions: [],

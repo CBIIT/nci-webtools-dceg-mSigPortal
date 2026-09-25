@@ -98,7 +98,10 @@ export default function PcReference({ state }) {
               .filter(
                 (e) =>
                   e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.matrix ==
+                    defaultMatrix(profile.value, ['96', '78', '83']) &&
+                  // a de novo set is only valid for the strategy its file was built from
+                  (e.study === 'Reference' || e.strategy == strategy?.value)
               )
               .map((e) => e.signatureSetName)
           ),
@@ -122,7 +125,8 @@ export default function PcReference({ state }) {
                   e.profile == profile.value &&
                   e.matrix ==
                     defaultMatrix(profile.value, ['96', '78', '83']) &&
-                  e.signatureSetName == signatureSet.value
+                  e.signatureSetName == signatureSet.value &&
+                  (e.study === 'Reference' || e.strategy == strategy?.value)
               )
               .map((e) => e.signatureName)
           ),

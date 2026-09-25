@@ -72,7 +72,8 @@ export default function CsReference({ state }) {
       setSignatureSetQuery({
         profile: profile.value,
         matrix: defaultMatrix(profile.value, ['96', '78', '83']),
-        ...(source == 'public' && { study: `Reference;${study.value}` }),
+        study: source == 'public' ? `Reference;${study.value}` : 'Reference',
+        ...(source == 'public' && { strategy: strategy.value }),
       });
     }
   }, [profile]);

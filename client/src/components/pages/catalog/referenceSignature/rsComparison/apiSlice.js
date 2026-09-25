@@ -14,18 +14,18 @@ export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
       transformResponse: (data, meta, args) => {
         const signatureSetNames = args.signatureSetName.split(';');
         const signatureNames = args.signatureName.split(';');
-        const studies = args.study.split(';');
+        const studies = args.study?.split(';');
         const data1 = data.filter(
           (e) =>
             e.signatureSetName == signatureSetNames[0] &&
             e.signatureName == signatureNames[0] &&
-            e.study == studies[0]
+            (!studies || e.study == studies[0])
         );
         const data2 = data.filter(
           (e) =>
             e.signatureSetName == signatureSetNames[1] &&
             e.signatureName == signatureNames[1] &&
-            e.study == studies[1]
+            (!studies || e.study == studies[1])
         );
 
         if (args.profile === 'SBS') {

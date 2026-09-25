@@ -331,6 +331,9 @@ async function getPublicTreeLeafData(req, res, next) {
     const { connection } = req.app.locals;
     let { study, strategy, cancer, signatureSetName, profile, matrix } =
       req.body;
+    if (typeof study !== 'string' || !study) {
+      return res.status(400).json('A study is required for public data');
+    }
     const pickNotNull = (obj, nulls = [null, undefined, '']) =>
       Object.fromEntries(
         Object.entries(obj).filter(([_, v]) => !nulls.includes(v))
@@ -362,7 +365,8 @@ async function getPublicTreeLeafData(req, res, next) {
 
     const signatureData = await getSignatureData(
       connection,
-      pickNotNull({ strategy, signatureSetName }),
+      // a de novo set name can be reused by other studies, so scope by study like every other query
+      pickNotNull({ strategy, signatureSetName, study: `Reference;${study}` }),
       '*',
       1e8
     );
@@ -395,6 +399,8 @@ async function getPublicTreeLeafData(req, res, next) {
           's.signatureSetName': signatureSetName,
         })
       )
+      // a de novo set name can be reused by other studies, so scope the signature side too
+      .whereIn('s.study', ['Reference', study])
       .andWhere('exposure', '>', 0)
       .groupBy('e.cancer', 'e.sample', 'mutationType');
 
