@@ -69,7 +69,7 @@ export default function PcaWithin({ state }) {
         ...(source == 'public' && { strategy: strategy.value }),
       });
     }
-  }, [profile]);
+  }, [profile, source, study?.value, strategy?.value]);
 
   function onSubmit(data) {
     const cacheBust = new Date().getTime();
