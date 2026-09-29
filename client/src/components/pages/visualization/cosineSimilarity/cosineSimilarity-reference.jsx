@@ -76,7 +76,7 @@ export default function CsReference({ state }) {
         ...(source == 'public' && { strategy: strategy.value }),
       });
     }
-  }, [profile]);
+  }, [profile, source, study?.value, strategy?.value]);
 
   function onSubmit(data) {
     const { profile, signatureSet } = data;
