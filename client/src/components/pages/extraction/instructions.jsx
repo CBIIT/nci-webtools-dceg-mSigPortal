@@ -97,11 +97,57 @@ export default function Instructions({ formLimits }) {
       <div className="mt-2">
         <h4>User matrix file requirements</h4>
         <p>
-          The Extraction user-data workflow accepts a mutational-count matrix,
-          not raw VCF or MAF files. If starting from individual variants, first
-          generate a matrix for the required mutation context and then upload
-          that matrix.
+          The Extraction workflow accepts a mutation-count matrix rather than
+          raw VCF or MAF files. If you are starting from individual somatic
+          variant calls, first generate the appropriate matrix using one of the
+          following options.
         </p>
+        <h5>Generate the matrix in mSigPortal — recommended</h5>
+        <ol>
+          <li>
+            Open the <a href="#/visualization">Visualization module.</a>
+          </li>
+          <li>
+            Select the user-data workflow and upload your final,
+            quality-controlled somatic VCF file(s).
+          </li>
+          <li>
+            Select the correct reference-genome assembly and run the
+            mutation-matrix generation workflow, which uses
+            SigProfilerMatrixGenerator.
+          </li>
+          <li>
+            Download the matrix appropriate for your analysis—typically SBS96
+            for single-base substitutions, DBS78 for doublet-base substitutions,
+            or ID83 for small insertions and deletions.
+          </li>
+          <li>
+            Return to the Extraction module and upload the downloaded matrix to
+            perform mutational-signature extraction.
+          </li>
+        </ol>
+        <h5>Generate the matrix outside mSigPortal</h5>
+        <p>
+          Alternatively, matrices can be generated locally using{' '}
+          <a
+            href="https://github.com/SigProfilerSuite/SigProfilerMatrixGenerator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SigProfilerMatrixGenerator
+          </a>
+          . The software accepts VCF, MAF, and supported text-formatted mutation
+          files and generates SBS, DBS, and ID mutation-count matrices.
+        </p>
+        <p>
+          <b>Important:</b> Users are responsible for providing final,
+          high-quality somatic mutation calls, selecting the correct
+          reference-genome assembly, and removing germline variants, sequencing
+          artifacts, and other low-confidence calls before matrix generation.
+          mSigPortal does not replace upstream variant calling or variant-level
+          quality control.
+        </p>
+        <h5>Mutation Matrix Format and Requirements</h5>
         <Alert variant="info" className="mb-3">
           Column names are case-insensitive. If a column name does not match the
           required name, an error is shown.
