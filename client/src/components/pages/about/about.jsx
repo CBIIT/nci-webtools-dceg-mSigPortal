@@ -214,10 +214,118 @@ export default function About() {
             </p>
             <br />
             <div>
-              <h5>Release History</h5>
-              <i>mSigPortal 1.0.0</i>
+              <h5>Software Versions for the Current Release</h5>
+              <p>
+                mSigPortal is actively maintained. The versions and source
+                snapshots below correspond to mSigPortal v1.2.0, released August
+                6, 2026. Users should report the mSigPortal version and analysis
+                module when publishing results generated through the portal.
+              </p>
+
+              <table className="table table-bordered table-sm">
+                <thead>
+                  <tr>
+                    <th>Software or algorithm</th>
+                    <th>Application in mSigPortal</th>
+                    <th>Version or source snapshot</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>mSigPortal</td>
+                    <td>Web portal and integrated analysis workflows</td>
+                    <td>
+                      <strong>1.2.0</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SigProfilerMatrixGenerator</td>
+                    <td>
+                      Generation of mutational-count matrices from variant files
+                    </td>
+                    <td>
+                      <strong>1.1.30</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SigProfilerExtractor</td>
+                    <td>De novo extraction of mutational signatures</td>
+                    <td>
+                      <strong>1.1.13</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SigProfilerClusters</td>
+                    <td>
+                      Identification and classification of clustered mutations
+                    </td>
+                    <td>
+                      <strong>1.0.11</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SigProfilerPlotting</td>
+                    <td>Visualization of mutational profiles and signatures</td>
+                    <td>
+                      <strong>1.2.2</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SigProfilerAssignment</td>
+                    <td>
+                      Assignment and decomposition of reference signatures
+                    </td>
+                    <td>
+                      <strong>0.0.14</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SATS refitting algorithm</td>
+                    <td>Assay-aware SBS and DBS signature refitting</td>
+                    <td>N/A</td>
+                  </tr>
+                  <tr>
+                    <td>mSigSDK</td>
+                    <td>
+                      Browser-based and programmatic mutational-signature
+                      workflows
+                    </td>
+                    <td>
+                      <strong>0.3.0</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h6>Source code and release information</h6>
               <ul>
-                <li>Initial Release</li>
+                <li>
+                  <a
+                    href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    mSigPortal web application
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/xtmgah/mSigPortal"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    mSigPortal scientific analysis code
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/CBIIT/nci-webtools-dceg-mSigPortal/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    mSigPortal release history
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
