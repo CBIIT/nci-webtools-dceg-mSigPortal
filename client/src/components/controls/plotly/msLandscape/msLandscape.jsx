@@ -130,9 +130,7 @@ export default function MsLandscape(
 
   const samples = cosineData.map((e) => e.sample);
 
-  var longest = samples.sort(function (a, b) {
-    return b.length - a.length;
-  })[0].length;
+  const longest = Math.max(...samples.map((s) => s.length));
 
   const newVariableData = [...variableData];
   const variableDataSort = newVariableData.sort(mapOrder(samples, 'sample'));
@@ -195,7 +193,7 @@ export default function MsLandscape(
       xaxis: 'x',
       yaxis: 'y6',
       text: dendrogram.data[1].x.map((e) =>
-        samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
+        samples[e - 1] ? `<b>Sample: </b>${samples[e - 1]}` : null
       ),
     }
   : {};
