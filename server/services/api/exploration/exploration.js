@@ -145,7 +145,7 @@ async function msLandscape(req, res, next) {
     }
 
     const fn = 'msLandscape';
-    const args = { exposureData, signatureData, seqmatrixData, study };
+    const args = { exposureData, signatureData, seqmatrixData };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
@@ -210,7 +210,7 @@ async function msDecomposition(req, res, next) {
     }
 
     const fn = 'msDecomposition';
-    const args = { exposureData, signatureData, seqmatrixData, study };
+    const args = { exposureData, signatureData, seqmatrixData };
     const id = userId || randomUUID();
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
@@ -260,7 +260,7 @@ async function cosineSimilarity(req, res, next) {
       limit
     );
     const fn = 'cosineSimilarity';
-    const args = { signatureData1, signatureData2, study };
+    const args = { signatureData1, signatureData2 };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
