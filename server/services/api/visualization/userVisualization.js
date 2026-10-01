@@ -7,12 +7,15 @@ import rWrapper from 'r-wrapper';
 import { parseCSV } from '../general.js';
 import { getExposureData, getSignatureData } from '../../query.js';
 import { createCacheMiddleware } from '../../cache.js';
+import { computeTreeLeafLayout } from '../../treeLeafLayoutRunner.js';
 import isUUID from 'validator/lib/isUUID.js';
 import { mkdirs, writeJson, isValidId, resolveWithin } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 
 const r = rWrapper.async;
 const env = process.env;
+// must equal the client's plotSize / 2; the force simulation's output depends on it
+const TREE_LEAF_RADIUS = 1000;
 
 export async function submit(req, res, next) {
   const { id } = req.params;
@@ -356,25 +359,51 @@ async function getPublicTreeLeafData(req, res, next) {
       signatureSetName = signatureSetNameValues[0];
     }
 
-    const exposureData = await getExposureData(
-      connection,
-      pickNotNull({ study, strategy, signatureSetName }),
-      '*',
-      1e8
-    );
+    const [exposureData, signatureRows, seqmatrixData] = await Promise.all([
+      // per-sample calculations in R, so restricting to the selected cancer doesn't change results
+      getExposureData(
+        connection,
+        pickNotNull({ study, strategy, cancer, signatureSetName }),
+        ['sample', 'cancer', 'signatureName', 'exposure'],
+        1e8
+      ),
+      // only checked for existence; R's getTreeLeaf doesn't use signature data
+      getSignatureData(
+        connection,
+        // a de novo set name can be reused by other studies, so scope by study like every other query
+        pickNotNull({
+          strategy,
+          signatureSetName,
+          study: `Reference;${study}`,
+        }),
+        ['signatureName'],
+        1
+      ),
+      connection
+        .select(
+          'sample',
+          'mutationType',
+          'mutations',
+          connection.raw('concat(profile, matrix) as "profileMatrix"')
+        )
+        .from('seqmatrix')
+        .where(pickNotNull({ study, strategy, cancer, profile, matrix })),
+    ]);
 
-    const signatureData = await getSignatureData(
-      connection,
-      // a de novo set name can be reused by other studies, so scope by study like every other query
-      pickNotNull({ strategy, signatureSetName, study: `Reference;${study}` }),
-      '*',
-      1e8
-    );
-
-    let seqmatrixData = await connection
-      .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
-      .from('seqmatrix')
-      .where(pickNotNull({ study, strategy, cancer, profile, matrix }));
+    if (
+      !exposureData?.length ||
+      !seqmatrixData?.length ||
+      !signatureRows?.length
+    ) {
+      const missing = [
+        !exposureData?.length && 'exposure',
+        !seqmatrixData?.length && 'seqmatrix',
+        !signatureRows?.length && 'signature',
+      ].filter(Boolean);
+      throw new Error(
+        `The selected study does not provide ${missing.join(' and ')} data`
+      );
+    }
 
     const estimatedMutations = connection
       .select(
@@ -434,7 +463,7 @@ async function getPublicTreeLeafData(req, res, next) {
         })
       );
 
-    const cosineSimilarityData = await connection
+    const cosineSimilarityQuery = connection
       .with('estimated_mutations', estimatedMutations)
       .with('mutations', mutations)
       .select(
@@ -447,34 +476,29 @@ async function getPublicTreeLeafData(req, res, next) {
       .from('mutations as b')
       .groupBy('b.cancer', 'b.sample');
 
-    // todo: execute this in the database (requires that we resolve underflow/overflow issues)
-    const cosineSimilarityMap = cosineSimilarityData.reduce(
-      (acc, curr) => ({
-        ...acc,
-        [curr.sample]:
-          +curr.numerator /
-          (Math.sqrt(+curr.denominator1) * Math.sqrt(curr.denominator2)),
+    const [results, cosineSimilarityData] = await Promise.all([
+      wrapper('wrapper', {
+        fn: 'getTreeLeaf',
+        args: { exposureData, seqmatrixData },
       }),
-      {}
-    );
+      cosineSimilarityQuery,
+    ]);
 
-    if (
-      !exposureData?.length ||
-      !seqmatrixData?.length ||
-      !signatureData?.length
-    ) {
-      const missing = [
-        !exposureData?.length && 'exposure',
-        !seqmatrixData?.length && 'seqmatrix',
-        !signatureData?.length && 'signature',
-      ].filter(Boolean);
-      throw new Error(
-        `The selected study does not provide ${missing.join(' and ')} data`
+    // todo: execute this in the database (requires that we resolve underflow/overflow issues)
+    const cosineSimilarityMap = new Map();
+    for (const curr of cosineSimilarityData) {
+      cosineSimilarityMap.set(
+        curr.sample,
+        +curr.numerator /
+          (Math.sqrt(+curr.denominator1) * Math.sqrt(curr.denominator2))
       );
     }
-    const args = { exposureData, seqmatrixData, signatureData };
-    const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
-    results.output.params = {
+
+    for (let record of results.output?.attributes || []) {
+      record.Cosine_similarity = cosineSimilarityMap.get(record.Sample) || 0;
+    }
+
+    const params = {
       study,
       strategy,
       cancer,
@@ -482,10 +506,22 @@ async function getPublicTreeLeafData(req, res, next) {
       profile,
       matrix,
     };
-    for (let record of results.output?.attributes || []) {
-      record.Cosine_similarity = cosineSimilarityMap[record.Sample] || 0;
+    const { hierarchy, attributes } = results.output || {};
+    if (!hierarchy || !attributes) {
+      // R returned an error/uncaughtError; let the client surface it as-is
+      return res.json({ output: { ...results.output, params } });
     }
-    res.json(results);
+
+    const mutationsBySample = new Map(
+      attributes.map((record) => [String(record.Sample), record.Mutations])
+    );
+    const { nodes, links } = await computeTreeLeafLayout({
+      data: hierarchy,
+      mutations: mutationsBySample,
+      radius: TREE_LEAF_RADIUS,
+    });
+
+    res.json({ output: { attributes, nodes, links, params } });
   } catch (error) {
     console.log(error);
     next(error);
@@ -533,10 +569,28 @@ async function getUserTreeLeafData(req, res, next) {
         userId,
         error: results.output.error || results.output.uncaughtError,
       });
+      results.output.params = { userId, profile, matrix };
+      return res.json({ output: results.output });
     }
 
-    results.output.params = { userId, profile, matrix };
-    res.json(results);
+    const { hierarchy, attributes } = results.output;
+    const mutationsBySample = new Map(
+      attributes.map((record) => [String(record.Sample), record.Mutations])
+    );
+    const { nodes, links } = await computeTreeLeafLayout({
+      data: hierarchy,
+      mutations: mutationsBySample,
+      radius: TREE_LEAF_RADIUS,
+    });
+
+    res.json({
+      output: {
+        attributes,
+        nodes,
+        links,
+        params: { userId, profile, matrix },
+      },
+    });
   } catch (error) {
     logger.error('[treeLeaf/user] failed', {
       userId: req.body?.userId,

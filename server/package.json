@@ -27,6 +27,7 @@
     "cors": "^2.8.6",
     "cron": "^4.4.0",
     "csv-stringify": "^6.8.3",
+    "d3": "^7.9.0",
     "execa": "^7.2.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",

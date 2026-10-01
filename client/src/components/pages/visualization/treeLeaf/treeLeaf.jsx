@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { Alert, Button, Container } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRecoilValue } from 'recoil';
@@ -7,7 +7,7 @@ import Loader from '@/components/controls/loader/loader';
 import ErrorBoundary from '@/components/controls/errorBoundary/error-boundary';
 import D3TreeLeaf from './treeLeafPlot';
 import TreeLeafForm from './treeLeafForm';
-import { exportSvg } from './treeLeaf.utils';
+import { exportSvg, groupBy, getPlotTitle } from './treeLeaf.utils';
 import {
   graphDataSelector,
   getInitialFormState,
@@ -17,6 +17,8 @@ import {
 } from './treeLeaf.state';
 
 const plotId = 'treeLeafPlot';
+// the server lays out the tree with radius plotSize / 2 (TREE_LEAF_RADIUS)
+const plotSize = 2000;
 
 export default function TreeAndLeaf({ state = {}, ...props }) {
   const publicForm = useSelector((store) => store.visualization.publicForm);
@@ -126,6 +128,17 @@ function TreeLeafContent({
       };
 
   const graphData = useRecoilValue(graphDataSelector(params));
+  const { nodes, links, attributes, params: parameters } = graphData || {};
+  const attributesBySample = useMemo(
+    () => (attributes ? groupBy(attributes, 'Sample') : null),
+    [attributes]
+  );
+  // nodes/links arrive already laid out by the server; just pass them through
+  const layout = useMemo(
+    () => (nodes && links ? { nodes, links } : null),
+    [nodes, links]
+  );
+
   if (graphData?.error) {
     throw new Error(graphData.error);
   }
@@ -138,7 +151,12 @@ function TreeLeafContent({
     );
   }
 
-  const { attributes } = graphData || {};
+  const plotTitle = getPlotTitle({
+    isUser,
+    form,
+    studyLabel: publicForm?.study?.label,
+    signatureSetName: parameters?.signatureSetName,
+  });
 
   return (
     <>
@@ -153,15 +171,18 @@ function TreeLeafContent({
           Export Plot
         </Button>
       </div>
-      <D3TreeLeaf
-        id={plotId}
-        width={2000}
-        height={2000}
-        onSelect={onSelect}
-        isUser={isUser}
-        graphData={graphData}
-        form={form}
-      />
+      <div className="border rounded p-3 position-relative">
+        <D3TreeLeaf
+          id={plotId}
+          width={plotSize}
+          height={plotSize}
+          onSelect={onSelect}
+          layout={parameters ? layout : null}
+          attributes={attributesBySample}
+          form={form}
+          plotTitle={plotTitle}
+        />
+      </div>
     </>
   );
 }

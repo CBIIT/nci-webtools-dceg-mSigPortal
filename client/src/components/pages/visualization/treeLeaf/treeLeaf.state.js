@@ -1,4 +1,4 @@
-import { atom, selectorFamily } from 'recoil';
+import { selectorFamily } from 'recoil';
 import axios from 'axios';
 
 export const colorOptions = [
@@ -54,13 +54,6 @@ export function getInitialFormState({ isUser, publicForm }) {
     cancer: known ? value : '',
   };
 }
-
-export const defaultTreeLeafData = { links: [], nodes: [] };
-
-export const treeLeafDataState = atom({
-  key: 'treeLeaf.coordinateState',
-  default: defaultTreeLeafData,
-});
 
 export const graphDataSelector = selectorFamily({
   key: 'treeLeaf.plotData',

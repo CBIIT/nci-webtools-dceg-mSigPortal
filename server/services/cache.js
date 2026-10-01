@@ -27,6 +27,9 @@ export function createDatabaseCache(connection, tableName = 'cache') {
   };
 }
 
+// in-flight responses by cache key; concurrent identical requests in this process share one computation
+const pending = new Map();
+
 export function createCacheMiddleware(getCacheKey) {
   return async (req, res, next) => {
     try {
@@ -34,15 +37,39 @@ export function createCacheMiddleware(getCacheKey) {
       const cache = req.app.locals.cache;
       const value = await cache.get(key);
       if (value) {
-        res.json(value);
-      } else {
-        const originalJson = res.json.bind(res);
-        res.json = (body) => {
-          cache.set(key, JSON.stringify(body));
-          originalJson(body);
-        };
-        next();
+        return res.json(value);
       }
+
+      // undefined means the in-flight request failed; retry with one new leader at a time
+      while (pending.has(key)) {
+        const body = await pending.get(key);
+        if (body !== undefined) return res.json(body);
+      }
+
+      let settle;
+      const promise = new Promise((resolve) => (settle = resolve));
+      pending.set(key, promise);
+      const finish = (body) => {
+        if (pending.get(key) === promise) pending.delete(key);
+        settle(body);
+      };
+
+      const originalJson = res.json.bind(res);
+      res.json = (body) => {
+        // error responses (e.g. from the error handler) must not be cached
+        const ok = res.statusCode < 400;
+        if (ok) {
+          cache
+            .set(key, JSON.stringify(body))
+            .catch((error) =>
+              req.app.locals.logger?.error(`Failed to cache ${key}: ${error}`)
+            );
+        }
+        finish(ok ? body : undefined);
+        return originalJson(body);
+      };
+      res.on('close', () => finish(undefined));
+      next();
     } catch (err) {
       next(err);
     }
