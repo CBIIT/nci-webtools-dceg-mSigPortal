@@ -1140,7 +1140,6 @@ msigportal.getTreeLeaf <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 
   seqmatrix_refdata <- args$seqmatrixData
-  signature_refsets <- args$signatureData
   exposure_refdata <- args$exposureData
 
   seqmatrix_refdata_ratio <- seqmatrix_refdata %>%
@@ -1198,7 +1197,7 @@ msigportal.getTreeLeaf <- function(args, config) {
         ungroup()
     ) %>%
     rename(Cancer_Type = cancer, Sample = sample, Mutations = mutations) %>%
-    group_by(row_number())
+    select(Sample, Cancer_Type, Dsig, Dmut, Mutations)
 
   # determine the distance between samples
   hc <- hclust(dist(na.omit(unlist(mdata0))), "ward.D")
@@ -1278,7 +1277,7 @@ msigportal.getTreeLeafUser <- function(args, config) {
     ) %>%
     mutate(Cancer_Type = "Input") %>%
     rename(Sample = leafKey, SampleName = sample, Filter = filter, Mutations = mutations) %>%
-    group_by(row_number())
+    select(Sample, SampleName, Filter, Cancer_Type, Dmut, Mutations)
 
   hc <- hclust(dist(mdata0), "ward.D")
 
