@@ -15,8 +15,13 @@ async function submit(req, res, next) {
   const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
   const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
   await mkdirs([inputFolder, outputFolder]);
-  const { exposureFile, matrixFile, signatureFile, signatureSetName } =
-    req.body;
+  const {
+    exposureFile,
+    matrixFile,
+    signatureFile,
+    signatureSetName,
+    strategy,
+  } = req.body;
   const exposurePath = resolveWithin(
     inputFolder,
     sanitizeFilename(exposureFile)
@@ -120,7 +125,7 @@ async function submit(req, res, next) {
         .flat()
     : await getSignatureData(
         req.app.locals.connection,
-        { signatureSetName, study: 'Reference' },
+        { signatureSetName, strategy, study: 'Reference' },
         ['signatureName', 'mutationType', 'contribution'],
         false
       );

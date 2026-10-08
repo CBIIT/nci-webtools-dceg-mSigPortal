@@ -136,6 +136,13 @@ export function MsIndividualComparison(
     mutationGroupSort
   );
 
+  // signature/deconstructed rows aren't guaranteed to arrive in the same order as the original profile
+  const mutationTypeIndex = new Map(
+    groupOriginal.flatMap((g) => g.data.map((e) => e.mutationType)).map((m, i) => [m, i])
+  );
+  const byOriginalMutationTypeOrder = (a, b) =>
+    mutationTypeIndex.get(a.mutationType) - mutationTypeIndex.get(b.mutationType);
+
   const arraySignatureData = Object.values(signature_groupBySignature).map(
     (e) => e
   );
@@ -172,7 +179,8 @@ export function MsIndividualComparison(
   const groupDestructed = groupDataByMutation(
     newDestructedData,
     mutationRegex,
-    mutationGroupSort
+    mutationGroupSort,
+    byOriginalMutationTypeOrder
   );
   //console.log('groupDestructed', groupDestructed);
   // get total mutations per sample
@@ -260,7 +268,8 @@ export function MsIndividualComparison(
       groupDataByMutation(
         arraySignatureData[i],
         mutationRegex,
-        mutationGroupSort
+        mutationGroupSort,
+        byOriginalMutationTypeOrder
       )
     );
   }
@@ -647,7 +656,7 @@ export function MsIndividualComparison(
     align: 'center',
   }));
   const tickLabels =
-    groupSamples.length > 0 ? formatTickLabels(groupSamples[0]) : '';
+    groupOriginal.length > 0 ? formatTickLabels(groupOriginal) : '';
 
   const layout =
     traces.length > 0
