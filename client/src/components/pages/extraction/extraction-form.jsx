@@ -23,6 +23,19 @@ import {
 
 const actions = { ...extractionActions, ...modalActions };
 
+const DEFAULT_SIGNATURE_SET = 'COSMIC_v3.3_Signatures_GRCh37_SBS96';
+
+function getDefaultSignatureSetOption(contextTypeValue, filteredOptions) {
+  if (contextTypeValue === 'default' || contextTypeValue === 'SBS96') {
+    return (
+      filteredOptions.find(
+        (option) => option.value === DEFAULT_SIGNATURE_SET
+      ) || filteredOptions[0]
+    );
+  }
+  return filteredOptions[0];
+}
+
 export default function ExtractionForm({ formLimits }) {
   const { submitted, ...state } = useSelector((state) => state.extraction);
   const id = useParams().id || state.id || false;
@@ -105,6 +118,13 @@ export default function ExtractionForm({ formLimits }) {
         .sort((a, b) => a.value.localeCompare(b.value))
     : [];
 
+  // strategies present anywhere in the reference catalog, used to filter the decomposition signature query for user uploads
+  const referenceStrategyOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.strategy))]
+        .sort()
+        .map((e) => ({ label: e, value: e }))
+    : [];
+
   const handleContextTypeChange = (selectedOption) => {
     setValue('context_type', selectedOption);
     let filteredOptions;
@@ -118,15 +138,10 @@ export default function ExtractionForm({ formLimits }) {
       filteredOptions = signatureSetOptions;
     }
     setFilteredSignatureSetOptions(filteredOptions);
-
-    if (selectedOption.value === 'SBS96') {
-      const cosmicOption = filteredOptions.find(
-        (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
-      );
-      setValue('signatureSetName', cosmicOption);
-    } else {
-      setValue('signatureSetName', filteredOptions[0]);
-    }
+    setValue(
+      'signatureSetName',
+      getDefaultSignatureSetOption(selectedOption.value, filteredOptions)
+    );
   };
   const dataTypeOptions = ['matrix'].map((e) => ({
     label: e,
@@ -232,6 +247,7 @@ export default function ExtractionForm({ formLimits }) {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
     },
+    context_type: { label: 'default', value: 'default' },
     signatureName: [{ label: 'all', value: 'all' }],
     extractTool: {
       label: 'SigProfilerExtractor',
@@ -373,10 +389,7 @@ export default function ExtractionForm({ formLimits }) {
 
   useEffect(() => {
     if (study && contextTypeOptions.length > 0) {
-      const hasDefault = contextTypeOptions[0].value === 'default';
-      const selectedContext = hasDefault
-        ? contextTypeOptions[0]
-        : contextTypeOptions[0]; // fallback to first available even if no 'default'
+      const selectedContext = contextTypeOptions[0];
 
       // Only reset if it's not already set
       if (
@@ -397,15 +410,10 @@ export default function ExtractionForm({ formLimits }) {
         }
 
         setFilteredSignatureSetOptions(filteredOptions);
-
-        if (selectedContext.value === 'SBS96') {
-          const cosmicOption = filteredOptions.find(
-            (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
-          );
-          setValue('signatureSetName', cosmicOption);
-        } else {
-          setValue('signatureSetName', filteredOptions[0]);
-        }
+        setValue(
+          'signatureSetName',
+          getDefaultSignatureSetOption(selectedContext.value, filteredOptions)
+        );
       }
     }
   }, [study, contextTypeOptions, context_type]);
@@ -511,6 +519,7 @@ export default function ExtractionForm({ formLimits }) {
       signatureSetName,
       profile,
       matrix,
+      strategy: data.strategy?.value,
       // extraction decomposes against the reference catalog, not the seqmatrix study above
       study: 'Reference',
       ...(data.signatureName[0].value != 'all' && {
@@ -658,6 +667,14 @@ export default function ExtractionForm({ formLimits }) {
                   label="Data Type"
                   disabled={submitted || id}
                   options={dataTypeOptions}
+                  control={control}
+                />
+                <SelectForm
+                  className="mb-2"
+                  name="strategy"
+                  label="Experimental Strategy"
+                  disabled={submitted || id || fetchingSignatureOptions}
+                  options={referenceStrategyOptions}
                   control={control}
                 />
                 <Form.Group>
