@@ -47,6 +47,7 @@ export default function PublicForm() {
     matrixFile: '',
     signatureFile: '',
     study: { label: 'PCAWG', value: 'PCAWG' },
+    strategy: { label: 'WGS', value: 'WGS' },
     signatureSetName: {
       label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
@@ -64,7 +65,7 @@ export default function PublicForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const { exposureFile, matrixFile, signatureFile } = watch();
+  const { exposureFile, matrixFile, signatureFile, strategy } = watch();
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -89,14 +90,34 @@ export default function PublicForm() {
     }
   }
 
-  const signatureSetOptions = signatureOptions
-    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }))
+  const strategyOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.strategy))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
     : [];
+
+  const signatureSetOptions = (strategy) =>
+    signatureOptions && strategy
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter((e) => e.strategy === strategy.value)
+              .map((e) => e.signatureSetName)
+          ),
+        ]
+          .sort()
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
+
+  function handleStrategyChange(strategy) {
+    const signatureSets = signatureSetOptions(strategy);
+    setValue('strategy', strategy);
+    setValue('signatureSetName', signatureSets[0]);
+  }
 
   async function readFirstColumns(file) {
     const text = await file.text();
@@ -112,7 +133,10 @@ export default function PublicForm() {
   // verify first-column headers (case-insensitive) before uploading
   async function validateExplorationHeaders(exposure, matrix, signature) {
     if (!exposure || !matrix)
-      return { isValid: false, error: 'Please upload the required input files.' };
+      return {
+        isValid: false,
+        error: 'Please upload the required input files.',
+      };
     try {
       const exposureCols = await readFirstColumns(exposure);
       if ((exposureCols[0] || '').toLowerCase() !== 'samples')
@@ -125,7 +149,8 @@ export default function PublicForm() {
       if (exposureCols.length < 2)
         return {
           isValid: false,
-          error: 'The exposure/activity file must include at least one signature column.',
+          error:
+            'The exposure/activity file must include at least one signature column.',
         };
       const matrixCols = await readFirstColumns(matrix);
       if ((matrixCols[0] || '').toLowerCase() !== 'mutationtype')
@@ -138,7 +163,8 @@ export default function PublicForm() {
       if (matrixCols.length < 2)
         return {
           isValid: false,
-          error: 'The mutation matrix file must include at least one sample column.',
+          error:
+            'The mutation matrix file must include at least one sample column.',
         };
       if (signature) {
         const signatureCols = await readFirstColumns(signature);
@@ -152,7 +178,8 @@ export default function PublicForm() {
         if (signatureCols.length < 2)
           return {
             isValid: false,
-            error: 'The signature-profile file must include at least one signature column.',
+            error:
+              'The signature-profile file must include at least one signature column.',
           };
       }
       return { isValid: true };
@@ -193,6 +220,7 @@ export default function PublicForm() {
         signatureFile: data?.signatureFile.name,
         ...(usePublicSignature && {
           signatureSetName: data?.signatureSetName.value,
+          strategy: data?.strategy.value,
         }),
       }).unwrap();
 
@@ -374,13 +402,23 @@ export default function PublicForm() {
       </Row>
 
       {usePublicSignature ? (
-        <Select
-          name="signatureSetName"
-          label="Reference Signature Set"
-          control={control}
-          disabled={loading || submitted || isFetching}
-          options={signatureSetOptions}
-        />
+        <>
+          <Select
+            name="strategy"
+            label="Experimental Strategy"
+            control={control}
+            disabled={loading || submitted || isFetching}
+            options={strategyOptions}
+            onChange={handleStrategyChange}
+          />
+          <Select
+            name="signatureSetName"
+            label="Reference Signature Set"
+            control={control}
+            disabled={loading || submitted || isFetching}
+            options={signatureSetOptions(strategy)}
+          />
+        </>
       ) : (
         <Row>
           <Col>
