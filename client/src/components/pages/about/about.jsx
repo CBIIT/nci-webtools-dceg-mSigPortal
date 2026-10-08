@@ -131,6 +131,42 @@ export default function About() {
               for visualization and comparison.
             </p>
           </div>
+          <div id="refitting">
+            <h5 className="text-refitting">Signature Refitting</h5>
+            <p>
+              The Refitting module estimates the contributions of known
+              mutational signatures in individual tumors or cohorts profiled by
+              targeted sequencing. The module uses the panel-aware Signature
+              Analyzer for Targeted Sequencing (SATS), which accounts for
+              differences in the genomic regions and mutation opportunities
+              covered by each sequencing panel. Using matched mutation-count and
+              panel-context information together with an appropriate
+              reference-signature set, SATS estimates sample-level signature
+              activities and the expected number of mutations attributable to
+              each signature. Because targeted-panel data can be sparse, results
+              should be interpreted in the context of the tumor type, sequencing
+              panel, mutation burden, and other biological evidence. Additional
+              information is available in the{' '}
+              <a
+                href="https://www.medrxiv.org/content/10.1101/2023.05.18.23290188v4"
+                target="_blank"
+                rel="noreferrer"
+                className="accessible-link"
+              >
+                SATS publication
+              </a>{' '}
+              and the{' '}
+              <a
+                href="https://github.com/binzhulab/SATS"
+                target="_blank"
+                rel="noreferrer"
+                className="accessible-link"
+              >
+                SATS software and user guide
+              </a>
+              .
+            </p>
+          </div>
           <div id="exploration">
             <h5 className="text-exploration">Signature Exploration</h5>
             <p>
