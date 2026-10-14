@@ -61,3 +61,14 @@ fieldset {
 .guidance hr {
   margin: 1rem 0;
 }
+
+// instructions tab: worked-example screenshots scale to the card and never
+// overflow it
+.guidance .guidance-screenshot {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5rem 0 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+}
