@@ -9,6 +9,7 @@ import './swagger-override.scss';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fontsource/montserrat';
 import '@fontsource/inter';
+import '@fontsource/inter/700.css';
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
