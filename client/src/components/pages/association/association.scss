@@ -35,3 +35,29 @@ fieldset {
 .btn.btn-secondary.reset {
   min-width: 120px;
 }
+
+// instructions tab tables: shaded, bold header row and light purple striping
+.guidance-table.table.table-striped {
+  thead th {
+    background-color: #efe8f0;
+    font-weight: 700;
+  }
+
+  tbody tr:nth-of-type(odd) {
+    background-color: #f1edf2;
+  }
+}
+
+// instructions tab: section titles are bold as in the client guidance document
+.guidance {
+  h5,
+  h6 {
+    font-weight: 700;
+  }
+}
+
+// instructions tab: give the rules above Data Source and the first section the
+// same breathing room as the card's top padding (global hr has no margin)
+.guidance hr {
+  margin: 1rem 0;
+}
