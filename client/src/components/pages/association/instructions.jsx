@@ -1,4 +1,3 @@
-import React from 'react';
 import { Table } from 'react-bootstrap';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
@@ -379,8 +378,8 @@ export default function Instructions({ loading }) {
         <li>
           Review the model terms and estimates in the results table. Select{' '}
           <b>Signature Name</b> to inspect a signature-specific coefficient
-          plot, and verify that the plotted estimates match that signature's
-          table rows.
+          plot, and verify that the plotted estimates match that
+          signature&apos;s table rows.
         </li>
       </ol>
       <p>
@@ -534,7 +533,8 @@ export default function Instructions({ loading }) {
         </li>
         <li>
           Select a signature and compare the displayed group labels and plot
-          with that signature's table row. Save the outputs and settings used.
+          with that signature&apos;s table row. Save the outputs and settings
+          used.
         </li>
       </ol>
       <p>
@@ -549,8 +549,8 @@ export default function Instructions({ loading }) {
       <h4>Multivariable example</h4>
       <h5>EGFR adjusted for age and gender</h5>
       <p>
-        Model signature exposure using EGFR, age at diagnosis, and the study's
-        recorded gender variable together.
+        Model signature exposure using EGFR, age at diagnosis, and the
+        study&apos;s recorded gender variable together.
       </p>
       <StudySettings />
       <h6>Run the analysis</h6>
@@ -615,7 +615,7 @@ export default function Instructions({ loading }) {
         </li>
         <li>
           Interpret the EGFR coefficient as its association with signature
-          exposure conditional on age at diagnosis and the study's recorded{' '}
+          exposure conditional on age at diagnosis and the study&apos;s recorded{' '}
           <code>gender</code> variable. Confirm the categorical reference
           levels; do not assume their meaning from the term names alone.
         </li>
