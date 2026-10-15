@@ -153,7 +153,7 @@ export default function Extraction() {
       name: 'MS Individual',
       disabled:
         explorationId === false ||
-        !['SBS96', 'DBS72', 'ID83', 'RS32', 'SBS192'].includes(
+        !['default', 'SBS96', 'DBS72', 'ID83', 'RS32', 'SBS192'].includes(
           params?.args.context_type
         ),
     },
