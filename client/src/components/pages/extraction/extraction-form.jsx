@@ -3,6 +3,7 @@ import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import SelectForm from '@/components/controls/select/selectHookForm';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as extractionActions } from '@/services/store/extraction';
@@ -269,6 +270,7 @@ export default function ExtractionForm({ formLimits }) {
 
     email: '',
     jobName: '',
+    piiAcknowledged: false,
   };
 
   const sbsSample = {
@@ -317,6 +319,7 @@ export default function ExtractionForm({ formLimits }) {
     context_type,
     signatureSetName,
     input_type,
+    piiAcknowledged,
   } = watch();
 
   const contextTypeOptions = (() => {
@@ -1193,6 +1196,14 @@ export default function ExtractionForm({ formLimits }) {
             </Form.Group>
           </div>
         </div>
+        {source === 'user' && (
+          <PiiAcknowledgment
+            id="extractionPiiAcknowledgment"
+            control={control}
+            disabled={submitted || id}
+            className="mt-3"
+          />
+        )}
         <Row className="mt-3">
           <Col>
             <Button
@@ -1207,7 +1218,11 @@ export default function ExtractionForm({ formLimits }) {
           <Col>
             <Button
               disabled={
-                fetchingSeqmatrixOptions || submitted || id || warning !== ''
+                fetchingSeqmatrixOptions ||
+                submitted ||
+                id ||
+                warning !== '' ||
+                (source === 'user' && !piiAcknowledged)
               }
               className="w-100"
               variant="primary"
