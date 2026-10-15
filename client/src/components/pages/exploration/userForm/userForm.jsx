@@ -10,6 +10,7 @@ import {
   resetExplorationApi,
   useSignatureOptionsQuery,
 } from '@/services/store/rootApi';
+import { signatureSetCompare } from '@/services/utils';
 import {
   useUploadExplorationMutation,
   useSubmitExplorationMutation,
@@ -106,7 +107,7 @@ export default function PublicForm() {
               .map((e) => e.signatureSetName)
           ),
         ]
-          .sort()
+          .sort(signatureSetCompare)
           .map((e) => ({
             label: e,
             value: e,

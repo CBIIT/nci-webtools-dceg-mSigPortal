@@ -13,6 +13,7 @@ import {
   useAssociationOptionsQuery,
   useExposureOptionsQuery,
 } from '@/services/store/rootApi';
+import { signatureSetCompare } from '@/services/utils';
 import { useAssociationPublicMutation } from './apiSlice';
 
 const actions = { ...associationActions, ...modalActions };
@@ -108,8 +109,10 @@ export default function PublicForm() {
       const { id, output: assocOutput } = assocResponse;
       const { output: expOutput } = expResponse;
 
-      if (assocOutput.error || assocOutput.uncaughtError) throw assocOutput.error || assocOutput.uncaughtError;
-      if (expOutput.error || expOutput.uncaughtError) throw expOutput.error || expOutput.uncaughtError;
+      if (assocOutput.error || assocOutput.uncaughtError)
+        throw assocOutput.error || assocOutput.uncaughtError;
+      if (expOutput.error || expOutput.uncaughtError)
+        throw expOutput.error || expOutput.uncaughtError;
 
       mergeState({
         submitted: true,
@@ -198,11 +201,8 @@ export default function PublicForm() {
             .map((e) => e.signatureSetName)
         ),
       ]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }));
+        .sort(signatureSetCompare)
+        .map((e) => ({ label: e, value: e }));
     } else {
       return [];
     }
