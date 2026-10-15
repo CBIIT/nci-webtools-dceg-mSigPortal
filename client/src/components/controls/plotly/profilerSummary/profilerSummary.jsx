@@ -86,7 +86,7 @@ export default function profilerSummary(inputData) {
       categoryarray: allSamples,
     },
     yaxis: {
-      title: 'log<sub>10</sub>(Mutations)',
+      title: { text: 'log<sub>10</sub>(Mutations)' },
       ticks: 'outside',
       zeroline: false,
       showline: true,

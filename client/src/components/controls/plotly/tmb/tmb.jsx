@@ -230,7 +230,7 @@ export default function TMB(data, tmbTabName, signatureName) {
       showgrid: false,
     },
     yaxis: {
-      title: 'Number of Mutations per Megabase<br>(log10)',
+      title: { text: 'Number of Mutations per Megabase<br>(log10)' },
       zeroline: false,
       //showline: true,
       linecolor: 'black',

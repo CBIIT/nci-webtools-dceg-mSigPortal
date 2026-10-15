@@ -184,7 +184,7 @@ export default function ID83(apiData, title = '') {
   }));
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     //width:1080,

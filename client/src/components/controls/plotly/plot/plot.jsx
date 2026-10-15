@@ -21,6 +21,7 @@ export default function Plotly({
     displayModeBar: true,
     responsive: true,
     displaylogo: false,
+    showSendToCloud: false,
     toImageButtonOptions: {
       format: 'svg',
       filename: filename || divId,

@@ -113,7 +113,7 @@ export default function SBS192(apiData, title = '') {
     .flat();
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     height: 450,
