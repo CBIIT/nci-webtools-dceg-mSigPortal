@@ -486,7 +486,7 @@ export default function ID415(data, title = '') {
   );
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     width: 1100,

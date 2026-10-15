@@ -450,8 +450,10 @@ export function compareProfiles(
     hoverlabel: { bgcolor: '#FFF' },
     autosize: true,
 
-    title:
-      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    title: {
+      text:
+        '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    },
     xaxis: {
       showline: true,
       tickangle: tickAngle,
