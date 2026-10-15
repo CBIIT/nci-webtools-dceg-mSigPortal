@@ -92,6 +92,18 @@ export function defaultSignatureSet3_4(signatureSetOptions) {
     : signatureSetOptions[0];
 }
 
+// SBS-named sets first (alphabetical within each group) for signature set dropdowns
+export function signatureSetCompare(a, b) {
+  const aSbs = a.includes('SBS');
+  const bSbs = b.includes('SBS');
+  if (aSbs !== bSbs) return aSbs ? -1 : 1;
+  return a.localeCompare(b);
+}
+
+export function signatureSetOptionCompare(a, b) {
+  return signatureSetCompare(a.value, b.value);
+}
+
 export function defaultStrategy(strategyOptions) {
   const options = strategyOptions.map(({ value }) => value);
   return options.includes('NA')

@@ -9,6 +9,7 @@ import {
   resetExplorationApi,
   useExposureOptionsQuery,
 } from '@/services/store/rootApi';
+import { signatureSetCompare } from '@/services/utils';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -120,10 +121,9 @@ export default function PublicForm() {
             )
             .map((e) => e.signatureSetName)
         ),
-      ].map((e) => ({
-        label: e,
-        value: e,
-      }));
+      ]
+        .sort(signatureSetCompare)
+        .map((e) => ({ label: e, value: e }));
     } else {
       return [];
     }

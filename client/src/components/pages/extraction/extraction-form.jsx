@@ -15,6 +15,7 @@ import {
   useSignatureOptionsQuery,
   useRefGenomeQuery,
 } from '@/services/store/rootApi';
+import { signatureSetOptionCompare } from '@/services/utils';
 import {
   useUploadMutation,
   useSubmitMutation,
@@ -115,7 +116,7 @@ export default function ExtractionForm({ formLimits }) {
   const signatureSetOptions = signatureOptions
     ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
         .map((e) => ({ label: e, value: e }))
-        .sort((a, b) => a.value.localeCompare(b.value))
+        .sort(signatureSetOptionCompare)
     : [];
 
   // strategies present anywhere in the reference catalog, used to filter the decomposition signature query for user uploads
@@ -132,7 +133,7 @@ export default function ExtractionForm({ formLimits }) {
       setIsDefaultContext(false);
       filteredOptions = signatureSetOptions
         .filter((option) => option.value.includes(selectedOption.value))
-        .sort((a, b) => a.value.localeCompare(b.value));
+        .sort(signatureSetOptionCompare);
     } else {
       setIsDefaultContext(true);
       filteredOptions = signatureSetOptions;
@@ -403,7 +404,7 @@ export default function ExtractionForm({ formLimits }) {
           setIsDefaultContext(false);
           filteredOptions = signatureSetOptions
             .filter((option) => option.value.includes(selectedContext.value))
-            .sort((a, b) => a.value.localeCompare(b.value));
+            .sort(signatureSetOptionCompare);
         } else {
           setIsDefaultContext(true);
           filteredOptions = signatureSetOptions;
