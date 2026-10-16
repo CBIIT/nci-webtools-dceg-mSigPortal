@@ -1,38 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from '@/components/controls/select/selectHookForm';
-import { useMsBurdenOptionsQuery } from './apiSlice';
 
-export default function MsBurdenForm({ state, form, setForm }) {
-  const [params, setParams] = useState('');
-  const { data: signatureNameOptions } = useMsBurdenOptionsQuery(params, {
-    skip: !params,
-  });
-
+export default function MsBurdenForm({ options, compareOptions, form, setForm }) {
   const { control } = useForm({ defaultValues: form });
 
-  // query signature name options
-  useEffect(() => {
-    const { study, strategy, signatureSetName, cancer, useAllCancer } = state;
-    if (study) {
-      setParams({
-        study: study.value,
-        strategy: strategy.value,
-        signatureSetName: signatureSetName.value,
-        ...(!useAllCancer && { cancer: cancer.value }),
-      });
-    } else if (state.id) {
-      setParams({ userId: state.id });
-    }
-  }, [state]);
+  const mergedOptions = [...(options || []), ...(compareOptions || [])]
+    .filter(
+      (option, index, self) =>
+        self.findIndex((o) => o.value === option.value) === index
+    )
+    .sort((a, b) =>
+      a.label.localeCompare(b.label, undefined, { numeric: true })
+    );
 
   // set inital
   useEffect(() => {
-    if (signatureNameOptions) {
-      setForm({ signatureName: signatureNameOptions[0] });
+    if (mergedOptions.length) {
+      setForm({ signatureName: mergedOptions[0] });
     }
-  }, [signatureNameOptions]);
+  }, [options, compareOptions]);
 
   return (
     <Form className="p-3">
@@ -42,9 +30,9 @@ export default function MsBurdenForm({ state, form, setForm }) {
             name="signatureName"
             label="Signature Name"
             value={form.signatureName}
-            disabled={!signatureNameOptions}
+            disabled={!options}
             control={control}
-            options={signatureNameOptions}
+            options={mergedOptions}
             onChange={(name) => setForm({ signatureName: name })}
           />
         </Col>

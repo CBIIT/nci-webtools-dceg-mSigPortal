@@ -5,8 +5,14 @@ import {
 } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import Plotly from '@/components/controls/plotly/plot/plot';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function MsAssociationPlot({ state, form }) {
+export default function MsAssociationPlot({
+  state,
+  form,
+  availableOptions,
+  divId = 'msAssociation',
+}) {
   const [params, setParams] = useState('');
   const [params2, setParams2] = useState('');
   const { signatureName1, signatureName2, both } = form;
@@ -20,7 +26,14 @@ export default function MsAssociationPlot({ state, form }) {
     skip: !params2,
   });
 
+  const missingSignature =
+    availableOptions &&
+    [signatureName1, signatureName2].find(
+      (sig) => sig && !availableOptions.some((e) => e.value === sig.value)
+    );
+
   useEffect(() => {
+    if (missingSignature) return;
     if (signatureName1 && signatureName2 && id && !id2) {
       setParams({
         signatureName: signatureName1.value + ';' + signatureName2.value,
@@ -50,23 +63,34 @@ export default function MsAssociationPlot({ state, form }) {
         ...(!useAllCancer && { cancer: cancer.value }),
       });
     }
-  }, [signatureName1, signatureName2, both]);
+  }, [signatureName1, signatureName2, both, missingSignature]);
 
   const plotError = error || error2 || currentData?.error || currentData2?.error;
   const plotData = currentData || currentData2;
-  console.log('plotError', plotError);
-  console.log('plotData', plotData);
+  const label = getDatasetLabel(state);
+
   return (
     <div>
       <LoadingOverlay active={isFetching} />
-      {plotError && <p className="p-3 text-danger">{plotError}</p>}
-      {plotData && !plotError && (
-        <Plotly
-          className="w-100"
-          data={plotData.traces}
-          layout={plotData.layout}
-          config={plotData.config}
-        />
+      {label && <p className="text-center text-muted mb-0">{label}</p>}
+      {missingSignature ? (
+        <p className="p-3 text-danger text-center">
+          Signature {missingSignature.value} is missing in this dataset
+        </p>
+      ) : (
+        <>
+          {plotError && <p className="p-3 text-danger">{plotError}</p>}
+          {plotData && !plotError && (
+            <Plotly
+              className="w-100"
+              divId={divId}
+              filename={divId}
+              data={plotData.traces}
+              layout={plotData.layout}
+              config={plotData.config}
+            />
+          )}
+        </>
       )}
     </div>
   );

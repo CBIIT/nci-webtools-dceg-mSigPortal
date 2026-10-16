@@ -3,8 +3,13 @@ import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsLandscapePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { readFile, parseMatrix } from '@/components/controls/utils/utils';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function MsLandscapePlot({ state, variableFile }) {
+export default function MsLandscapePlot({
+  state,
+  variableFile,
+  divId = 'msLandscape',
+}) {
   const [params, setParams] = useState('');
   let { currentData, error, isFetching } = useMsLandscapePlotQuery(params, {
     skip: !params,
@@ -30,16 +35,25 @@ export default function MsLandscapePlot({ state, variableFile }) {
     handleCalculate(state, variableFile);
   }, [state, variableFile]);
 
+  const label = getDatasetLabel(state);
+
   return (
     <div style={{ minHeight: '500px' }}>
       <LoadingOverlay active={isFetching} />
+      {label && <p className="text-center text-muted mb-0">{label}</p>}
       {error && (
         <p className="p-3 text-danger">
           {error.data?.error || error.error || 'Plot is unavailable'}
         </p>
       )}
       {currentData && (
-        <Plotly data={currentData.traces} layout={currentData.layout} config={currentData.config} />
+        <Plotly
+          divId={divId}
+          filename={divId}
+          data={currentData.traces}
+          layout={currentData.layout}
+          config={currentData.config}
+        />
       )}
     </div>
   );

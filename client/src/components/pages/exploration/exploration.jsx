@@ -34,9 +34,13 @@ export default function Exploration() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { publicForm, main } = useSelector((state) => state.exploration);
+  const { publicForm, comparePublicForm, main } = useSelector(
+    (state) => state.exploration
+  );
 
   const { exampleName } = useParams();
+
+  const compareState = main.compare ? comparePublicForm : null;
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
@@ -321,27 +325,45 @@ export default function Exploration() {
             <Instructions />
           </div>
           <div className={displayTab == 'tmb' ? 'd-block' : 'd-none'}>
-            <TMB state={{ ...publicForm, ...main }} />
+            <TMB state={{ ...publicForm, ...main }} compareState={compareState} />
           </div>
           <div className={displayTab == 'tmbSig' ? 'd-block' : 'd-none'}>
-            <TmbSig state={{ ...publicForm, ...main }} />
+            <TmbSig
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div className={displayTab == 'msBurden' ? 'd-block' : 'd-none'}>
-            <MsBurden state={{ ...publicForm, ...main }} />
+            <MsBurden
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div
             className={displayTab == 'msDecomposition' ? 'd-block' : 'd-none'}
           >
-            <MsDecomposition state={{ ...publicForm, ...main }} />
+            <MsDecomposition
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
-            <MsAssociation state={{ ...publicForm, ...main }} />
+            <MsAssociation
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
-            <MsLandscape state={{ ...publicForm, ...main }} />
+            <MsLandscape
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div className={displayTab == 'msPrevalence' ? 'd-block' : 'd-none'}>
-            <MsPrevalence state={{ ...publicForm, ...main }} />
+            <MsPrevalence
+              state={{ ...publicForm, ...main }}
+              compareState={compareState}
+            />
           </div>
           <div className={displayTab == 'msIndividual' ? 'd-block' : 'd-none'}>
             <MsIndividual state={{ ...publicForm, ...main }} />

@@ -1,6 +1,5 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import Select from '@/components/controls/select/selectHookForm';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '@/services/store/exploration';
@@ -9,7 +8,7 @@ import {
   resetExplorationApi,
   useExposureOptionsQuery,
 } from '@/services/store/rootApi';
-import { signatureSetCompare } from '@/services/utils';
+import PublicDataFields from './publicDataFields';
 
 const actions = { ...exposureActions, ...modalActions };
 
@@ -20,6 +19,8 @@ export default function PublicForm() {
   const dispatch = useDispatch();
   const mergeForm = (state) =>
     dispatch(actions.mergeExploration({ publicForm: state }));
+  const mergeCompareForm = (state) =>
+    dispatch(actions.mergeExploration({ comparePublicForm: state }));
   const resetExploration = (_) => dispatch(actions.resetExploration());
   const mergeMain = (state) =>
     dispatch(actions.mergeExploration({ main: state }));
@@ -32,7 +33,7 @@ export default function PublicForm() {
     isFetching,
   } = useExposureOptionsQuery();
 
-  const defaultValues = {
+  const publicDataDefaults = {
     study: { label: 'PCAWG', value: 'PCAWG' },
     strategy: { label: 'WGS', value: 'WGS' },
     signatureSetName: {
@@ -40,7 +41,13 @@ export default function PublicForm() {
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
     cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+  };
+
+  const defaultValues = {
+    ...publicDataDefaults,
     useAllCancer: false,
+    compareEnabled: false,
+    compare: publicDataDefaults,
   };
 
   const {
@@ -51,7 +58,7 @@ export default function PublicForm() {
     watch,
   } = useForm({ defaultValues });
 
-  const { study, strategy, signatureSetName, cancer } = watch();
+  const { compareEnabled } = watch();
 
   function handleReset() {
     window.location.hash = '#/exploration';
@@ -60,14 +67,18 @@ export default function PublicForm() {
     resetExploration();
   }
 
-  async function onSubmit(data) {
+  async function onSubmit({ compare, compareEnabled, ...data }) {
     try {
       mergeForm(data);
+      mergeCompareForm(
+        compareEnabled ? { ...compare, useAllCancer: data.useAllCancer } : {}
+      );
       mergeMain({
         displayTab: 'tmb',
         submitted: true,
         loading: true,
         openSidebar: false,
+        compare: compareEnabled,
       });
     } catch (error) {
       if (error.originalStatus == 504) {
@@ -89,148 +100,16 @@ export default function PublicForm() {
     mergeMain({ loading: false });
   }
 
-  const studyOptions = options
-    ? [...new Set(options.map((e) => e.study))].sort().map((e) => ({
-        label: e,
-        value: e,
-      }))
-    : [];
-
-  const strategyOptions = (study) => {
-    if (options && study.value) {
-      return [
-        ...new Set(
-          options.filter((e) => e.study == study.value).map((e) => e.strategy)
-        ),
-      ].map((e) => ({
-        label: e,
-        value: e,
-      }));
-    } else {
-      return [];
-    }
-  };
-
-  const signatureSetOptions = (study, strategy) => {
-    if (options && study.value && strategy.value) {
-      return [
-        ...new Set(
-          options
-            .filter(
-              (e) => e.study == study.value && e.strategy == strategy.value
-            )
-            .map((e) => e.signatureSetName)
-        ),
-      ]
-        .sort(signatureSetCompare)
-        .map((e) => ({ label: e, value: e }));
-    } else {
-      return [];
-    }
-  };
-
-  // const getSignatureNameOptions = () => {
-  //   if (results) {
-  //     return [...new Set(results.map((e) => e.signatureName))].map((e) => ({
-  //       label: e,
-  //       value: e,
-  //     }));
-  //   } else {
-  //     return [];
-  //   }
-  // };
-
-  // const signatureNameOptions = getSignatureNameOptions();
-
-  const cancerOptions = (study, strategy, signatureSetName) => {
-    if (options && study.value && strategy.value && signatureSetName.value) {
-      return [
-        ...new Set(
-          options
-            .filter(
-              (e) =>
-                e.study == study.value &&
-                e.strategy == strategy.value &&
-                e.signatureSetName == signatureSetName.value
-            )
-
-            .map((e) => e.cancer)
-        ),
-      ]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }));
-    } else {
-      return [];
-    }
-  };
-  function handleStudyChange(study) {
-    const strategies = strategyOptions(study);
-    const signatureSets = signatureSetOptions(study, strategies[0]);
-    const cancers = cancerOptions(study, strategies[0], signatureSets[0]);
-
-    setValue('study', study);
-    setValue('strategy', strategies[0]);
-    setValue('signatureSetName', signatureSets[0]);
-    setValue('cancer', cancers[0]);
-  }
-
-  function handleStrategyChange(strategy) {
-    const signatureSets = signatureSetOptions(study, strategy);
-    const cancers = cancerOptions(study, strategy, signatureSets[0]);
-
-    setValue('strategy', strategy);
-    setValue('signatureSetName', signatureSets[0]);
-    setValue('cancer', cancers[0]);
-  }
-
-  function handleSignatureSetChange(signatureSetName) {
-    const cancers = cancerOptions(study, strategy, signatureSetName);
-
-    setValue('signatureSetName', signatureSetName);
-    setValue('cancer', cancers[0]);
-  }
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <LoadingOverlay active={isFetching} />
       {optionsError && <p>There was an error retrieving public data options</p>}
-      <Select
-        className="mb-2"
-        name="study"
-        label="Study"
-        disabled={submitted}
-        options={studyOptions}
+      <PublicDataFields
         control={control}
-        onChange={handleStudyChange}
-      />
-      <Select
-        className="mb-4"
-        name="strategy"
-        label="Experimental Strategy"
+        setValue={setValue}
+        watch={watch}
+        options={options}
         disabled={submitted}
-        options={strategyOptions(study)}
-        control={control}
-        onChange={handleStrategyChange}
-      />
-      <Select
-        className="mb-4"
-        name="signatureSetName"
-        label="Reference Signature Set"
-        disabled={submitted}
-        options={signatureSetOptions(study, strategy)}
-        control={control}
-        onChange={handleSignatureSetChange}
-      />
-      <Select
-        className="mb-2"
-        name="cancer"
-        label="Cancer Type or Group"
-        disabled={submitted}
-        options={cancerOptions(study, strategy, signatureSetName)}
-        control={control}
       />
       <Form.Group controlId="useAllCancer" className="d-flex">
         <Form.Check inline className="mr-1">
@@ -251,6 +130,42 @@ export default function PublicForm() {
           Use all Cancer Types or Groups for TMB and MS Burden plots
         </Form.Label>
       </Form.Group>
+
+      <Form.Group controlId="compareEnabled" className="d-flex">
+        <Form.Check inline className="mr-1">
+          <Controller
+            name="compareEnabled"
+            control={control}
+            render={({ field }) => (
+              <Form.Check.Input
+                {...field}
+                type="checkbox"
+                disabled={submitted}
+                checked={field.value}
+              />
+            )}
+          />
+        </Form.Check>
+        <Form.Label className="font-weight-normal" style={{ fontSize: '12px' }}>
+          Compare with Public Data
+        </Form.Label>
+      </Form.Group>
+
+      {compareEnabled && (
+        <div className="border rounded p-2 mb-3 bg-light">
+          <p className="font-weight-bold mb-2" style={{ fontSize: '12px' }}>
+            Comparison Public Data
+          </p>
+          <PublicDataFields
+            control={control}
+            setValue={setValue}
+            watch={watch}
+            options={options}
+            disabled={submitted}
+            prefix="compare"
+          />
+        </div>
+      )}
 
       <Row>
         <Col>
