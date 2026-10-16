@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsPrevelencePlotQuery } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function MsPrevalancePlot({ form, state }) {
+export default function MsPrevalancePlot({ form, state, divId = 'msPrevalence' }) {
   const [params, setParams] = useState('');
   const { currentData, error, isFetching } = useMsPrevelencePlotQuery(params, {
     skip: !params,
@@ -26,14 +27,19 @@ export default function MsPrevalancePlot({ form, state }) {
     }
   }, [form, state]);
 
+  const label = getDatasetLabel(state);
+
   return (
     <div>
       <LoadingOverlay active={isFetching} />
+      {label && <p className="text-center text-muted mb-0">{label}</p>}
       {error && <p className="p-3 text-danger">Plot is unavailable</p>}
       {currentData && (
         <div>
           <Plotly
             className="w-100"
+            divId={divId}
+            filename={divId}
             data={currentData.traces}
             layout={currentData.layout}
             config={currentData.config}

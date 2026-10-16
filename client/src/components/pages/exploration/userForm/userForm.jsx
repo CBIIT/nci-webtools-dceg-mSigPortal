@@ -10,12 +10,14 @@ import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExplorationApi,
   useSignatureOptionsQuery,
+  useExposureOptionsQuery,
 } from '@/services/store/rootApi';
 import { signatureSetCompare } from '@/services/utils';
 import {
   useUploadExplorationMutation,
   useSubmitExplorationMutation,
 } from './apiSlice';
+import PublicDataFields from '../publicForm/publicDataFields';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check, Label } = Form;
@@ -26,6 +28,8 @@ export default function PublicForm() {
     await dispatch(actions.mergeExploration({ userForm: state }));
   const mergeMain = async (state) =>
     await dispatch(actions.mergeExploration({ main: state }));
+  const mergeCompareForm = async (state) =>
+    await dispatch(actions.mergeExploration({ comparePublicForm: state }));
   const resetExploration = (_) => dispatch(actions.resetExploration());
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
@@ -39,10 +43,22 @@ export default function PublicForm() {
     isFetching,
     isError,
   } = useSignatureOptionsQuery({ study: 'Reference' });
+  const { data: publicDataOptions, isFetching: isFetchingPublicData } =
+    useExposureOptionsQuery();
   const [handleUpload, { isLoading: isUploading }] =
     useUploadExplorationMutation();
   const [submitExploration, { isLoading: loadingUserExposure }] =
     useSubmitExplorationMutation();
+
+  const comparePublicDataDefaults = {
+    study: { label: 'PCAWG', value: 'PCAWG' },
+    strategy: { label: 'WGS', value: 'WGS' },
+    signatureSetName: {
+      label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+      value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+    },
+    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+  };
 
   const defaultFormValues = {
     exposureFile: '',
@@ -56,6 +72,8 @@ export default function PublicForm() {
     },
     genome: { label: 'GRCh37', value: 'GRCh37' },
     piiAcknowledged: false,
+    compareEnabled: false,
+    compare: comparePublicDataDefaults,
   };
 
   const {
@@ -68,8 +86,14 @@ export default function PublicForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const { exposureFile, matrixFile, signatureFile, strategy, piiAcknowledged } =
-    watch();
+  const {
+    exposureFile,
+    matrixFile,
+    signatureFile,
+    strategy,
+    piiAcknowledged,
+    compareEnabled,
+  } = watch();
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -208,6 +232,7 @@ export default function PublicForm() {
       }
       mergeMain({ submitted: true, loading: true });
       mergeForm(data);
+      mergeCompareForm(data.compareEnabled ? data.compare : {});
 
       // create form data for upload
       const formData = new FormData();
@@ -228,7 +253,7 @@ export default function PublicForm() {
         }),
       }).unwrap();
 
-      mergeMain({ displayTab: 'tmb', id });
+      mergeMain({ displayTab: 'tmb', id, compare: data.compareEnabled });
     } catch (error) {
       mergeError(error.message || 'Failed to submit');
     } finally {
@@ -511,6 +536,44 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <Row>
+        <Col>
+          <Group controlId="compareEnabled" className="d-flex">
+            <Label className="mr-4">Compare with Public Data</Label>
+            <Check inline id="compareEnabled">
+              <Controller
+                name="compareEnabled"
+                control={control}
+                render={({ field }) => (
+                  <Check.Input
+                    {...field}
+                    type="checkbox"
+                    disabled={loading || submitted || id}
+                    checked={field.value}
+                  />
+                )}
+              />
+            </Check>
+          </Group>
+        </Col>
+      </Row>
+
+      {compareEnabled && (
+        <div className="border rounded p-2 mb-3 bg-light">
+          <p className="font-weight-bold mb-2" style={{ fontSize: '12px' }}>
+            Comparison Public Data
+          </p>
+          <PublicDataFields
+            control={control}
+            setValue={setValue}
+            watch={watch}
+            options={publicDataOptions}
+            disabled={loading || submitted || id || isFetchingPublicData}
+            prefix="compare"
+          />
+        </div>
+      )}
+
       <PiiAcknowledgment
         id="explorationPiiAcknowledgment"
         control={control}

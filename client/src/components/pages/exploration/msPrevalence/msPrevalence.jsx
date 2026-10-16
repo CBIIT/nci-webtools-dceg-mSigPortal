@@ -4,7 +4,7 @@ import Description from '@/components/controls/description/description';
 import MsPrevalencePlot from './msPrevalence-plot';
 import MsPrevalenceForm from './msPrevalence-form';
 
-export default function MsPrevalence({ state }) {
+export default function MsPrevalence({ state, compareState }) {
   const [form, setForm] = useState({ minimum: 100 });
 
   return (
@@ -20,7 +20,17 @@ export default function MsPrevalence({ state }) {
       <MsPrevalenceForm form={form} setForm={setForm} />
       <hr />
 
-      <MsPrevalencePlot form={form} state={state} />
+      <MsPrevalencePlot form={form} state={state} divId="msPrevalence-primary" />
+      {compareState && (
+        <>
+          <hr />
+          <MsPrevalencePlot
+            form={form}
+            state={compareState}
+            divId="msPrevalence-compare"
+          />
+        </>
+      )}
     </Container>
   );
 }

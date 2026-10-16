@@ -2,7 +2,7 @@ import { Container } from 'react-bootstrap';
 import TmbPlot from './tmb-plot';
 import Description from '@/components/controls/description/description';
 
-export default function TMB({ state }) {
+export default function TMB({ state, compareState }) {
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -14,7 +14,13 @@ export default function TMB({ state }) {
         />
       </div>
       <hr />
-      <TmbPlot state={state} />
+      <TmbPlot state={state} divId="tmb-primary" />
+      {compareState && (
+        <>
+          <hr />
+          <TmbPlot state={compareState} divId="tmb-compare" />
+        </>
+      )}
     </Container>
   );
 }

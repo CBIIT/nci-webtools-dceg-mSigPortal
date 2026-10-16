@@ -2,7 +2,7 @@ import { Container } from 'react-bootstrap';
 import TmbSigPlot from './tmbSignature-plot';
 import Description from '@/components/controls/description/description';
 
-export default function TmbSignature({ state }) {
+export default function TmbSignature({ state, compareState }) {
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -14,7 +14,13 @@ export default function TmbSignature({ state }) {
         />
       </div>
       <hr />
-      <TmbSigPlot state={state} />
+      <TmbSigPlot state={state} divId="tmbSig-primary" />
+      {compareState && (
+        <>
+          <hr />
+          <TmbSigPlot state={compareState} divId="tmbSig-compare" />
+        </>
+      )}
     </Container>
   );
 }

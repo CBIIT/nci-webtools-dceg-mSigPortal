@@ -2,10 +2,40 @@ import { Container } from 'react-bootstrap';
 import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
 import Description from '@/components/controls/description/description';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useMsBurdenOptionsQuery } from './apiSlice';
 
-export default function MsBurden({ state }) {
+function toParams(state) {
+  if (!state) return '';
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  if (study) {
+    return {
+      study: study.value,
+      strategy: strategy.value,
+      signatureSetName: signatureSetName.value,
+      ...(!useAllCancer && { cancer: cancer.value }),
+    };
+  } else if (id) {
+    return { userId: id };
+  }
+  return '';
+}
+
+export default function MsBurden({ state, compareState }) {
   const [form, setForm] = useState({ signatureName: '' });
+  const [params, setParams] = useState('');
+  const [compareParams, setCompareParams] = useState('');
+
+  const { data: options } = useMsBurdenOptionsQuery(params, { skip: !params });
+  const { data: compareOptions } = useMsBurdenOptionsQuery(compareParams, {
+    skip: !compareParams,
+  });
+
+  useEffect(() => setParams(toParams(state)), [state]);
+  useEffect(
+    () => setCompareParams(compareState ? toParams(compareState) : ''),
+    [compareState]
+  );
 
   return (
     <Container fluid className="bg-white border rounded p-0">
@@ -18,9 +48,30 @@ export default function MsBurden({ state }) {
         />
       </div>
       <hr />
-      <TmbBurdenForm state={state} form={form} setForm={setForm} />
+      <TmbBurdenForm
+        options={options}
+        compareOptions={compareOptions}
+        form={form}
+        setForm={setForm}
+      />
       <hr />
-      <TmbBurdenPlot form={form} state={state} />
+      <TmbBurdenPlot
+        form={form}
+        state={state}
+        availableOptions={options}
+        divId="msBurden-primary"
+      />
+      {compareState && (
+        <>
+          <hr />
+          <TmbBurdenPlot
+            form={form}
+            state={compareState}
+            availableOptions={compareOptions}
+            divId="msBurden-compare"
+          />
+        </>
+      )}
     </Container>
   );
 }
