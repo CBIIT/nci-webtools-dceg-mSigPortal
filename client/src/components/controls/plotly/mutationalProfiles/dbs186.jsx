@@ -158,7 +158,7 @@ export default function DBS186(data, title = '') {
   const sampleAnnotation = createSampleAnnotation(data);
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     height: 600,

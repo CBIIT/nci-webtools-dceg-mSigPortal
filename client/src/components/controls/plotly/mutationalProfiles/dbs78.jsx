@@ -45,7 +45,7 @@ export default function DBS78(apiData, title = '') {
   const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 450,
     //width:1080,

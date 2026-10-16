@@ -484,8 +484,10 @@ export default function sbs192(data1, data2, tab) {
       rows: 3,
       column: 1,
     },
-    title:
-      '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    title: {
+      text:
+        '<b>RSS = ' + rss + '; Cosine Similarity = ' + cosineSimilarity + '</b>',
+    },
     xaxis: {
       showline: true,
       tickangle: -90,

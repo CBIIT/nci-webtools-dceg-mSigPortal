@@ -313,7 +313,7 @@ export default function ID28(data, title = '') {
   );
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 600,
     width: 750,

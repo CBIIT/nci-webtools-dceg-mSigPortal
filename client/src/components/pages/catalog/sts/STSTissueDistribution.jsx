@@ -45,7 +45,7 @@ function SATSPlot({ signatureName, signatureSetName, useExampleData, plotTitle, 
     },
     yaxis: {
       ...finalPlotConfig.layout.yaxis,
-      title: yAxisLabel || finalPlotConfig.layout.yaxis?.title
+      title: yAxisLabel ? { text: yAxisLabel } : finalPlotConfig.layout.yaxis?.title
     }
   } : null;
 

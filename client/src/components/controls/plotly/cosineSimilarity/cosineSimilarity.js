@@ -18,7 +18,7 @@ export default function CosineSimilarity(inputData) {
       type: 'heatmap',
       colorscale: 'Viridis',
       colorbar: {
-        title: 'Cosine Similarity',
+        title: { text: 'Cosine Similarity' },
         orientation: 'h',
         y: 1.01,
         len: 450,

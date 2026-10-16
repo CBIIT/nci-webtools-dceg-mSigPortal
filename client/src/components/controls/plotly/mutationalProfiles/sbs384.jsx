@@ -211,7 +211,7 @@ export default function SBS384(data, title = '') {
   }
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

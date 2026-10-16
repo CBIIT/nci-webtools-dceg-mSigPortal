@@ -105,7 +105,7 @@ export default function ID29(apiData, title = '') {
   const mutationShapes = createMutationShapes(data, colors);
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,
