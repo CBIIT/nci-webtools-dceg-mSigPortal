@@ -1,14 +1,11 @@
-import { Container } from 'react-bootstrap';
-import MsLandscapeForm from './msLandscape-form';
-import MsLandscapePlot from './msLandscape-plot';
+import { Container, Nav, Tab } from 'react-bootstrap';
+import MsLandscapePanel from './msLandscape-panel';
 import Description from '@/components/controls/description/description';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function MsLandscape({ state }) {
-  const { control, watch, setValue, resetField } = useForm({
-    defaultValues: { variableFile: '' },
-  });
-  const { variableFile } = watch();
+export default function MsLandscape({ state, compareState }) {
+  const [display, setDisplay] = useState('primary');
 
   return (
     <Container fluid className="bg-white border rounded p-0">
@@ -21,15 +18,59 @@ export default function MsLandscape({ state }) {
         />
       </div>
       <hr />
-      <MsLandscapeForm
-        state={state}
-        variableFile={variableFile}
-        formControl={control}
-        setValue={setValue}
-        resetField={resetField}
-      />
-      <hr />
-      <MsLandscapePlot state={state} variableFile={variableFile} />
+      {compareState ? (
+        <Tab.Container
+          transition={false}
+          activeKey={display}
+          onSelect={(tab) => setDisplay(tab)}
+        >
+          <Nav variant="tabs" className="px-3 mt-3">
+            <Nav.Item>
+              <Nav.Link
+                eventKey="primary"
+                as="button"
+                className="outline-none exploration"
+              >
+                <strong>{getDatasetLabel(state) || 'Primary Data'}</strong>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                eventKey="compare"
+                as="button"
+                className="outline-none exploration"
+              >
+                <strong>{getDatasetLabel(compareState)}</strong>
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+          <Tab.Content
+            className="bg-white tab-pane-bordered rounded-0 d-block mx-3 mb-3"
+            style={{ overflowX: 'auto' }}
+          >
+            <Tab.Pane eventKey="primary" mountOnEnter className="border-0">
+              <MsLandscapePanel
+                state={state}
+                fieldId="variableFile"
+                divId="msLandscape-primary"
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="compare" mountOnEnter className="border-0">
+              <MsLandscapePanel
+                state={compareState}
+                fieldId="compareVariableFile"
+                divId="msLandscape-compare"
+              />
+            </Tab.Pane>
+          </Tab.Content>
+        </Tab.Container>
+      ) : (
+        <MsLandscapePanel
+          state={state}
+          fieldId="variableFile"
+          divId="msLandscape-primary"
+        />
+      )}
     </Container>
   );
 }

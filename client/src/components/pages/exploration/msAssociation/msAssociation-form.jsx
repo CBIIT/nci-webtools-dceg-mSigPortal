@@ -7,7 +7,12 @@ import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-ov
 
 const { Group, Check } = Form;
 
-export default function MsAssociationForm({ state, form, mergeForm }) {
+export default function MsAssociationForm({
+  state,
+  compareOptions,
+  form,
+  mergeForm,
+}) {
   const { study, strategy, signatureSetName, cancer, useAllCancer, id, id2 } =
     state;
 
@@ -64,7 +69,11 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
     mergeForm({ signatureName2: e });
   }
 
-  const mergedOptions = [...(options || []), ...(options2 || [])]
+  const mergedOptions = [
+    ...(options || []),
+    ...(options2 || []),
+    ...(compareOptions || []),
+  ]
     .filter(
       (option, index, self) =>
         self.findIndex((o) => o.value === option.value) === index

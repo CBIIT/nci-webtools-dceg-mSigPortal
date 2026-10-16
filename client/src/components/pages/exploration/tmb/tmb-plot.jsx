@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Plotly from '@/components/controls/plotly/plot/plot';
 import { useTmbPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function TmbPlot({ state }) {
+export default function TmbPlot({ state, divId = 'tmb' }) {
   const [params, setParams] = useState('');
   const { currentData, error, isFetching } = useTmbPlotQuery(params, {
     skip: !params,
@@ -28,14 +29,21 @@ export default function TmbPlot({ state }) {
     }
   }, [id]);
 
+  const label = getDatasetLabel(state);
+
   return (
     <>
       <LoadingOverlay active={isFetching} />
       <br></br>
       <h5 className="d-flex justify-content-center">Tumor Mutational Burden</h5>
+      {label && (
+        <p className="text-center text-muted mb-0">{label}</p>
+      )}
       {currentData && !error ? (
         <Plotly
           className="w-100"
+          divId={divId}
+          filename={divId}
           data={currentData.traces}
           layout={currentData.layout}
           config={currentData.config}

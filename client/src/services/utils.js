@@ -176,3 +176,15 @@ export function getErrorMessage(
     data?.error || data?.message || error.error || error.message || fallback
   );
 }
+
+// label identifying a dataset (user upload vs a public study/strategy/set/cancer) for side-by-side plots
+export function getDatasetLabel(state) {
+  if (!state) return '';
+  if (state.id) return 'User Data';
+  const { study, strategy, signatureSetName, cancer, useAllCancer } = state;
+  if (!study) return '';
+  return `Public: ${study.value} · ${strategy.value} · ${signatureSetName.value} · ${
+    useAllCancer ? 'All Cancer Types' : cancer?.value
+  }`;
+}
+

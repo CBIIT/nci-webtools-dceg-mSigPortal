@@ -16,12 +16,13 @@ export default function MsLandscapeForm({
   formControl,
   setValue,
   resetField,
+  fieldId = 'variableFile',
 }) {
   return (
     <Form className="p-3">
       <Row className="">
         <Col lg="auto">
-          <Form.Group controlId="landscape">
+          <Form.Group controlId={fieldId}>
             <Form.Label>
               Upload Variable Data{' '}
               <OverlayTrigger
@@ -49,7 +50,7 @@ export default function MsLandscapeForm({
                     {...field}
                     className="w-100"
                     value={''}
-                    id="variableFile"
+                    id={fieldId}
                     label={variableFile.name || 'Upload here (optional)'}
                     title={variableFile.name || 'Upload here (optional)'}
                     onChange={(e) => {

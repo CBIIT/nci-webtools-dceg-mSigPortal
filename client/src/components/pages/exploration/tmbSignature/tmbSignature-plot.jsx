@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Plotly from '@/components/controls/plotly/plot/plot';
 import { useTmbSignaturesPlotQuery } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function TmbSignaturePlot({ state }) {
+export default function TmbSignaturePlot({ state, divId = 'tmbSig' }) {
   const [params, setParams] = useState('');
   const { currentData, error, isFetching } = useTmbSignaturesPlotQuery(params, {
     skip: !params,
@@ -26,6 +27,8 @@ export default function TmbSignaturePlot({ state }) {
     if (id) setParams({ userId: id });
   }, [id]);
 
+  const label = getDatasetLabel(state);
+
   return (
     <>
       <LoadingOverlay active={isFetching} />
@@ -33,9 +36,12 @@ export default function TmbSignaturePlot({ state }) {
       <h5 className="d-flex justify-content-center">
         Tumor Mutational Burden Separated by Signatures
       </h5>
+      {label && <p className="text-center text-muted mb-0">{label}</p>}
       {currentData && !error ? (
         <Plotly
           className="w-100"
+          divId={divId}
+          filename={divId}
           data={currentData.traces}
           layout={currentData.layout}
           config={currentData.config}
