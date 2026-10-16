@@ -97,7 +97,7 @@ export function signatureSetCompare(a, b) {
   const aSbs = a.includes('SBS');
   const bSbs = b.includes('SBS');
   if (aSbs !== bSbs) return aSbs ? -1 : 1;
-  return a.localeCompare(b);
+  return a.localeCompare(b, undefined, { numeric: true });
 }
 
 export function signatureSetOptionCompare(a, b) {
@@ -172,5 +172,7 @@ export function getErrorMessage(
   if (typeof error === 'string') return error;
   const { data } = error;
   if (typeof data === 'string') return data;
-  return data?.error || data?.message || error.error || error.message || fallback;
+  return (
+    data?.error || data?.message || error.error || error.message || fallback
+  );
 }
