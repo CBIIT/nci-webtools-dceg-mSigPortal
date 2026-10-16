@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import Select from '@/components/controls/select/selectHookForm';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as exposureActions } from '@/services/store/exploration';
 import { actions as modalActions } from '@/services/store/modal';
@@ -54,6 +55,7 @@ export default function PublicForm() {
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
     genome: { label: 'GRCh37', value: 'GRCh37' },
+    piiAcknowledged: false,
   };
 
   const {
@@ -66,7 +68,8 @@ export default function PublicForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const { exposureFile, matrixFile, signatureFile, strategy } = watch();
+  const { exposureFile, matrixFile, signatureFile, strategy, piiAcknowledged } =
+    watch();
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -508,6 +511,11 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <PiiAcknowledgment
+        id="explorationPiiAcknowledgment"
+        control={control}
+        disabled={loading || isUploading || loadingUserExposure || id}
+      />
       <Row>
         <Col lg="6">
           <Button
@@ -521,7 +529,12 @@ export default function PublicForm() {
         <Col lg="6">
           <Button
             disabled={
-              loading || isFetching || isUploading || loadingUserExposure || id
+              loading ||
+              isFetching ||
+              isUploading ||
+              loadingUserExposure ||
+              id ||
+              !piiAcknowledged
             }
             className="w-100"
             variant="primary"

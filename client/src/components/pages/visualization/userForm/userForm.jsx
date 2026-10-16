@@ -12,6 +12,7 @@ import { faInfoCircle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import Select from '@/components/controls/select/selectHookForm';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
 import MultiSelect from '@/components/controls/select/multiSelect';
 import { actions as visualizationActions } from '@/services/store/visualization';
 import { actions as modalActions } from '@/services/store/modal';
@@ -88,6 +89,7 @@ export default function UserForm() {
     cluster: false,
     email: '',
     jobName: '',
+    piiAcknowledged: false,
   };
 
   const {
@@ -113,6 +115,7 @@ export default function UserForm() {
     useQueue,
     seqInfo,
     cluster,
+    piiAcknowledged,
   } = watch();
 
   // update form after job retrieval
@@ -758,6 +761,11 @@ export default function UserForm() {
           </Form.Control.Feedback>
         </Form.Group>
       </div>
+      <PiiAcknowledgment
+        id="visualizationPiiAcknowledgment"
+        control={control}
+        disabled={submitted || isUploading || isLoading}
+      />
       <Row>
         <Col>
           <Button
@@ -771,7 +779,7 @@ export default function UserForm() {
         </Col>
         <Col>
           <Button
-            disabled={submitted || isUploading || isLoading}
+            disabled={submitted || isUploading || isLoading || !piiAcknowledged}
             className="w-100"
             variant="primary"
             type="submit"
