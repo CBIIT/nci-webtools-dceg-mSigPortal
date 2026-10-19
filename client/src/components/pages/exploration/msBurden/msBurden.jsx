@@ -1,4 +1,4 @@
-import { Container } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
 import Description from '@/components/controls/description/description';
@@ -37,6 +37,26 @@ export default function MsBurden({ state, compareState }) {
     [compareState]
   );
 
+  const columnLayout =
+    compareState && !state.useAllCancer && !compareState.useAllCancer;
+
+  const primaryPlot = (
+    <TmbBurdenPlot
+      form={form}
+      state={state}
+      availableOptions={options}
+      divId="msBurden-primary"
+    />
+  );
+  const comparePlot = compareState && (
+    <TmbBurdenPlot
+      form={form}
+      state={compareState}
+      availableOptions={compareOptions}
+      divId="msBurden-compare"
+    />
+  );
+
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -55,21 +75,24 @@ export default function MsBurden({ state, compareState }) {
         setForm={setForm}
       />
       <hr />
-      <TmbBurdenPlot
-        form={form}
-        state={state}
-        availableOptions={options}
-        divId="msBurden-primary"
-      />
-      {compareState && (
+      {columnLayout ? (
+        <Row className="m-0">
+          <Col lg="6" className="p-0">
+            {primaryPlot}
+          </Col>
+          <Col lg="6" className="p-0">
+            {comparePlot}
+          </Col>
+        </Row>
+      ) : (
         <>
-          <hr />
-          <TmbBurdenPlot
-            form={form}
-            state={compareState}
-            availableOptions={compareOptions}
-            divId="msBurden-compare"
-          />
+          {primaryPlot}
+          {comparePlot && (
+            <>
+              <hr />
+              {comparePlot}
+            </>
+          )}
         </>
       )}
     </Container>

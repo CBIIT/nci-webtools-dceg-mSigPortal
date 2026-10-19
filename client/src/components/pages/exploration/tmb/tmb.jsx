@@ -1,8 +1,11 @@
-import { Container } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import TmbPlot from './tmb-plot';
 import Description from '@/components/controls/description/description';
 
 export default function TMB({ state, compareState }) {
+  const columnLayout =
+    compareState && !state.useAllCancer && !compareState.useAllCancer;
+
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -14,11 +17,24 @@ export default function TMB({ state, compareState }) {
         />
       </div>
       <hr />
-      <TmbPlot state={state} divId="tmb-primary" />
-      {compareState && (
+      {columnLayout ? (
+        <Row className="m-0">
+          <Col lg="6" className="p-0">
+            <TmbPlot state={state} divId="tmb-primary" />
+          </Col>
+          <Col lg="6" className="p-0">
+            <TmbPlot state={compareState} divId="tmb-compare" />
+          </Col>
+        </Row>
+      ) : (
         <>
-          <hr />
-          <TmbPlot state={compareState} divId="tmb-compare" />
+          <TmbPlot state={state} divId="tmb-primary" />
+          {compareState && (
+            <>
+              <hr />
+              <TmbPlot state={compareState} divId="tmb-compare" />
+            </>
+          )}
         </>
       )}
     </Container>
