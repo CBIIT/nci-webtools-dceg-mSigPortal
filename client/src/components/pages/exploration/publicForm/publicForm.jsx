@@ -111,8 +111,12 @@ export default function PublicForm() {
         options={options}
         disabled={submitted}
       />
+      <hr className="mb-3" />
       <Form.Group controlId="useAllCancer" className="d-flex">
-        <Form.Check inline className="mr-1">
+        <Form.Label className="mr-auto">
+          Use all Cancer Types or Groups for TMB and MS Burden plots
+        </Form.Label>
+        <Form.Check inline id="useAllCancer">
           <Controller
             name="useAllCancer"
             control={control}
@@ -126,13 +130,11 @@ export default function PublicForm() {
             )}
           />
         </Form.Check>
-        <Form.Label className="font-weight-normal" style={{ fontSize: '12px' }}>
-          Use all Cancer Types or Groups for TMB and MS Burden plots
-        </Form.Label>
       </Form.Group>
-
+      <hr className="mb-3" />
       <Form.Group controlId="compareEnabled" className="d-flex">
-        <Form.Check inline className="mr-1">
+        <Form.Label className="mr-auto">Public Data for Comparison</Form.Label>
+        <Form.Check inline>
           <Controller
             name="compareEnabled"
             control={control}
@@ -146,9 +148,6 @@ export default function PublicForm() {
             )}
           />
         </Form.Check>
-        <Form.Label className="font-weight-normal" style={{ fontSize: '12px' }}>
-          Compare with Public Data
-        </Form.Label>
       </Form.Group>
 
       {compareEnabled && (
