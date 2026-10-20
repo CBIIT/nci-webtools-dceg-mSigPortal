@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { useUploadMutation, useSubmitRefittingMutation } from './apiSlice';
 import { actions as modalActions } from '@/services/store/modal';
 import { actions as refittingActions } from '@/services/store/refitting';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
 
 export default function RefittingForm() {
   const { submitted, ...state } = useSelector((state) => state.refitting.main);
@@ -38,6 +39,7 @@ export default function RefittingForm() {
     clinicalFile: null,
     email: '',
     jobName: '',
+    piiAcknowledged: false,
   };
 
   const {
@@ -57,6 +59,7 @@ export default function RefittingForm() {
   const referenceGenome = watch('referenceGenome');
   const email = watch('email');
   const jobName = watch('jobName');
+  const piiAcknowledged = watch('piiAcknowledged');
 
   // Sync form values to Redux store so Instructions component can access them
   useEffect(() => {
@@ -164,7 +167,10 @@ export default function RefittingForm() {
       const text = await file.text();
       const lines = text.split('\n').filter((line) => line.trim());
       if (lines.length < 2)
-        return { isValid: false, error: `${fileLabel} appears to be empty or invalid` };
+        return {
+          isValid: false,
+          error: `${fileLabel} appears to be empty or invalid`,
+        };
       const header = lines[0].toLowerCase();
       const missingColumns = requiredColumns.filter(
         (col) => !header.includes(col)
@@ -592,6 +598,12 @@ export default function RefittingForm() {
             </Form.Group>
           </div>
 
+          <PiiAcknowledgment
+            id="refittingPiiAcknowledgment"
+            control={control}
+            disabled={isFormDisabled}
+          />
+
           <Row className="mt-3">
             <Col>
               <Button
@@ -606,7 +618,7 @@ export default function RefittingForm() {
               <Button
                 variant="primary"
                 type="submit"
-                disabled={isFormDisabled}
+                disabled={isFormDisabled || !piiAcknowledged}
                 className="w-100"
               >
                 Submit
