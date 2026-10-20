@@ -409,10 +409,11 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <hr className="mb-3" />
       <Row>
         <Col>
           <Group controlId="toggleSignatureSource" className="d-flex">
-            <Label className="mr-4">Use Public Signature Data</Label>
+            <Label className="mr-auto">Use Public Signature Data</Label>
             <Check inline id="toggleSignatureSource">
               <Check.Input
                 disabled={loading || submitted}
@@ -519,6 +520,7 @@ export default function PublicForm() {
           </Col>
         </Row>
       )}
+      <hr className="mb-3" />
       <Row>
         <Col>
           <Group>
@@ -536,10 +538,11 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <hr className="mb-3" />
       <Row>
         <Col>
           <Group controlId="compareEnabled" className="d-flex">
-            <Label className="mr-4">Compare with Public Data</Label>
+            <Label className="mr-auto">Public Data for Comparison</Label>
             <Check inline id="compareEnabled">
               <Controller
                 name="compareEnabled"
@@ -557,6 +560,7 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <hr className="mb-3" />
 
       {compareEnabled && (
         <div className="border rounded p-2 mb-3 bg-light">
