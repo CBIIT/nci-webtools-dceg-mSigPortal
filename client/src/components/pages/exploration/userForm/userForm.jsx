@@ -542,7 +542,7 @@ export default function PublicForm() {
       <Row>
         <Col>
           <Group controlId="compareEnabled" className="d-flex">
-            <Label className="mr-auto">Public Data for Comparison</Label>
+            <Label className="mr-auto">Compare with Public Data</Label>
             <Check inline id="compareEnabled">
               <Controller
                 name="compareEnabled"
@@ -565,7 +565,7 @@ export default function PublicForm() {
       {compareEnabled && (
         <div className="border rounded p-2 mb-3 bg-light">
           <p className="font-weight-bold mb-2" style={{ fontSize: '12px' }}>
-            Comparison Public Data
+            Public Data for Comparison
           </p>
           <PublicDataFields
             control={control}
