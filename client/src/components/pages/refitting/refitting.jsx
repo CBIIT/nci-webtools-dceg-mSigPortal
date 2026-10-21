@@ -14,6 +14,7 @@ import Results from './results';
 import RefittingForm from './refitting-form';
 import { useRefittingStatusQuery } from './apiSlice';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import TabPanel from '@/components/controls/tab/tab';
 
 export default function Refitting() {
   const { displayTab, openSidebar, ...state } = useSelector(
@@ -192,18 +193,16 @@ export default function Refitting() {
             </div>
           )}
 
-          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+          <TabPanel active={displayTab === 'instructions'}>
             <Instructions />
-          </div>
-          <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
+          </TabPanel>
+          <TabPanel active={displayTab === 'status'}>
             <Status setDisplayTab={setDisplayTab} />
-          </div>
-          {status && status.status === 'COMPLETED' && (
-            <>
-              <div className={displayTab === 'results' ? 'd-block' : 'd-none'}>
-                <Results jobId={jobId} />
-              </div>
-            </>
+          </TabPanel>
+          {status?.status === 'COMPLETED' && (
+            <TabPanel active={displayTab === 'results'}>
+              <Results jobId={jobId} />
+            </TabPanel>
           )}
         </MainPanel>
       </SidebarContainer>

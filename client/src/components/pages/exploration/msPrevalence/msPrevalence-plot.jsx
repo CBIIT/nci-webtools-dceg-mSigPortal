@@ -11,9 +11,9 @@ export default function MsPrevalancePlot({ form, state, divId = 'msPrevalence' }
   });
 
   const { minimum } = form;
+  const { study, strategy, signatureSetName, cancer, id } = state;
 
   useEffect(() => {
-    const { study, strategy, signatureSetName, cancer } = state;
     if (study) {
       setParams({
         study: study.value,
@@ -22,10 +22,10 @@ export default function MsPrevalancePlot({ form, state, divId = 'msPrevalence' }
         cancer: cancer.value,
         minimum,
       });
-    } else if (state.id) {
-      setParams({ userId: state.id, minimum });
+    } else if (id) {
+      setParams({ userId: id, minimum });
     }
-  }, [form, state]);
+  }, [minimum, study, strategy, signatureSetName, cancer, id]);
 
   const label = getDatasetLabel(state);
 

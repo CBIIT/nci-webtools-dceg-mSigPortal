@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Form, Row, Col, Nav, Button, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import {
@@ -19,6 +19,7 @@ import PCA from './pca/pca';
 import ClusteredIdentification from './clustered/clustered';
 import Download from './download';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import TabPanel from '@/components/controls/tab/tab';
 import { useSelector, useDispatch } from 'react-redux';
 import { actions as visualizationActions } from '@/services/store/visualization';
 import { actions as modalActions } from '@/services/store/modal';
@@ -59,6 +60,19 @@ export default function Visualization() {
   const completed =
     (source === 'user' && status?.status === 'COMPLETED') ||
     (source === 'public' && submitted);
+
+  const tabState = useMemo(
+    () => ({ ...publicForm, ...main, id, source }),
+    [publicForm, main, id, source]
+  );
+  const mutationalProfilesState = useMemo(
+    () => ({ ...tabState, mutationalProfiles }),
+    [tabState, mutationalProfiles]
+  );
+  const clusterState = useMemo(
+    () => ({ ...publicForm, ...main, params, id, source }),
+    [publicForm, main, params, id, source]
+  );
 
   const refreshState = useCallback(() => {
     refreshJob();
@@ -315,80 +329,40 @@ export default function Visualization() {
             </div>
           )}
 
-          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+          <TabPanel active={displayTab === 'instructions'}>
             <Instructions />
-          </div>
+          </TabPanel>
           {completed && (
             <>
-              <div
-                className={
-                  displayTab === 'profilerSummary' ? 'd-block' : 'd-none'
-                }
-              >
-                <ProfilerSummary
-                  state={{ ...publicForm, ...main, id, source }}
-                />
-              </div>
-              <div
-                className={
-                  displayTab === 'mutationalProfiles' ? 'd-block' : 'd-none'
-                }
-              >
-                <MutationalProfiles
-                  state={{
-                    ...publicForm,
-                    ...main,
-                    mutationalProfiles,
-                    id,
-                    source,
-                  }}
-                />
-              </div>
-              {displayTab === 'treeAndLeaf' && (
-                <TreeAndLeaf state={{ ...publicForm, ...main, id, source }} />
-              )}
-              <div
-                className={
-                  displayTab === 'cosineSimilarity' ? 'd-block' : 'd-none'
-                }
-              >
-                <CosineSimilarity
-                  state={{ ...publicForm, ...main, id, source }}
-                />
-              </div>
-              <div
-                className={
-                  displayTab === 'profileComparison' ? 'd-block' : 'd-none'
-                }
-              >
-                <ProfileComparison
-                  state={{ ...publicForm, ...main, id, source }}
-                />
-              </div>
-              <div className={displayTab === 'pca' ? 'd-block' : 'd-none'}>
-                <PCA state={{ ...publicForm, ...main, id, source }} />
-              </div>
-              <div
-                className={
-                  displayTab === 'mutationalPattern' ? 'd-block' : 'd-none'
-                }
-              >
-                <MutationalPattern
-                  state={{ ...publicForm, ...main, id, source }}
-                />
-              </div>
+              <TabPanel active={displayTab === 'profilerSummary'}>
+                <ProfilerSummary state={tabState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'mutationalProfiles'}>
+                <MutationalProfiles state={mutationalProfilesState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'treeAndLeaf'}>
+                <TreeAndLeaf state={tabState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'cosineSimilarity'}>
+                <CosineSimilarity state={tabState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'profileComparison'}>
+                <ProfileComparison state={tabState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'pca'}>
+                <PCA state={tabState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'mutationalPattern'}>
+                <MutationalPattern state={tabState} />
+              </TabPanel>
               {source == 'user' && (
-                <div
-                  className={displayTab === 'cluster' ? 'd-block' : 'd-none'}
-                >
-                  <ClusteredIdentification
-                    state={{ ...publicForm, ...main, params, id, source }}
-                  />
-                </div>
+                <TabPanel active={displayTab === 'cluster'}>
+                  <ClusteredIdentification state={clusterState} />
+                </TabPanel>
               )}
-              <div className={displayTab === 'download' ? 'd-block' : 'd-none'}>
-                <Download state={{ ...publicForm, ...main, id, source }} />
-              </div>
+              <TabPanel active={displayTab === 'download'}>
+                <Download state={tabState} />
+              </TabPanel>
             </>
           )}
         </MainPanel>

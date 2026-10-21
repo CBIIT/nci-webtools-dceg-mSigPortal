@@ -2,7 +2,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
 import Description from '@/components/controls/description/description';
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useMsBurdenOptionsQuery } from './apiSlice';
 
 function toParams(state) {
@@ -23,19 +23,20 @@ function toParams(state) {
 
 export default function MsBurden({ state, compareState }) {
   const [form, setForm] = useState({ signatureName: '' });
-  const [params, setParams] = useState('');
-  const [compareParams, setCompareParams] = useState('');
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  const params = useMemo(
+    () => toParams({ study, strategy, signatureSetName, cancer, useAllCancer, id }),
+    [study, strategy, signatureSetName, cancer, useAllCancer, id]
+  );
+  const compareParams = useMemo(
+    () => (compareState ? toParams(compareState) : ''),
+    [compareState]
+  );
 
   const { data: options } = useMsBurdenOptionsQuery(params, { skip: !params });
   const { data: compareOptions } = useMsBurdenOptionsQuery(compareParams, {
     skip: !compareParams,
   });
-
-  useEffect(() => setParams(toParams(state)), [state]);
-  useEffect(
-    () => setCompareParams(compareState ? toParams(compareState) : ''),
-    [compareState]
-  );
 
   const columnLayout =
     compareState && !state.useAllCancer && !compareState.useAllCancer;
