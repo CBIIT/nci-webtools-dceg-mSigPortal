@@ -2,7 +2,7 @@ import { Container } from 'react-bootstrap';
 import MsAssociationForm from './msAssociation-form';
 import MsAssociationPlot from './msAssociation-plot';
 import Description from '@/components/controls/description/description';
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useMsAssociationOptionsQuery } from './apiSlice';
 
 function toParams(state) {
@@ -30,20 +30,21 @@ export default function MsAssociation({ state, compareState }) {
 
   const mergeForm = (update) => setForm({ ...form, ...update });
 
-  const [params, setParams] = useState('');
-  const [compareParams, setCompareParams] = useState('');
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  const params = useMemo(
+    () => toParams({ study, strategy, signatureSetName, cancer, useAllCancer, id }),
+    [study, strategy, signatureSetName, cancer, useAllCancer, id]
+  );
+  const compareParams = useMemo(
+    () => (compareState ? toParams(compareState) : ''),
+    [compareState]
+  );
   const { data: options } = useMsAssociationOptionsQuery(params, {
     skip: !params,
   });
   const { data: compareOptions } = useMsAssociationOptionsQuery(
     compareParams,
     { skip: !compareParams }
-  );
-
-  useEffect(() => setParams(toParams(state)), [state]);
-  useEffect(
-    () => setCompareParams(compareState ? toParams(compareState) : ''),
-    [compareState]
   );
 
   return (
