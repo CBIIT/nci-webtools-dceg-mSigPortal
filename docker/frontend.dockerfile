@@ -1,20 +1,16 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
 
 RUN dnf -y update \
-    && dnf -y install \
-    httpd \
-    nodejs24 \
+    && dnf -y install nodejs24 \
     && dnf clean all
-
-RUN mkdir -p /app/client
 
 WORKDIR /app/client
 
-COPY client/package.json /app/client/
+COPY client/package.json client/package-lock.json ./
 
-RUN npm install
+RUN npm ci
 
-COPY client /app/client/
+COPY client/ ./
 
 ARG VITE_APP_VERSION=local
 ARG VITE_LAST_UPDATED
@@ -23,8 +19,13 @@ RUN echo "VITE_APP_VERSION=${VITE_APP_VERSION}" >> .env \
 
 RUN npm run build
 
-RUN mkdir -p /var/www/html/mutational-signatures \
-    && cp -r /app/client/dist/* /var/www/html/mutational-signatures
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS runner
+
+RUN dnf -y update \
+    && dnf -y install httpd \
+    && dnf clean all
+
+COPY --from=builder /app/client/dist/ /var/www/html/mutational-signatures/
 
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
@@ -42,7 +43,3 @@ ENV SERVER_TIMEOUT=900
 
 CMD rm -rf /run/httpd/* /tmp/httpd* \
     && exec /usr/sbin/httpd -DFOREGROUND
-
-
-# docker build -t msigportal-frontend -f frontend.dockerfile ~/Projects/msigportal/
-# docker run -d -p 8331:80 --name msigportal-frontend msigportal-frontend
