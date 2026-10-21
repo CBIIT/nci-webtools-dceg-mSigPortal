@@ -17,7 +17,9 @@ RUN npm install
 COPY client /app/client/
 
 ARG VITE_APP_VERSION=local
-RUN echo "VITE_APP_VERSION=${VITE_APP_VERSION}" >> .env
+ARG VITE_LAST_UPDATED
+RUN echo "VITE_APP_VERSION=${VITE_APP_VERSION}" >> .env \
+    && echo "VITE_LAST_UPDATED=${VITE_LAST_UPDATED}" >> .env
 
 RUN npm run build
 

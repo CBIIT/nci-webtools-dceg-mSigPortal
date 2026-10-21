@@ -14,27 +14,27 @@ services:
     ports:
       - "8330:8330"
 
-  refitting:
-    build:
-      context: "."
-      dockerfile: "./docker/refitting.dockerfile"
-    env_file: "./refitting-service/.env"
-    volumes:
-      - "./data:/data"
-    environment:
-      DATA_FOLDER: /data
-      INPUT_FOLDER: /data/input
-      OUTPUT_FOLDER: /data/output
-    ports:
-      - "8334:8334"
-    entrypoint: ["node", "worker.js", "1"]
+  # refitting:
+  #   build:
+  #     context: "."
+  #     dockerfile: "./docker/refitting.dockerfile"
+  #   env_file: "./refitting-service/.env"
+  #   volumes:
+  #     - "./data:/data"
+  #   environment:
+  #     DATA_FOLDER: /data
+  #     INPUT_FOLDER: /data/input
+  #     OUTPUT_FOLDER: /data/output
+  #   ports:
+  #     - "8334:8334"
+  #   entrypoint: ["node", "worker.js", "1"]
 
   frontend:
     build:
       context: "."
       dockerfile: "./docker/frontend.dockerfile"
       args:
-        VITE_APP_VERSION: msigportal_1.1.0_20260109
+        VITE_APP_VERSION: docker
     env_file: "./server/.env"
     environment:
       API_BASE_URL: http://backend:8330

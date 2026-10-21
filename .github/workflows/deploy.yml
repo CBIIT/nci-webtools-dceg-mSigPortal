@@ -106,6 +106,7 @@ jobs:
           echo "REFITTING_IMAGE_LATEST=$REPO:refitting-${{ inputs.tier }}-latest" >> $GITHUB_ENV
 
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+          echo "DEPLOY_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
             echo "LOG_LEVEL=debug" >> $GITHUB_ENV
@@ -189,6 +190,7 @@ jobs:
             ${{ env.FRONTEND_IMAGE_LATEST }}
           build-args: |
             VITE_APP_VERSION=${{ github.ref_name }}
+            VITE_LAST_UPDATED=${{ env.DEPLOY_DATE }}
           cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE_LATEST }}
           cache-to: type=inline
 
