@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-function parseVersionAndDate(versionString) {
+function parseVersionAndDate(versionString, lastUpdated) {
   if (!versionString)
-    return { version: 'missing env: VITE_APP_VERSION', date: 'N/A' };
+    return { version: 'missing env: VITE_APP_VERSION', date: lastUpdated || 'N/A' };
 
   // Check for format: msigportal_X.X.X_YYYYMMDD
   const formatMatch = versionString.match(/msigportal_(\d+\.\d+\.\d+)_(\d{8})/);
@@ -15,16 +15,17 @@ function parseVersionAndDate(versionString) {
       6,
       8
     )}`;
-    return { version, date };
+    return { version, date: lastUpdated || date };
   }
 
-  return { version: versionString, date: 'N/A' };
+  return { version: versionString, date: lastUpdated || 'N/A' };
 }
 
 export function Footer() {
   const location = useLocation();
   const { version, date } = parseVersionAndDate(
-    import.meta.env.VITE_APP_VERSION
+    import.meta.env.VITE_APP_VERSION,
+    import.meta.env.VITE_LAST_UPDATED
   );
 
   return (
