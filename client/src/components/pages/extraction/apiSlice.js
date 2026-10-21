@@ -1,5 +1,6 @@
 import { extractionApiSlice } from '@/services/store/rootApi';
 import { groupBy } from 'lodash';
+import { profilePlots } from '@/components/controls/plotly/mutationalProfiles';
 
 export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -93,16 +94,10 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
           let refSigPlots;
           let denovoPlots;
 
-          async function createPlot(profileMatrix, data, title) {
-            try {
-              const plotFn = await import(
-                `../../controls/plotly/mutationalProfiles/${profileMatrix.toLowerCase()}.js`
-              );
-              return plotFn.default(data, title);
-            } catch (error) {
-              console.log(error);
-              throw new Error(`${profileMatrix} is not supported`);
-            }
+          function createPlot(profileMatrix, data, title) {
+            const plotFn = profilePlots[profileMatrix.toUpperCase()];
+            if (!plotFn) throw new Error(`${profileMatrix} is not supported`);
+            return plotFn(data, title);
           }
 
           // query signatures
@@ -133,9 +128,7 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
             decomposed = firstValues;
 
             refSigPlots = [];
-            denovoPlots = [
-              await createPlot(contextType, denovo, 'Denovo Signature'),
-            ];
+            denovoPlots = [createPlot(contextType, denovo, 'Denovo Signature')];
           } else {
             const distributionRegex = new RegExp(
               /Signature\s(\w+)\s\((\d+.\d+)%\)/g
@@ -198,23 +191,17 @@ export const inputFormApiSlice = extractionApiSlice.injectEndpoints({
               )
             );
 
-            refSigPlots = {};
-            decomposed.forEach(async (e) => {
-              refSigPlots[e[0].signatureName] = await createPlot(
-                profileMatrix,
-                e,
-                'Reference Signature'
-              );
-            });
+            refSigPlots = Object.fromEntries(
+              decomposed.map((e) => [
+                e[0].signatureName,
+                createPlot(profileMatrix, e, 'Reference Signature'),
+              ])
+            );
 
-            denovoPlots = await Promise.all([
+            denovoPlots = [
               createPlot(contextType, denovo, 'Denovo Signature'),
-              createPlot(
-                profileMatrix,
-                reconstructed,
-                'Reconstructed Signature'
-              ),
-            ]);
+              createPlot(profileMatrix, reconstructed, 'Reconstructed Signature'),
+            ];
           }
 
           // parse signature distribution names and proportion
