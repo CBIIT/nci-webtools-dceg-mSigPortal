@@ -218,14 +218,14 @@ function UnivariableExample() {
         </li>
         <li>
           In <b>Parameters</b>, leave signature exposure Threshold blank and
-          log₂ unchecked. Set{' '}
+          check log₂. Set{' '}
           <b>
             Method = <code>nonparametric</code>
           </b>
           , then click <b>Calculate</b>.
           <Screenshot
             file="guidance-univariable-parameters.png"
-            alt="Parameters section with Signature Exposure Filtering left blank, Method set to nonparametric, and the Calculate button"
+            alt="Parameters section with Signature Exposure Filtering Threshold left blank and log₂ checked, Method set to nonparametric, and the Calculate button"
           />
         </li>
         <li>

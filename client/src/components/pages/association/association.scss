@@ -48,8 +48,21 @@ fieldset {
   }
 }
 
-// instructions tab: section titles are bold as in the client guidance document
+// instructions tab: headings are a step smaller than the site defaults, and
+// section titles are bold as in the client guidance document
 .guidance {
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  h5 {
+    font-size: 1.1rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+  }
+
   h5,
   h6 {
     font-weight: 700;
