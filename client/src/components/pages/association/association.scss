@@ -72,3 +72,10 @@ fieldset {
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
 }
+
+// instructions tab: the Data Source example links sit in a list and toggle the
+// worked example below them
+.guidance .guidance-example-link {
+  vertical-align: baseline;
+  text-decoration: underline;
+}
