@@ -62,11 +62,11 @@ fieldset {
   margin: 1rem 0;
 }
 
-// instructions tab: worked-example screenshots scale to the card and never
-// overflow it
+// instructions tab: worked-example screenshots are shown at a reduced width so
+// they read as illustrations, and never overflow the card
 .guidance .guidance-screenshot {
   display: block;
-  max-width: 100%;
+  max-width: min(100%, 720px);
   height: auto;
   margin: 0.5rem 0 1rem;
   border: 1px solid #dee2e6;
