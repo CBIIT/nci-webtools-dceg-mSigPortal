@@ -1,4 +1,5 @@
-import { Table } from 'react-bootstrap';
+import { useState } from 'react';
+import { Button, Table } from 'react-bootstrap';
 import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const exposureMeasures = [
@@ -124,6 +125,11 @@ const multivariableRows = [
   { source: 'clinical_data', type: 'clinical_variables', name: 'gender' },
 ];
 
+const examples = [
+  { key: 'univariable', label: 'Univariable Analysis Example' },
+  { key: 'multivariable', label: 'Multivariable Analysis Example' },
+];
+
 const imagePath = 'assets/images/association';
 
 function Screenshot({ file, alt }) {
@@ -171,7 +177,178 @@ function StudySettings() {
   );
 }
 
+function UnivariableExample() {
+  return (
+    <>
+      <h4>Univariable example</h4>
+      <h5>EGFR and signature exposure</h5>
+      <p>
+        Explore whether signature exposure differs across the EGFR categories
+        recorded in Sherlock-Lung.
+      </p>
+      <StudySettings />
+      <h6>Run the analysis</h6>
+      <ol>
+        <li>
+          In <b>Univariable</b>, set{' '}
+          <b>
+            Variable Source = <code>genomic_data</code>
+          </b>
+          ,{' '}
+          <b>
+            Data Type = <code>driver_mutation</code>
+          </b>
+          , and{' '}
+          <b>
+            Variable Name = <code>EGFR</code>
+          </b>
+          .
+        </li>
+        <li>
+          Leave Variable Filtering at blank Threshold, unchecked log₂, and
+          unchanged Collapse. Set{' '}
+          <b>
+            Signature Exposure Variable = <code>Signature_exposure</code>
+          </b>{' '}
+          and click <b>Load Data</b>.
+          <Screenshot
+            file="guidance-univariable-variables.png"
+            alt="Univariable Variables section showing the study variables table with the EGFR row, Variable Source genomic_data, Data Type driver_mutation, Variable Name EGFR, Signature Exposure Variable Signature_exposure, and the Load Data button"
+          />
+        </li>
+        <li>
+          In <b>Parameters</b>, leave signature exposure Threshold blank and
+          check log₂. Set{' '}
+          <b>
+            Method = <code>nonparametric</code>
+          </b>
+          , then click <b>Calculate</b>.
+          <Screenshot
+            file="guidance-univariable-parameters.png"
+            alt="Parameters section with Signature Exposure Filtering Threshold left blank and log₂ checked, Method set to nonparametric, and the Calculate button"
+          />
+        </li>
+        <li>
+          Review <code>method</code>, <code>estimate</code>, <code>n.obs</code>,{' '}
+          <code>p.value</code>, and <code>fdr</code> in the table. This example
+          compares signature exposure across the EGFR categories recorded in the
+          study; it does not adjust for age or other covariates.
+          <Screenshot
+            file="guidance-univariable-results.png"
+            alt="Univariable results table listing method, estimate, n.obs, p.value, and fdr for each signature, with the SBS1 violin plot comparing EGFR groups below"
+          />
+        </li>
+        <li>
+          Select a signature and compare the displayed group labels and plot
+          with that signature&apos;s table row. Save the outputs and settings
+          used.
+        </li>
+      </ol>
+      <p>
+        <b>Optional extension — positive exposures:</b> Repeat with log₂ checked
+        under <b>Signature Exposure Filtering</b>. This analyzes positive
+        signature exposures and can reduce the sample count. Compare{' '}
+        <code>n.obs</code> with the untransformed analysis. It answers a
+        different question from an analysis that retains zero exposures.
+      </p>
+    </>
+  );
+}
+
+function MultivariableExample() {
+  return (
+    <>
+      <h4>Multivariable example</h4>
+      <h5>EGFR adjusted for age and gender</h5>
+      <p>
+        Model signature exposure using EGFR, age at diagnosis, and the
+        study&apos;s recorded gender variable together.
+      </p>
+      <StudySettings />
+      <h6>Run the analysis</h6>
+      <ol>
+        <li>
+          Select <b>Multivariable</b> and configure the three rows below, using{' '}
+          <b>Add Association Variable</b> between rows.
+          <Table
+            striped
+            bordered
+            size="sm"
+            responsive
+            className="guidance-table mt-2"
+          >
+            <thead>
+              <tr>
+                <th>Variable Source</th>
+                <th>Data Type</th>
+                <th>Variable Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {multivariableRows.map(({ source, type, name }) => (
+                <tr key={name}>
+                  <td>
+                    <code>{source}</code>
+                  </td>
+                  <td>
+                    <code>{type}</code>
+                  </td>
+                  <td>
+                    <code>{name}</code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </li>
+        <li>
+          Leave all variable thresholds blank, log₂ unchecked, and Collapse
+          unchanged. Set{' '}
+          <b>
+            Signature Exposure Variable = <code>Signature_exposure</code>
+          </b>
+          , then click <b>Load Data</b>.
+          <Screenshot
+            file="guidance-multivariable-variables.png"
+            alt="Multivariable Variables section with three association variable rows for EGFR, age_at_diagnosis, and gender, Signature Exposure Variable Signature_exposure, and the Load Data button"
+          />
+        </li>
+        <li>
+          In <b>Parameters</b>, leave exposure Threshold blank and log₂
+          unchecked, select{' '}
+          <b>
+            Method = <code>lm</code>
+          </b>
+          , then click <b>Calculate</b>.
+          <Screenshot
+            file="guidance-multivariable-parameters.png"
+            alt="Parameters section with Signature Exposure Filtering left blank, Method set to lm, and the Calculate button"
+          />
+        </li>
+        <li>
+          Interpret the EGFR coefficient as its association with signature
+          exposure conditional on age at diagnosis and the study&apos;s recorded{' '}
+          <code>gender</code> variable. Confirm the categorical reference
+          levels; do not assume their meaning from the term names alone.
+        </li>
+        <li>
+          Select the signature of interest and verify the plot against its table
+          rows.
+          <Screenshot
+            file="guidance-multivariable-results.png"
+            alt="Multivariable results table listing term, estimate, std.error, and p.value for each signature, with the coefficient plot for the selected signature below"
+          />
+        </li>
+      </ol>
+    </>
+  );
+}
+
 export default function Instructions({ loading }) {
+  const [openExample, setOpenExample] = useState(null);
+  const toggleExample = (key) =>
+    setOpenExample((current) => (current === key ? null : key));
+
   return (
     <div className="bg-white border rounded py-3 px-4 guidance">
       <LoadingOverlay active={loading} />
@@ -190,12 +367,6 @@ export default function Instructions({ loading }) {
         variable causes a mutational process, or that a mutational process
         causes a clinical or genomic feature.
       </p>
-      <hr />
-      <h4>Data Source</h4>
-      <p>Public: Perform analysis using data available on the website</p>
-      {/* <p>User: Upload your own data</p> */}
-
-      <hr />
       <h5>1. Load a study</h5>
       <ol>
         <li>Open the Association module.</li>
@@ -473,161 +644,34 @@ export default function Instructions({ loading }) {
         </li>
       </ul>
       <hr />
-      <h4>Univariable example</h4>
-      <h5>EGFR and signature exposure</h5>
-      <p>
-        Explore whether signature exposure differs across the EGFR categories
-        recorded in Sherlock-Lung.
-      </p>
-      <StudySettings />
-      <h6>Run the analysis</h6>
-      <ol>
-        <li>
-          In <b>Univariable</b>, set{' '}
-          <b>
-            Variable Source = <code>genomic_data</code>
-          </b>
-          ,{' '}
-          <b>
-            Data Type = <code>driver_mutation</code>
-          </b>
-          , and{' '}
-          <b>
-            Variable Name = <code>EGFR</code>
-          </b>
-          .
-        </li>
-        <li>
-          Leave Variable Filtering at blank Threshold, unchecked log₂, and
-          unchanged Collapse. Set{' '}
-          <b>
-            Signature Exposure Variable = <code>Signature_exposure</code>
-          </b>{' '}
-          and click <b>Load Data</b>.
-          <Screenshot
-            file="guidance-univariable-variables.png"
-            alt="Univariable Variables section showing the study variables table with the EGFR row, Variable Source genomic_data, Data Type driver_mutation, Variable Name EGFR, Signature Exposure Variable Signature_exposure, and the Load Data button"
-          />
-        </li>
-        <li>
-          In <b>Parameters</b>, leave signature exposure Threshold blank and
-          log₂ unchecked. Set{' '}
-          <b>
-            Method = <code>nonparametric</code>
-          </b>
-          , then click <b>Calculate</b>.
-          <Screenshot
-            file="guidance-univariable-parameters.png"
-            alt="Parameters section with Signature Exposure Filtering left blank, Method set to nonparametric, and the Calculate button"
-          />
-        </li>
-        <li>
-          Review <code>method</code>, <code>estimate</code>, <code>n.obs</code>,{' '}
-          <code>p.value</code>, and <code>fdr</code> in the table. This example
-          compares signature exposure across the EGFR categories recorded in the
-          study; it does not adjust for age or other covariates.
-          <Screenshot
-            file="guidance-univariable-results.png"
-            alt="Univariable results table listing method, estimate, n.obs, p.value, and fdr for each signature, with the SBS1 violin plot comparing EGFR groups below"
-          />
-        </li>
-        <li>
-          Select a signature and compare the displayed group labels and plot
-          with that signature&apos;s table row. Save the outputs and settings
-          used.
-        </li>
-      </ol>
-      <p>
-        <b>Optional extension — positive exposures:</b> Repeat with log₂ checked
-        under <b>Signature Exposure Filtering</b>. This analyzes positive
-        signature exposures and can reduce the sample count. Compare{' '}
-        <code>n.obs</code> with the untransformed analysis. It answers a
-        different question from an analysis that retains zero exposures.
-      </p>
-
-      <hr />
-      <h4>Multivariable example</h4>
-      <h5>EGFR adjusted for age and gender</h5>
-      <p>
-        Model signature exposure using EGFR, age at diagnosis, and the
-        study&apos;s recorded gender variable together.
-      </p>
-      <StudySettings />
-      <h6>Run the analysis</h6>
-      <ol>
-        <li>
-          Select <b>Multivariable</b> and configure the three rows below, using{' '}
-          <b>Add Association Variable</b> between rows.
-          <Table
-            striped
-            bordered
-            size="sm"
-            responsive
-            className="guidance-table mt-2"
-          >
-            <thead>
-              <tr>
-                <th>Variable Source</th>
-                <th>Data Type</th>
-                <th>Variable Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {multivariableRows.map(({ source, type, name }) => (
-                <tr key={name}>
-                  <td>
-                    <code>{source}</code>
-                  </td>
-                  <td>
-                    <code>{type}</code>
-                  </td>
-                  <td>
-                    <code>{name}</code>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </li>
-        <li>
-          Leave all variable thresholds blank, log₂ unchecked, and Collapse
-          unchanged. Set{' '}
-          <b>
-            Signature Exposure Variable = <code>Signature_exposure</code>
-          </b>
-          , then click <b>Load Data</b>.
-          <Screenshot
-            file="guidance-multivariable-variables.png"
-            alt="Multivariable Variables section with three association variable rows for EGFR, age_at_diagnosis, and gender, Signature Exposure Variable Signature_exposure, and the Load Data button"
-          />
-        </li>
-        <li>
-          In <b>Parameters</b>, leave exposure Threshold blank and log₂
-          unchecked, select{' '}
-          <b>
-            Method = <code>lm</code>
-          </b>
-          , then click <b>Calculate</b>.
-          <Screenshot
-            file="guidance-multivariable-parameters.png"
-            alt="Parameters section with Signature Exposure Filtering left blank, Method set to lm, and the Calculate button"
-          />
-        </li>
-        <li>
-          Interpret the EGFR coefficient as its association with signature
-          exposure conditional on age at diagnosis and the study&apos;s recorded{' '}
-          <code>gender</code> variable. Confirm the categorical reference
-          levels; do not assume their meaning from the term names alone.
-        </li>
-        <li>
-          Select the signature of interest and verify the plot against its table
-          rows.
-          <Screenshot
-            file="guidance-multivariable-results.png"
-            alt="Multivariable results table listing term, estimate, std.error, and p.value for each signature, with the coefficient plot for the selected signature below"
-          />
-        </li>
-      </ol>
+      <h4>Data Source</h4>
+      <p>Public: Perform analysis using data available on the website</p>
+      {/* <p>User: Upload your own data</p> */}
+      <ul className="list-unstyled mb-0">
+        {examples.map(({ key, label }) => (
+          <li key={key}>
+            <Button
+              variant="link"
+              className="p-0 guidance-example-link"
+              aria-expanded={openExample === key}
+              aria-controls={`${key}-example`}
+              onClick={() => toggleExample(key)}
+            >
+              {label}
+            </Button>
+          </li>
+        ))}
+      </ul>
+      {openExample && (
+        <div id={`${openExample}-example`} className="mt-3">
+          <hr />
+          {openExample === 'univariable' ? (
+            <UnivariableExample />
+          ) : (
+            <MultivariableExample />
+          )}
+        </div>
+      )}
     </div>
   );
 }

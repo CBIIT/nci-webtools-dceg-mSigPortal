@@ -48,8 +48,21 @@ fieldset {
   }
 }
 
-// instructions tab: section titles are bold as in the client guidance document
+// instructions tab: headings are a step smaller than the site defaults, and
+// section titles are bold as in the client guidance document
 .guidance {
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  h5 {
+    font-size: 1.1rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+  }
+
   h5,
   h6 {
     font-weight: 700;
@@ -62,13 +75,20 @@ fieldset {
   margin: 1rem 0;
 }
 
-// instructions tab: worked-example screenshots scale to the card and never
-// overflow it
+// instructions tab: worked-example screenshots are shown at a reduced width so
+// they read as illustrations, and never overflow the card
 .guidance .guidance-screenshot {
   display: block;
-  max-width: 100%;
+  max-width: min(100%, 720px);
   height: auto;
   margin: 0.5rem 0 1rem;
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
+}
+
+// instructions tab: the Data Source example links sit in a list and toggle the
+// worked example below them
+.guidance .guidance-example-link {
+  vertical-align: baseline;
+  text-decoration: underline;
 }
