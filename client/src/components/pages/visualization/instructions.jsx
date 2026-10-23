@@ -298,6 +298,61 @@ export default function Instructions() {
         Choose a Data Source and its associated options to submit a query using
         the panel on the left
       </p>
+      {source === 'user' && (
+        <>
+          <p className="text-danger">
+            The Visualization module uses SigProfilerMatrixGenerator to generate
+            mutation-count matrices from uploaded variant files, including VCF
+            and MAF files. Supported profiles include SBS96 (single-base
+            substitutions), DBS78 (doublet-base substitutions), ID83 (small
+            insertions and deletions), and others. Generated matrices can be
+            downloaded and uploaded to the Extraction module for
+            mutational-signature analysis. Alternatively, users can generate
+            matrices locally using the standalone{' '}
+            <a
+              href="https://github.com/SigProfilerSuite/SigProfilerMatrixGenerator"
+              target="_blank"
+              className="text-danger"
+              style={{ textDecoration: 'underline' }}
+            >
+              SigProfilerMatrixGenerator
+            </a>
+            .
+          </p>
+          <p className="text-danger">
+            For users starting from raw sequencing reads, the general workflow
+            is:
+            <b>
+              FASTQ files → read quality control → alignment to a reference
+              genome (e.g., BWA) → somatic variant calling (e.g., Strelka or
+              GATK Mutect2 with matched tumor-normal samples) → variant
+              filtering → somatic VCF file.
+            </b>{' '}
+            These steps are performed outside mSigPortal; see the{' '}
+            <a
+              href="https://gatk.broadinstitute.org/hc/en-us/articles/360035894731-Somatic-short-variant-discovery-SNVs-Indels"
+              target="_blank"
+              className="text-danger"
+              style={{ textDecoration: 'underline' }}
+            >
+              GATK somatic variant discovery workflow
+            </a>{' '}
+            for guidance. Users are responsible for preparing high-quality
+            somatic callsets, removing germline variants and sequencing
+            artifacts, and excluding identifying information from sample names
+            and associated metadata before upload.
+          </p>
+          <p className="text-danger">
+            Users can also enable <b>Split Mutations According to Filter</b> in
+            mSigPortal to compare mutational patterns across caller-defined
+            filter categories and explore how filtering choices affect the
+            observed profiles. Together with upstream quality-control criteria,
+            these comparisons can guide the selection of appropriate filters
+            using <b>Select Filter(s)</b> when generating the final
+            mutation-count matrices.
+          </p>
+        </>
+      )}
       <hr />
       <h4>Data Source</h4>
       <p>Public: Perform analysis using data available on the website</p>
