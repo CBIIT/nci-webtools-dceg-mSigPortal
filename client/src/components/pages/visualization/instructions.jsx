@@ -300,7 +300,7 @@ export default function Instructions() {
       </p>
       {source === 'user' && (
         <>
-          <p className="text-danger">
+          <p>
             The Visualization module uses SigProfilerMatrixGenerator to generate
             mutation-count matrices from uploaded variant files, including VCF
             and MAF files. Supported profiles include SBS96 (single-base
@@ -312,14 +312,13 @@ export default function Instructions() {
             <a
               href="https://github.com/SigProfilerSuite/SigProfilerMatrixGenerator"
               target="_blank"
-              className="text-danger"
               style={{ textDecoration: 'underline' }}
             >
               SigProfilerMatrixGenerator
             </a>
             .
           </p>
-          <p className="text-danger">
+          <p>
             For users starting from raw sequencing reads, the general workflow
             is:
             <b>
@@ -332,7 +331,6 @@ export default function Instructions() {
             <a
               href="https://gatk.broadinstitute.org/hc/en-us/articles/360035894731-Somatic-short-variant-discovery-SNVs-Indels"
               target="_blank"
-              className="text-danger"
               style={{ textDecoration: 'underline' }}
             >
               GATK somatic variant discovery workflow
@@ -342,7 +340,7 @@ export default function Instructions() {
             artifacts, and excluding identifying information from sample names
             and associated metadata before upload.
           </p>
-          <p className="text-danger">
+          <p>
             Users can also enable <b>Split Mutations According to Filter</b> in
             mSigPortal to compare mutational patterns across caller-defined
             filter categories and explore how filtering choices affect the
