@@ -13,7 +13,7 @@ RUN dnf -y update \
     libjpeg-turbo-devel \
     libxml2-devel \
     mpfr-devel \
-    nodejs \
+    nodejs24 \
     npm \
     openssl-devel \
     python3-devel \

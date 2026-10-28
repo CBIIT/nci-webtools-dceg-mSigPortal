@@ -1,6 +1,6 @@
 FROM nvidia/cuda:12.1.1-runtime-rockylinux9
 
-RUN dnf -y module enable nodejs:20 && dnf clean all
+RUN dnf -y module enable nodejs:24 && dnf clean all
 
 RUN dnf -y update \
     && dnf -y install \
