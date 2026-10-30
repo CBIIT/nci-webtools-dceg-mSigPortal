@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.1-runtime-rockylinux9
+FROM nvidia/cuda:12.9.2-runtime-rockylinux9
 
 RUN dnf -y module enable nodejs:24 && dnf clean all
 
@@ -22,12 +22,10 @@ RUN dnf -y update \
     python3-devel \
     python3-pip \
     python3-setuptools \
-    # python3-wheel \
-    rsync \
-    tar \
+    # rsync \
+    # tar \
     wget \ 
     which \
-    # https://us.download.nvidia.com/tesla/470.182.03/nvidia-driver-local-repo-rhel8-470.182.03-1.0-1.x86_64.rpm \
     && dnf clean all
 
 
