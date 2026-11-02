@@ -107,8 +107,10 @@ export async function profilerExtraction(
       .join(' ');
 
     logger.info(`[${id}] Run Profiler Extraction`);
+    // PYTHON_BIN lets the image select a non-default interpreter (e.g. python3.13 on AL2023,
+    // where /usr/bin/python3 must stay at the system version)
     const script = await execa(
-      'python3',
+      env.PYTHON_BIN || 'python3',
       ['services/python/mSigPortal_Profiler_Extraction.py', cliArgs],
       { shell: true, all: true }
     )
