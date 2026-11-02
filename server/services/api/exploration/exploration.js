@@ -107,7 +107,10 @@ async function msLandscape(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName, strategy },
+      // a de novo set name can be reused by other studies; the user sqlite table has no study column
+      userId
+        ? { signatureSetName, strategy }
+        : { signatureSetName, strategy, study: `Reference;${study}` },
       columns,
       limit
     );
@@ -142,7 +145,7 @@ async function msLandscape(req, res, next) {
     }
 
     const fn = 'msLandscape';
-    const args = { exposureData, signatureData, seqmatrixData, study };
+    const args = { exposureData, signatureData, seqmatrixData };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,
@@ -177,7 +180,10 @@ async function msDecomposition(req, res, next) {
     );
     const signatureData = await getSignatureData(
       connection,
-      { signatureSetName, strategy },
+      // a de novo set name can be reused by other studies; the user sqlite table has no study column
+      userId
+        ? { signatureSetName, strategy }
+        : { signatureSetName, strategy, study: `Reference;${study}` },
       columns,
       limit
     );
@@ -204,7 +210,7 @@ async function msDecomposition(req, res, next) {
     }
 
     const fn = 'msDecomposition';
-    const args = { exposureData, signatureData, seqmatrixData, study };
+    const args = { exposureData, signatureData, seqmatrixData };
     const id = userId || randomUUID();
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
@@ -231,20 +237,30 @@ async function cosineSimilarity(req, res, next) {
       : req.app.locals.connection;
     const columns = '*';
     const limit = false;
+    // this endpoint only ever compares reference sets, and the user sqlite table has no study column
+    const studyFilter = userId ? {} : { study: 'Reference' };
     const signatureData1 = await getSignatureData(
       connection,
-      { ...params, signatureSetName: signatureSetName.split(';')[0] },
+      {
+        ...params,
+        ...studyFilter,
+        signatureSetName: signatureSetName.split(';')[0],
+      },
       columns,
       limit
     );
     const signatureData2 = await getSignatureData(
       connection,
-      { ...params, signatureSetName: signatureSetName.split(';')[1] },
+      {
+        ...params,
+        ...studyFilter,
+        signatureSetName: signatureSetName.split(';')[1],
+      },
       columns,
       limit
     );
     const fn = 'cosineSimilarity';
-    const args = { signatureData1, signatureData2, study };
+    const args = { signatureData1, signatureData2 };
     const wrapper = await r('services/R/explorationWrapper.R', 'wrapper', {
       fn,
       args,

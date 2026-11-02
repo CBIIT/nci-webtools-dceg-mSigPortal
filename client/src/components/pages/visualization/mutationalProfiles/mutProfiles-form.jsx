@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
-import Select from '../../../controls/select/selectHookForm';
-import Description from '../../../controls/description/description';
+import Select from '@/components/controls/select/selectHookForm';
+import Description from '@/components/controls/description/description';
 import {
   defaultProfile2,
   defaultMatrix2,
   defaultFilter2,
-} from '../../../../services/utils';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
+} from '@/services/utils';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
 
 export default function MutationalProfilesForm({ state, form, mergeForm }) {
   const {
@@ -20,7 +20,7 @@ export default function MutationalProfilesForm({ state, form, mergeForm }) {
     source,
     mutationalProfiles: storeState,
   } = state;
-  const { sample: externalSample } = storeState;
+  const { sample: externalSample, filter: externalFilter } = storeState;
 
   const { data: options } = useSeqmatrixOptionsQuery(
     {
@@ -41,15 +41,27 @@ export default function MutationalProfilesForm({ state, form, mergeForm }) {
     CN: [48],
   };
 
-  // handle external sample change events
+  // handle external sample/filter change events (e.g. from a Tree & Leaf leaf click)
   useEffect(() => {
-    if (typeof externalSample === 'string') {
+    if (externalSample && options?.length) {
       const sampleOption =
-        sampleOptions.find((e) => e.value == externalSample) ||
-        sampleOptions[0];
-      handleSample(sampleOption);
+        sampleOptions.find((e) => e.value == externalSample) || sampleOptions[0];
+      const profiles = profileOptions(sampleOption);
+      const profileOption = defaultProfile2(profiles);
+      const matrices = matrixOptions(sampleOption, profileOption);
+      const matrixOption = defaultMatrix2(profileOption, matrices);
+      const filters = filterOptions(sampleOption, profileOption, matrixOption);
+      const filterOption =
+        (typeof externalFilter === 'string' &&
+          filters.find((f) => f.value === externalFilter)) ||
+        defaultFilter2(filters);
+
+      setValue('sample', sampleOption);
+      setValue('profile', profileOption);
+      setValue('matrix', matrixOption);
+      setValue('filter', filterOption);
     }
-  }, [externalSample]);
+  }, [externalSample, externalFilter, options]);
 
   // populate controls
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { Row, Col, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as catalogActions } from '@/services/store/catalog';
+import { actions as modalActions } from '@/services/store/modal';
 
 const actions = { ...catalogActions, ...modalActions };
 const { Check } = Form;

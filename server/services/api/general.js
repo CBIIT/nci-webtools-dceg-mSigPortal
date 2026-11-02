@@ -5,9 +5,14 @@ import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import Papa from 'papaparse';
 import rWrapper from 'r-wrapper';
-import Router from 'express-promise-router';
+import { Router } from 'express';
 import archiver from 'archiver';
-import { mkdirs } from '../utils.js';
+import {
+  mkdirs,
+  resolveWithin,
+  sanitizeFilename,
+  isValidId,
+} from '../utils.js';
 const r = rWrapper.async;
 import { getObjectBuffer } from '../s3.js';
 const env = process.env;
@@ -48,10 +53,10 @@ export function parseTSV(filepath) {
 function upload(req, res, next) {
   const { logger } = req.app.locals;
   const { id } = req.params;
-  if (!validate(id)) next(new Error('Invalid ID'));
+  if (!validate(id)) return next(new Error('Invalid ID'));
 
   const form = formidable({
-    uploadDir: path.resolve(env.INPUT_FOLDER, id),
+    uploadDir: resolveWithin(env.INPUT_FOLDER, id),
     multiples: true,
   });
 
@@ -60,8 +65,14 @@ function upload(req, res, next) {
 
   form
     .on('fileBegin', (field, file) => {
-      const destination = path.resolve(form.uploadDir, file.originalFilename);
-      file.filepath = destination;
+      try {
+        file.filepath = resolveWithin(
+          form.uploadDir,
+          sanitizeFilename(file.originalFilename)
+        );
+      } catch (err) {
+        form.emit('error', err);
+      }
     })
     .on('error', (err) => {
       logger.info('/UPLOAD: An error occurred\n' + err);
@@ -91,10 +102,15 @@ async function associationWrapper(req, res, next) {
   };
 
   // create directory for results if needed
-  const savePath = sessionId
-    ? path.join('output', sessionId, 'results', fn, '/')
-    : '';
-  if (sessionId) await mkdirs([path.join(rConfig.wd, savePath)]);
+  if (!isValidId(sessionId)) return next(new Error('Invalid session ID'));
+  const savePath = path.join(
+    'output',
+    sessionId,
+    'results',
+    sanitizeFilename(fn),
+    '/'
+  );
+  await mkdirs([resolveWithin(rConfig.wd, savePath)]);
 
   try {
     const wrapper = await r('services/R/associationWrapper.R', 'wrapper', {
@@ -120,33 +136,41 @@ async function associationWrapper(req, res, next) {
 
 async function getFileS3(req, res, next) {
   // serve static files from s3
-  const { path } = req.body;
-  if (path) {
-    const file = await getObjectBuffer(
-      `msigportal/Database/${path}`,
-      env.DATA_BUCKET
-    );
-    res.send(file);
-  } else {
-    next('Missing path to file');
+  const { path: filePath } = req.body;
+  if (!filePath) return next('Missing path to file');
+  // reject traversal so the request cannot escape the Database prefix
+  if (
+    typeof filePath !== 'string' ||
+    filePath.includes('\0') ||
+    filePath.includes('..') ||
+    filePath.startsWith('/')
+  ) {
+    return next('Invalid path to file');
   }
+  const file = await getObjectBuffer(
+    `msigportal/Database/${filePath}`,
+    env.DATA_BUCKET
+  );
+  res.send(file);
 }
 
 export async function downloadOutput(req, res, next) {
   const { id } = req.params;
-  const output = path.resolve(env.OUTPUT_FOLDER, id);
+
+  if (!validate(id)) return res.status(500).json(`${id} is not a valid ID`);
+
+  const output = resolveWithin(env.OUTPUT_FOLDER, id);
+  if (!fs.existsSync(output))
+    return res.status(500).json(`${id} does not exist`);
+
   const archive = archiver('zip', { zlib: { level: 6 } });
-
-  if (!validate(id)) res.status(500).json(`${id} is not a valid ID`);
-  if (!fs.existsSync(output)) res.status(500).json(`${id} does not exist`);
-
   res.attachment(`${id}.zip`);
   archive.directory(output, false).pipe(res);
   archive.finalize();
 }
 
 const router = Router();
-router.post('/upload/:id?', upload);
+router.post('/upload{/:id}', upload);
 router.get('/downloadOutput/:id', downloadOutput);
 router.post('/getFileS3', getFileS3);
 router.post('/associationWrapper', associationWrapper);

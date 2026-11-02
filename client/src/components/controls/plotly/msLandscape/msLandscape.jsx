@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
-import { isNumber, mapOrder } from '../../utils/utils';
-import { colorPallet, colorPallet0 } from '../../utils/colors';
+import { isNumber, mapOrder } from '@/components/controls/utils/utils';
+import { colorPallet, colorPallet0 } from '@/components/controls/utils/colors';
 
 export default function MsLandscape(
   cosineData,
@@ -130,9 +130,7 @@ export default function MsLandscape(
 
   const samples = cosineData.map((e) => e.sample);
 
-  var longest = samples.sort(function (a, b) {
-    return b.length - a.length;
-  })[0].length;
+  const longest = Math.max(...samples.map((s) => s.length));
 
   const newVariableData = [...variableData];
   const variableDataSort = newVariableData.sort(mapOrder(samples, 'sample'));
@@ -195,7 +193,7 @@ export default function MsLandscape(
       xaxis: 'x',
       yaxis: 'y6',
       text: dendrogram.data[1].x.map((e) =>
-        samples[e] ? `<b>Sample: </b>${samples[e - 1]}` : null
+        samples[e - 1] ? `<b>Sample: </b>${samples[e - 1]}` : null
       ),
     }
   : {};
@@ -238,35 +236,36 @@ export default function MsLandscape(
 
   const mutationCountTraces = Object.entries(groupBySignatureName_exposure2)
     .reverse()
-    .map(([key, value]) => ({
-      name: key,
-      type: 'bar',
-      x: value
+    .map(([key, value]) => {
+      const points = value
         .filter((obj) => obj.exposure !== 0)
-        .map((e) => samples.findIndex((v) => v === e.sample)),
-      y: value.filter((obj) => obj.exposure !== 0).map((e, i) => e.exposure),
-      marker: {
-        color: contains ? colors[key.replace(/^\D*/, '')] : colors[key],
-      },
-      xaxis: 'x',
-      yaxis: 'y3',
-      transforms: [
-        {
-          type: 'sort',
-          target: 'y',
-          order: 'descending',
+        .map((e) => ({
+          x: samples.findIndex((v) => v === e.sample),
+          y: e.exposure,
+        }))
+        .sort((a, b) => b.y - a.y);
+      return {
+        name: key,
+        type: 'bar',
+        x: points.map((p) => p.x),
+        y: points.map((p) => p.y),
+        marker: {
+          color: contains ? colors[key.replace(/^\D*/, '')] : colors[key],
         },
-      ],
-      ...(arrNames.length > 0 && {
-        legendrank: 1001,
-        legendgroup: 'b',
-      }),
-      legendgrouptitle: {
-        text: '\t Mutational Signatures:',
-      },
-      showlegend: true,
-      hovertemplate: '<b>Number of mutation: </b>%{y} <br><b>Sample: </b>%{x}',
-    }));
+        xaxis: 'x',
+        yaxis: 'y3',
+        ...(arrNames.length > 0 && {
+          legendrank: 1001,
+          legendgroup: 'b',
+        }),
+        legendgrouptitle: {
+          text: '\t Mutational Signatures:',
+        },
+        showlegend: true,
+        hovertemplate:
+          '<b>Number of mutation: </b>%{y} <br><b>Sample: </b>%{x}',
+      };
+    });
 
   const tracesHeatMapVariableNum1 = [
     {
@@ -564,7 +563,7 @@ export default function MsLandscape(
     //   range: [0.5, samples.length + 0.5],
     // },
     yaxis: {
-      title: 'Signature Contribution',
+      title: { text: 'Signature Contribution' },
       domain: [0, 0.35],
       zeroline: false,
     },
@@ -576,7 +575,7 @@ export default function MsLandscape(
       zeroline: false,
     },
     yaxis3: {
-      title: 'Number of mutation',
+      title: { text: 'Number of mutation' },
       domain: [0.395, 0.74],
       zeroline: false,
     },

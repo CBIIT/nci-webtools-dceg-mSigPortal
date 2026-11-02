@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions } from '../../../../services/store/catalog';
+import { actions } from '@/services/store/catalog';
 import {
   useEtiologySignatureQuery,
-} from '../etiology/apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plotly from '../../../controls/plotly/plot/plot';
+} from '@/components/pages/catalog/etiology/apiSlice';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Plotly from '@/components/controls/plotly/plot/plot';
 
 export default function STSSignatureInfo({ data }) {
   const dispatch = useDispatch();

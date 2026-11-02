@@ -1,13 +1,18 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useMsAssociationOptionsQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 
 const { Group, Check } = Form;
 
-export default function MsAssociationForm({ state, form, mergeForm }) {
+export default function MsAssociationForm({
+  state,
+  compareOptions,
+  form,
+  mergeForm,
+}) {
   const { study, strategy, signatureSetName, cancer, useAllCancer, id, id2 } =
     state;
 
@@ -64,7 +69,11 @@ export default function MsAssociationForm({ state, form, mergeForm }) {
     mergeForm({ signatureName2: e });
   }
 
-  const mergedOptions = [...(options || []), ...(options2 || [])]
+  const mergedOptions = [
+    ...(options || []),
+    ...(options2 || []),
+    ...(compareOptions || []),
+  ]
     .filter(
       (option, index, self) =>
         self.findIndex((o) => o.value === option.value) === index

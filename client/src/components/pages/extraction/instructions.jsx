@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import { Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { Container, Table, Alert } from 'react-bootstrap';
 import { useExampleQuery } from './apiSlice';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
+import { renderInlineCode } from '@/components/controls/utils/renderInlineCode';
 
 export default function Instructions({ formLimits }) {
   const examples = [
@@ -91,6 +92,128 @@ export default function Instructions({ formLimits }) {
             {label}
           </Button>
         ))}
+      </div>
+      <hr />
+      <div className="mt-2">
+        <h4>User matrix file requirements</h4>
+        <p>
+          The Extraction workflow accepts a mutation-count matrix rather than
+          raw VCF or MAF files. If you are starting from individual somatic
+          variant calls, first generate the appropriate matrix using one of the
+          following options.
+        </p>
+        <h5>Generate the matrix in mSigPortal — recommended</h5>
+        <ol>
+          <li>
+            Open the <a href="#/visualization">Visualization module.</a>
+          </li>
+          <li>
+            Select the user-data workflow and upload your final,
+            quality-controlled somatic VCF file(s).
+          </li>
+          <li>
+            Select the correct reference-genome assembly and run the
+            mutation-matrix generation workflow, which uses
+            SigProfilerMatrixGenerator.
+          </li>
+          <li>
+            Download the matrix appropriate for your analysis—typically SBS96
+            for single-base substitutions, DBS78 for doublet-base substitutions,
+            or ID83 for small insertions and deletions.
+          </li>
+          <li>
+            Return to the Extraction module and upload the downloaded matrix to
+            perform mutational-signature extraction.
+          </li>
+        </ol>
+        <h5>Generate the matrix outside mSigPortal</h5>
+        <p>
+          Alternatively, matrices can be generated locally using{' '}
+          <a
+            href="https://github.com/SigProfilerSuite/SigProfilerMatrixGenerator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SigProfilerMatrixGenerator
+          </a>
+          . The software accepts VCF, MAF, and supported text-formatted mutation
+          files and generates SBS, DBS, and ID mutation-count matrices.
+        </p>
+        <p>
+          <b>Important:</b> Users are responsible for providing final,
+          high-quality somatic mutation calls, selecting the correct
+          reference-genome assembly, and removing germline variants, sequencing
+          artifacts, and other low-confidence calls before matrix generation.
+          mSigPortal does not replace upstream variant calling or variant-level
+          quality control.
+        </p>
+        <h5>Mutation Matrix Format and Requirements</h5>
+        <Alert variant="info" className="mb-3">
+          Column names are case-insensitive. If a column name does not match the
+          required name, an error is shown.
+        </Alert>
+        <Table striped bordered size="sm" responsive>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Status</th>
+              <th>Requirement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MutationType</td>
+              <td>Required</td>
+              <td>
+                First column. Each row must contain one unique mutation-channel
+                label that matches the selected Context Type. For example, SBS96
+                requires the 96 standard trinucleotide channels and DBS78
+                requires the 78 standard dinucleotide channels.
+              </td>
+            </tr>
+            <tr>
+              <td>Sample columns</td>
+              <td>Required; dynamic</td>
+              <td>
+                Each remaining column represents one uniquely named sample.
+                Values must be finite, non-negative integer mutation counts.
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+        <p>
+          <b>File format:</b>
+          {renderInlineCode(
+            'Tab-delimited plain text. Recommended extensions are `.all`, `.tsv`, or `.txt`.'
+          )}
+        </p>
+        <p className="mb-1">
+          <b>Matrix rules:</b>
+        </p>
+        <ul style={{ display: 'block', listStyle: 'disc', columnCount: 1 }}>
+          <li> Use one row per mutation channel and one column per sample.</li>
+          <li>
+            The mutation-channel names and number of rows must match the
+            selected Context Type.
+          </li>
+          <li>
+            {renderInlineCode(
+              'Do not include duplicate mutation channels, duplicate sample names, blank cells, `NA`, negative values, or nonnumeric values.'
+            )}
+          </li>
+          <li> Do not include an all-zero sample column.</li>
+          <li>
+            Select a reference genome, opportunity genome, context type, and
+            reference-signature set that are compatible with the uploaded
+            matrix.
+          </li>
+        </ul>
+        <p>
+          <b>Examples: </b>
+          {renderInlineCode(
+            '`extraction_sample_SBS96.all` for SBS96 and `extraction_sample_DBS78.all` for DBS78.'
+          )}
+        </p>
       </div>
       <hr />
       <div className="pt-2">

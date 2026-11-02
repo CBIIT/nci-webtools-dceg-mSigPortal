@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
-import { useNonStaticParent, useAbsoluteCenteredPositioning } from '../hooks';
+import { useNonStaticParent, useAbsoluteCenteredPositioning } from '@/components/controls/hooks';
 
 const overlayStyle = {
   position: 'absolute',

@@ -17,7 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as modalActions } from '@/services/store/modal';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);

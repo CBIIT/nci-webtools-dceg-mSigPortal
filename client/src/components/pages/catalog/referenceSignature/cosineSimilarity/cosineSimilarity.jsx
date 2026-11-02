@@ -1,5 +1,5 @@
 import { NavHashLink } from 'react-router-hash-link';
-import Description from '../../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import CosineSimilarityPlot from './form-plot';
 
 export default function CosineSimilarity() {

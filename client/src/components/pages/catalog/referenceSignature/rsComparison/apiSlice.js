@@ -1,8 +1,8 @@
-import { catalogApiSlice } from '../../../../../services/store/rootApi';
-import sbs96 from '../../../../controls/plotly/profileComparison/sbs96';
-import sbs192 from '../../../../controls/plotly/profileComparison/sbs192';
-import dbs78 from '../../../../controls/plotly/profileComparison/dbs78';
-import id83 from '../../../../controls/plotly/profileComparison/id83';
+import { catalogApiSlice } from '@/services/store/rootApi';
+import sbs96 from '@/components/controls/plotly/profileComparison/sbs96';
+import sbs192 from '@/components/controls/plotly/profileComparison/sbs192';
+import dbs78 from '@/components/controls/plotly/profileComparison/dbs78';
+import id83 from '@/components/controls/plotly/profileComparison/id83';
 
 export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -14,20 +14,20 @@ export const rsComparisonApiSlice = catalogApiSlice.injectEndpoints({
       transformResponse: (data, meta, args) => {
         const signatureSetNames = args.signatureSetName.split(';');
         const signatureNames = args.signatureName.split(';');
+        const studies = args.study?.split(';');
         const data1 = data.filter(
           (e) =>
             e.signatureSetName == signatureSetNames[0] &&
-            e.signatureName == signatureNames[0]
+            e.signatureName == signatureNames[0] &&
+            (!studies || e.study == studies[0])
         );
         const data2 = data.filter(
           (e) =>
             e.signatureSetName == signatureSetNames[1] &&
-            e.signatureName == signatureNames[1]
+            e.signatureName == signatureNames[1] &&
+            (!studies || e.study == studies[1])
         );
 
-        // console.log('--RS Comparison:');
-        // console.log(data1);
-        // console.log(data2);
         if (args.profile === 'SBS') {
           if (args.matrix == '96') {
             return sbs96(data1, data2, 'pc');

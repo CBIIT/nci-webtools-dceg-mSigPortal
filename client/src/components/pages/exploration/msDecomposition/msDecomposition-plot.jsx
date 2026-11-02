@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMsDecompositionQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { getDatasetLabel } from '@/services/utils';
 
-export default function MsDecompositionPlot({ state }) {
+export default function MsDecompositionPlot({ state, divId = 'msDecomposition' }) {
   const [params, setParams] = useState('');
 
   const { currentData, error, isFetching } = useMsDecompositionQuery(params, {
@@ -24,13 +25,18 @@ export default function MsDecompositionPlot({ state }) {
     }
   }, [study, id]);
 
+  const label = getDatasetLabel(state);
+
   return (
     <>
       <LoadingOverlay active={isFetching} />
+      {label && <p className="text-center text-muted mb-0">{label}</p>}
       {error && <p className="p-3 text-danger">Plot is unavailable</p>}
       {currentData && !error ? (
         <Plotly
           className="w-100"
+          divId={divId}
+          filename={divId}
           data={currentData.traces}
           layout={currentData.layout}
           config={currentData.config}

@@ -1,9 +1,9 @@
 import { Container } from 'react-bootstrap';
 import MsDecompositionPlot from './msDecomposition-plot';
-import Description from '../../../controls/description/description';
+import Description from '@/components/controls/description/description';
 import { NavHashLink } from 'react-router-hash-link';
 
-export default function MsDecomposition({ state }) {
+export default function MsDecomposition({ state, compareState }) {
   return (
     <Container fluid className="bg-white border rounded p-0">
       <div className="p-3">
@@ -25,7 +25,16 @@ export default function MsDecomposition({ state }) {
         />
       </div>
       <hr />
-      <MsDecompositionPlot state={state} />
+      <MsDecompositionPlot state={state} divId="msDecomposition-primary" />
+      {compareState && (
+        <>
+          <hr />
+          <MsDecompositionPlot
+            state={compareState}
+            divId="msDecomposition-compare"
+          />
+        </>
+      )}
     </Container>
   );
 }

@@ -1,5 +1,5 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import MsBurden from '../../../controls/plotly/tmb/tmb';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import MsBurden from '@/components/controls/plotly/tmb/tmb';
 import { groupBy } from 'lodash';
 
 export const msBurdenApiSlice = explorationApiSlice.injectEndpoints({

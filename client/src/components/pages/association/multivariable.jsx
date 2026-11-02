@@ -10,13 +10,14 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { actions as associationActions } from '../../../services/store/association';
-import { actions as modalActions } from '../../../services/store/modal';
-import CustomSelect from '../../controls/select/select-old';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { actions as associationActions } from '@/services/store/association';
+import { getEmptyAssocVar } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
+import CustomSelect from '@/components/controls/select/select-old';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import AssocVarParams from './assocVarParams';
-import SvgContainer from '../../controls/svgContainer/svgContainer';
-import Table from '../../controls/table/table';
+import SvgContainer from '@/components/controls/svgContainer/svgContainer';
+import Table from '@/components/controls/table/table';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group, Label, Check, Control } = Form;
@@ -144,10 +145,10 @@ export default function Multivariable() {
             body: JSON.stringify({
               fn: 'loadCollapseMulti',
               args: {
-                study,
-                strategy,
-                rsSet,
-                cancer,
+                study: study.value,
+                strategy: strategy.value,
+                rsSet: rsSet.value,
+                cancer: cancer.value,
                 expName: exposureVar.name,
                 associationVars: associationVars.map(
                   ({
@@ -164,20 +165,29 @@ export default function Multivariable() {
           })
         ).json();
 
-        mergeState({
-          associationVars: associationVars.map((assocVar, i) => ({
-            ...assocVar,
-            name: assocVar.tmpName,
-            collapse: Array.isArray(collapseData[i + 1])
-              ? collapseData[i + 1][0]
-              : '',
-            collapseOptions: Array.isArray(collapseData[i + 1])
-              ? collapseData[i + 1]
-              : [],
-            id: sessionId,
-          })),
-          // exposureVar: { name: expVarList[0] },
-        });
+        if (collapseData?.error || collapseData?.uncaughtError) {
+          mergeState({
+            error:
+              collapseData.error ||
+              collapseData.uncaughtError ||
+              'An error has occurred. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
+          });
+        } else {
+          mergeState({
+            associationVars: associationVars.map((assocVar, i) => ({
+              ...assocVar,
+              name: assocVar.tmpName,
+              collapse: Array.isArray(collapseData[i + 1])
+                ? collapseData[i + 1][0]
+                : '',
+              collapseOptions: Array.isArray(collapseData[i + 1])
+                ? collapseData[i + 1]
+                : [],
+              id: sessionId,
+            })),
+            // exposureVar: { name: expVarList[0] },
+          });
+        }
       } catch (error) {
         mergeError(error);
       }
@@ -187,20 +197,7 @@ export default function Multivariable() {
 
   function handleReset() {
     mergeState({
-      associationVars: [
-        {
-          source: '',
-          type: '',
-          tmpName: '',
-          sourceOptions: [],
-          typeOptions: [],
-          nameOptions: [],
-          filter: '',
-          log2: false,
-          collapse: '',
-          collapseOptions: [],
-        },
-      ],
+      associationVars: [getEmptyAssocVar()],
       id: '',
       plotPath: '',
       dataPath: '',
@@ -244,7 +241,7 @@ export default function Multivariable() {
                 cancer: cancer.value,
                 testType: testType,
                 signature: signature,
-                xlab: xlab || associationVars.name,
+                xlab: xlab || associationVars[0].name,
                 ylab: ylab || exposureVar.name,
                 associationVars: associationVars.map(
                   ({
@@ -286,6 +283,11 @@ export default function Multivariable() {
               uncaughtError ||
               'An error has occurred. Please review your input and try again. If the issue persists, please contact us: NCImSigPortalWebAdmin@mail.nih.gov',
           });
+        } else if (!Array.isArray(dataTable) || dataTable.length === 0) {
+          mergeState({
+            error:
+              'No association results were produced for the selected variables.',
+          });
         } else {
           mergeState({
             id,
@@ -298,7 +300,7 @@ export default function Multivariable() {
           });
         }
       } catch (error) {
-        mergeState({ error: error });
+        mergeState({ error: error.message || String(error) });
       }
       mergeState({
         loadingCalculate: false,
@@ -316,18 +318,7 @@ export default function Multivariable() {
   function addParam() {
     if (associationVars.length < 10) {
       let newParams = associationVars.slice();
-      newParams.push({
-        source: '',
-        type: '',
-        tmpName: '',
-        sourceOptions: [],
-        typeOptions: [],
-        nameOptions: [],
-        filter: '',
-        log2: false,
-        collapse: '',
-        collapseOptions: [],
-      });
+      newParams.push(getEmptyAssocVar());
       mergeState({ associationVars: newParams });
     } else {
       showWarnLimit(true);
@@ -358,7 +349,7 @@ export default function Multivariable() {
           }
           data={assocVarData}
           columns={[
-            ...new Set(...assocVarData.map((row) => Object.keys(row))),
+            ...new Set(assocVarData.flatMap((row) => Object.keys(row))),
           ].reduce(reducer, [])}
           pagination={assocTable.pagination}
           hidden={assocTable.hidden}
@@ -401,19 +392,70 @@ export default function Multivariable() {
             style={{ maxWidth: '1720px' }}
           >
             <Col md="auto" lg="auto">
-              <CustomSelect
-                disabled={
-                  loadingData ||
-                  loadingParams ||
-                  loadingCalculate ||
-                  resultsTable.data.length
-                }
-                id="expVariable"
-                label="Signature Exposure Variable"
-                value={exposureVar.name}
-                options={expVarList}
-                onChange={(e) => mergeState({ exposureVar: { name: e } })}
-              />
+              <div className="d-flex align-items-center">
+                <OverlayTrigger
+                  trigger="click"
+                  placement="top"
+                  overlay={
+                    <Popover id="expVar-info" style={{ maxWidth: '420px' }}>
+                      <Popover.Title as="h6" className="font-weight-bold">
+                        Signature Exposure Variable
+                      </Popover.Title>
+                      <Popover.Content>
+                        <p className="mb-2">
+                          <b>Signature_exposure</b> and{' '}
+                          <b>Signature_exposure_ratio</b> are numeric
+                          (continuous) variables.
+                        </p>
+                        <p className="mb-2">
+                          <b>Signature_exposure_cat</b> is a categorical
+                          variable with two levels: Observed and Not_observed.
+                        </p>
+                        <p className="mb-0">
+                          The multivariable analysis uses regression modeling.
+                          The regression method is selected according to the
+                          type of outcome variable:
+                        </p>
+                        <ul>
+                          <li>Continuous outcome: linear regression.</li>
+                          <li>
+                            Binary categorical outcome: logistic regression.
+                          </li>
+                        </ul>
+                        <p>
+                          Multiple covariates can be included in the regression
+                          model to estimate adjusted associations.
+                        </p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                  rootClose
+                >
+                  <Button
+                    aria-label="signature exposure variable info"
+                    variant="link"
+                    className="p-0 font-weight-bold mr-1"
+                  >
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      style={{ verticalAlign: 'baseline' }}
+                    />
+                  </Button>
+                </OverlayTrigger>
+                <CustomSelect
+                  disabled={
+                    loadingData ||
+                    loadingParams ||
+                    loadingCalculate ||
+                    resultsTable.data.length
+                  }
+                  id="expVariable"
+                  label="Signature Exposure Variable"
+                  value={exposureVar.name}
+                  options={expVarList}
+                  onChange={(e) => mergeState({ exposureVar: { name: e } })}
+                />
+              </div>
             </Col>
             <Col md="auto">
               {warnDupe.length > 0 && (
@@ -591,7 +633,9 @@ export default function Multivariable() {
               </Col>
               <Col lg="auto">
                 <fieldset className="border rounded p-2">
-                  <legend id="testType-label" className="font-weight-bold">Method</legend>
+                  <legend id="testType-label" className="font-weight-bold">
+                    Method
+                  </legend>
                   <CustomSelect
                     className="mb-0"
                     disabled={
@@ -652,7 +696,7 @@ export default function Multivariable() {
                   data={resultsTable.data}
                   columns={[
                     ...new Set(
-                      ...resultsTable.data.map((row) => Object.keys(row))
+                      resultsTable.data.flatMap((row) => Object.keys(row))
                     ),
                   ]
                     .reduce(reducer, [])

@@ -187,6 +187,7 @@ export default function SATSTMBBarChart(data, options = {}) {
     displayModeBar: true,
     responsive: true,
     displaylogo: false,
+    showSendToCloud: false,
     toImageButtonOptions: {
       format: 'svg',
       filename: 'SATS_TMB_BarChart',

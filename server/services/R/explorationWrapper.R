@@ -448,18 +448,14 @@ msigportal.exposurePublic <- function(args, config) {
   )
   genomesize <- genome2size(genome)
 
-  study_signature_file <- paste0(config$prefix, "Exposure/Study_Signatures/", common$study, "_", common$strategy, "_signature_refsets.RData")
-  if (aws.s3::object_exists(study_signature_file, config$bucket)) {
-    s3load(study_signature_file, config$bucket)
-  } else {
-    s3load(paste0(config$prefix, "Signature/signature_refsets.RData"), config$bucket)
-  }
+  signature_refsets <- load_signature_refsets(config, common$study, common$strategy)
   s3load(paste0(config$prefix, "Exposure/", common$study, "_", common$strategy, "_exposure_refdata.RData"), config$bucket)
   s3load(paste0(config$prefix, "Seqmatrix/seqmatrix_refdata_subset_files.RData"), config$bucket)
 
   # filter data
   exposure_refdata_selected <- exposure_refdata %>% filter(Study == common$study, Dataset == common$strategy, Signature_set_name == common$rsSet)
   signature_refsets_selected <- signature_refsets %>% filter(Signature_set_name == common$rsSet)
+  assert_signature_set(signature_refsets_selected, common$rsSet, study = common$study)
 
   if (common$useCancerType) {
     seqmatrixFile <- seqmatrix_refdata_subset_files %>%
@@ -836,7 +832,6 @@ msigportal.msLandscape <- function(args, ...) {
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
   signatureData <- args$signatureData %>%
-    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
     distinct() %>%
     pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
@@ -917,7 +912,6 @@ msigportal.msDecomposition <- function(args, ...) {
     pivot_wider(id_cols = Sample, names_from = Signature_name, values_from = Exposure)
 
   signatureData <- args$signatureData %>%
-    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(MutationType = mutationType, Signature_name = signatureName, Contribution = contribution) %>%
     distinct() %>%
     pivot_wider(id_cols = MutationType, names_from = Signature_name, values_from = Contribution) %>%
@@ -973,13 +967,11 @@ msigportal.cosineSimilarity <- function(args, config) {
   source("services/R/Sigvisualfunc.R")
 
   signatureData1 <- args$signatureData1 %>%
-    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
     distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)
 
   signatureData2 <- args$signatureData2 %>%
-    { if ("study" %in% names(.) && !is.null(args$study)) dplyr::filter(., is.na(study) | study == "" | study == args$study) else . } %>%
     select(Signature_name = signatureName, MutationType = mutationType, Contribution = contribution) %>%
     distinct() %>%
     pivot_wider(names_from = Signature_name, values_from = Contribution)

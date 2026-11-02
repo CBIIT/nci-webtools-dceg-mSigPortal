@@ -1,4 +1,4 @@
-import Table from '../../../components/controls/table/table2';
+import Table from '@/components/controls/table/table2';
 import { usePublicationsQuery } from './apiSlice';
 import './publications.scss';
 

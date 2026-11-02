@@ -1,6 +1,6 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import mutationalPatternBar from '../../../controls/plotly/mutationalPattern/mutationalPatternBar';
-import mutationalPatternScatter from '../../../controls/plotly/mutationalPattern/mutationalPatternScatter';
+import { visualizationApiSlice } from '@/services/store/rootApi';
+import mutationalPatternBar from '@/components/controls/plotly/mutationalPattern/mutationalPatternBar';
+import mutationalPatternScatter from '@/components/controls/plotly/mutationalPattern/mutationalPatternScatter';
 
 export const mutationalPatternApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

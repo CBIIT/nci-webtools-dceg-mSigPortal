@@ -6,7 +6,7 @@ import {
   createMutationAnnotations,
   getTotalMutations,
 } from './utils';
-import {rnaSBS192Color } from '../../utils/colors';
+import {rnaSBS192Color } from '@/components/controls/utils/colors';
 
 export default function RNASBS192(apiData, title = '') {
   const colors = rnaSBS192Color;
@@ -59,7 +59,7 @@ export default function RNASBS192(apiData, title = '') {
   }
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

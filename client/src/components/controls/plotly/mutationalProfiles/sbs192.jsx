@@ -5,7 +5,7 @@ import {
   createMutationShapes,
   createMutationAnnotations,
 } from './utils';
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '@/components/controls/utils/colors';
 
 export default function SBS192(apiData, title = '') {
   const colors = sbsColor;
@@ -113,7 +113,7 @@ export default function SBS192(apiData, title = '') {
     .flat();
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     showlegend: true,
     height: 450,

@@ -2,18 +2,22 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderMinus } from '@fortawesome/free-solid-svg-icons';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as exposureActions } from '../../../../services/store/exploration';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as exposureActions } from '@/services/store/exploration';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExplorationApi,
   useSignatureOptionsQuery,
-} from '../../../../services/store/rootApi';
+  useExposureOptionsQuery,
+} from '@/services/store/rootApi';
+import { signatureSetCompare } from '@/services/utils';
 import {
   useUploadExplorationMutation,
   useSubmitExplorationMutation,
 } from './apiSlice';
+import PublicDataFields from '../publicForm/publicDataFields';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Check, Label } = Form;
@@ -24,6 +28,8 @@ export default function PublicForm() {
     await dispatch(actions.mergeExploration({ userForm: state }));
   const mergeMain = async (state) =>
     await dispatch(actions.mergeExploration({ main: state }));
+  const mergeCompareForm = async (state) =>
+    await dispatch(actions.mergeExploration({ comparePublicForm: state }));
   const resetExploration = (_) => dispatch(actions.resetExploration());
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
@@ -36,22 +42,38 @@ export default function PublicForm() {
     data: signatureOptions,
     isFetching,
     isError,
-  } = useSignatureOptionsQuery();
+  } = useSignatureOptionsQuery({ study: 'Reference' });
+  const { data: publicDataOptions, isFetching: isFetchingPublicData } =
+    useExposureOptionsQuery();
   const [handleUpload, { isLoading: isUploading }] =
     useUploadExplorationMutation();
   const [submitExploration, { isLoading: loadingUserExposure }] =
     useSubmitExplorationMutation();
+
+  const comparePublicDataDefaults = {
+    study: { label: 'PCAWG', value: 'PCAWG' },
+    strategy: { label: 'WGS', value: 'WGS' },
+    signatureSetName: {
+      label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+      value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
+    },
+    cancer: { label: 'Lung-AdenoCA', value: 'Lung-AdenoCA' },
+  };
 
   const defaultFormValues = {
     exposureFile: '',
     matrixFile: '',
     signatureFile: '',
     study: { label: 'PCAWG', value: 'PCAWG' },
+    strategy: { label: 'WGS', value: 'WGS' },
     signatureSetName: {
       label: 'COSMIC_v3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3_Signatures_GRCh37_SBS96',
     },
     genome: { label: 'GRCh37', value: 'GRCh37' },
+    piiAcknowledged: false,
+    compareEnabled: false,
+    compare: comparePublicDataDefaults,
   };
 
   const {
@@ -64,7 +86,14 @@ export default function PublicForm() {
     formState: { errors },
   } = useForm({ defaultValues: defaultFormValues });
 
-  const { exposureFile, matrixFile, signatureFile } = watch();
+  const {
+    exposureFile,
+    matrixFile,
+    signatureFile,
+    strategy,
+    piiAcknowledged,
+    compareEnabled,
+  } = watch();
 
   async function loadExample(type) {
     const filepath = `assets/exampleInput/Sherlock_SBS96_${type}.txt`;
@@ -89,19 +118,121 @@ export default function PublicForm() {
     }
   }
 
-  const signatureSetOptions = signatureOptions
-    ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }))
+  const strategyOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.strategy))].sort().map((e) => ({
+        label: e,
+        value: e,
+      }))
     : [];
+
+  const signatureSetOptions = (strategy) =>
+    signatureOptions && strategy
+      ? [
+          ...new Set(
+            signatureOptions
+              .filter((e) => e.strategy === strategy.value)
+              .map((e) => e.signatureSetName)
+          ),
+        ]
+          .sort(signatureSetCompare)
+          .map((e) => ({
+            label: e,
+            value: e,
+          }))
+      : [];
+
+  function handleStrategyChange(strategy) {
+    const signatureSets = signatureSetOptions(strategy);
+    setValue('strategy', strategy);
+    setValue('signatureSetName', signatureSets[0]);
+  }
+
+  async function readFirstColumns(file) {
+    const text = await file.text();
+    const firstLine = text.split(/\r?\n/).find((l) => l.trim() !== '');
+    if (!firstLine) return [];
+    const delimiter = firstLine.includes('\t') ? '\t' : ',';
+    return firstLine
+      .replace(/^\uFEFF/, '')
+      .split(delimiter)
+      .map((c) => c.trim());
+  }
+
+  // verify first-column headers (case-insensitive) before uploading
+  async function validateExplorationHeaders(exposure, matrix, signature) {
+    if (!exposure || !matrix)
+      return {
+        isValid: false,
+        error: 'Please upload the required input files.',
+      };
+    try {
+      const exposureCols = await readFirstColumns(exposure);
+      if ((exposureCols[0] || '').toLowerCase() !== 'samples')
+        return {
+          isValid: false,
+          error: `The exposure/activity file's first column must be "Samples" (found "${
+            exposureCols[0] || ''
+          }").`,
+        };
+      if (exposureCols.length < 2)
+        return {
+          isValid: false,
+          error:
+            'The exposure/activity file must include at least one signature column.',
+        };
+      const matrixCols = await readFirstColumns(matrix);
+      if ((matrixCols[0] || '').toLowerCase() !== 'mutationtype')
+        return {
+          isValid: false,
+          error: `The mutation matrix file's first column must be "MutationType" (found "${
+            matrixCols[0] || ''
+          }").`,
+        };
+      if (matrixCols.length < 2)
+        return {
+          isValid: false,
+          error:
+            'The mutation matrix file must include at least one sample column.',
+        };
+      if (signature) {
+        const signatureCols = await readFirstColumns(signature);
+        if ((signatureCols[0] || '').toLowerCase() !== 'mutationtype')
+          return {
+            isValid: false,
+            error: `The signature-profile file's first column must be "MutationType" (found "${
+              signatureCols[0] || ''
+            }").`,
+          };
+        if (signatureCols.length < 2)
+          return {
+            isValid: false,
+            error:
+              'The signature-profile file must include at least one signature column.',
+          };
+      }
+      return { isValid: true };
+    } catch (e) {
+      return {
+        isValid: false,
+        error: 'Error reading an input file. Please check the file format.',
+      };
+    }
+  }
 
   async function onSubmit(data) {
     try {
+      const validation = await validateExplorationHeaders(
+        data.exposureFile,
+        data.matrixFile,
+        usePublicSignature ? null : data.signatureFile
+      );
+      if (!validation.isValid) {
+        mergeError(validation.error);
+        return;
+      }
       mergeMain({ submitted: true, loading: true });
       mergeForm(data);
+      mergeCompareForm(data.compareEnabled ? data.compare : {});
 
       // create form data for upload
       const formData = new FormData();
@@ -118,10 +249,11 @@ export default function PublicForm() {
         signatureFile: data?.signatureFile.name,
         ...(usePublicSignature && {
           signatureSetName: data?.signatureSetName.value,
+          strategy: data?.strategy.value,
         }),
       }).unwrap();
 
-      mergeMain({ displayTab: 'tmb', id });
+      mergeMain({ displayTab: 'tmb', id, compare: data.compareEnabled });
     } catch (error) {
       mergeError(error.message || 'Failed to submit');
     } finally {
@@ -277,10 +409,11 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <hr className="mb-3" />
       <Row>
         <Col>
           <Group controlId="toggleSignatureSource" className="d-flex">
-            <Label className="mr-4">Use Public Signature Data</Label>
+            <Label className="mr-auto">Use Public Signature Data</Label>
             <Check inline id="toggleSignatureSource">
               <Check.Input
                 disabled={loading || submitted}
@@ -299,13 +432,23 @@ export default function PublicForm() {
       </Row>
 
       {usePublicSignature ? (
-        <Select
-          name="signatureSetName"
-          label="Reference Signature Set"
-          control={control}
-          disabled={loading || submitted || isFetching}
-          options={signatureSetOptions}
-        />
+        <>
+          <Select
+            name="strategy"
+            label="Experimental Strategy"
+            control={control}
+            disabled={loading || submitted || isFetching}
+            options={strategyOptions}
+            onChange={handleStrategyChange}
+          />
+          <Select
+            name="signatureSetName"
+            label="Reference Signature Set"
+            control={control}
+            disabled={loading || submitted || isFetching}
+            options={signatureSetOptions(strategy)}
+          />
+        </>
       ) : (
         <Row>
           <Col>
@@ -377,6 +520,7 @@ export default function PublicForm() {
           </Col>
         </Row>
       )}
+      <hr className="mb-3" />
       <Row>
         <Col>
           <Group>
@@ -394,6 +538,51 @@ export default function PublicForm() {
           </Group>
         </Col>
       </Row>
+      <hr className="mb-3" />
+      <Row>
+        <Col>
+          <Group controlId="compareEnabled" className="d-flex">
+            <Label className="mr-auto">Compare with Public Data</Label>
+            <Check inline id="compareEnabled">
+              <Controller
+                name="compareEnabled"
+                control={control}
+                render={({ field }) => (
+                  <Check.Input
+                    {...field}
+                    type="checkbox"
+                    disabled={loading || submitted || id}
+                    checked={field.value}
+                  />
+                )}
+              />
+            </Check>
+          </Group>
+        </Col>
+      </Row>
+      <hr className="mb-3" />
+
+      {compareEnabled && (
+        <div className="border rounded p-2 mb-3 bg-light">
+          <p className="font-weight-bold mb-2" style={{ fontSize: '12px' }}>
+            Public Data for Comparison
+          </p>
+          <PublicDataFields
+            control={control}
+            setValue={setValue}
+            watch={watch}
+            options={publicDataOptions}
+            disabled={loading || submitted || id || isFetchingPublicData}
+            prefix="compare"
+          />
+        </div>
+      )}
+
+      <PiiAcknowledgment
+        id="explorationPiiAcknowledgment"
+        control={control}
+        disabled={loading || isUploading || loadingUserExposure || id}
+      />
       <Row>
         <Col lg="6">
           <Button
@@ -407,7 +596,12 @@ export default function PublicForm() {
         <Col lg="6">
           <Button
             disabled={
-              loading || isFetching || isUploading || loadingUserExposure || id
+              loading ||
+              isFetching ||
+              isUploading ||
+              loadingUserExposure ||
+              id ||
+              !piiAcknowledged
             }
             className="w-100"
             variant="primary"

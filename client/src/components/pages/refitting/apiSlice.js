@@ -1,4 +1,4 @@
-import { refittingApiSlice } from '../../../services/store/rootApi';
+import { refittingApiSlice } from '@/services/store/rootApi';
 
 export const inputFormApiSlice = refittingApiSlice.injectEndpoints({
   endpoints: (builder) => ({

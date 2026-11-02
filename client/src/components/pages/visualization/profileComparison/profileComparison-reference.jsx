@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { NavHashLink } from 'react-router-hash-link';
 import { useProfileComparisonReferenceQuery } from './apiSlice';
-import { useSignatureOptionsQuery } from '../../../../services/store/rootApi';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { defaultMatrix } from '../../../../services/utils';
-import Plotly from '../../../controls/plotly/plot/plot';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { defaultProfile2 } from '../../../../services/utils';
+import { useSignatureOptionsQuery } from '@/services/store/rootApi';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { defaultMatrix } from '@/services/utils';
+import Plotly from '@/components/controls/plotly/plot/plot';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
+import { defaultProfile2 } from '@/services/utils';
 
 export default function PcReference({ state }) {
   const [params, setParams] = useState(null);
@@ -25,7 +25,12 @@ export default function PcReference({ state }) {
     { skip: source == 'user' ? !id : !study }
   );
   const { data: signatureOptions, isFetching: fetchingSignatureOptions } =
-    useSignatureOptionsQuery();
+    useSignatureOptionsQuery(
+      source == 'public'
+        ? { study: `Reference;${study.value}` }
+        : { study: 'Reference' },
+      { skip: source == 'public' ? !study : false }
+    );
   // query plot
   const {
     data: plot,
@@ -93,7 +98,10 @@ export default function PcReference({ state }) {
               .filter(
                 (e) =>
                   e.profile == profile.value &&
-                  e.matrix == defaultMatrix(profile.value, ['96', '78', '83'])
+                  e.matrix ==
+                    defaultMatrix(profile.value, ['96', '78', '83']) &&
+                  // a de novo set is only valid for the strategy its file was built from
+                  (e.study === 'Reference' || e.strategy == strategy?.value)
               )
               .map((e) => e.signatureSetName)
           ),
@@ -117,7 +125,8 @@ export default function PcReference({ state }) {
                   e.profile == profile.value &&
                   e.matrix ==
                     defaultMatrix(profile.value, ['96', '78', '83']) &&
-                  e.signatureSetName == signatureSet.value
+                  e.signatureSetName == signatureSet.value &&
+                  (e.study === 'Reference' || e.strategy == strategy?.value)
               )
               .map((e) => e.signatureName)
           ),
@@ -165,6 +174,8 @@ export default function PcReference({ state }) {
       signatureSetName: signatureSet.value,
       signatureName,
       scalarValue,
+      // a de novo set name can be reused by other studies, so scope by study like every other query
+      study: source == 'public' ? `Reference;${study.value}` : 'Reference',
     };
 
     setParams({ spectrumQueryParams, signatureQueryParams });
@@ -362,7 +373,13 @@ export default function PcReference({ state }) {
                 are. For example, two identical mutational profiles will have
                 RSS = 0 and Cosine similarity = 1. For additional information
                 about RSS and cosine similarity, click{' '}
-                <NavHashLink to="/faq#cosine-similarity" className="accessible-link">here</NavHashLink>.
+                <NavHashLink
+                  to="/faq#cosine-similarity"
+                  className="accessible-link"
+                >
+                  here
+                </NavHashLink>
+                .
               </p>
             </div>
           </>

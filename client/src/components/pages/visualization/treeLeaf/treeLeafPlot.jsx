@@ -1,168 +1,94 @@
-import { useRef, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import cloneDeep from 'lodash/cloneDeep';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { formState, graphDataSelector, treeLeafDataState } from './treeLeaf.state';
-import { groupBy, createPromiseWorker } from './treeLeaf.utils';
+import {
+  plotStyle,
+  getTreeFit,
+  getOverlayLayout,
+  createColorScale,
+  createNodeStyles,
+  getTooltipHtml,
+} from './treeLeaf.utils';
 
+/**
+ * @param {object} props
+ * @param {{nodes: object[], links: number[][]} | null} props.layout precomputed positions; links are [sourceIndex, targetIndex]
+ * @param {object} props.attributes leaf attributes keyed by sample
+ */
 export default function D3TreeLeaf({
   id = 'treeleaf-plot',
   width = 1000,
   height = 1000,
   onSelect,
-  ...props
+  layout,
+  attributes,
+  form,
+  plotTitle,
 }) {
   const plotRef = useRef(null);
-  const form = useRecoilValue(formState);
-  const publicForm = useSelector((state) => state.visualization.publicForm);
-  const study = publicForm?.study?.value ?? 'PCAWG';
-  const strategy = publicForm?.strategy?.value ?? 'WGS';
-  const signatureSetName = form?.signatureSetName;
-  const profile = form?.profile;
-  const matrix = form?.matrix;
-  const cancer = form?.cancerType?.value;
-  const params = { study, strategy, signatureSetName, profile, matrix, cancer };
-  const { hierarchy, attributes, params: parameters } = useRecoilValue(graphDataSelector(params));
-  // const { hierarchy, attributes } = cloneDeep(graphData) || {};
-  const [treeLeafData, setTreeLeafData] = useRecoilState(treeLeafDataState);
-  const [loading, setLoading] = useState(false);
+  const plotHandleRef = useRef(null);
+  const { color, searchSamples } = form;
 
   useEffect(() => {
-    setLoading(true);
-    // use sessionCache as a temporary cache to allow storing objects with circular references (eg: hierarchy)
-    window.sessionCache = window.sessionCache || {};
-    const worker = createPromiseWorker('./workers/treeLeaf.js', { type: 'module' });
-    const params = {
-      data: hierarchy,
-      attributes: groupBy(attributes, 'Sample'),
-      radius: Math.min(width, height) / 2,
-    };
-    const key = JSON.stringify(params);
-    const sessionTreeLeafData = window.sessionCache[key];
-
-    if (sessionTreeLeafData) {
-      setTreeLeafData(sessionTreeLeafData);
-      setLoading(false);
-    } else {
-      worker.submit(params).then(data => {
-        setTreeLeafData(data);
-        window.sessionCache[key] = data;
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    if (!plotRef.current) return;
+    if (!layout || !attributes) {
+      plotRef.current.replaceChildren();
+      plotHandleRef.current = null;
+      return;
     }
+    const plot = createForceDirectedTree(
+      { attributes, nodes: layout.nodes, links: layout.links },
+      { id, width, height, radius: Math.min(width, height) / 2 },
+      { onClick: onSelect }
+    );
+    plotRef.current.replaceChildren(plot.node);
+    plotHandleRef.current = plot;
+  }, [layout, attributes, id, width, height, onSelect]);
 
-    return () => worker?.terminate();
-  }, [hierarchy, attributes, width, height, setTreeLeafData, setLoading]);
-  
+  // restyles in place so changing color or search keeps the DOM and zoom
   useEffect(() => {
-    if (plotRef.current && hierarchy && attributes && parameters) {
-      const plotData = {
-        data: hierarchy,
-        attributes: groupBy(attributes, 'Sample'),
-        form: form,
-        nodes: treeLeafData.nodes,
-        links: treeLeafData.links,
-      };
+    plotHandleRef.current?.updateStyle({
+      form: { color, searchSamples },
+      plotTitle,
+    });
+  }, [
+    layout,
+    attributes,
+    id,
+    width,
+    height,
+    onSelect,
+    color,
+    searchSamples,
+    plotTitle,
+  ]);
 
-      let plotTitle = `${publicForm?.study?.label} - ${form.color.label}`;
-
-      if (form.color.label === 'Dominant Signature' && parameters.signatureSetName) {
-        plotTitle += ' - ' + parameters.signatureSetName;
-      }
-
-      const plotLayout = {
-        id,
-        width,
-        height,
-        radius: Math.min(width, height) / 2,
-        plotTitle,
-      };
-
-      const plotEvents = {
-        onClick: onSelect,
-      };
-
-      const plot = createForceDirectedTree(plotData, plotLayout, plotEvents);
-      plotRef.current?.replaceChildren(plot);
-    } else {
-      plotRef.current?.replaceChildren(null);
-    }
-  }, [plotRef, attributes, form, hierarchy, id, width, height, publicForm?.study?.label, form.color.label, onSelect, treeLeafData]);
-
-  return (
-    <div className="border rounded p-3 position-relative" {...props}>
-      <div hidden={!loading}>Please wait one minute while your plot is being rendered...</div>
-      <div hidden={loading} ref={plotRef}  />
-    </div>
-  );
+  return <div ref={plotRef} />;
 }
 
 // Copyright 2022 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/force-directed-tree
 function createForceDirectedTree(
-  { attributes, form, nodes, links },
+  { attributes, nodes, links },
   {
     id,
-    title, // given a node d, returns its hover text
     width = 640, // outer width, in pixels
     height = 400, // outer height, in pixels
     margin = 0, // shorthand for margins
     marginTop = margin, // top margin, in pixels
-    marginRight = margin, // right margin, in pixels
-    marginBottom = margin, // bottom margin, in pixels
     marginLeft = margin, // left margin, in pixels
-    radius = Math.min(
-      width - marginLeft - marginRight,
-      height - marginTop - marginBottom
-    ) / 2, // outer radius
-    fill = form.color.continuous
-      ? d3.scaleSequential(d3.interpolateRgb("white", "steelblue"))
-      : d3.scaleOrdinal(d3.schemeCategory10), // fill for nodes
-    stroke = '#666', // stroke for links
-    strokeWidth = 0.3, // stroke width for links
+    radius, // outer radius
     strokeOpacity = 1, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
     strokeLinecap, // stroke line cap for links
-    plotTitle,
   },
-  { onClick },
+  { onClick }
 ) {
-  const range = {
-    xMin: 0,
-    xMax: 0,
-    yMin: 0,
-    yMax: 0,
-  };
-
-  nodes.forEach((d) => {
-    if (d.x < range.xMin) range.xMin = d.x;
-    if (d.x > range.xMax) range.xMax = d.x;
-    if (d.y < range.yMin) range.yMin = d.y;
-    if (d.y > range.yMax) range.yMax = d.y;
-  });
-
-  const treeScale = Math.min(
-    Math.log2(Object.keys(attributes).length),
-    Math.max(
-      width / (range.xMax - range.xMin),
-      height / (range.yMax - range.yMin)
-    )
-  ) * 1.05;
-
-  // gather range of attributes
-  const colorValues = Object.values(attributes).map((e) => e[form.color.value]);
-  const colorMin = d3.min(colorValues);
-  const colorMax = d3.max(colorValues);
-  const colorFill = form.color.continuous
-    ? fill.domain([colorMin, colorMax])
-    : fill.domain(colorValues);
+  const { viewBoxScale, stroke, strokeWidth } = plotStyle;
+  const { cx, cy, treeScale } = getTreeFit(nodes, width, height);
 
   const zoom = d3.zoom().on('zoom', zoomed);
-  const viewBoxScale = 1.3;
-  const container = d3.create('div');
+  const container = d3.create('div').style('position', 'relative');
   const svg = container
     .append('svg')
     .attr('id', id)
@@ -184,20 +110,28 @@ function createForceDirectedTree(
 
   // add zoom reset control
   const zoomReset = container
-      .append('button')
-      .attr('id', 'treeleaf-zoom-reset')
-      .attr('class', 'btn btn-outline-secondary btn-sm')
-      .attr('style', 'position: absolute; top: 10px; left: 10px;')
-      .text('Reset Zoom')
-      .on('click', () => svg.transition().duration(250).call(zoom.transform,d3.zoomIdentity));
+    .append('button')
+    .attr('id', 'treeleaf-zoom-reset')
+    .attr('class', 'btn btn-outline-secondary btn-sm')
+    .attr('style', 'position: absolute; top: 10px; left: 10px;')
+    .text('Reset Zoom')
+    .on('click', () =>
+      svg.transition().duration(250).call(zoom.transform, d3.zoomIdentity)
+    );
 
   // add tree container
-  const treeZoomContainer = svg.append('g')
-    .attr('id', 'treeleaf-zoom-container')
+  const treeZoomContainer = svg
+    .append('g')
+    .attr('id', 'treeleaf-zoom-container');
 
-  const treeGroup = treeZoomContainer.append('g')
+  // Center the bounding box at the viewBox origin, then scale to fill.
+  const treeGroup = treeZoomContainer
+    .append('g')
     .attr('id', 'treeleaf-tree')
-    .attr('transform', `translate(0, 0) scale(${treeScale})`);
+    .attr(
+      'transform',
+      `translate(${-cx * treeScale}, ${-cy * treeScale}) scale(${treeScale})`
+    );
 
   // add lines
   const link = treeGroup
@@ -212,65 +146,38 @@ function createForceDirectedTree(
     .selectAll('path')
     .data(links)
     .join('line')
-    .attr('x1', (d) => d.source.x)
-    .attr('y1', (d) => d.source.y)
-    .attr('x2', (d) => d.target.x)
-    .attr('y2', (d) => d.target.y);
+    .attr('x1', ([source]) => nodes[source].x)
+    .attr('y1', ([source]) => nodes[source].y)
+    .attr('x2', ([, target]) => nodes[target].x)
+    .attr('y2', ([, target]) => nodes[target].y);
 
-  const searchValues = form.searchSamples?.map((s) => s.value) || [];
-  const highlightedColor = 'yellow';
-
-  function getNodeColor({ data }) {
-    if (data.name && searchValues.includes(data.name)) {
-      return highlightedColor;
-    }
-
-    return data.name && attributes[data.name]
-      ? colorFill(attributes[data.name][form.color.value])
-      : stroke;
-  }
-
-  function getNodeOpacity({ data }) {
-    if (
-      !searchValues?.length ||
-      (data.name && searchValues.includes(data.name[0]))
-    ) {
-      return 1;
-    }
-
-    return 0.8;
-  }
-
-  const node = treeGroup
+  // one listener per event on the group instead of per circle
+  const nodeGroup = treeGroup
     .append('g')
     .attr('id', 'treeleaf-nodes')
     .attr('fill', '#fff')
     .attr('stroke', '#000')
     .attr('stroke-width', 1.5)
+    .on('mouseover', mouseover)
+    .on('mousemove', mousemove)
+    .on('mouseout', mouseleave)
+    .on('click', click);
+
+  // r=0 circles are never painted, so only visible leaves get DOM elements
+  const circles = nodeGroup
     .selectAll('circle')
-    .data(nodes)
+    .data(nodes.filter((d) => d.r > 0))
     .join('circle')
-    .attr('id', (d) => d.data.name[0])
-    .attr('fill', getNodeColor)
-    .attr('opacity', getNodeOpacity)
+    .attr('id', (d) => d.name)
     .attr('stroke', stroke)
     .attr('stroke-width', strokeWidth)
     .attr('r', (d) => d.r)
     .attr('cx', (d) => d.x)
     .attr('cy', (d) => d.y)
-    .attr('class', 'c-pointer')
-    .on('mouseover', mouseover)
-    .on('mousemove', mousemove)
-    .on('mouseleave', mouseleave)
-    .on('click', click);
-
-  if (title != null) node.append('title').text((d) => title(d.data, d));
+    .attr('class', 'c-pointer');
 
   function zoomed({ transform }) {
-    d3.selectAll('#treeleaf-zoom-container').attr(
-      'transform',
-      transform
-    );
+    treeZoomContainer.attr('transform', transform);
   }
 
   // add tooltips
@@ -278,6 +185,7 @@ function createForceDirectedTree(
     .append('div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
+    .style('pointer-events', 'none')
     .attr('class', 'bg-light border rounded p-1');
 
   function mouseover() {
@@ -288,26 +196,17 @@ function createForceDirectedTree(
     tooltip.style('visibility', 'hidden');
   }
 
-  function mousemove(e, d) {
-    const sample = d.data.name;
-    const data = attributes[sample];
+  function mousemove(e) {
+    const sample = d3.select(e.target).datum().name;
+    const [px, py] = d3.pointer(e, container.node());
     tooltip
-      .html(
-        `<div class="text-start">
-          <div>Sample: ${sample ?? 'Unavailable'}</div>
-          <div>Cancer Type: ${data.Cancer_Type ?? 'Unavailable'}</div>
-          <div>Cosine Similarity: ${
-            data.Cosine_similarity.toFixed(3) || 'Unavailable'
-          }</div>
-          <div>Mutations: ${data.Mutations || 'Unavailable'}</div>
-        </div>`
-      )
-      .style('left', e.layerX + 'px')
-      .style('top', e.layerY + 'px');
+      .html(getTooltipHtml(sample, attributes[sample]))
+      .style('left', px + 12 + 'px')
+      .style('top', py + 12 + 'px');
   }
 
-  function click(e, d) {
-    const sample = d.data.name;
+  function click(e) {
+    const sample = d3.select(e.target).datum().name;
     const data = attributes[sample];
     if (typeof onClick === 'function') {
       onClick(data);
@@ -315,34 +214,47 @@ function createForceDirectedTree(
   }
 
   // append title
-  svg
+  const overlay = getOverlayLayout(width, height);
+  const titleText = svg
     .append('g')
     .attr('id', 'treeleaf-title')
-    .attr('transform', `translate(0, ${(-height / 2 + 10) * viewBoxScale})`)
+    .attr('transform', `translate(0, ${overlay.titleY})`)
     .append('text')
     .attr('x', 0)
     .attr('y', 20)
     .attr('fill', 'black')
     .attr('text-anchor', 'middle')
     .style('font-weight', 'bold')
-    .style('font-size', '24px')
-    //.attr('class', 'h2')
-    .text(plotTitle);
+    .style('font-size', '24px');
 
-  // append legend
-  const legendParams = {
-    svg,
-    color: colorFill,
-    title: form.color.label,
-    x: (width / 2 - 40) * viewBoxScale,
-    y: (-height / 2 + 20) * viewBoxScale,
-  };
+  function updateStyle({ form, plotTitle }) {
+    const colorFill = createColorScale(attributes, form.color);
+    const { getColor, getOpacity } = createNodeStyles({
+      attributes,
+      form,
+      colorScale: colorFill,
+    });
 
-  form.color.continuous
-    ? continuousLegend(legendParams)
-    : categoricalLegend(legendParams);
+    circles
+      .attr('fill', (d) => getColor(d.name))
+      .attr('opacity', (d) => getOpacity(d.name));
 
-  return container.node();
+    titleText.text(plotTitle);
+
+    svg.selectAll('#treeleaf-legend, defs').remove();
+    const legendParams = {
+      svg,
+      color: colorFill,
+      title: form.color.label,
+      x: overlay.legendX,
+      y: overlay.legendY,
+    };
+    form.color.continuous
+      ? continuousLegend(legendParams)
+      : categoricalLegend(legendParams);
+  }
+
+  return { node: container.node(), updateStyle };
 }
 
 function continuousLegend({

@@ -1,5 +1,5 @@
-import { validationResult } from "express-validator";
-import { formatObject } from "./logger.js";
+import { query, validationResult } from 'express-validator';
+import { formatObject } from './logger.js';
 
 export function handleValidationErrors(request, response, next) {
   const { logger } = request.app.locals;
@@ -13,9 +13,27 @@ export function handleValidationErrors(request, response, next) {
   }
 }
 
+export const validateColumns = [
+  query('columns')
+    .optional()
+    .isString()
+    .withMessage('columns must be a string')
+    .bail()
+    .matches(/^(\*|[A-Za-z0-9_]+(\s*,\s*[A-Za-z0-9_]+)*)$/)
+    .withMessage(
+      "columns must be '*' or a comma-separated list of column names"
+    ),
+  handleValidationErrors,
+];
+
 export function requestFormatter(request) {
-  const parts = [request.method, request.path, formatObject(request.query), formatObject(request.body)];
-  return parts.join(" ");
+  const parts = [
+    request.method,
+    request.path,
+    formatObject(request.query),
+    formatObject(request.body),
+  ];
+  return parts.join(' ');
 }
 
 export function fileFormatter(request) {

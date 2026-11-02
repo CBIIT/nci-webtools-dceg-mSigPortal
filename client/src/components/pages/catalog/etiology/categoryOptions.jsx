@@ -1,6 +1,6 @@
 import { Row, Col, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../services/store/catalog';
+import { actions as catalogActions } from '@/services/store/catalog';
 
 import './etiology.scss';
 
