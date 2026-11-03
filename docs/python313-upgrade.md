@@ -80,21 +80,22 @@ in the same image may rely on the system copies.
 
 | Before | After |
 |---|---|
-| `nvidia/cuda:12.1.1-runtime-rockylinux9` | `nvidia/cuda:12.6.3-runtime-amzn2023` |
-| `dnf -y update` | `dnf -y --releasever=latest update`: the base is locked to AL2023 2023.6.20241121, which has no `python3.13` or `nodejs24` packages |
+| `nvidia/cuda:12.1.1-runtime-rockylinux9` | `nvidia/cuda:12.9.2-runtime-amzn2023` |
+| `dnf -y update` | `dnf -y --releasever=latest update`: the nvidia amzn2023 bases are locked to an older AL2023 release with no `python3.13` or `nodejs24` packages |
 | `dnf module enable nodejs:20`, `nodejs npm` | `nodejs24` (same package as the backend image; Node 20 is end of life) |
 | `python3-devel python3-pip python3-setuptools` | `python3.13 python3.13-devel python3.13-pip` |
-| `torch==2.1.0` (PyPI default, cu121) | `torch>=2.5,<3` from `https://download.pytorch.org/whl/cu126` |
+| `torch==2.1.0` (PyPI default, cu121) | `torch>=2.5,<3` from `https://download.pytorch.org/whl/cu129` |
 | Extractor fork `main`; `PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2`; upstream SPMG from git; forced `numpy==1.26.4 pandas==1.3.5 reportlab<5.1` | one install: Extractor fork `@python313` (editable) + `SigProfilerAssignment>=1.1.5,<1.2 sigProfilerPlotting>=1.4.3,<1.5 SigProfilerMatrixGenerator>=1.4,<1.5 pypdf>=6,<7 reportlab>=4,<6 numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9,<4` ([python313-sigprofilerextractor.md](python313-sigprofilerextractor.md#recommended-dockerfile-pins-and-order-extraction-batch-image)) |
 | `LD_LIBRARY_PATH` += `/usr/local/lib/python3.9/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` | `/usr/local/lib/python3.13/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` (checked in the built image) |
 | (none) | `ENV PYTHON_BIN=python3.13` |
 | `GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/...` (SPMG was an editable git install) | `/usr/local/lib/python3.13/site-packages/SigProfilerMatrixGenerator/references/chromosomes/tsb`: SPMG is now a regular PyPI install (only used for `input_type=vcf`, which the UI never sends) |
 
-CUDA choice: 12.6 is the oldest 12.x line with an amzn2023 runtime image and a matching torch index
-that still carries current torch builds. torch wheels bundle their own CUDA user-space libraries, so
-the host only needs a driver new enough for CUDA 12.6 (>= 560, or >= 525 through CUDA minor-version
-compatibility). The current Batch GPU AMI driver was not checked from this machine. If it is older
-than 525, the AMI has to be updated: no torch build for Python 3.13 targets CUDA 12.1.
+CUDA choice: 12.9, matching `stage`, which moved the current image to
+`nvidia/cuda:12.9.2-runtime-rockylinux9` (#125), so it relies on the same CUDA 12.9-capable driver on
+the Batch GPU hosts. torch wheels bundle their own CUDA user-space libraries; the cu129 index carries
+cp313 builds (resolved to torch 2.13.0+cu129 on 2026-11-03). The first local build used 12.6.3 / cu126
+and passed the same checks. Merging into
+`stage` will conflict in `docker/extraction-batch.dockerfile`; take this branch's version.
 
 ### Local build
 
@@ -105,8 +106,8 @@ Dockerfiles.
 
 ## Running the regression suite
 
-Full details in `utils/regression/README.md`. Short form, from the repository root (use a working host
-Python, e.g. `/opt/homebrew/bin/python3.12`; the harness is stdlib only):
+Full details in `utils/regression/README.md`. Short form, from the repository root (any host Python
+3.9+, e.g. `python3.13`; the harness is stdlib only):
 
 ```bash
 # 1. baselines on the current images (check out dev, or git stash the Dockerfile changes)
