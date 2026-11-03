@@ -67,6 +67,8 @@ def stage_inputs(suite_cfg):
         if not dst.exists() and src.is_file():
             shutil.copy2(src, dst)
             print(f"  [inputs] {name} <- {src.relative_to(REPO)}")
+    if "seed" in suite_cfg:
+        (INPUTS_DIR / "Seeds.txt").write_text(f"Replicate\tSeed\n1\t{suite_cfg['seed']}\n")
 
 
 DRY_RUN = False

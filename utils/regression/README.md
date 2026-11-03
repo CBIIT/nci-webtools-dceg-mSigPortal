@@ -49,8 +49,10 @@ Exploration sessions through the API, so one end-to-end UI run per tier is still
 Defined in `cases.json`. Profiler cases cover every input format, all three genomes, WES, Collapse,
 split-by-filter, Bed, SeqInfo, both catalog formats, CNV48 and RS32 plotting, and two Cluster runs
 (tagged `slow`). Extractor cases cover SBS96/DBS78/ID83 on CPU, SBS96 on GPU (tagged `gpu`), the
-no-plot/no-collapse path, and exome normalization. Extractor runs use the fixed seed file from
-`data/examples/extraction/Example_SBS96_SigProfileExtractor/Seeds.txt` and small NMF settings so a
+no-plot/no-collapse path, and exome normalization. Extractor runs use a fixed one-row seeds file written
+by `run_cases.py` (seed 5177184, the first entry of
+`data/examples/extraction/Example_SBS96_SigProfileExtractor/Seeds.txt`, whose 500-row `Seeds` format
+the Extractor rejects) and small NMF settings so a
 case finishes in minutes.
 
 ## 3. Running
