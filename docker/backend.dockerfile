@@ -7,8 +7,9 @@ RUN dnf -y update \
     git \
     tar \
     nodejs24 \
-    python3-devel \
-    python3-pip \
+    python3.13 \
+    python3.13-devel \
+    python3.13-pip \
     R-4.3.2 \
     bcftools \
     glpk \
@@ -24,14 +25,16 @@ RUN cd /tmp && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
 
-# install python packages
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerClusters#egg=SigProfilerClusters'
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerPlotting#egg=SigProfilerPlotting'
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
-RUN pip3 install seaborn==0.13.2
-RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4 pandas==1.3.5
-# patch: alias renamed module so upstream SigProfilerSimulator can find it
-RUN echo 'from SigProfilerMatrixGenerator.scripts import SigProfilerMatrixGenerator as MutationMatrixGenerator' >> /src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/scripts/__init__.py
+# install python packages (system python3 stays at 3.9; the app runs $PYTHON_BIN)
+ENV PYTHON_BIN=python3.13
+ARG PY_PINS="numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9 seaborn==0.13.2"
+RUN python3.13 -m pip install --no-cache-dir -e 'git+https://github.com/xtmgah/SigProfilerPlotting@python313#egg=SigProfilerPlotting' ${PY_PINS}
+RUN python3.13 -m pip install --no-cache-dir -e 'git+https://github.com/xtmgah/SigProfilerMatrixGenerator@python313#egg=SigProfilerMatrixGenerator' ${PY_PINS}
+# Simulator and Clusters declare PyPI SPMG/SPP (and Extractor) deps that would replace the forks
+RUN python3.13 -m pip install --no-cache-dir --no-deps SigProfilerSimulator==1.2.2 \
+    && python3.13 -m pip install --no-cache-dir 'fastrand>=1.2'
+RUN python3.13 -m pip install --no-cache-dir --no-deps -e 'git+https://github.com/xtmgah/SigProfilerClusters@python313#egg=SigProfilerClusters' \
+    && python3.13 -m pip install --no-cache-dir statsmodels scipy ${PY_PINS}
 
 # install genomes
 # NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
