@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Button, Form, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
-import Plotly from '../../../controls/plotly/plot/plot';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useMpeaScatterQuery, useMpeaBarQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { useMatrixListQuery } from '../userForm/apiSlice';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import { useMatrixListQuery } from '@/components/pages/visualization/userForm/apiSlice';
 
 export default function MutPatternPlot({ state }) {
   const [scatterParams, setScatterParams] = useState('');

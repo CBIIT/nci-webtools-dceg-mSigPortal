@@ -1,10 +1,10 @@
-import { explorationApiSlice } from '../../../../services/store/rootApi';
-import sbs96 from '../../../controls/plotly/profileComparison/sbs96';
-import dbs78 from '../../../controls/plotly/profileComparison/dbs78';
-import id83 from '../../../controls/plotly/profileComparison/id83';
-import msIndividual_rs32 from '../../../controls/plotly/msIndividual/msIndividual_rs32';
-import MsIndividual_Error from '../../../controls/plotly/msIndividual/msIndividual_error';
-import { extractLastWord } from '../../../controls/utils/utils';
+import { explorationApiSlice } from '@/services/store/rootApi';
+import sbs96 from '@/components/controls/plotly/profileComparison/sbs96';
+import dbs78 from '@/components/controls/plotly/profileComparison/dbs78';
+import id83 from '@/components/controls/plotly/profileComparison/id83';
+import msIndividual_rs32 from '@/components/controls/plotly/msIndividual/msIndividual_rs32';
+import MsIndividual_Error from '@/components/controls/plotly/msIndividual/msIndividual_error';
+import { extractLastWord } from '@/components/controls/utils/utils';
 import { groupBy } from 'lodash';
 
 export const msIndividualApiSlice = explorationApiSlice.injectEndpoints({

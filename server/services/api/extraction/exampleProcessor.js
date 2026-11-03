@@ -7,7 +7,13 @@ import { randomUUID } from 'crypto';
 import knex from 'knex';
 import axios from 'axios';
 import FormData from 'form-data';
-import { mkdirs, writeJson, readJson } from '../../utils.js';
+import {
+  mkdirs,
+  writeJson,
+  readJson,
+  isValidId,
+  resolveWithin,
+} from '../../utils.js';
 import { getSignatureData, getSeqmatrixData } from '../../query.js';
 import { parseCSV } from '../general.js';
 
@@ -42,6 +48,7 @@ export async function exampleProcessor(
       signatureSetName: 'COSMIC_v3_Signatures_GRCh37_DBS78',
       profile: 'DBS',
       matrix: '78',
+      study: 'Reference',
     },
     seqmatrixQuery: {
       study: 'Sherlock-Lung-232',
@@ -96,7 +103,7 @@ export async function exampleProcessor(
   if (inputFolderId.startsWith('Example_')) {
     const parts = inputFolderId.split('_');
     if (parts.length >= 2) {
-      const match = parts[1].match(/([A-Za-z]+)(\d+)/);
+      const match = parts[1].slice(0, 64).match(/^([A-Za-z]+?)(\d+)$/);
       if (match) {
         const profileType = match[1];
         const matrixSize = match[2];
@@ -282,7 +289,11 @@ export async function exampleProcessor(
 
       seqmatrixFileName = path.basename(seqmatrixFilePath);
     } else {
-      seqmatrixFilePath = path.resolve(outputFolder, args.context_type, args.input_data);
+      seqmatrixFilePath = path.resolve(
+        outputFolder,
+        args.context_type,
+        args.input_data
+      );
     }
 
     // modify and include parameters
@@ -518,12 +529,13 @@ export async function exampleProcessor(
 
 async function getPaths(params, exampleId, randomID, env = process.env) {
   const { id, args } = params;
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-  const paramsFile = path.resolve(inputFolder, 'params.json');
-  const statusFile = path.resolve(outputFolder, 'status.json');
-  const manifestFile = path.resolve(outputFolder, 'manifest.json');
-  const databaseFile = path.resolve(outputFolder, 'results.db');
+  if (!isValidId(id)) throw new Error('Invalid id');
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
+  const paramsFile = resolveWithin(inputFolder, 'params.json');
+  const statusFile = resolveWithin(outputFolder, 'status.json');
+  const manifestFile = resolveWithin(outputFolder, 'manifest.json');
+  const databaseFile = resolveWithin(outputFolder, 'results.db');
 
   // map files to be used as input for exploration module
   const solutionsFolder = path.resolve(

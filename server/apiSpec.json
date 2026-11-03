@@ -520,6 +520,16 @@
         "produces": ["application/json"],
         "parameters": [
           {
+            "name": "study",
+            "in": "query",
+            "description": "Filter by study. Reference/published/experimental signatures are assigned study 'Reference'; study de novo signatures are assigned their own study name. Combine with a semicolon to get reference sets plus one study's de novo sets, e.g. 'Reference;KoNA-PanCancer-CG2024-Human'.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "Reference"
+          },
+          {
             "name": "source",
             "in": "query",
             "description": "Enter source",
@@ -617,6 +627,16 @@
         "summary": "Retrieves signature data",
         "produces": ["application/json"],
         "parameters": [
+          {
+            "name": "study",
+            "in": "query",
+            "description": "Filter by study. Reference/published/experimental signatures are assigned study 'Reference'; study de novo signatures are assigned their own study name. Signature set names are only unique within a study, so this should be provided whenever signatureSetName may refer to a study de novo set. Combine with a semicolon to get reference sets plus one study's de novo sets, e.g. 'Reference;KoNA-PanCancer-CG2024-Human'.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "value": "Reference"
+          },
           {
             "name": "source",
             "in": "query",

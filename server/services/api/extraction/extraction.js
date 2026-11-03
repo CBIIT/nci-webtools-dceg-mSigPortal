@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { validate } from 'uuid';
 import path from 'path';
-import { mkdirs, writeJson, readJson } from '../../utils.js';
+import {
+  mkdirs,
+  writeJson,
+  readJson,
+  isValidId,
+  resolveWithin,
+} from '../../utils.js';
 import { getWorker } from '../../workers.js';
 import { exampleProcessor } from './exampleProcessor.js';
 import fs from 'fs';
@@ -22,15 +28,55 @@ const EXTRACTION_FORM_LIMIT = env.EXTRACTION_FORM_LIMIT
       nmf_test_conv: [1, 10000],
     };
 
+// validate that a user matrix has a MutationType first column and at least one sample column
+function validateMatrixHeader(filePath) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(65536);
+    const bytes = fs.readSync(fd, buffer, 0, 65536, 0);
+    fs.closeSync(fd);
+    const firstLine = buffer
+      .toString('utf8', 0, bytes)
+      .split(/\r?\n/)
+      .find((l) => l.trim() !== '');
+    if (!firstLine)
+      return { valid: false, error: 'The uploaded matrix file appears to be empty.' };
+    const delimiter = firstLine.includes('\t') ? '\t' : ',';
+    const cols = firstLine
+      .replace(/^\uFEFF/, '')
+      .split(delimiter)
+      .map((c) => c.trim());
+    if (cols[0].toLowerCase() !== 'mutationtype')
+      return {
+        valid: false,
+        error: `The first column of the matrix must be "MutationType" (found "${cols[0]}").`,
+      };
+    if (cols.length < 2)
+      return {
+        valid: false,
+        error: 'The matrix must include at least one sample column after MutationType.',
+      };
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, error: 'Unable to read the uploaded matrix file.' };
+  }
+}
+
 export async function submit(req, res, next) {
   const id = req.params.id;
-  if (!validate(id)) res.status(500).json('Invalid ID');
+  if (!validate(id)) return res.status(500).json('Invalid ID');
 
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const statusFilePath = path.resolve(outputFolder, 'status.json');
   await mkdirs([inputFolder, outputFolder]);
+
+  if (req.body?.form?.source === 'user' && req.body?.args?.input_data) {
+    const matrixPath = resolveWithin(inputFolder, req.body.args.input_data);
+    const headerCheck = validateMatrixHeader(matrixPath);
+    if (!headerCheck.valid) return res.status(400).json({ error: headerCheck.error });
+  }
 
   const status = {
     id,
@@ -54,8 +100,8 @@ async function getJobStatus(id) {
     return `${id} is not a valid ID`;
   }
   try {
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+    const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
 
     const paramsFilePath = path.resolve(inputFolder, 'params.json');
     const statusFilePath = path.resolve(outputFolder, 'status.json');
@@ -102,10 +148,13 @@ export async function extractionExample(req, res, next) {
   const { logger } = req.app.locals;
   try {
     const id = req.params.id;
+    if (!isValidId(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
     const uuid = randomUUID();
     const dataFolder = path.resolve(env.DATA_FOLDER);
     const outputFolder = path.resolve(env.OUTPUT_FOLDER, uuid);
-    const exampleFolderPath = path.resolve(
+    const exampleFolderPath = resolveWithin(
       dataFolder,
       'examples',
       'extraction',
@@ -144,14 +193,14 @@ const minMaxValidation = (param, min, max) =>
 const router = Router();
 
 router.post(
-  '/submitExtraction/:id?',
+  '/submitExtraction{/:id}',
   Object.entries(EXTRACTION_FORM_LIMIT).map(([arg, [min, max]]) =>
     minMaxValidation(`args.${arg}`, min, max)
   ),
   handleValidationErrors,
   submit
 );
-router.get('/refreshExtraction/:id?', refresh);
+router.get('/refreshExtraction{/:id}', refresh);
 router.post('/refreshExtractionMulti', refreshMulti);
 router.get('/extractionExample/:id', extractionExample);
 

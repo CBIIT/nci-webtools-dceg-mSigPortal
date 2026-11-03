@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form';
 import Plot from 'react-plotly.js';
 import { useSatsDataQuery } from './satsApiSlice';
 import { useEtiologyOptionsQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Select from '../../../controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
 
 export default function SATSPlotPage() {
   const [params, setParams] = useState(null);

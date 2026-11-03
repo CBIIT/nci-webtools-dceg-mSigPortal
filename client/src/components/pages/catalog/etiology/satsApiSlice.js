@@ -1,9 +1,9 @@
-import { catalogApiSlice } from '../../../../services/store/rootApi';
-import SATSSignaturePresence from '../../../controls/plotly/SATS/satsSignaturePresence';
-import SATSDotPlot from '../../../controls/plotly/SATS/satsDotPlot';
+import { catalogApiSlice } from '@/services/store/rootApi';
+import SATSSignaturePresence from '@/components/controls/plotly/SATS/satsSignaturePresence';
+import SATSDotPlot from '@/components/controls/plotly/SATS/satsDotPlot';
 import { groupBy } from 'lodash';
-import satsExampleData_SBS from '../../../controls/plotly/SATS/sats_example_data_SBS.json';
-import satsExampleData_DBS from '../../../controls/plotly/SATS/sats_example_data_DBS.json';
+import satsExampleData_SBS from '@/components/controls/plotly/SATS/sats_example_data_SBS.json';
+import satsExampleData_DBS from '@/components/controls/plotly/SATS/sats_example_data_DBS.json';
 
 export const satsApiSlice = catalogApiSlice.injectEndpoints({
   endpoints: (builder) => ({

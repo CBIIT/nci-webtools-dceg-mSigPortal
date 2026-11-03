@@ -683,6 +683,7 @@ export default function SATSSignaturePresence(data, options = {}) {
     displayModeBar: true,
     responsive: true,
     displaylogo: false,
+    showSendToCloud: false,
     toImageButtonOptions: {
       format: 'svg',
       filename: 'SATS_Combined_Plot',

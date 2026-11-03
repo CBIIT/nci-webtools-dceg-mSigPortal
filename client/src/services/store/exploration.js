@@ -9,6 +9,12 @@ export const getInitialState = () => ({
     cancer: '',
     useAllCancer: false,
   },
+  comparePublicForm: {
+    study: '',
+    strategy: '',
+    signatureSetName: '',
+    cancer: '',
+  },
   userForm: {},
   main: {
     displayTab: 'instructions',
@@ -18,6 +24,7 @@ export const getInitialState = () => ({
     openSidebar: true,
     submitted: false,
     usePublicSignature: true,
+    compare: false,
   },
 
   msAssociation: {

@@ -1,4 +1,4 @@
-import { sbsColor } from '../../utils/colors';
+import { sbsColor } from '@/components/controls/utils/colors';
 import { createSampleAnnotation } from './utils';
 export default function SBS384(data, title = '') {
   const colors = sbsColor;
@@ -211,7 +211,7 @@ export default function SBS384(data, title = '') {
   }
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     bargap: 0.3,
     height: 450,

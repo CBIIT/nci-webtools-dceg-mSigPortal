@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Form,
   Row,
@@ -14,7 +14,7 @@ import {
   faMinus,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import CustomSelect from '../../controls/select/select-old';
+import CustomSelect from '@/components/controls/select/select-old';
 
 const { Group, Label, Check, Control } = Form;
 
@@ -41,9 +41,6 @@ export default function AssocVarParams({
     source = '',
     type = '',
     tmpName = '',
-    sourceOptions = [],
-    typeOptions = [],
-    nameOptions = [],
     filter = '',
     log2 = false,
     collapse = '',
@@ -66,27 +63,40 @@ export default function AssocVarParams({
     ),
   ];
 
-  // populate controls
+  // options derived from current data so Variable Name always follows the selected Data Type
+  const sourceOptions = useMemo(
+    () => [...new Set(assocVarData.map((row) => row.data_source))],
+    [assocVarData]
+  );
+  const typeOptions = useMemo(
+    () => getTypeOptions(source),
+    [assocVarData, source]
+  );
+  const nameOptions = useMemo(
+    () => getNameOptions(source, type),
+    [assocVarData, source, type]
+  );
+
+  // (re)default source/type/name when unset or stale for the current data
   useEffect(() => {
-    if (assocVarData.length && !source) {
-      const sourceOptions = [
-        ...new Set(assocVarData.map((row) => row.data_source)),
-      ];
-      const source = sourceOptions[0];
-      const typeOptions = getTypeOptions(source);
-      const type = typeOptions[0];
-      const nameOptions = getNameOptions(source, type);
+    if (!assocVarData.length || name) return;
+
+    const sourceValid = source && sourceOptions.includes(source);
+    const typeValid = sourceValid && typeOptions.includes(type);
+    const nameValid = typeValid && nameOptions.includes(tmpName);
+
+    if (!nameValid) {
+      const newSource = sourceValid ? source : sourceOptions[0];
+      const newType = typeValid ? type : getTypeOptions(newSource)[0];
+      const newNameOptions = getNameOptions(newSource, newType);
 
       mergeState({
-        source,
-        sourceOptions,
-        type,
-        typeOptions,
-        nameOptions,
-        tmpName: nameOptions[0],
+        source: newSource,
+        type: newType,
+        tmpName: newNameOptions[0],
       });
     }
-  }, [source]);
+  }, [assocVarData, source, type]);
 
   function handleSource(source) {
     const typeOptions = getTypeOptions(source);
@@ -95,9 +105,10 @@ export default function AssocVarParams({
     mergeState({
       source,
       type: typeOptions[0],
-      typeOptions,
       tmpName: nameOptions[0],
-      nameOptions,
+      filter: '',
+      collapse: '',
+      collapseOptions: [],
     });
   }
 
@@ -107,7 +118,9 @@ export default function AssocVarParams({
     mergeState({
       type,
       tmpName: nameOptions[0],
-      nameOptions,
+      filter: '',
+      collapse: '',
+      collapseOptions: [],
     });
   }
 
@@ -126,11 +139,15 @@ export default function AssocVarParams({
       >
         <Col md="auto">
           <CustomSelect
-            disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
+            disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             id={'source-' + index}
             label="Variable Source"
             aria-labelledby={`label-source-${index}`}
-            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
+            aria-disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             value={source}
             options={sourceOptions}
             onChange={(e) => handleSource(e)}
@@ -138,11 +155,15 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <CustomSelect
-            disabled={!!!(loadingData || loadingParams || loadingCalculate || name)}
+            disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             id={'type-' + index}
             label="Data Type"
             aria-labelledby={`label-type-${index}`}
-            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
+            aria-disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             value={type}
             options={typeOptions}
             onChange={(e) => handleType(e)}
@@ -150,11 +171,15 @@ export default function AssocVarParams({
         </Col>
         <Col md="auto">
           <CustomSelect
-            disabled={!!!(loadingData || loadingParams || loadingCalculate || name)}
+            disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             id={'assocVariable-' + index}
             label="Variable Name"
             aria-labelledby={`label-assocVariable-${index}`}
-            aria-disabled={!!(loadingData || loadingParams || loadingCalculate || name)}
+            aria-disabled={
+              !!(loadingData || loadingParams || loadingCalculate || name)
+            }
             value={tmpName}
             options={nameOptions}
             onChange={(e) => mergeState({ tmpName: e })}
@@ -273,8 +298,7 @@ export default function AssocVarParams({
                     loadingData ||
                     loadingParams ||
                     loadingCalculate ||
-                    !collapseOptions.length ||
-                    name
+                    !collapseOptions.length
                   }
                   id={'collapse1-' + index}
                   label="Collapse"

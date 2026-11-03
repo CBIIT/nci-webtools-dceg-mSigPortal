@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { LoadingOverlay } from '../../../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as catalogActions } from '../../../../../services/store/catalog';
-import { actions as modalActions } from '../../../../../services/store/modal';
-import Plotly from '../../../../controls/plotly/plot/plot';
+import { actions as catalogActions } from '@/services/store/catalog';
+import { actions as modalActions } from '@/services/store/modal';
+import Plotly from '@/components/controls/plotly/plot/plot';
 import { useRsInMsigportalDataQuery } from './apiSlice';
 import { cloneDeep } from 'lodash';
 

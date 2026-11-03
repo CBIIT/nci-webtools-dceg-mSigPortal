@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
-import Select from '../../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Select from '@/components/controls/select/selectHookForm';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as associationActions } from '../../../../services/store/association';
-import { actions as modalActions } from '../../../../services/store/modal';
+import { actions as associationActions } from '@/services/store/association';
+import { getEmptyAssocVar } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetAssociationApi,
   useAssociationOptionsQuery,
   useExposureOptionsQuery,
-} from '../../../../services/store/rootApi';
+} from '@/services/store/rootApi';
+import { signatureSetCompare } from '@/services/utils';
 import { useAssociationPublicMutation } from './apiSlice';
 
 const actions = { ...associationActions, ...modalActions };
@@ -107,8 +109,10 @@ export default function PublicForm() {
       const { id, output: assocOutput } = assocResponse;
       const { output: expOutput } = expResponse;
 
-      if (assocOutput.error || assocOutput.uncaughtError) throw assocOutput.error || assocOutput.uncaughtError;
-      if (expOutput.error || expOutput.uncaughtError) throw expOutput.error || expOutput.uncaughtError;
+      if (assocOutput.error || assocOutput.uncaughtError)
+        throw assocOutput.error || assocOutput.uncaughtError;
+      if (expOutput.error || expOutput.uncaughtError)
+        throw expOutput.error || expOutput.uncaughtError;
 
       mergeState({
         submitted: true,
@@ -118,7 +122,14 @@ export default function PublicForm() {
         displayTab: 'univariable',
         openSidebar: false,
       });
-      dispatch(actions.mergeAssociation({ univariable: { id } }));
+      // reset variable selection so defaults repopulate from the new dataset
+      const emptyAssocVar = getEmptyAssocVar();
+      dispatch(
+        actions.mergeAssociation({
+          univariable: { id, associationVar: emptyAssocVar },
+          multivariable: { associationVars: [emptyAssocVar] },
+        })
+      );
     } catch (error) {
       if (error.originalStatus == 504) {
         mergeState({
@@ -190,11 +201,8 @@ export default function PublicForm() {
             .map((e) => e.signatureSetName)
         ),
       ]
-        .sort()
-        .map((e) => ({
-          label: e,
-          value: e,
-        }));
+        .sort(signatureSetCompare)
+        .map((e) => ({ label: e, value: e }));
     } else {
       return [];
     }

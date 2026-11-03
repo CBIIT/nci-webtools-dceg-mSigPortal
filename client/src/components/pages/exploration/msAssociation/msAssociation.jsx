@@ -1,10 +1,27 @@
 import { Container } from 'react-bootstrap';
 import MsAssociationForm from './msAssociation-form';
 import MsAssociationPlot from './msAssociation-plot';
-import Description from '../../../controls/description/description';
-import { useState } from 'react';
+import Description from '@/components/controls/description/description';
+import { useState, useMemo } from 'react';
+import { useMsAssociationOptionsQuery } from './apiSlice';
 
-export default function MsAssociation({ state }) {
+function toParams(state) {
+  if (!state) return '';
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  if (study) {
+    return {
+      study: study.value,
+      strategy: strategy.value,
+      signatureSetName: signatureSetName.value,
+      ...(!useAllCancer && { cancer: cancer.value }),
+    };
+  } else if (id) {
+    return { userId: id };
+  }
+  return '';
+}
+
+export default function MsAssociation({ state, compareState }) {
   const [form, setForm] = useState({
     signatureName1: '',
     signatureName2: '',
@@ -12,6 +29,23 @@ export default function MsAssociation({ state }) {
   });
 
   const mergeForm = (update) => setForm({ ...form, ...update });
+
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  const params = useMemo(
+    () => toParams({ study, strategy, signatureSetName, cancer, useAllCancer, id }),
+    [study, strategy, signatureSetName, cancer, useAllCancer, id]
+  );
+  const compareParams = useMemo(
+    () => (compareState ? toParams(compareState) : ''),
+    [compareState]
+  );
+  const { data: options } = useMsAssociationOptionsQuery(params, {
+    skip: !params,
+  });
+  const { data: compareOptions } = useMsAssociationOptionsQuery(
+    compareParams,
+    { skip: !compareParams }
+  );
 
   return (
     <Container fluid className="bg-white border rounded p-0">
@@ -23,9 +57,30 @@ export default function MsAssociation({ state }) {
         />
       </div>
       <hr />
-      <MsAssociationForm state={state} form={form} mergeForm={mergeForm} />
+      <MsAssociationForm
+        state={state}
+        compareOptions={compareOptions}
+        form={form}
+        mergeForm={mergeForm}
+      />
       <hr />
-      <MsAssociationPlot state={state} form={form} />
+      <MsAssociationPlot
+        state={state}
+        form={form}
+        availableOptions={options}
+        divId="msAssociation-primary"
+      />
+      {compareState && (
+        <>
+          <hr />
+          <MsAssociationPlot
+            state={compareState}
+            form={form}
+            availableOptions={compareOptions}
+            divId="msAssociation-compare"
+          />
+        </>
+      )}
     </Container>
   );
 }

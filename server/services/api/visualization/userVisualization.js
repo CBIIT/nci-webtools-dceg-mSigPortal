@@ -7,19 +7,22 @@ import rWrapper from 'r-wrapper';
 import { parseCSV } from '../general.js';
 import { getExposureData, getSignatureData } from '../../query.js';
 import { createCacheMiddleware } from '../../cache.js';
+import { computeTreeLeafLayout } from '../../treeLeafLayoutRunner.js';
 import isUUID from 'validator/lib/isUUID.js';
-import { mkdirs, writeJson } from '../../utils.js';
+import { mkdirs, writeJson, isValidId, resolveWithin } from '../../utils.js';
 import { getWorker } from '../../workers.js';
 
 const r = rWrapper.async;
 const env = process.env;
+// must equal the client's plotSize / 2; the force simulation's output depends on it
+const TREE_LEAF_RADIUS = 1000;
 
 export async function submit(req, res, next) {
   const { id } = req.params;
-  if (!isUUID(id)) res.status(500).json('Invalid ID');
+  if (!isUUID(id)) return res.status(500).json('Invalid ID');
 
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+  const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+  const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
   const paramsFilePath = path.resolve(inputFolder, 'params.json');
   const statusFilePath = path.resolve(outputFolder, 'status.json');
   await mkdirs([inputFolder, outputFolder]);
@@ -45,8 +48,8 @@ export async function submit(req, res, next) {
 async function getJobStatus(id) {
   if (!isUUID(id)) return `${id} is not a valid ID`;
   try {
-    const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
+    const inputFolder = resolveWithin(env.INPUT_FOLDER, id);
+    const outputFolder = resolveWithin(env.OUTPUT_FOLDER, id);
 
     const paramsFilePath = path.resolve(inputFolder, 'params.json');
     const statusFilePath = path.resolve(outputFolder, 'status.json');
@@ -174,10 +177,12 @@ async function getResultsFiles(resultsPath, id = '') {
 
 async function getResults(req, res, next) {
   const { logger } = req.app.locals;
-  logger.info(`/getResults: Retrieving Results for ${req.body.id}`);
-  const userResults = path.resolve(env.OUTPUT_FOLDER, req.body.id, 'results');
+  const { id } = req.body;
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  logger.info(`/getResults: Retrieving Results for ${id}`);
+  const userResults = resolveWithin(env.OUTPUT_FOLDER, id, 'results');
   if (fs.existsSync(path.join(userResults, 'svg_files_list.txt'))) {
-    res.json(await getResultsFiles(userResults, req.body.id));
+    res.json(await getResultsFiles(userResults, id));
   } else {
     logger.info('/getResults: Results not found');
     res.status(500).json('Results not found');
@@ -189,7 +194,12 @@ async function wrapper(fn, args) {
 // Visualization Calculation functions
 async function visualizationWrapper(req, res, next) {
   const { logger } = req.app.locals;
-  const { fn, args, id = randomUUID() } = req.body;
+  const id = req.body.id || randomUUID();
+  const { fn, args } = req.body;
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  if (typeof fn !== 'string' || !/^[A-Za-z0-9_]+$/.test(fn)) {
+    return res.status(400).json('Invalid function name');
+  }
 
   // config info for R functions
   const rConfig = {
@@ -200,7 +210,7 @@ async function visualizationWrapper(req, res, next) {
 
   // create directory for results if needed
   const savePath = path.join('output', id, 'results', fn, '/');
-  await mkdirs([path.resolve(rConfig.wd, savePath)]);
+  await mkdirs([resolveWithin(rConfig.wd, savePath)]);
 
   try {
     const { scriptOutput, ...rest } = await wrapper('wrapper', {
@@ -289,7 +299,8 @@ async function downloadWorkspace(req, res, next) {
   const { logger } = req.app.locals;
   logger.info(`/visualization/downloadWorkspace`);
   const { state, id } = req.body;
-  const session = path.resolve(env.OUTPUT_FOLDER, id);
+  if (!isValidId(id)) return res.status(400).json('Invalid ID');
+  const session = resolveWithin(env.OUTPUT_FOLDER, id);
   const archive = archiver('zip', {
     zlib: { level: 6 }, // Sets the compression level.
   });
@@ -323,125 +334,283 @@ async function getPublicTreeLeafData(req, res, next) {
     const { connection } = req.app.locals;
     let { study, strategy, cancer, signatureSetName, profile, matrix } =
       req.body;
-    const pickNotNull = (obj, nulls = [null, undefined, '']) => 
-      Object.fromEntries(Object.entries(obj).filter(([_, v]) => !nulls.includes(v)));
+    if (typeof study !== 'string' || !study) {
+      return res.status(400).json('A study is required for public data');
+    }
+    const pickNotNull = (obj, nulls = [null, undefined, '']) =>
+      Object.fromEntries(
+        Object.entries(obj).filter(([_, v]) => !nulls.includes(v))
+      );
 
     // determine signature set names from profile and matrix (e.g. SBS96 -> *_SBS96)
     const signatureSetNames = await connection
       .select('signatureSetName')
       .from('exposure')
-      .where({study})
+      .where({ study })
       .andWhere('signatureSetName', 'like', `%${profile + matrix}`);
 
-    const signatureSetNameValues = signatureSetNames.map(s => s.signatureSetName);
-    if (!signatureSetName || !signatureSetNameValues.includes(signatureSetName)) {
+    const signatureSetNameValues = signatureSetNames.map(
+      (s) => s.signatureSetName
+    );
+    if (
+      !signatureSetName ||
+      !signatureSetNameValues.includes(signatureSetName)
+    ) {
       signatureSetName = signatureSetNameValues[0];
     }
 
-    const exposureData = await getExposureData(
-      connection,
-      pickNotNull({ study, strategy, signatureSetName }),
-      '*',
-      1e8
-    );
-    
-    const signatureData = await getSignatureData(
-      connection,
-      pickNotNull({ strategy, signatureSetName }),
-      '*',
-      1e8
-    );
+    const [exposureData, signatureRows, seqmatrixData] = await Promise.all([
+      // per-sample calculations in R, so restricting to the selected cancer doesn't change results
+      getExposureData(
+        connection,
+        pickNotNull({ study, strategy, cancer, signatureSetName }),
+        ['sample', 'cancer', 'signatureName', 'exposure'],
+        1e8
+      ),
+      // only checked for existence; R's getTreeLeaf doesn't use signature data
+      getSignatureData(
+        connection,
+        // a de novo set name can be reused by other studies, so scope by study like every other query
+        pickNotNull({
+          strategy,
+          signatureSetName,
+          study: `Reference;${study}`,
+        }),
+        ['signatureName'],
+        1
+      ),
+      connection
+        .select(
+          'sample',
+          'mutationType',
+          'mutations',
+          connection.raw('concat(profile, matrix) as "profileMatrix"')
+        )
+        .from('seqmatrix')
+        .where(pickNotNull({ study, strategy, cancer, profile, matrix })),
+    ]);
 
-    let seqmatrixData = await connection
-      .select('*', connection.raw('concat(profile, matrix) as "profileMatrix"'))
-      .from('seqmatrix')
-      .where(pickNotNull({ study, strategy, cancer, profile, matrix }))
+    if (
+      !exposureData?.length ||
+      !seqmatrixData?.length ||
+      !signatureRows?.length
+    ) {
+      const missing = [
+        !exposureData?.length && 'exposure',
+        !seqmatrixData?.length && 'seqmatrix',
+        !signatureRows?.length && 'signature',
+      ].filter(Boolean);
+      throw new Error(
+        `The selected study does not provide ${missing.join(' and ')} data`
+      );
+    }
 
     const estimatedMutations = connection
-      .select('e.cancer', 'e.sample', 'mutationType', connection.raw('SUM(contribution * exposure) as estimated'))
+      .select(
+        'e.cancer',
+        'e.sample',
+        'mutationType',
+        connection.raw('SUM(contribution * exposure) as estimated')
+      )
       .from('signature as s')
-      .innerJoin('exposure as e', function() {
-          this.on('s.strategy', '=', 'e.strategy')
-              .andOn('s.signatureSetName', '=', 'e.signatureSetName')
-              .andOn('s.signatureName', '=', 'e.signatureName')
+      .innerJoin('exposure as e', function () {
+        this.on('s.strategy', '=', 'e.strategy')
+          .andOn('s.signatureSetName', '=', 'e.signatureSetName')
+          .andOn('s.signatureName', '=', 'e.signatureName');
       })
-      .where(pickNotNull({
+      .where(
+        pickNotNull({
           'e.study': study,
           'e.strategy': strategy,
           'e.cancer': cancer,
           's.profile': profile,
           's.matrix': matrix,
-          's.signatureSetName': signatureSetName
-      }))
+          's.signatureSetName': signatureSetName,
+        })
+      )
+      // a de novo set name can be reused by other studies, so scope the signature side too
+      .whereIn('s.study', ['Reference', study])
       .andWhere('exposure', '>', 0)
-      .groupBy('e.cancer', 'e.sample', 'mutationType')
-  
+      .groupBy('e.cancer', 'e.sample', 'mutationType');
+
     const mutations = connection('seqmatrix as s')
       .select(
-        's.study', 's.strategy', 's.cancer', 's.sample', 's.profile', 's.matrix', 's.mutationType', 
-          connection.raw('cast(s.mutations as bigint) as mutations'),
-          connection.raw(`cast(floor(a.estimated) as bigint) as estimated`),
+        's.study',
+        's.strategy',
+        's.cancer',
+        's.sample',
+        's.profile',
+        's.matrix',
+        's.mutationType',
+        connection.raw('cast(s.mutations as bigint) as mutations'),
+        connection.raw(`cast(floor(a.estimated) as bigint) as estimated`)
         // connection.raw(`1.0 * s.mutations * a.estimated as mutations_estimated`),
         // connection.raw(`1.0 * s.mutations * s.mutations as mutations2`), // we need to materialize these columns types to avoid underflow/overflow when calculating cosine similarity
         // connection.raw(`1.0 * a.estimated * a.estimated as estimated2`),
       )
-      .join('estimated_mutations as a', function() {
-          this.on('s.mutationType', '=', 'a.mutationType')
-              .andOn('s.sample', '=', 'a.sample')
-              .andOn('s.cancer', '=', 'a.cancer')
+      .join('estimated_mutations as a', function () {
+        this.on('s.mutationType', '=', 'a.mutationType')
+          .andOn('s.sample', '=', 'a.sample')
+          .andOn('s.cancer', '=', 'a.cancer');
       })
-      .where(pickNotNull({
+      .where(
+        pickNotNull({
           's.study': study,
           's.strategy': strategy,
           's.cancer': cancer,
           's.profile': profile,
-          's.matrix': matrix
-      }))
-  
-    const cosineSimilarityData = await connection
+          's.matrix': matrix,
+        })
+      );
+
+    const cosineSimilarityQuery = connection
       .with('estimated_mutations', estimatedMutations)
       .with('mutations', mutations)
       .select(
-          'b.cancer', 
-          'b.sample', 
-          connection.raw('SUM(b.mutations * b.estimated) as numerator'),
-          connection.raw('SUM(b.mutations * b.mutations) as denominator1'),
-          connection.raw('SUM(b.estimated * b.estimated) as denominator2')
+        'b.cancer',
+        'b.sample',
+        connection.raw('SUM(b.mutations * b.estimated) as numerator'),
+        connection.raw('SUM(b.mutations * b.mutations) as denominator1'),
+        connection.raw('SUM(b.estimated * b.estimated) as denominator2')
       )
       .from('mutations as b')
       .groupBy('b.cancer', 'b.sample');
-    
-    // todo: execute this in the database (requires that we resolve underflow/overflow issues)
-    const cosineSimilarityMap = cosineSimilarityData.reduce((acc, curr) => ({
-      ...acc,
-      [curr.sample]: +curr.numerator / (Math.sqrt(+curr.denominator1) * Math.sqrt(curr.denominator2))
-    }), {});
 
-    if (
-      !exposureData?.length ||
-      !seqmatrixData?.length ||
-      !signatureData?.length
-    ) {
-      console.log('exposureData', exposureData[0], exposureData?.length);
-      console.log('seqmatrixData', seqmatrixData[0], seqmatrixData?.length);
-      console.log('signatureData', signatureData[0], signatureData?.length);
-      throw new Error('No data found');
+    const [results, cosineSimilarityData] = await Promise.all([
+      wrapper('wrapper', {
+        fn: 'getTreeLeaf',
+        args: { exposureData, seqmatrixData },
+      }),
+      cosineSimilarityQuery,
+    ]);
+
+    // todo: execute this in the database (requires that we resolve underflow/overflow issues)
+    const cosineSimilarityMap = new Map();
+    for (const curr of cosineSimilarityData) {
+      cosineSimilarityMap.set(
+        curr.sample,
+        +curr.numerator /
+          (Math.sqrt(+curr.denominator1) * Math.sqrt(curr.denominator2))
+      );
     }
-    const args = { exposureData, seqmatrixData, signatureData };
-    const results = await wrapper('wrapper', { fn: 'getTreeLeaf', args });
-    results.output.params = { study, strategy, cancer, signatureSetName, profile, matrix };
+
     for (let record of results.output?.attributes || []) {
-      record.Cosine_similarity = cosineSimilarityMap[record.Sample] || 0;
+      record.Cosine_similarity = cosineSimilarityMap.get(record.Sample) || 0;
     }
-    res.json(results);
+
+    const params = {
+      study,
+      strategy,
+      cancer,
+      signatureSetName,
+      profile,
+      matrix,
+    };
+    const { hierarchy, attributes } = results.output || {};
+    if (!hierarchy || !attributes) {
+      // R returned an error/uncaughtError; let the client surface it as-is
+      return res.json({ output: { ...results.output, params } });
+    }
+
+    const mutationsBySample = new Map(
+      attributes.map((record) => [String(record.Sample), record.Mutations])
+    );
+    const { nodes, links } = await computeTreeLeafLayout({
+      data: hierarchy,
+      mutations: mutationsBySample,
+      radius: TREE_LEAF_RADIUS,
+    });
+
+    res.json({ output: { attributes, nodes, links, params } });
   } catch (error) {
     console.log(error);
     next(error);
   }
 }
 
+async function getUserTreeLeafData(req, res, next) {
+  const { logger } = req.app.locals;
+  try {
+    const { userId, profile = 'SBS', matrix = 96 } = req.body;
+    if (!userId) {
+      throw new Error('Missing userId for user tree leaf data');
+    }
+
+    const connection = req.app.locals.sqlite(userId, 'local');
+    const seqmatrixData = await connection
+      .select('*', connection.raw('profile || matrix as profileMatrix'))
+      .from('seqmatrix')
+      .where({ profile })
+      .andWhere(function () {
+        // matrix may be stored as integer or string depending on import path
+        this.where('matrix', matrix).orWhere('matrix', String(matrix));
+      });
+
+    logger.info('[treeLeaf/user] request', {
+      userId,
+      profile,
+      matrix,
+      rows: seqmatrixData?.length || 0,
+    });
+
+    if (!seqmatrixData?.length) {
+      throw new Error(
+        `No SBS96 seqmatrix data found for user session ${userId}`
+      );
+    }
+
+    const results = await wrapper('wrapper', {
+      fn: 'getTreeLeafUser',
+      args: { seqmatrixData },
+    });
+
+    if (results?.output?.error || results?.output?.uncaughtError) {
+      logger.error('[treeLeaf/user] R error', {
+        userId,
+        error: results.output.error || results.output.uncaughtError,
+      });
+      results.output.params = { userId, profile, matrix };
+      return res.json({ output: results.output });
+    }
+
+    const { hierarchy, attributes } = results.output;
+    const mutationsBySample = new Map(
+      attributes.map((record) => [String(record.Sample), record.Mutations])
+    );
+    const { nodes, links } = await computeTreeLeafLayout({
+      data: hierarchy,
+      mutations: mutationsBySample,
+      radius: TREE_LEAF_RADIUS,
+    });
+
+    res.json({
+      output: {
+        attributes,
+        nodes,
+        links,
+        params: { userId, profile, matrix },
+      },
+    });
+  } catch (error) {
+    logger.error('[treeLeaf/user] failed', {
+      userId: req.body?.userId,
+      profile: req.body?.profile,
+      matrix: req.body?.matrix,
+      error,
+    });
+    next(error);
+  }
+}
+
+async function getTreeLeafData(req, res, next) {
+  if (req.body.userId || req.body.source === 'user') {
+    return getUserTreeLeafData(req, res, next);
+  }
+  return getPublicTreeLeafData(req, res, next);
+}
+
 const router = Router();
-router.post('/submitVisualization/:id?', submit);
+router.post('/submitVisualization{/:id}', submit);
 router.post('/getResults', getResults);
 router.post('/visualizationWrapper', visualizationWrapper);
 router.get('/visualization/download', visualizationDownload);
@@ -452,7 +621,7 @@ router.post(
   createCacheMiddleware((req) =>
     [
       'treeLeaf',
-      req.body.study,
+      req.body.userId || req.body.study,
       req.body.strategy,
       req.body.cancer,
       req.body.signatureSetName,
@@ -460,7 +629,7 @@ router.post(
       req.body.matrix,
     ].join(':')
   ),
-  getPublicTreeLeafData
+  getTreeLeafData
 );
 
 export {

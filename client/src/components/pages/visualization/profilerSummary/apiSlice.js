@@ -1,5 +1,5 @@
-import { visualizationApiSlice } from '../../../../services/store/rootApi';
-import profilerSummary from '../../../controls/plotly/profilerSummary/profilerSummary';
+import { visualizationApiSlice } from '@/services/store/rootApi';
+import profilerSummary from '@/components/controls/plotly/profilerSummary/profilerSummary';
 
 export const profilerSummaryApiSlice = visualizationApiSlice.injectEndpoints({
   endpoints: (builder) => ({

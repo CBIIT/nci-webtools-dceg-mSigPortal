@@ -21,8 +21,18 @@ function getData(
     (v) => typeof v === 'string' && v.includes('%')
   );
 
+  // normalize columns
+  const selectColumns =
+    typeof columns === 'string'
+      ? columns.includes(',')
+        ? columns.split(',')
+        : columns
+      : Array.isArray(columns)
+      ? columns.map(String)
+      : '*';
+
   let sqlQuery = connection
-    .select(columns.includes(',') ? columns.split(',') : columns)
+    .select(selectColumns)
     .from(table)
     // .where(conditions)
     .offset(offset, rowMode)
@@ -32,7 +42,7 @@ function getData(
     sqlQuery = sqlQuery.limit(limit || 100000);
   }
   if (distinct) {
-    sqlQuery = sqlQuery.distinct(columns);
+    sqlQuery = sqlQuery.distinct(selectColumns);
   }
 
   // apply where conditions to query

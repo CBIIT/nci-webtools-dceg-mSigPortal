@@ -1,8 +1,9 @@
+import { useMemo } from 'react';
 import Plot from 'react-plotly.js';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { saveAs } from 'file-saver';
-import { handleSaveCSV } from '../../../controls/table/table2';
+import { handleSaveCSV } from '@/components/controls/table/table2';
 
 import './plot.scss';
 
@@ -17,16 +18,25 @@ export default function Plotly({
   className = '',
   ...rest
 }) {
-  const defaultConfig = {
-    displayModeBar: true,
-    responsive: true,
-    displaylogo: false,
-    toImageButtonOptions: {
-      format: 'svg',
-      filename: filename || divId,
-      scale: 1,
-    },
-  };
+  // Plotly mutates data/layout (inputs may be frozen store data); clone only when props change
+  const plotData = useMemo(() => cloneDeep(data), [data]);
+  const plotLayout = useMemo(() => cloneDeep(layout), [layout]);
+  const plotConfig = useMemo(
+    () =>
+      cloneDeep({
+        displayModeBar: true,
+        responsive: true,
+        displaylogo: false,
+        showSendToCloud: false,
+        toImageButtonOptions: {
+          format: 'svg',
+          filename: filename || divId,
+          scale: 1,
+        },
+        ...config,
+      }),
+    [config, filename, divId]
+  );
 
   return (
     <Container fluid style={{ minHeight: layout.height || 500 }}>
@@ -36,9 +46,9 @@ export default function Plotly({
             className={`w-100 ${className}`}
             style={{ minHeight: layout.height || 500, ...style }}
             divId={divId}
-            data={cloneDeep(data)}
-            layout={cloneDeep(layout)}
-            config={cloneDeep({ ...defaultConfig, ...config })}
+            data={plotData}
+            layout={plotLayout}
+            config={plotConfig}
             useResizeHandler
             {...rest}
           />

@@ -75,13 +75,11 @@ export function defaultSignatureSet(signatureSetOptions) {
 }
 
 export function defaultSignatureSet2(signatureSetOptions) {
-  const options = signatureSetOptions.map(({ value }) => value);
-  return options.includes('COSMIC_v3.4_Signatures_GRCh38_SBS96')
-    ? {
-        label: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
-        value: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
-      }
-    : signatureSetOptions[0];
+  return (
+    signatureSetOptions.find(
+      ({ value }) => value === 'COSMIC_v3.4_Signatures_GRCh38_SBS96'
+    ) || signatureSetOptions[0]
+  );
 }
 
 export function defaultSignatureSet3_4(signatureSetOptions) {
@@ -92,6 +90,18 @@ export function defaultSignatureSet3_4(signatureSetOptions) {
         value: 'COSMIC_v3.4_Signatures_GRCh38_SBS96',
       }
     : signatureSetOptions[0];
+}
+
+// SBS-named sets first (alphabetical within each group) for signature set dropdowns
+export function signatureSetCompare(a, b) {
+  const aSbs = a.includes('SBS');
+  const bSbs = b.includes('SBS');
+  if (aSbs !== bSbs) return aSbs ? -1 : 1;
+  return a.localeCompare(b, undefined, { numeric: true });
+}
+
+export function signatureSetOptionCompare(a, b) {
+  return signatureSetCompare(a.value, b.value);
 }
 
 export function defaultStrategy(strategyOptions) {
@@ -151,3 +161,30 @@ export function parseCSV(data) {
     });
   });
 }
+
+// normalizes RTK Query errors, Error objects, and plain strings into a
+// renderable string, so error values are never passed directly as React children
+export function getErrorMessage(
+  error,
+  fallback = 'An error has occurred. Please verify your input.'
+) {
+  if (!error) return fallback;
+  if (typeof error === 'string') return error;
+  const { data } = error;
+  if (typeof data === 'string') return data;
+  return (
+    data?.error || data?.message || error.error || error.message || fallback
+  );
+}
+
+// label identifying a dataset (user upload vs a public study/strategy/set/cancer) for side-by-side plots
+export function getDatasetLabel(state) {
+  if (!state) return '';
+  if (state.id) return 'User Data';
+  const { study, strategy, signatureSetName, cancer, useAllCancer } = state;
+  if (!study) return '';
+  return `Public: ${study.value} · ${strategy.value} · ${signatureSetName.value} · ${
+    useAllCancer ? 'All Cancer Types' : cancer?.value
+  }`;
+}
+

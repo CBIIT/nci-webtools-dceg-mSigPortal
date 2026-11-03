@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
-import SelectForm from '../../controls/select/selectHookForm';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import SelectForm from '@/components/controls/select/selectHookForm';
+import PiiAcknowledgment from '@/components/controls/pii-acknowledgment/piiAcknowledgment';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as extractionActions } from '../../../services/store/extraction';
+import { actions as extractionActions } from '@/services/store/extraction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   resetExtractionApi,
   useSeqmatrixOptionsQuery,
   useSignatureOptionsQuery,
   useRefGenomeQuery,
-} from '../../../services/store/rootApi';
+} from '@/services/store/rootApi';
+import { signatureSetOptionCompare } from '@/services/utils';
 import {
   useUploadMutation,
   useSubmitMutation,
@@ -22,6 +24,19 @@ import {
 } from './apiSlice';
 
 const actions = { ...extractionActions, ...modalActions };
+
+const DEFAULT_SIGNATURE_SET = 'COSMIC_v3.3_Signatures_GRCh37_SBS96';
+
+function getDefaultSignatureSetOption(contextTypeValue, filteredOptions) {
+  if (contextTypeValue === 'default' || contextTypeValue === 'SBS96') {
+    return (
+      filteredOptions.find(
+        (option) => option.value === DEFAULT_SIGNATURE_SET
+      ) || filteredOptions[0]
+    );
+  }
+  return filteredOptions[0];
+}
 
 export default function ExtractionForm({ formLimits }) {
   const { submitted, ...state } = useSelector((state) => state.extraction);
@@ -33,6 +48,8 @@ export default function ExtractionForm({ formLimits }) {
   const mergeState = (state) => dispatch(actions.mergeExtraction(state));
   const mergeSuccess = (msg) =>
     dispatch(actions.mergeModal({ success: { visible: true, message: msg } }));
+  const mergeError = (msg) =>
+    dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
   const { data: params } = useParamsQuery(id, { skip: !id });
 
@@ -53,7 +70,7 @@ export default function ExtractionForm({ formLimits }) {
     data: signatureOptions,
     error: signatureError,
     isFetching: fetchingSignatureOptions,
-  } = useSignatureOptionsQuery();
+  } = useSignatureOptionsQuery({ study: 'Reference' });
   const {
     data: genomeData,
     error: genomeError,
@@ -100,7 +117,14 @@ export default function ExtractionForm({ formLimits }) {
   const signatureSetOptions = signatureOptions
     ? [...new Set(signatureOptions.map((e) => e.signatureSetName))]
         .map((e) => ({ label: e, value: e }))
-        .sort((a, b) => a.value.localeCompare(b.value))
+        .sort(signatureSetOptionCompare)
+    : [];
+
+  // strategies present anywhere in the reference catalog, used to filter the decomposition signature query for user uploads
+  const referenceStrategyOptions = signatureOptions
+    ? [...new Set(signatureOptions.map((e) => e.strategy))]
+        .sort()
+        .map((e) => ({ label: e, value: e }))
     : [];
 
   const handleContextTypeChange = (selectedOption) => {
@@ -110,21 +134,16 @@ export default function ExtractionForm({ formLimits }) {
       setIsDefaultContext(false);
       filteredOptions = signatureSetOptions
         .filter((option) => option.value.includes(selectedOption.value))
-        .sort((a, b) => a.value.localeCompare(b.value));
+        .sort(signatureSetOptionCompare);
     } else {
       setIsDefaultContext(true);
       filteredOptions = signatureSetOptions;
     }
     setFilteredSignatureSetOptions(filteredOptions);
-
-    if (selectedOption.value === 'SBS96') {
-      const cosmicOption = filteredOptions.find(
-        (option) => option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
-      );
-      setValue('signatureSetName', cosmicOption);
-    } else {
-      setValue('signatureSetName', filteredOptions[0]);
-    }
+    setValue(
+      'signatureSetName',
+      getDefaultSignatureSetOption(selectedOption.value, filteredOptions)
+    );
   };
   const dataTypeOptions = ['matrix'].map((e) => ({
     label: e,
@@ -230,6 +249,7 @@ export default function ExtractionForm({ formLimits }) {
       label: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
       value: 'COSMIC_v3.3_Signatures_GRCh37_SBS96',
     },
+    context_type: { label: 'default', value: 'default' },
     signatureName: [{ label: 'all', value: 'all' }],
     extractTool: {
       label: 'SigProfilerExtractor',
@@ -250,6 +270,7 @@ export default function ExtractionForm({ formLimits }) {
 
     email: '',
     jobName: '',
+    piiAcknowledged: false,
   };
 
   const sbsSample = {
@@ -298,6 +319,7 @@ export default function ExtractionForm({ formLimits }) {
     context_type,
     signatureSetName,
     input_type,
+    piiAcknowledged,
   } = watch();
 
   const contextTypeOptions = (() => {
@@ -310,7 +332,8 @@ export default function ExtractionForm({ formLimits }) {
               .map((e) => ({ label: e, value: e })),
           ]
         : [];
-    } if (signatureOptions && seqmatrixOptions && study?.value) {
+    }
+    if (signatureOptions && seqmatrixOptions && study?.value) {
       const sigProfiles = [
         ...new Set(signatureOptions.map((e) => e.profile + e.matrix)),
       ];
@@ -330,8 +353,8 @@ export default function ExtractionForm({ formLimits }) {
       const sortedOptions = commonProfiles
         .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
         .map((e) => ({ label: e, value: e }));
-      
-        // Only add 'default' if SBS96 is present in common profiles
+
+      // Only add 'default' if SBS96 is present in common profiles
       const hasSBS96 = commonProfiles.includes('SBS96');
       return hasSBS96
         ? [{ label: 'default', value: 'default' }, ...sortedOptions]
@@ -342,7 +365,6 @@ export default function ExtractionForm({ formLimits }) {
     } else {
       return [];
     }
-  
   })();
 
   // update url with id
@@ -371,45 +393,34 @@ export default function ExtractionForm({ formLimits }) {
 
   useEffect(() => {
     if (study && contextTypeOptions.length > 0) {
-      const hasDefault = contextTypeOptions[0].value === 'default';
-      const selectedContext = hasDefault
-        ? contextTypeOptions[0]
-        : contextTypeOptions[0]; // fallback to first available even if no 'default'
-  
+      const selectedContext = contextTypeOptions[0];
+
       // Only reset if it's not already set
-      if (!context_type || !contextTypeOptions.find(o => o.value === context_type.value)) {
+      if (
+        !context_type ||
+        !contextTypeOptions.find((o) => o.value === context_type.value)
+      ) {
         setValue('context_type', selectedContext);
-  
+
         let filteredOptions;
         if (selectedContext.value !== 'default') {
           setIsDefaultContext(false);
           filteredOptions = signatureSetOptions
-            .filter((option) =>
-              option.value.includes(selectedContext.value)
-            )
-            .sort((a, b) => a.value.localeCompare(b.value));
+            .filter((option) => option.value.includes(selectedContext.value))
+            .sort(signatureSetOptionCompare);
         } else {
           setIsDefaultContext(true);
           filteredOptions = signatureSetOptions;
         }
-  
+
         setFilteredSignatureSetOptions(filteredOptions);
-  
-        if (selectedContext.value === 'SBS96') {
-          const cosmicOption = filteredOptions.find(
-            (option) =>
-              option.value === 'COSMIC_v3.3_Signatures_GRCh37_SBS96'
-          );
-          setValue('signatureSetName', cosmicOption);
-        } else {
-          setValue('signatureSetName', filteredOptions[0]);
-        }
+        setValue(
+          'signatureSetName',
+          getDefaultSignatureSetOption(selectedContext.value, filteredOptions)
+        );
       }
     }
   }, [study, contextTypeOptions, context_type]);
-  
-  
-  
 
   function handleReset() {
     history.push('/extraction');
@@ -418,7 +429,50 @@ export default function ExtractionForm({ formLimits }) {
     dispatch(resetExtractionApi);
   }
 
+  // verify the user matrix has a MutationType first column and >=1 sample column
+  async function validateMatrixHeader(file) {
+    if (!file) return { isValid: false, error: 'Please upload a data file.' };
+    try {
+      const text = await file.text();
+      const firstLine = text.split(/\r?\n/).find((l) => l.trim() !== '');
+      if (!firstLine)
+        return {
+          isValid: false,
+          error: 'The uploaded matrix file appears to be empty.',
+        };
+      const delimiter = firstLine.includes('\t') ? '\t' : ',';
+      const cols = firstLine
+        .replace(/^\uFEFF/, '')
+        .split(delimiter)
+        .map((c) => c.trim());
+      if (cols[0].toLowerCase() !== 'mutationtype')
+        return {
+          isValid: false,
+          error: `The first column of the matrix must be "MutationType" (found "${cols[0]}").`,
+        };
+      if (cols.length < 2)
+        return {
+          isValid: false,
+          error:
+            'The matrix must include at least one sample column after MutationType.',
+        };
+      return { isValid: true };
+    } catch (e) {
+      return {
+        isValid: false,
+        error: 'Error reading the matrix file. Please check the file format.',
+      };
+    }
+  }
+
   async function onSubmit(data) {
+    if (source === 'user') {
+      const matrixValidation = await validateMatrixHeader(data.inputFile);
+      if (!matrixValidation.isValid) {
+        mergeError(matrixValidation.error);
+        return;
+      }
+    }
     mergeState({ submitted: true });
     const formData = new FormData();
     formData.append('inputFile', data.inputFile);
@@ -469,6 +523,9 @@ export default function ExtractionForm({ formLimits }) {
       signatureSetName,
       profile,
       matrix,
+      strategy: data.strategy?.value,
+      // extraction decomposes against the reference catalog, not the seqmatrix study above
+      study: 'Reference',
       ...(data.signatureName[0].value != 'all' && {
         signatureName: data.signatureName.map((e) => e.value).join(';'),
       }),
@@ -503,12 +560,13 @@ export default function ExtractionForm({ formLimits }) {
     localStorage.setItem('jobs', JSON.stringify([...jobs, id]));
   }
 
-  const handleSelectChange = (selectedOptions) => {
-    const isAllOptionSelected = selectedOptions.some(
-      (option) => option.value === 'all'
-    );
+  const handleSelectChange = (selectedOptions, actionMeta) => {
+    // if the user just picked 'all', collapse to only 'all'
+    const justSelectedAll =
+      actionMeta?.action === 'select-option' &&
+      actionMeta?.option?.value === 'all';
 
-    if (isAllOptionSelected) {
+    if (justSelectedAll) {
       // Clear the warning when 'all' is selected and unselect individual signatures
       setWarning('');
       selectedOptions = [{ value: 'all', label: 'all' }];
@@ -613,6 +671,14 @@ export default function ExtractionForm({ formLimits }) {
                   label="Data Type"
                   disabled={submitted || id}
                   options={dataTypeOptions}
+                  control={control}
+                />
+                <SelectForm
+                  className="mb-2"
+                  name="strategy"
+                  label="Experimental Strategy"
+                  disabled={submitted || id || fetchingSignatureOptions}
+                  options={referenceStrategyOptions}
                   control={control}
                 />
                 <Form.Group>
@@ -724,8 +790,6 @@ export default function ExtractionForm({ formLimits }) {
             name="signatureSetName"
             label="Reference Signature Set"
             disabled={submitted || id}
-            //options={signatureSetOptions}
-            //options={filteredSignatureSetOptions}
             options={
               isDefaultContext
                 ? signatureSetOptions
@@ -741,48 +805,6 @@ export default function ExtractionForm({ formLimits }) {
             options={signatureNameOptions(signatureSetName)}
             control={control}
             onChange={handleSelectChange}
-            // onChange={(selectedOptions) => {
-            //   // Check if the 'all' option is selected
-            //   const isAllOptionSelected = selectedOptions.some(
-            //     (option) => option.value === 'all'
-            //   );
-            //   if (!isAllOptionSelected) {
-            //     // Filter out the 'all' option if it exists in selectedOptions
-            //     selectedOptions = selectedOptions.filter(
-            //       (option) => option.value !== 'all'
-            //     );
-
-            //     if (selectedOptions.length === 1) {
-            //       // Show a warning message if only one option (other than 'all') is selected
-            //       setWarning('More than one signature is required as input');
-            //     } else {
-            //       // Clear the warning if multiple options are selected
-            //       setWarning('');
-            //     }
-            //   } else {
-            //     // Clear the warning when 'all' is selected
-            //     setWarning('');
-            //     setValue('signatureName', [{ value: 'all', label: 'all' }]);
-            //   }
-
-            //   // Update the form values with the modified selectedOptions
-            //   setValue('signatureName', selectedOptions);
-            // }}
-            // onChange={(values, e) => {
-            //   // remove "all" option if a specific signature is selected
-            //   // remove other options if "all" is selected
-            //   console.log('e', e);
-            //   if (e.action === 'select-option') {
-            //     if (e.option.value !== 'all') {
-            //       setValue(
-            //         'signatureName',
-            //         values.filter((e) => e.value !== 'all')
-            //       );
-            //     } else if (e.option.value === 'all') {
-            //       setValue('signatureName', [e.option]);
-            //     }
-            //   } else setValue('signatureName', values);
-            // }}
             isMulti
           />
           <SelectForm
@@ -1174,6 +1196,14 @@ export default function ExtractionForm({ formLimits }) {
             </Form.Group>
           </div>
         </div>
+        {source === 'user' && (
+          <PiiAcknowledgment
+            id="extractionPiiAcknowledgment"
+            control={control}
+            disabled={submitted || id}
+            className="mt-3"
+          />
+        )}
         <Row className="mt-3">
           <Col>
             <Button
@@ -1188,7 +1218,11 @@ export default function ExtractionForm({ formLimits }) {
           <Col>
             <Button
               disabled={
-                fetchingSeqmatrixOptions || submitted || id || warning !== ''
+                fetchingSeqmatrixOptions ||
+                submitted ||
+                id ||
+                warning !== '' ||
+                (source === 'user' && !piiAcknowledged)
               }
               className="w-100"
               variant="primary"

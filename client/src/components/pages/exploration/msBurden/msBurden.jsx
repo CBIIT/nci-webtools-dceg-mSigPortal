@@ -1,11 +1,62 @@
-import { Container } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import TmbBurdenPlot from './msBurden-plot';
 import TmbBurdenForm from './msBurden-form';
-import Description from '../../../controls/description/description';
-import { useState } from 'react';
+import Description from '@/components/controls/description/description';
+import { useState, useMemo } from 'react';
+import { useMsBurdenOptionsQuery } from './apiSlice';
 
-export default function MsBurden({ state }) {
+function toParams(state) {
+  if (!state) return '';
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  if (study) {
+    return {
+      study: study.value,
+      strategy: strategy.value,
+      signatureSetName: signatureSetName.value,
+      ...(!useAllCancer && { cancer: cancer.value }),
+    };
+  } else if (id) {
+    return { userId: id };
+  }
+  return '';
+}
+
+export default function MsBurden({ state, compareState }) {
   const [form, setForm] = useState({ signatureName: '' });
+  const { study, strategy, signatureSetName, cancer, useAllCancer, id } = state;
+  const params = useMemo(
+    () => toParams({ study, strategy, signatureSetName, cancer, useAllCancer, id }),
+    [study, strategy, signatureSetName, cancer, useAllCancer, id]
+  );
+  const compareParams = useMemo(
+    () => (compareState ? toParams(compareState) : ''),
+    [compareState]
+  );
+
+  const { data: options } = useMsBurdenOptionsQuery(params, { skip: !params });
+  const { data: compareOptions } = useMsBurdenOptionsQuery(compareParams, {
+    skip: !compareParams,
+  });
+
+  const columnLayout =
+    compareState && !state.useAllCancer && !compareState.useAllCancer;
+
+  const primaryPlot = (
+    <TmbBurdenPlot
+      form={form}
+      state={state}
+      availableOptions={options}
+      divId="msBurden-primary"
+    />
+  );
+  const comparePlot = compareState && (
+    <TmbBurdenPlot
+      form={form}
+      state={compareState}
+      availableOptions={compareOptions}
+      divId="msBurden-compare"
+    />
+  );
 
   return (
     <Container fluid className="bg-white border rounded p-0">
@@ -18,9 +69,33 @@ export default function MsBurden({ state }) {
         />
       </div>
       <hr />
-      <TmbBurdenForm state={state} form={form} setForm={setForm} />
+      <TmbBurdenForm
+        options={options}
+        compareOptions={compareOptions}
+        form={form}
+        setForm={setForm}
+      />
       <hr />
-      <TmbBurdenPlot form={form} state={state} />
+      {columnLayout ? (
+        <Row className="m-0">
+          <Col lg="6" className="p-0">
+            {primaryPlot}
+          </Col>
+          <Col lg="6" className="p-0">
+            {comparePlot}
+          </Col>
+        </Row>
+      ) : (
+        <>
+          {primaryPlot}
+          {comparePlot && (
+            <>
+              <hr />
+              {comparePlot}
+            </>
+          )}
+        </>
+      )}
     </Container>
   );
 }

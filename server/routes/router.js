@@ -1,8 +1,8 @@
-import express from 'express';
-import Router from 'express-promise-router';
+import express, { Router } from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import {xss} from 'express-xss-sanitizer';
+import rateLimit from 'express-rate-limit';
 import {
   handleValidationErrors,
   logRequests,
@@ -32,6 +32,14 @@ export function createApi(env) {
   router.use(logRequests());
   router.use(cors());
   router.use(xss());
+  router.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 3000,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+    })
+  );
   // serve static files under /data
   router.use('/data', express.static(env.DATA_FOLDER));
 

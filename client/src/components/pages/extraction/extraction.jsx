@@ -1,28 +1,29 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Button, Nav, Form, Row, Col, Alert } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { actions as extractionActions } from '../../../services/store/extraction';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as extractionActions } from '@/services/store/extraction';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 import ExtractionForm from './extraction-form';
 import Instructions from './instructions';
 import Status from './status';
 import SignatureMap from './signatureMap';
-import TMB from '../exploration/tmb/tmb';
-import TmbSignature from '../exploration/tmbSignature/tmbSignature';
-import MsBurden from '../exploration/msBurden/msBurden';
-import MsDecomposition from '../exploration/msDecomposition/msDecomposition';
-import MsAssociation from '../exploration/msAssociation/msAssociation';
-import MsLandscape from '../exploration/msLandscape/msLandscape';
-import MsPrevalence from '../exploration/msPrevalence/msPrevalence';
-import MsIndividual from '../exploration/msIndividual/msIndividual';
+import TMB from '@/components/pages/exploration/tmb/tmb';
+import TmbSignature from '@/components/pages/exploration/tmbSignature/tmbSignature';
+import MsBurden from '@/components/pages/exploration/msBurden/msBurden';
+import MsDecomposition from '@/components/pages/exploration/msDecomposition/msDecomposition';
+import MsAssociation from '@/components/pages/exploration/msAssociation/msAssociation';
+import MsLandscape from '@/components/pages/exploration/msLandscape/msLandscape';
+import MsPrevalence from '@/components/pages/exploration/msPrevalence/msPrevalence';
+import MsIndividual from '@/components/pages/exploration/msIndividual/msIndividual';
 import { useRefreshQuery } from './apiSlice';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import TabPanel from '@/components/controls/tab/tab';
 
 const actions = { ...extractionActions, ...modalActions };
 
@@ -76,6 +77,19 @@ export default function Extraction() {
       ? manifest.decomposedId
       : manifest.denovoId
     : false;
+
+  const signatureMapState = useMemo(
+    () => ({ id, params, manifest }),
+    [id, params, manifest]
+  );
+  const explorationState = useMemo(
+    () => ({ id: explorationId }),
+    [explorationId]
+  );
+  const associationState = useMemo(
+    () => ({ id: explorationId, id2 }),
+    [explorationId, id2]
+  );
 
   const refreshState = useCallback(() => {
     refreshExtraction();
@@ -153,7 +167,7 @@ export default function Extraction() {
       name: 'MS Individual',
       disabled:
         explorationId === false ||
-        !['SBS96', 'DBS72', 'ID83', 'RS32', 'SBS192'].includes(
+        !['default', 'SBS96', 'DBS72', 'ID83', 'RS32', 'SBS192'].includes(
           params?.args.context_type
         ),
     },
@@ -313,57 +327,41 @@ export default function Extraction() {
             </div>
           )}
 
-          <div className={displayTab === 'instructions' ? 'd-block' : 'd-none'}>
+          <TabPanel active={displayTab === 'instructions'}>
             <Instructions formLimits={formLimits} />
-          </div>
-          <div className={displayTab === 'status' ? 'd-block' : 'd-none'}>
+          </TabPanel>
+          <TabPanel active={displayTab === 'status'}>
             <Status setDisplayTab={(tab) => mergeState({ displayTab: tab })} />
-          </div>
+          </TabPanel>
           {status && status.status === 'COMPLETED' && (
             <>
-              <div
-                className={displayTab === 'signatureMap' ? 'd-block' : 'd-none'}
-              >
-                <SignatureMap state={{ id, params, manifest }} />
-              </div>
-              <div className={displayTab === 'tmb' ? 'd-block' : 'd-none'}>
-                <TMB state={{ id: explorationId }} />
-              </div>
-              <div className={displayTab === 'tmbSig' ? 'd-block' : 'd-none'}>
-                <TmbSignature state={{ id: explorationId }} />
-              </div>
-              <div className={displayTab === 'msBurden' ? 'd-block' : 'd-none'}>
-                <MsBurden state={{ id: explorationId }} />
-              </div>
-              <div
-                className={
-                  displayTab === 'msDecomposition' ? 'd-block' : 'd-none'
-                }
-              >
-                <MsDecomposition state={{ id: explorationId }} />
-              </div>
-              <div
-                className={
-                  displayTab === 'msAssociation' ? 'd-block' : 'd-none'
-                }
-              >
-                <MsAssociation state={{ id: explorationId, id2 }} />
-              </div>
-              <div
-                className={displayTab === 'msLandscape' ? 'd-block' : 'd-none'}
-              >
-                <MsLandscape state={{ id: explorationId }} />
-              </div>
-              <div
-                className={displayTab === 'msPrevalence' ? 'd-block' : 'd-none'}
-              >
-                <MsPrevalence state={{ id: explorationId }} />
-              </div>
-              <div
-                className={displayTab === 'msIndividual' ? 'd-block' : 'd-none'}
-              >
-                <MsIndividual state={{ id: explorationId }} />
-              </div>
+              <TabPanel active={displayTab === 'signatureMap'}>
+                <SignatureMap state={signatureMapState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'tmb'}>
+                <TMB state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'tmbSig'}>
+                <TmbSignature state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msBurden'}>
+                <MsBurden state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msDecomposition'}>
+                <MsDecomposition state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msAssociation'}>
+                <MsAssociation state={associationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msLandscape'}>
+                <MsLandscape state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msPrevalence'}>
+                <MsPrevalence state={explorationState} />
+              </TabPanel>
+              <TabPanel active={displayTab === 'msIndividual'}>
+                <MsIndividual state={explorationState} />
+              </TabPanel>
             </>
           )}
         </MainPanel>

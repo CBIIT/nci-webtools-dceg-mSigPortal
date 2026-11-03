@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
-import CustomSelect from '../../controls/select/select-old';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import CustomSelect from '@/components/controls/select/select-old';
 import { useSelector, useDispatch } from 'react-redux';
-import { actions as associationActions } from '../../../services/store/association';
-import { actions as modalActions } from '../../../services/store/modal';
+import { actions as associationActions } from '@/services/store/association';
+import { getEmptyAssocVar } from '@/services/store/association';
+import { actions as modalActions } from '@/services/store/modal';
 
 const actions = { ...associationActions, ...modalActions };
 const { Group } = Form;
@@ -152,7 +153,14 @@ export default function PublicForm() {
         displayTab: 'univariable',
         openSidebar: false,
       });
-      dispatch(actions.mergeAssociation({ univariable: { id } }));
+      // reset variable selection so defaults repopulate from the new dataset
+      const emptyAssocVar = getEmptyAssocVar();
+      dispatch(
+        actions.mergeAssociation({
+          univariable: { id, associationVar: emptyAssocVar },
+          multivariable: { associationVars: [emptyAssocVar] },
+        })
+      );
     } catch (error) {
       mergeError(error);
     }

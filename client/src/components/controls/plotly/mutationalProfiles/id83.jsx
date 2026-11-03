@@ -5,7 +5,7 @@ import {
   groupDataByMutation,
 } from './utils';
 
-import { id83Color } from '../../utils/colors';
+import { id83Color } from '@/components/controls/utils/colors';
 export default function ID83(apiData, title = '') {
   const colors = id83Color;
 
@@ -184,7 +184,7 @@ export default function ID83(apiData, title = '') {
   }));
 
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     //width:1080,

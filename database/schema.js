@@ -236,6 +236,7 @@ export const schema = [
     dependsOn: ['signature'],
     schema: (view, connection) => {
       const columns = [
+        'study',
         'source',
         'strategy',
         'profile',
@@ -249,6 +250,7 @@ export const schema = [
     },
     index: (table) => {
       table.index([
+        'study',
         'source',
         'strategy',
         'profile',

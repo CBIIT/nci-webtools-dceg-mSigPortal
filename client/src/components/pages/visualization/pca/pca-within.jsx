@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Select from '../../../controls/select/selectHookForm';
+import Select from '@/components/controls/select/selectHookForm';
 import { useForm } from 'react-hook-form';
 import { usePcaWithinQuery, usePcaSignatureSetsQuery } from './apiSlice';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import SvgContainer from '../../../controls/svgContainer/svgContainer';
-import { defaultMatrix, defaultProfile2 } from '../../../../services/utils';
-import { useSeqmatrixOptionsQuery } from '../../../../services/store/rootApi';
-import { useMatrixListQuery } from '../userForm/apiSlice';
+import { LoadingOverlay } from '@/components/controls/loading-overlay/loading-overlay';
+import SvgContainer from '@/components/controls/svgContainer/svgContainer';
+import {
+  defaultMatrix,
+  defaultProfile2,
+  getErrorMessage,
+} from '@/services/utils';
+import { useSeqmatrixOptionsQuery } from '@/services/store/rootApi';
+import { useMatrixListQuery } from '@/components/pages/visualization/userForm/apiSlice';
 
 export default function PcaWithin({ state }) {
   const [params, setParams] = useState('');
@@ -61,9 +65,11 @@ export default function PcaWithin({ state }) {
       setSignatureSetQuery({
         profile: profile.value,
         matrix: defaultMatrix(profile.value, ['96', '78', '83']),
+        study: source == 'public' ? `Reference;${study.value}` : 'Reference',
+        ...(source == 'public' && { strategy: strategy.value }),
       });
     }
-  }, [profile]);
+  }, [profile, source, study?.value, strategy?.value]);
 
   function onSubmit(data) {
     const cacheBust = new Date().getTime();
@@ -138,10 +144,11 @@ export default function PcaWithin({ state }) {
         <>
           <hr />
           <p className="p-3">
-            {error ||
-              data?.output?.error ||
-              data?.output?.uncaughtError ||
-              'An error has occurred. Please verify your input.'}
+            {error
+              ? getErrorMessage(error)
+              : data?.output?.error ||
+                data?.output?.uncaughtError ||
+                'An error has occurred. Please verify your input.'}
           </p>
         </>
       )}

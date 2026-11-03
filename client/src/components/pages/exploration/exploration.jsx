@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Form, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveAs } from 'file-saver';
@@ -15,13 +15,14 @@ import MsLandscape from './msLandscape/msLandscape';
 import MsPrevalence from './msPrevalence/msPrevalence';
 import MsIndividual from './msIndividual/msIndividual';
 import Download from './download';
-import { actions as exposureActions } from '../../../services/store/exploration';
-import { actions as modalActions } from '../../../services/store/modal';
+import TabPanel from '@/components/controls/tab/tab';
+import { actions as exposureActions } from '@/services/store/exploration';
+import { actions as modalActions } from '@/services/store/modal';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container/sidebar-container';
+} from '@/components/controls/sidebar-container/sidebar-container';
 
 const actions = { ...exposureActions, ...modalActions };
 const { Group, Label, Check } = Form;
@@ -34,9 +35,17 @@ export default function Exploration() {
   const mergeError = (msg) =>
     dispatch(actions.mergeModal({ error: { visible: true, message: msg } }));
 
-  const { publicForm, main } = useSelector((state) => state.exploration);
+  const { publicForm, comparePublicForm, main } = useSelector(
+    (state) => state.exploration
+  );
 
   const { exampleName } = useParams();
+
+  const compareState = main.compare ? comparePublicForm : null;
+  const tabState = useMemo(
+    () => ({ ...publicForm, ...main }),
+    [publicForm, main]
+  );
 
   // const [variableFileObj, setVariable] = useState(new File([], ''));
 
@@ -317,44 +326,36 @@ export default function Exploration() {
           </div>
         </SidebarPanel>
         <MainPanel>
-          <div className={displayTab == 'instructions' ? 'd-block' : 'd-none'}>
+          <TabPanel active={displayTab == 'instructions'}>
             <Instructions />
-          </div>
-          <div className={displayTab == 'tmb' ? 'd-block' : 'd-none'}>
-            <TMB state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'tmbSig' ? 'd-block' : 'd-none'}>
-            <TmbSig state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'msBurden' ? 'd-block' : 'd-none'}>
-            <MsBurden state={{ ...publicForm, ...main }} />
-          </div>
-          <div
-            className={displayTab == 'msDecomposition' ? 'd-block' : 'd-none'}
-          >
-            <MsDecomposition state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'msAssociation' ? 'd-block' : 'd-none'}>
-            <MsAssociation state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'msLandscape' ? 'd-block' : 'd-none'}>
-            <MsLandscape state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'msPrevalence' ? 'd-block' : 'd-none'}>
-            <MsPrevalence state={{ ...publicForm, ...main }} />
-          </div>
-          <div className={displayTab == 'msIndividual' ? 'd-block' : 'd-none'}>
-            <MsIndividual state={{ ...publicForm, ...main }} />
-          </div>
-          <div
-            className={
-              displayTab == 'download' && source == 'public'
-                ? 'd-block'
-                : 'd-none'
-            }
-          >
+          </TabPanel>
+          <TabPanel active={displayTab == 'tmb'}>
+            <TMB state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'tmbSig'}>
+            <TmbSig state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msBurden'}>
+            <MsBurden state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msDecomposition'}>
+            <MsDecomposition state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msAssociation'}>
+            <MsAssociation state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msLandscape'}>
+            <MsLandscape state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msPrevalence'}>
+            <MsPrevalence state={tabState} compareState={compareState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'msIndividual'}>
+            <MsIndividual state={tabState} />
+          </TabPanel>
+          <TabPanel active={displayTab == 'download' && source == 'public'}>
             <Download exposureDownload={exposureDownload} />
-          </div>
+          </TabPanel>
         </MainPanel>
       </SidebarContainer>
     </div>

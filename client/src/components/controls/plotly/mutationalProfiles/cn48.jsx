@@ -240,7 +240,7 @@ export default function CN48(apiData, title = '') {
   );
   const sampleAnnotation = createSampleAnnotation(apiData);
   const layout = {
-    title: `<b>${title}</b>`,
+    title: { text: `<b>${title}</b>` },
     hoverlabel: { bgcolor: '#FFF' },
     height: 500,
     autosize: true,

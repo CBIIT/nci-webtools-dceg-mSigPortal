@@ -1,4 +1,5 @@
 import path from 'path';
+// import { execa } from 'execa';
 import ECS, { ECSClient, RunTaskCommand } from '@aws-sdk/client-ecs';
 import Batch, {
   BatchClient,
@@ -39,7 +40,15 @@ export async function runLocalWorker(id, app, taskName, env = process.env) {
   if (taskName === 'visualization') {
     return await profilerExtraction(params, logger, dbConnection, env);
   } else if (taskName === 'extraction') {
-    fetch(`${env.API_BASE_URL}/extraction/run/${id}`);
+    // run the extraction-service worker as a child process
+    // const extractionServicePath = path.resolve(
+    //   process.cwd(),
+    //   '../extraction-service'
+    // );
+    // execa('node', ['worker.js', id], { cwd: extractionServicePath }).catch(
+    //   (error) =>
+    //     logger.error(`Local extraction job ${id} failed: ${error.message}`)
+    // );
   } else if (taskName === 'refitting') {
     fetch(`${env.API_BASE_URL}/refitting/run/${id}`);
   }

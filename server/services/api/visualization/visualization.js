@@ -7,6 +7,7 @@ import {
   getClusterData,
   getRefgenomeData,
 } from '../../query.js';
+import { validateColumns } from '../../middleware.js';
 
 const env = process.env;
 
@@ -123,7 +124,7 @@ async function queryRefgenome(req, res, next) {
 
 const router = Router();
 router.get('/mutational_spectrum', querySeqmatrix);
-router.get('/mutational_spectrum_options', seqmatrixOptions);
+router.get('/mutational_spectrum_options', validateColumns, seqmatrixOptions);
 router.get('/mutational_spectrum_summary', seqmatrixSummary);
 router.get('/cluster', queryCluster);
 router.get('/refgenome', queryRefgenome);
