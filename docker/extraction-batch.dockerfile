@@ -1,6 +1,6 @@
-FROM nvidia/cuda:12.6.3-runtime-amzn2023
+FROM nvidia/cuda:12.9.2-runtime-amzn2023
 
-# the base is locked to AL2023 2023.6, which predates the python3.13 and nodejs24 packages
+# the base is locked to an older AL2023 release that predates the python3.13 and nodejs24 packages
 RUN dnf -y --releasever=latest update \
     && dnf -y install \
     bzip2 \
@@ -37,9 +37,9 @@ RUN mkdir -p /deploy/app /deploy/logs
 WORKDIR /deploy/app
 
 
-# install pytorch (cu126 wheels to match the base image)
+# install pytorch (cu129 wheels to match the base image)
 ENV PYTHON_BIN=python3.13
-RUN python3.13 -m pip install --no-cache-dir "torch>=2.5,<3" --index-url https://download.pytorch.org/whl/cu126
+RUN python3.13 -m pip install --no-cache-dir "torch>=2.5,<3" --index-url https://download.pytorch.org/whl/cu129
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.13/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.13/site-packages/nvidia/cuda_cupti/lib/
 
 # install SigProfilerExtractor (editable: a regular install would pick up the fork's stale committed build/lib)
