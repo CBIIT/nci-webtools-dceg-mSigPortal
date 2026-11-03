@@ -71,7 +71,16 @@ python3 utils/regression/run_cases.py profiler --label baseline --all
 ```
 
 Drop `--all` to skip the two Cluster cases while iterating. After the Dockerfile upgrade, rebuild and run
-the same command with `--label candidate`.
+the same command with `--label candidate`. To keep both images side by side, tag the builds and pass
+`--image` instead of using compose (the profiler script does not need `server/.env`):
+
+```bash
+docker build -t msigportal-backend:py313 -f docker/backend.dockerfile .
+python3 utils/regression/run_cases.py profiler --label candidate --all --image msigportal-backend:py313
+```
+
+`run_cases.py` runs `${PYTHON_BIN:-python3}` inside the container, so the py3.13 images (which set
+`PYTHON_BIN=python3.13` and leave the system `python3` alone) and the old images both work unchanged.
 
 ### Extraction (extractor) suite
 

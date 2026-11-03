@@ -110,11 +110,15 @@ def docker_prefix(args, suite):
             "run", "--rm", "--no-deps", "-T", "backend"]
 
 
+# the py3.13 images keep system python3 and select the interpreter via ENV PYTHON_BIN, like the Node spawn sites
+PYTHON = ["sh", "-c", 'exec "${PYTHON_BIN:-python3}" "$@"', "python"]
+
+
 def capture_env(prefix, out_dir: Path, label: str, image_desc: str):
     """Record interpreter and package versions of the image under test."""
-    py = run(prefix + ["python3", "-c",
+    py = run(prefix + PYTHON + ["-c",
                        "import sys,platform;print(sys.version.replace(chr(10),' '));print(platform.platform())"])
-    freeze = run(prefix + ["python3", "-m", "pip", "freeze"])
+    freeze = run(prefix + PYTHON + ["-m", "pip", "freeze"])
     env = {
         "label": label,
         "image": image_desc,
@@ -195,7 +199,7 @@ def cmd_profiler(args):
             continue
         print(f"- {name} [{case.get('package')}]")
         t0 = time.time()
-        proc = run(prefix + ["python3", cfg["script"]] + cli,
+        proc = run(prefix + PYTHON + [cfg["script"]] + cli,
                    log_path=out_dir / "profiler_extraction_log.txt")
         dt = time.time() - t0
         status = "ok" if proc.returncode == 0 else f"exit {proc.returncode}"
@@ -255,7 +259,7 @@ def cmd_extractor(args):
             continue
         print(f"- {name} [{case.get('package')}]")
         t0 = time.time()
-        proc = run(prefix + ["python3", cfg["script"]] + cli,
+        proc = run(prefix + PYTHON + [cfg["script"]] + cli,
                    log_path=out_dir / "extraction_log.txt")
         dt = time.time() - t0
         status = "ok" if proc.returncode == 0 else f"exit {proc.returncode}"
