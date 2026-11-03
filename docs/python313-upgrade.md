@@ -110,9 +110,9 @@ Full details in `utils/regression/README.md`. Short form, from the repository ro
 3.9+, e.g. `python3.13`; the harness is stdlib only):
 
 ```bash
-# 1. baselines on the current images (check out dev, or git stash the Dockerfile changes)
-docker build -t msigportal-backend:py39 -f docker/backend.dockerfile .
-docker build -t msigportal-extraction:py39 -f docker/extraction-batch.dockerfile .
+# 1. baselines: build from dev's Dockerfiles (on python313, docker/*.dockerfile are already the 3.13 ones)
+git show dev:docker/backend.dockerfile | docker build -t msigportal-backend:py39 -f - .
+git show dev:docker/extraction-batch.dockerfile | docker build -t msigportal-extraction:py39 -f - .
 python3 utils/regression/run_cases.py profiler  --label baseline --all --image msigportal-backend:py39
 python3 utils/regression/run_cases.py extractor --label baseline --image msigportal-extraction:py39
 

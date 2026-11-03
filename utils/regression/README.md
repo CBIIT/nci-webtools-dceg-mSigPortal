@@ -62,7 +62,9 @@ Python scripts present under `server/services/python/` and `extraction-service/s
 
 ### Backend (profiler) suite
 
-Build the current image and capture the baseline before touching the Dockerfile:
+Build the current image and capture the baseline before touching the Dockerfile (on the `python313`
+branch, use `git show dev:docker/backend.dockerfile | docker build -t msigportal-backend:py39 -f - .`
+and `--image msigportal-backend:py39` instead):
 
 ```bash
 docker compose build backend
@@ -86,10 +88,11 @@ python3 utils/regression/run_cases.py profiler --label candidate --all --image m
 
 ### Extraction (extractor) suite
 
-There is no compose service for this image, so tag the builds explicitly:
+There is no compose service for this image, so tag the builds explicitly. On the `python313` branch the
+files in `docker/` are already the 3.13 versions, so build the baseline from `dev`'s Dockerfile:
 
 ```bash
-docker build -t msigportal-extraction:py39 -f docker/extraction-batch.dockerfile .
+git show dev:docker/extraction-batch.dockerfile | docker build -t msigportal-extraction:py39 -f - .
 ```
 
 The extractor needs a wide signature table (`Type` column plus one column per signature), the same file
