@@ -61,7 +61,80 @@ Only two application features reach Python. See `utils/regression/README.md` for
 
 ## Dockerfile changes
 
-To be completed once the sub-agent reports provide the working dependency versions.
+### `docker/backend.dockerfile`
+
+| Before | After |
+|---|---|
+| `dnf install python3-devel python3-pip` (system 3.9) | `dnf install python3.13 python3.13-devel python3.13-pip`; system `python3` untouched |
+| `pip3 install -e git+.../SigProfilerClusters` first (pulled PyPI SPMG/SPP/Extractor/torch, then overwritten) | order from [python313-sigprofilerclusters.md](python313-sigprofilerclusters.md#install-order-for-the-dockerfile): SPP fork, SPMG fork, `--no-deps SigProfilerSimulator==1.2.2`, `fastrand>=1.2`, `--no-deps` Clusters fork, then `statsmodels scipy` |
+| fork `master`/`main` branches | `@python313` branches |
+| `seaborn==0.13.2`, then `--force-reinstall numpy==1.26.4 pandas==1.3.5` | `numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9 seaborn==0.13.2` (build arg `PY_PINS`) on every install step |
+| `echo ... MutationMatrixGenerator >> scripts/__init__.py` | removed; the SPMG branch ships `scripts/MutationMatrixGenerator.py` |
+| (none) | `ENV PYTHON_BIN=python3.13` |
+| `GENOME_PATH=/src/sigprofilermatrixgenerator/.../tsb` | unchanged: editable `git+` installs still clone into `/src/<egg name lowercased>` (pip's default `src` dir under the working directory `/`), and SPMG resolves `references/` from its source checkout |
+
+The `cp fonts/* /usr/share/fonts` step stays. SPP now registers its bundled fonts itself, but R plots
+in the same image may rely on the system copies.
+
+### `docker/extraction-batch.dockerfile`
+
+| Before | After |
+|---|---|
+| `nvidia/cuda:12.1.1-runtime-rockylinux9` | `nvidia/cuda:12.6.3-runtime-amzn2023` |
+| `dnf -y update` | `dnf -y --releasever=latest update`: the base is locked to AL2023 2023.6.20241121, which has no `python3.13` or `nodejs24` packages |
+| `dnf module enable nodejs:20`, `nodejs npm` | `nodejs24` (same package as the backend image; Node 20 is end of life) |
+| `python3-devel python3-pip python3-setuptools` | `python3.13 python3.13-devel python3.13-pip` |
+| `torch==2.1.0` (PyPI default, cu121) | `torch>=2.5,<3` from `https://download.pytorch.org/whl/cu126` |
+| Extractor fork `main`; `PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2`; upstream SPMG from git; forced `numpy==1.26.4 pandas==1.3.5 reportlab<5.1` | one install: Extractor fork `@python313` (editable) + `SigProfilerAssignment>=1.1.5,<1.2 sigProfilerPlotting>=1.4.3,<1.5 SigProfilerMatrixGenerator>=1.4,<1.5 pypdf>=6,<7 reportlab>=4,<6 numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9,<4` ([python313-sigprofilerextractor.md](python313-sigprofilerextractor.md#recommended-dockerfile-pins-and-order-extraction-batch-image)) |
+| `LD_LIBRARY_PATH` += `/usr/local/lib/python3.9/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` | `/usr/local/lib/python3.13/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` (checked in the built image) |
+| (none) | `ENV PYTHON_BIN=python3.13` |
+| `GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/...` (SPMG was an editable git install) | `/usr/local/lib/python3.13/site-packages/SigProfilerMatrixGenerator/references/chromosomes/tsb`: SPMG is now a regular PyPI install (only used for `input_type=vcf`, which the UI never sends) |
+
+CUDA choice: 12.6 is the oldest 12.x line with an amzn2023 runtime image and a matching torch index
+that still carries current torch builds. torch wheels bundle their own CUDA user-space libraries, so
+the host only needs a driver new enough for CUDA 12.6 (>= 560, or >= 525 through CUDA minor-version
+compatibility). The current Batch GPU AMI driver was not checked from this machine. If it is older
+than 525, the AMI has to be updated: no torch build for Python 3.13 targets CUDA 12.1.
+
+### Local build
+
+The extraction image was first built before the fork branches were pushed, from a copy of the
+Dockerfile with the `git+https://github.com/xtmgah/<Repo>` URLs pointed at a local `git daemon`
+(`~/tmp/py313/docker/build.sh`). After the push on 2026-11-02 both images build from the unmodified
+Dockerfiles.
+
+## Running the regression suite
+
+Full details in `utils/regression/README.md`. Short form, from the repository root (use a working host
+Python, e.g. `/opt/homebrew/bin/python3.12`; the harness is stdlib only):
+
+```bash
+# 1. baselines on the current images (check out dev, or git stash the Dockerfile changes)
+docker build -t msigportal-backend:py39 -f docker/backend.dockerfile .
+docker build -t msigportal-extraction:py39 -f docker/extraction-batch.dockerfile .
+python3 utils/regression/run_cases.py profiler  --label baseline --all --image msigportal-backend:py39
+python3 utils/regression/run_cases.py extractor --label baseline --image msigportal-extraction:py39
+
+# 2. candidates on this branch
+docker build -t msigportal-backend:py313 -f docker/backend.dockerfile .
+docker build -t msigportal-extraction:py313 -f docker/extraction-batch.dockerfile .
+python3 utils/regression/run_cases.py profiler  --label candidate --all --image msigportal-backend:py313
+python3 utils/regression/run_cases.py extractor --label candidate --image msigportal-extraction:py313
+
+# 3. compare
+python3 utils/regression/compare.py data/regression/baseline data/regression/candidate --json data/regression/report.json
+```
+
+Expected: matrices and tables `identical` or `tolerated`; images `visual`; logs with deprecation counts
+but no new tracebacks. Known, accepted differences from the package docs:
+
+- Extractor de novo signatures differ by up to ~4e-6 (torch convergence check), so some de novo files
+  will be `FAIL` at the 1e-6 tolerance; COSMIC decomposition tables are identical.
+- Extractor: SigProfilerAssignment 1.x renames de novo labels (`96-A` → `96-SBS96A`), renames
+  `Decomposed_Mutation_Probabilities.txt`, adds `JOB_METADATA_SPA.txt`, and changes the assignment log
+  format. These show as `missing`/new files.
+- Clusters output is nondeterministic run to run on every version.
+- On an Apple-silicon host the extraction image runs under amd64 emulation and is slow.
 
 ## Regression results
 
@@ -69,9 +142,10 @@ To be filled in after `utils/regression/compare.py` is run against the baseline 
 
 ## Push checklist
 
-1. `gh auth login -h github.com` (the stored token was invalid on 2026-10-28).
-2. In each of `src/sigprofilerplotting`, `src/sigprofilermatrixgenerator`, `src/sigprofilerclusters`,
-   `src/sigprofilerextractor`: `git push -u origin python313`.
-3. `git push -u origin python313` in this repository.
-4. Build both images, run the regression suite, deploy to the dev tier, run the UI checks listed in
+1. Done 2026-11-02: `python313` pushed to xtmgah/SigProfilerPlotting (`7c3b1f2`),
+   SigProfilerMatrixGenerator (`caace75`), SigProfilerClusters (`6b8a7ff`) and SigProfilerExtractor
+   (`e97d4db`). The Dockerfiles install from these branches, so any later fork commit changes the next
+   image build.
+2. `git push -u origin python313` in this repository.
+3. Build both images, run the regression suite, deploy to the dev tier, run the UI checks listed in
    `utils/regression/README.md`.
