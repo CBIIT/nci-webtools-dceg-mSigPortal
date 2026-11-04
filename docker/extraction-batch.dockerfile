@@ -1,36 +1,12 @@
 FROM nvidia/cuda:12.9.2-runtime-amzn2023
 
-# the base is locked to an older AL2023 release that predates the python3.13 and nodejs24 packages
-RUN dnf -y --releasever=latest update \
+RUN dnf -y update \
     && dnf -y install \
-    bzip2 \
-    cairo-devel \
-    cmake \
-    dnf-plugins-core \
-    gcc \
-    gcc-c++ \
     git \
-    gmp-devel \
-    libcurl-devel \
-    libjpeg-turbo-devel \
-    libxml2-devel \
-    mpfr-devel \
     nodejs24 \
-    openssl-devel \
     python3.13 \
-    python3.13-devel \
     python3.13-pip \
-    rsync \
-    tar \
-    wget \ 
-    which \
     && dnf clean all
-
-
-# Add CUDA repo and install cuSPARSE Lt to get libcusparseLt.so.0
-# RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
-#     && dnf clean all \
-#     && dnf -y install cuda-cusparse-12-1 cuda-cusparse-devel-12-1
 
 
 RUN mkdir -p /deploy/app /deploy/logs
@@ -55,8 +31,6 @@ RUN python3.13 -m pip install --no-cache-dir -e 'git+https://github.com/xtmgah/S
 # genInstall.install('GRCh38', rsync=False, bash=True); \
 # genInstall.install('mm10', rsync=False, bash=True)"
 
-
-# use build cache for npm packages
 COPY extraction-service/package*.json /deploy/app/
 RUN npm install
 
