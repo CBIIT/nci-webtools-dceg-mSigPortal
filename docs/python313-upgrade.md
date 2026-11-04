@@ -81,9 +81,10 @@ in the same image may rely on the system copies.
 | Before | After |
 |---|---|
 | `nvidia/cuda:12.1.1-runtime-rockylinux9` | `nvidia/cuda:12.9.2-runtime-amzn2023` |
-| `dnf -y update` | `dnf -y --releasever=latest update`: the nvidia amzn2023 bases are locked to an older AL2023 release with no `python3.13` or `nodejs24` packages |
+| `dnf -y update` | unchanged: the 12.9.2 amzn2023 base is on AL2023 2023.11, which has `python3.13` and `nodejs24` (the 12.6.3 base was locked to 2023.6 and needed `--releasever=latest`) |
 | `dnf module enable nodejs:20`, `nodejs npm` | `nodejs24` (same package as the backend image; Node 20 is end of life) |
-| `python3-devel python3-pip python3-setuptools` | `python3.13 python3.13-devel python3.13-pip` |
+| `python3-devel python3-pip python3-setuptools` | `python3.13 python3.13-pip` |
+| build/tool packages `bzip2 cairo-devel cmake dnf-plugins-core gcc gcc-c++ gmp-devel libcurl-devel libjpeg-turbo-devel libxml2-devel mpfr-devel openssl-devel rsync tar wget which` | removed: every Python dependency installs from a wheel (only the pure-Python Extractor editable is built), better-sqlite3 uses its prebuilt binary, and neither the extraction service nor the Python script calls shell tools. `git` stays for the `pip install -e git+...` |
 | `torch==2.1.0` (PyPI default, cu121) | `torch>=2.5,<3` from `https://download.pytorch.org/whl/cu129` |
 | Extractor fork `main`; `PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2`; upstream SPMG from git; forced `numpy==1.26.4 pandas==1.3.5 reportlab<5.1` | one install: Extractor fork `@python313` (editable) + `SigProfilerAssignment>=1.1.5,<1.2 sigProfilerPlotting>=1.4.3,<1.5 SigProfilerMatrixGenerator>=1.4,<1.5 pypdf>=6,<7 reportlab>=4,<6 numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9,<4` ([python313-sigprofilerextractor.md](python313-sigprofilerextractor.md#recommended-dockerfile-pins-and-order-extraction-batch-image)) |
 | `LD_LIBRARY_PATH` += `/usr/local/lib/python3.9/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` | `/usr/local/lib/python3.13/site-packages/nvidia/{cudnn,cuda_cupti}/lib/` (checked in the built image) |
@@ -160,9 +161,20 @@ are normalized; table rows are compared order-independently; `.vcf` files are co
 
 ### Extractor suite (extraction image)
 
-Not run locally: the old image's torch 2.1.0 fails in `nmf_cpu.py` (`could not create a primitive
-descriptor for a matmul primitive`) under amd64 emulation on Apple silicon. To be run on x86_64
-(see Push checklist).
+No baseline comparison locally: the old image's torch 2.1.0 fails in `nmf_cpu.py` (`could not create a
+primitive descriptor for a matmul primitive`) under amd64 emulation on Apple silicon. A like-for-like
+comparison needs x86_64 (EC2 or dev Batch).
+
+Candidate-only run, 2026-11-04: `msigportal-extraction:py313` with the trimmed dnf list (6.87 GB, was
+18.9 GB), `--platform linux/amd64` under emulation, Docker 4 CPUs / 8 GB, torch 2.13.0+cu129 on CPU.
+
+| Case | Result |
+|---|---|
+| sbs96_cpu, dbs78_cpu, id83_cpu, sbs96_noplots_nocollapse, sbs96_exome | all exit 0 (342–514 s each); no tracebacks or errors in the logs; each writes De-Novo signatures, COSMIC decomposition and the expected PDFs (16 for the no-plot case, 17 otherwise) |
+| sbs96_gpu | not run (no GPU) |
+| image checks | Python imports clean with `-W error::DeprecationWarning`; better-sqlite3 native module loads; `services/extraction.js` imports; both `LD_LIBRARY_PATH` nvidia dirs and the genome symlink exist |
+
+The trimmed image has no `xargs`/`findutils`; nothing in the service uses them.
 
 ## Push checklist
 
