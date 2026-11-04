@@ -5,7 +5,8 @@
 The xtmgah fork of SigProfilerClusters (1.0.11) now installs and runs on Python 3.13 with
 numpy 2.1, pandas 2.2 and matplotlib 3.10, on top of the `python313` branches of the
 SigProfilerPlotting and SigProfilerMatrixGenerator forks and PyPI SigProfilerSimulator 1.2.2.
-Two commits on branch `python313`; the fork's VAF code is untouched and the version is unchanged.
+Three commits on branch `python313` (two for 3.13, one bug fix for parallel file writes); the fork's
+VAF code is untouched and the version is unchanged.
 
 | Area | Why |
 |---|---|
@@ -57,6 +58,26 @@ FORMAT with `VAF` but no `AF` raises `ValueError`. Not version related; left as 
 | `setup.py` | `matplotlib>=3.3.0,<3.5` -> `matplotlib>=3.3.0` | upstream dropped the cap in [`2f19cfd`](https://github.com/SigProfilerSuite/SigProfilerClusters/commit/2f19cfd4321c84824b2a8f5f713b7890da96d4c5) (`>=3.5`); the floor is left as is |
 | `setup.py` | `sigProfilerPlotting>=1.1.8` -> `>=1.1.6`; `SigProfilerMatrixGenerator>=1.2.4` -> `>=1.1.30` | fork versions; upstream raised these instead, which would exclude the forks |
 | `setup.py` | add `seaborn>=0.13.0` | [`74977e9`](https://github.com/SigProfilerSuite/SigProfilerClusters/commit/74977e99658e358788fb1a64895cca2e6cd4f252) "Add seaborn dependency" |
+
+## Bug fix: parallel appends to the clustered files (added 2026-11-04)
+
+Not a 3.13 issue; found by the image regression run. `hotspot.first_run` runs in `mp.Pool` workers,
+and every worker appends to the same `<project>_clustered.txt` and `<project>_nonClustered.txt`.
+Their buffered writes interleaved: rows from different samples were spliced together and cut
+mid-field, and a split on a line boundary left a blank line that crashed `classifyFunctions.pullVaf`
+(`IndexError: list index out of range` at `sample = lines[1]`). Observed on `vcf_grch37_cluster`
+(3 samples, `max_cpu=6`). Upstream HEAD has the same code and the same race.
+
+| File | Change |
+|---|---|
+| `SigProfilerClusters/hotspot.py` | `hotSpotAnalysis` creates the pool with `initializer=_init_write_lock, initargs=(mp.Lock(),)`; `first_run` holds that lock (`_append_lock()`) for each of the two `with open(..., 'a')` blocks, so a sample's rows are written as one block. Outside a pool `_append_lock()` is a no-op. |
+
+Effect: identical rows when no interleaving happened; corrupted rows from the old code no longer
+occur. Sample order in the files still follows worker completion order (unchanged). Verified by
+running both regression Cluster cases (`vcf_grch37_cluster`, `vcf_grch38_cluster`) on the
+`msigportal-backend:py313` image with the patched file: both exit 0, result tables have no blank
+or truncated rows. The 17-column `ClassIII` rows in `*_clustered_class_All.txt` (extra `vaf`
+field) are pre-existing and also appear in the Python 3.9 baseline.
 
 Behavior note on the stdev fix: on Python 3.9, `statistics.stdev()` of `numpy.int64` values
 casts the variance back to the input type (`statistics._convert`), so it is truncated to an
@@ -228,8 +249,10 @@ this filter no longer matches, but SPP's global ignore still hides it in normal 
 
 - Not verified: newer stacks (numpy 2.5 / pandas 3) for Clusters; `probability=True`,
   `includedCCFs`, `TCGA`/`sanger` VAF modes, ID contexts, GRCh38/mm10. mSigPortal uses none of these.
-- Run-to-run nondeterminism (worker write order and unseeded `random` in workers) is upstream
+- Run-to-run nondeterminism (worker completion order and unseeded `random` in workers) is upstream
   behavior on all versions. mSigPortal results can vary slightly between runs of the same input.
+  The interleaved-write corruption is fixed on this branch (`4354a91`) but still present in the
+  current production image, so baseline cluster files can contain corrupted rows.
 - Behavior change from the stdev fix is real but small: density-corrected regions with very few
   mutations can get a different IMD cutoff than on the old image.
 - The demo input `demo_input_multi.vcf` is not valid for bcftools, so the clustering path in
@@ -241,13 +264,15 @@ this filter no longer matches, but SPP's global ignore still hides it in normal 
 
 ## Branch and commits
 
-Branch `python313` in `src/sigprofilerclusters`, off `origin/main` (`ffa8298`). Not pushed.
-HEAD `6b8a7ffb5f31522235d35623020ac2c5634e5e1f`.
+Branch `python313` in `src/sigprofilerclusters`, off `origin/main` (`ffa8298`). Pushed to
+`xtmgah/SigProfilerClusters` 2026-11-02; `4354a91` pushed 2026-11-04.
+HEAD `4354a91`.
 
 | Commit | Summary |
 |---|---|
 | `a9db281` | setup.py: declare python_requires, drop matplotlib<3.5 cap, relax fork floors (and declare seaborn) |
 | `6b8a7ff` | Pass Python ints to statistics.stdev in first_run |
+| `4354a91` | Serialize worker appends to the shared clustered/nonClustered files |
 
 Files changed: `setup.py`, `SigProfilerClusters/hotspot.py`.
 
