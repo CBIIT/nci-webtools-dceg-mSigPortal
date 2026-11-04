@@ -139,7 +139,30 @@ but no new tracebacks. Known, accepted differences from the package docs:
 
 ## Regression results
 
-To be filled in after `utils/regression/compare.py` is run against the baseline and candidate images.
+### Profiler suite (backend image), 2026-11-04
+
+Run locally (Apple silicon, Docker Desktop 8 GB). Baseline `msigportal-backend:py39` built from `dev`
+(Python 3.9.25, numpy 1.26.4, pandas 1.3.5, fork default branches); candidate
+`msigportal-backend:py313` (Python 3.13.16, numpy 2.5.4, pandas 2.3.3, forks at `python313`, Clusters
+`4354a91`). Report: `data/regression/report-profiler.json`. **All 15 cases pass.**
+
+| Case(s) | Result |
+|---|---|
+| vcf GRCh37/GRCh38/mm10, maf, tsv split-filters, bed, seqinfo, wes | every matrix, statistics and SeqInfo file `identical` |
+| csv_grch37_collapse | matrices `identical`; the converted `*_mSigPortal_{SNV,INDEL}[_Collapse].txt` inputs hold the same rows in a different order (`tolerated`) |
+| catalog tsv/csv, CNV48, RS32 | matrix/list files `identical`; plots (PDF/SVG) `visual`, same page counts |
+| vcf_grch37_cluster, vcf_grch38_cluster | matrices `identical`; per-sample VCFs differ only in the `##bcftools` header (`tolerated`); `*_clustered_class_All.txt` `varies`: 99.8% / 99.7% of (sample, chr, start, ref, alt, subclass) rows agree, within Clusters' run-to-run variation plus the stdev and write-race fixes |
+| all logs | no tracebacks; error/warning counts equal baseline vs candidate |
+
+`compare.py` changes made for this run: paths containing the run label (`/data/regression/<label>/`)
+are normalized; table rows are compared order-independently; `.vcf` files are compared as text with
+`##bcftools` provenance lines ignored; Cluster result tables get the `varies` verdict.
+
+### Extractor suite (extraction image)
+
+Not run locally: the old image's torch 2.1.0 fails in `nmf_cpu.py` (`could not create a primitive
+descriptor for a matmul primitive`) under amd64 emulation on Apple silicon. To be run on x86_64
+(see Push checklist).
 
 ## Push checklist
 
