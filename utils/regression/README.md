@@ -126,7 +126,8 @@ python3 utils/regression/compare.py data/regression/baseline data/regression/can
 
 Verdicts per file: `identical`, `tolerated` (numeric within 1e-6 relative, or ordering only), `visual`
 (PNG/PDF/SVG differ but dimensions and page counts match), `log` (scanned for new tracebacks, counts of
-warnings and deprecations reported), `FAIL`, `missing`. Exit code is non-zero if any case fails.
+warnings and deprecations reported), `varies` (SigProfilerClusters result tables, which differ run to run on
+every version; agreement on sample/position/subclass is reported), `FAIL`, `missing`. Exit code is non-zero if any case fails.
 Install Pillow on the host (`pip install pillow`) to get a perceptual-hash threshold on PNGs instead of
 a plain "pixels differ".
 

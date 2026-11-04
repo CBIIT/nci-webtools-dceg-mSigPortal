@@ -8,6 +8,7 @@ Per-file verdicts
   tolerated   numeric table differences within tolerance, or row/column order only
   visual      image/PDF/SVG differs within the visual threshold (dimensions and page counts equal)
   log         log file; not diffed, scanned for Traceback/Error/Warning counts instead
+  varies      output that differs run to run on every version (SigProfilerClusters results); line overlap reported
   FAIL        content differs beyond tolerance, or structure differs
   missing     present in baseline, absent in candidate (FAIL)
   extra       present in candidate only (informational)
@@ -30,9 +31,14 @@ except Exception:  # pragma: no cover
     Image = None
 
 LOG_PATTERNS = re.compile(r"(_log\.txt$|\.log$|\.out$|\.err$|JOB_METADATA\.txt$|_case\.json$|_env\.json$)")
-TABLE_EXT = {".txt", ".tsv", ".csv", ".all", ".bed", ".exome", ".region"}
+TABLE_EXT = {".txt", ".tsv", ".csv", ".all", ".bed", ".exome", ".region", ".vcf"}
 DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{14}")
 NUM_RE = re.compile(r"^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$")
+# outputs embed their own run directory, e.g. /data/regression/<label>/...
+LABEL_PATH_RE = re.compile(rb"/data/regression/[^/\s]+/")
+# SigProfilerClusters assigns subclasses nondeterministically (worker order, unseeded random)
+VARIES_RE = re.compile(r"Cluster/Result/[^/]*\.txt$")
+PROVENANCE_PREFIXES = ("##bcftools",)
 
 
 # --------------------------------------------------------------------------- file discovery
@@ -86,13 +92,12 @@ def compare_tables(ta, tb, rtol, atol):
         return "FAIL", f"row count {len(ra)} vs {len(rb)}"
     reorder = ha != hb
     col_b = [hb.index(c) for c in ha]
-    key = lambda r: r[0]
-    sa, sb = sorted(ra, key=key), sorted(rb, key=key)
+    rb = [[y[j] for j in col_b] for y in rb]
+    sa, sb = sorted(ra), sorted(rb)
     if sa != ra or sb != rb:
         reorder = True
     diffs = []
     for i, (x, y) in enumerate(zip(sa, sb)):
-        y = [y[j] for j in col_b]
         for j, (cx, cy) in enumerate(zip(x, y)):
             if cx == cy:
                 continue
@@ -111,6 +116,11 @@ def compare_text(a: bytes, b: bytes, rtol, atol):
         sa, sb = a.decode("utf-8"), b.decode("utf-8")
     except UnicodeDecodeError:
         return "FAIL", "binary content differs"
+    if sa.startswith("##") or sb.startswith("##"):
+        keep = lambda s: "\n".join(l for l in s.splitlines() if not l.startswith(PROVENANCE_PREFIXES))
+        sa, sb = keep(sa), keep(sb)
+        if sa == sb:
+            return "tolerated", "provenance header lines only"
     ta, tb = parse_table(sa), parse_table(sb)
     if ta and tb:
         return compare_tables(ta, tb, rtol, atol)
@@ -179,7 +189,7 @@ def compare_zip(a, b, ctx):
     if set(na) != set(nb):
         return "FAIL", f"member lists differ: {sorted(set(na) ^ set(nb))[:5]}"
     worst, notes = "identical", []
-    rank = {"identical": 0, "tolerated": 1, "visual": 2, "log": 2, "FAIL": 3}
+    rank = {"identical": 0, "tolerated": 1, "visual": 2, "log": 2, "varies": 2, "FAIL": 3}
     for key in na:
         v, note = compare_bytes(Path(na[key]), za.read(na[key]), zb.read(nb[key]), ctx)
         if rank[v] > rank[worst]:
@@ -203,7 +213,29 @@ def scan_log(data: bytes):
     return c
 
 
+def compare_varies(a: bytes, b: bytes):
+    key_cols = ("samples", "chr", "start", "ref", "alt", "subclass")
+
+    def rows(data):
+        lines = data.decode("utf-8", "replace").splitlines()
+        head = lines[0].split("\t") if lines else []
+        idx = [head.index(c) for c in key_cols] if all(c in head for c in key_cols) else None
+        out = []
+        for l in lines[1:]:
+            f = l.split("\t")
+            out.append("|".join(f[i] for i in idx) if idx and len(f) > max(idx) else l)
+        return out, idx is not None
+
+    (la, keyed), (lb, _) = rows(a), rows(b)
+    common = sum((Counter(la) & Counter(lb)).values())
+    pct = 100 * common / max(len(la), len(lb), 1)
+    what = "same mutation+subclass" if keyed else "identical rows"
+    return "varies", f"{len(la)} vs {len(lb)} rows; {pct:.1f}% {what} (order ignored)"
+
+
 def compare_bytes(path: Path, a: bytes, b: bytes, ctx):
+    a = LABEL_PATH_RE.sub(b"/data/regression/<LABEL>/", a)
+    b = LABEL_PATH_RE.sub(b"/data/regression/<LABEL>/", b)
     if a == b:
         return "identical", ""
     name = path.name
@@ -212,6 +244,8 @@ def compare_bytes(path: Path, a: bytes, b: bytes, ctx):
         ca, cb = scan_log(a), scan_log(b)
         note = f"baseline {dict(ca)} candidate {dict(cb)}"
         return ("FAIL", "new traceback: " + note) if cb["traceback"] > ca["traceback"] else ("log", note)
+    if VARIES_RE.search(path.as_posix()):
+        return compare_varies(a, b)
     if ext == ".png":
         return compare_image(a, b, ctx["image_threshold"])
     if ext == ".pdf":
@@ -289,7 +323,7 @@ def main():
             for rel, (v, note) in res.items():
                 if v == "identical" and not args.verbose:
                     continue
-                if v in ("FAIL", "missing") or args.verbose or v in ("visual", "log", "tolerated", "extra"):
+                if v in ("FAIL", "missing") or args.verbose or v in ("visual", "log", "tolerated", "extra", "varies"):
                     print(f"    [{v:9s}] {rel}" + (f"  -- {note}" if note else ""))
             report[f"{suite}/{name}"] = {"status": verdict, "counts": dict(counts),
                                          "files": {k: {"verdict": v, "note": n} for k, (v, n) in res.items()}}
