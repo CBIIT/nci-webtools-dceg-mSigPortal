@@ -2,9 +2,11 @@ FROM nvidia/cuda:12.9.2-runtime-amzn2023
 
 RUN dnf -y --releasever=latest update \
     && dnf -y install \
+    gcc \
     git \
     nodejs24 \
     python3.13 \
+    python3.13-devel \
     python3.13-pip \
     && dnf clean all
 
