@@ -1,60 +1,29 @@
-FROM nvidia/cuda:12.9.2-runtime-rockylinux9
+FROM nvidia/cuda:12.9.2-runtime-amzn2023
 
-RUN dnf -y module enable nodejs:24 && dnf clean all
-
-RUN dnf -y update \
+RUN dnf -y --releasever=latest update \
     && dnf -y install \
-    bzip2 \
-    cairo-devel \
-    cmake \
-    dnf-plugins-core \
     gcc \
-    gcc-c++ \
     git \
-    gmp-devel \
-    libcurl-devel \
-    libjpeg-turbo-devel \
-    libxml2-devel \
-    mpfr-devel \
-    nodejs \
-    npm \
-    openssl-devel \
-    python3-devel \
-    python3-pip \
-    python3-setuptools \
-    # rsync \
-    # tar \
-    wget \ 
-    which \
+    nodejs24 \
+    python3.13 \
+    python3.13-devel \
+    python3.13-pip \
     && dnf clean all
-
-
-# Add CUDA repo and install cuSPARSE Lt to get libcusparseLt.so.0
-# RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
-#     && dnf clean all \
-#     && dnf -y install cuda-cusparse-12-1 cuda-cusparse-devel-12-1
 
 
 RUN mkdir -p /deploy/app /deploy/logs
 WORKDIR /deploy/app
 
 
-# install pytorch
-RUN pip3 install torch==2.1.0
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.9/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.9/site-packages/nvidia/cuda_cupti/lib/
+# install pytorch (cu129 wheels to match the base image)
+ENV PYTHON_BIN=python3.13
+RUN python3.13 -m pip install --no-cache-dir "torch>=2.5,<3" --index-url https://download.pytorch.org/whl/cu129
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/python3.13/site-packages/nvidia/cudnn/lib/:/usr/local/lib/python3.13/site-packages/nvidia/cuda_cupti/lib/
 
-# install SigProfilerExtractor
-RUN pip3 install -e 'git+https://github.com/xtmgah/SigProfilerExtractor#egg=SigProfilerExtractor'
-
-# install other python packages
-#RUN pip3 install pandas==1.5.3 PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2 
-RUN pip3 install --no-cache-dir PyPDF2==2.11.2 SigProfilerAssignment==0.0.14 sigProfilerPlotting==1.2.2
-RUN pip3 install -e 'git+https://github.com/AlexandrovLab/SigProfilerMatrixGenerator#egg=SigProfilerMatrixGenerator'
-
-
-# Force uninstall any existing NumPy/Pandas versions
-RUN pip3 uninstall -y numpy pandas \
-    && pip3 install --no-cache-dir numpy==1.26.4 pandas==1.3.5 "reportlab<5.1"
+# install SigProfilerExtractor (editable: a regular install would pick up the fork's stale committed build/lib)
+RUN python3.13 -m pip install --no-cache-dir -e 'git+https://github.com/xtmgah/SigProfilerExtractor@python313#egg=SigProfilerExtractor' \
+    "SigProfilerAssignment>=1.1.5,<1.2" "sigProfilerPlotting>=1.4.3,<1.5" "SigProfilerMatrixGenerator>=1.4,<1.5" \
+    "pypdf>=6,<7" "reportlab>=4,<6" "numpy>=2.1,<3" "pandas>=2.2.3,<3" "matplotlib>=3.9,<4"
 
 # install genomes
 ## NOTE: genomes do not need to be installed. They are saved on the host in [app]/data and mounted as a volume to the 
@@ -64,8 +33,6 @@ RUN pip3 uninstall -y numpy pandas \
 # genInstall.install('GRCh38', rsync=False, bash=True); \
 # genInstall.install('mm10', rsync=False, bash=True)"
 
-
-# use build cache for npm packages
 COPY extraction-service/package*.json /deploy/app/
 RUN npm install
 
@@ -76,9 +43,17 @@ COPY extraction-service /deploy/app/
 RUN touch .env
 
 # ensure symlink exists for /data/genomes
-ENV GENOME_PATH=/deploy/app/src/sigprofilermatrixgenerator/SigProfilerMatrixGenerator/references/chromosomes/tsb
+ENV GENOME_PATH=/usr/local/lib/python3.13/site-packages/SigProfilerMatrixGenerator/references/chromosomes/tsb
 RUN mkdir -p /data/genomes ${GENOME_PATH} \
     && rm -rf ${GENOME_PATH} \
     && ln -sf /data/genomes ${GENOME_PATH}
+
+# PyTorch requires setuptools; update it and its vendored dependencies for Prisma.
+# Remove the flagged Python 3.9 interpreter and pip without dependency autoremove.
+# This also removes dnf/yum; keep it after all package installs.
+RUN python3.13 -m pip install --no-cache-dir --upgrade "setuptools>=84.1.0,<85" \
+    && dnf -y --setopt=protected_packages= --setopt=clean_requirements_on_remove=False remove \
+    python3 \
+    python3.13-pip
 
 CMD npm run start

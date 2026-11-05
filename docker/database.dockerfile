@@ -13,4 +13,7 @@ RUN npm install --omit=dev
 
 COPY database .
 
+# Remove Python 3.9 and its dependents (including dnf/yum) after all package installs.
+RUN dnf -y --setopt=protected_packages= --setopt=clean_requirements_on_remove=False remove python3
+
 CMD ["node", "startDatabaseImport.js", "--schema", "schema.js", "--sources", "sources.js", "--provider", "s3"]

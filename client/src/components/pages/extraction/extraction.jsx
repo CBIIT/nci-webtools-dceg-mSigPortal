@@ -72,12 +72,6 @@ export default function Extraction() {
       return false;
     }
   })();
-  const id2 = explorationId
-    ? explorationId === manifest.denovoId
-      ? manifest.decomposedId
-      : manifest.denovoId
-    : false;
-
   const signatureMapState = useMemo(
     () => ({ id, params, manifest }),
     [id, params, manifest]
@@ -86,11 +80,6 @@ export default function Extraction() {
     () => ({ id: explorationId }),
     [explorationId]
   );
-  const associationState = useMemo(
-    () => ({ id: explorationId, id2 }),
-    [explorationId, id2]
-  );
-
   const refreshState = useCallback(() => {
     refreshExtraction();
   }, [refreshExtraction]);
@@ -265,7 +254,6 @@ export default function Extraction() {
                         as="select"
                         value={explorationType}
                         onChange={handleExplorationType}
-                        disabled={displayTab === 'msAssociation'}
                       >
                         <option value="denovo">Denovo</option>
                         <option value="decomposed">Decomposed</option>
@@ -351,7 +339,7 @@ export default function Extraction() {
                 <MsDecomposition state={explorationState} />
               </TabPanel>
               <TabPanel active={displayTab === 'msAssociation'}>
-                <MsAssociation state={associationState} />
+                <MsAssociation key={explorationId} state={explorationState} />
               </TabPanel>
               <TabPanel active={displayTab === 'msLandscape'}>
                 <MsLandscape state={explorationState} />
