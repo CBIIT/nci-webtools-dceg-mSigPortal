@@ -8,7 +8,6 @@ RUN dnf -y update \
     tar \
     nodejs24 \
     python3.13 \
-    python3.13-devel \
     python3.13-pip \
     R-4.3.2 \
     bcftools \
@@ -25,7 +24,7 @@ RUN cd /tmp && \
     cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts && \
     fc-cache -fv;
 
-# install python packages (system python3 stays at 3.9; the app runs $PYTHON_BIN)
+# install python packages
 ENV PYTHON_BIN=python3.13
 ARG PY_PINS="numpy>=2.1,<3 pandas>=2.2.3,<3 matplotlib>=3.9 seaborn==0.13.2"
 RUN python3.13 -m pip install --no-cache-dir -e 'git+https://github.com/xtmgah/SigProfilerPlotting@python313#egg=SigProfilerPlotting' ${PY_PINS}

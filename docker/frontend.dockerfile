@@ -41,5 +41,8 @@ EXPOSE 443
 
 ENV SERVER_TIMEOUT=900
 
+# Remove Python 3.9 and its dependents (including dnf/yum) from the runtime image.
+RUN dnf -y --setopt=protected_packages= --setopt=clean_requirements_on_remove=False remove python3
+
 CMD rm -rf /run/httpd/* /tmp/httpd* \
     && exec /usr/sbin/httpd -DFOREGROUND

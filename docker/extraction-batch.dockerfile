@@ -46,4 +46,12 @@ RUN mkdir -p /data/genomes ${GENOME_PATH} \
     && rm -rf ${GENOME_PATH} \
     && ln -sf /data/genomes ${GENOME_PATH}
 
+# PyTorch requires setuptools; update it and its vendored dependencies for Prisma.
+# Remove the flagged Python 3.9 interpreter and pip without dependency autoremove.
+# This also removes dnf/yum; keep it after all package installs.
+RUN python3.13 -m pip install --no-cache-dir --upgrade "setuptools>=84.1.0,<85" \
+    && dnf -y --setopt=protected_packages= --setopt=clean_requirements_on_remove=False remove \
+    python3 \
+    python3.13-pip
+
 CMD npm run start
