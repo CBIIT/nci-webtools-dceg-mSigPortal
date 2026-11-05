@@ -1,6 +1,6 @@
 FROM nvidia/cuda:12.9.2-runtime-amzn2023
 
-RUN dnf -y update \
+RUN dnf -y --releasever=latest update \
     && dnf -y install \
     git \
     nodejs24 \
