@@ -34,7 +34,7 @@ containerDefinitions:
         awslogs-create-group: "true"
 
   - name: database-import
-    image: "${DATABASE_IMAGE_REF}"
+    image: "${DATABASE_IMAGE}"
     essential: true
     dependsOn:
       - containerName: logs

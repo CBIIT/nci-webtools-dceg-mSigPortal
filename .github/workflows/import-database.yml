@@ -52,12 +52,10 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
-          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-12)
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
 
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
-          echo "DATABASE_IMAGE=$REPO:database-$SHORT_SHA" >> $GITHUB_ENV
-          echo "DATABASE_CACHE=$REPO:database-buildcache" >> $GITHUB_ENV
+          echo "DATABASE_IMAGE=$REPO:database-import" >> $GITHUB_ENV
           echo "DATABASE_IMPORT_TASK=${TIER}-${APP}-database-import" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
@@ -104,11 +102,8 @@ jobs:
           push: true
           provenance: false
           tags: ${{ env.DATABASE_IMAGE }}
-          cache-from: type=registry,ref=${{ env.DATABASE_CACHE }}
-          cache-to: type=registry,ref=${{ env.DATABASE_CACHE }},mode=max
-
-      - name: Set image digest reference
-        run: echo "DATABASE_IMAGE_REF=$IMAGE_REPOSITORY@${{ steps.build-database.outputs.digest }}" >> $GITHUB_ENV
+          cache-from: type=registry,ref=${{ env.DATABASE_IMAGE }}
+          cache-to: type=inline
 
       - name: Create rendered task definitions directory
         run: mkdir -p rendered
