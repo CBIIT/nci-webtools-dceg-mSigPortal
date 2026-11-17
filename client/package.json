@@ -44,6 +44,7 @@
     "start": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test:ms-association": "node --test tests/ms-association.test.mjs",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,json,css,scss}\""
   },
