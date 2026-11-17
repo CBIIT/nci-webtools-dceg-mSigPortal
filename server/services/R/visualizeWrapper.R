@@ -643,7 +643,7 @@ msigportal.mutationalPattern <- function(args, config) {
       context_plot(data = data_input, pattern = args$pattern, data_return = TRUE) %>%
         arrange(desc(N1)) %>%
         write_delim(txtPath, delim = "\t", col_names = T)
-      if (dim(data_tmp) > 0) {
+      if (nrow(data_tmp) > 0L) {
         barPath <- paste0(config$savePath, "barchart.svg")
         barchart_plot2(data = data_tmp, plot_width = 16, plot_height = 5, output_plot = barPath)
         return(list(barPath = barPath, plotPath = plotPath, txtPath = txtPath))
