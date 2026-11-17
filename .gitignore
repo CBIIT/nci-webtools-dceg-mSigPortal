@@ -3,6 +3,8 @@
 /tmp
 /data
 node_modules
+__pycache__/
+*.py[co]
 /packages
 /src
 

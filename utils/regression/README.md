@@ -1,5 +1,7 @@
 # Python package regression harness
 
+For the backend R function suite, see [R-README.md](R-README.md).
+
 Supports the Python 3.13 upgrade of `docker/backend.dockerfile` and `docker/extraction-batch.dockerfile`.
 The idea: run every Python code path the application can reach on the **current** images, keep the outputs
 as a baseline, run the same cases on the **new** images, and diff.
