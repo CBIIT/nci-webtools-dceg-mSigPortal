@@ -42,7 +42,7 @@ export default function MsAssociation({ state, compareState }) {
   const { data: options } = useMsAssociationOptionsQuery(params, {
     skip: !params,
   });
-  const { data: compareOptions } = useMsAssociationOptionsQuery(
+  const { currentData: compareOptions } = useMsAssociationOptionsQuery(
     compareParams,
     { skip: !compareParams }
   );

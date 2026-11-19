@@ -32,7 +32,7 @@ export default function MsAssociationForm({
     { skip: !study && !id }
   );
   const {
-    data: options2,
+    currentData: options2,
     error: error2,
     isFetching: fetchingOptions2,
   } = useMsAssociationOptionsQuery({ userId: id2 }, { skip: !id2 });
