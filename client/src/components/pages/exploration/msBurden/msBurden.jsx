@@ -33,10 +33,13 @@ export default function MsBurden({ state, compareState }) {
     [compareState]
   );
 
-  const { data: options } = useMsBurdenOptionsQuery(params, { skip: !params });
-  const { data: compareOptions } = useMsBurdenOptionsQuery(compareParams, {
-    skip: !compareParams,
+  const { currentData: options } = useMsBurdenOptionsQuery(params, {
+    skip: !params,
   });
+  const { currentData: compareOptions } = useMsBurdenOptionsQuery(
+    compareParams,
+    { skip: !compareParams }
+  );
 
   const columnLayout =
     compareState && !state.useAllCancer && !compareState.useAllCancer;
