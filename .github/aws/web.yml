@@ -31,6 +31,39 @@ containerDefinitions:
         awslogs-region: "${AWS_REGION}"
         awslogs-stream-prefix: logs
 
+  - name: datadog-agent
+    image: public.ecr.aws/datadog/agent:7-fips
+    essential: false
+    memoryReservation: 256
+    environment:
+      - name: ECS_FARGATE
+        value: "true"
+      - name: DD_SITE
+        value: ddog-gov.com
+      - name: DD_ENV
+        value: "${TIER}"
+      - name: DD_APM_ENABLED
+        value: "true"
+      - name: DD_TAGS
+        value: "project:${APP} tier:${TIER}"
+    secrets:
+      - name: DD_API_KEY
+        valueFrom: /analysistools/${TIER}/datadog/api_key
+    healthCheck:
+      command:
+        - CMD-SHELL
+        - agent health
+      interval: 30
+      timeout: 5
+      retries: 3
+      startPeriod: 15
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/${TIER}/${APP}/web"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream-prefix: datadog-agent
+
   - name: frontend
     image: "${FRONTEND_IMAGE_LATEST}"
     portMappings:
@@ -63,7 +96,24 @@ containerDefinitions:
     memoryReservation: 100
   - name: backend
     image: "${BACKEND_IMAGE_LATEST}"
+    dependsOn:
+      - containerName: datadog-agent
+        condition: START
+    dockerLabels:
+      com.datadoghq.tags.service: "${TIER}-${APP}-backend"
+      com.datadoghq.tags.env: "${TIER}"
+      com.datadoghq.tags.version: "${GITHUB_SHA}"
     environment:
+      - name: DD_SERVICE
+        value: "${TIER}-${APP}-backend"
+      - name: DD_ENV
+        value: "${TIER}"
+      - name: DD_VERSION
+        value: "${GITHUB_SHA}"
+      - name: DD_LOGS_INJECTION
+        value: "true"
+      - name: NODE_OPTIONS
+        value: "--import dd-trace/initialize.mjs"
       - name: AWS_DEFAULT_REGION
         value: "${AWS_REGION}"
       - name: APP_NAME
