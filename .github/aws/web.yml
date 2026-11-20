@@ -51,7 +51,6 @@ containerDefinitions:
       options:
         Name: datadog
         tls: "on"
-        tls.verify: "off"
         dd_service: "${TIER}-${APP}-frontend"
         dd_source: "httpd"
         dd_tags: "project:${APP} tier:${TIER}"
@@ -147,7 +146,6 @@ containerDefinitions:
       options:
         Name: datadog
         tls: "on"
-        tls.verify: "off"
         dd_service: "${TIER}-${APP}-backend"
         dd_source: "nodejs"
         dd_tags: "project:${APP} tier:${TIER}"
