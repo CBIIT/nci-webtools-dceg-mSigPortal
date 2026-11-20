@@ -150,6 +150,7 @@ containerDefinitions:
       options:
         Name: datadog
         tls: "on"
+        tls.verify: "on"
         dd_service: "${TIER}-${APP}-refitting-worker"
         dd_source: "nodejs"
         dd_tags: "project:${APP} tier:${TIER}"
