@@ -56,8 +56,8 @@ export function createCacheMiddleware(getCacheKey) {
 
       const originalJson = res.json.bind(res);
       res.json = (body) => {
-        // error responses (e.g. from the error handler) must not be cached
-        const ok = res.statusCode < 400;
+        // error responses (e.g. from the error handler) must not be cached; handlers set skipCache for 200-status failures
+        const ok = res.statusCode < 400 && !res.locals.skipCache;
         if (ok) {
           cache
             .set(key, JSON.stringify(body))

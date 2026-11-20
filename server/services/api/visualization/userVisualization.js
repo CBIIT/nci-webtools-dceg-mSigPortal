@@ -509,6 +509,7 @@ async function getPublicTreeLeafData(req, res, next) {
     const { hierarchy, attributes } = results.output || {};
     if (!hierarchy || !attributes) {
       // R returned an error/uncaughtError; let the client surface it as-is
+      res.locals.skipCache = true;
       return res.json({ output: { ...results.output, params } });
     }
 
@@ -570,6 +571,7 @@ async function getUserTreeLeafData(req, res, next) {
         error: results.output.error || results.output.uncaughtError,
       });
       results.output.params = { userId, profile, matrix };
+      res.locals.skipCache = true;
       return res.json({ output: results.output });
     }
 
