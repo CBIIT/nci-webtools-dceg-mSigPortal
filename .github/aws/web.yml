@@ -45,7 +45,7 @@ containerDefinitions:
       - name: DD_APM_ENABLED
         value: "true"
       - name: DD_TAGS
-        value: "project:${APP} tier:${TIER}"
+        value: "project:${APP} tier:${TIER} team:analysis-tools"
     secrets:
       - name: DD_API_KEY
         valueFrom: /analysistools/${TIER}/datadog/api_key
@@ -87,7 +87,7 @@ containerDefinitions:
         tls.verify: "on"
         dd_service: "${TIER}-${APP}-frontend"
         dd_source: "httpd"
-        dd_tags: "project:${APP} tier:${TIER}"
+        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host
@@ -113,6 +113,8 @@ containerDefinitions:
         value: "${GITHUB_SHA}"
       - name: DD_LOGS_INJECTION
         value: "true"
+      - name: DD_TAGS
+        value: "project:${APP},tier:${TIER},team:analysis-tools"
       - name: NODE_OPTIONS
         value: "--import dd-trace/initialize.mjs"
       - name: AWS_DEFAULT_REGION
@@ -200,7 +202,7 @@ containerDefinitions:
         tls.verify: "on"
         dd_service: "${TIER}-${APP}-backend"
         dd_source: "nodejs"
-        dd_tags: "project:${APP} tier:${TIER}"
+        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host

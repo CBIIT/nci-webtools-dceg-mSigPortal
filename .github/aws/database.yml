@@ -75,7 +75,7 @@ containerDefinitions:
         tls.verify: "on"
         dd_service: "${TIER}-${APP}-db-import"
         dd_source: "nodejs"
-        dd_tags: "project:${APP} tier:${TIER}"
+        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host
