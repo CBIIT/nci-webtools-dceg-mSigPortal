@@ -32,9 +32,11 @@ export function formatObject(object) {
 
 export function createLogger(name, level = 'info') {
   const { APP_TIER, DATADOG_HOST, DATADOG_API_KEY } = process.env;
+  const ddtags = `env:${APP_TIER},project:msigportal,tier:${APP_TIER},team:analysis-tools`;
   const datadogTransportOptions = {
     host: DATADOG_HOST,
-    path: `/api/v2/logs?dd-api-key=${DATADOG_API_KEY}&ddsource=nodejs&service=${APP_TIER}-msigportal-batch`,
+    path: `/api/v2/logs?ddsource=nodejs&service=msigportal-batch&ddtags=${encodeURIComponent(ddtags)}`,
+    headers: { 'DD-API-KEY': DATADOG_API_KEY },
     ssl: true,
     format: format.json(),
   };

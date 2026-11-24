@@ -19,6 +19,23 @@ RUN echo "VITE_APP_VERSION=${VITE_APP_VERSION}" >> .env \
 
 RUN npm run build
 
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS datadog
+
+ARG TARGETARCH
+
+# Install script from https://docs.datadoghq.com/tracing/trace_collection/proxy_setup/httpd/
+# mod_datadog is x86_64-only; other arches get an empty dir and httpd skips the module.
+RUN mkdir -p /out \
+    && if [ "$TARGETARCH" = "amd64" ]; then \
+        dnf -y install unzip \
+        && cd /tmp \
+        && RELEASE_DATA=$(curl -s https://api.github.com/repos/DataDog/httpd-datadog/releases/latest) \
+        && DOWNLOAD_URL=$(echo "$RELEASE_DATA" | grep '"browser_download_url".*mod_datadog_artifact.zip"' | sed 's/.*"browser_download_url": *"\([^"]*\)".*/\1/') \
+        && curl -Lf -o mod_datadog_artifact.zip "$DOWNLOAD_URL" \
+        && unzip -j mod_datadog_artifact.zip -d /out \
+        && rm mod_datadog_artifact.zip; \
+    fi
+
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS runner
 
 RUN dnf -y update \
@@ -29,6 +46,8 @@ COPY --from=builder /app/client/dist/ /var/www/html/mutational-signatures/
 
 # Add custom httpd configuration
 COPY docker/httpd-msigportal.conf /etc/httpd/conf.d/httpd-msigportal.conf
+COPY docker/httpd-datadog.conf /etc/httpd/conf.d/00-datadog.conf
+COPY --from=datadog /out/ /usr/lib64/httpd/modules/
 
 # forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/httpd/access_log \

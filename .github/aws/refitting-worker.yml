@@ -70,12 +70,12 @@ containerDefinitions:
       - containerName: datadog-agent
         condition: START
     dockerLabels:
-      com.datadoghq.tags.service: "${TIER}-${APP}-refitting-worker"
+      com.datadoghq.tags.service: "${APP}-refitting-worker"
       com.datadoghq.tags.env: "${TIER}"
       com.datadoghq.tags.version: "${GITHUB_SHA}"
     environment:
       - name: DD_SERVICE
-        value: "${TIER}-${APP}-refitting-worker"
+        value: "${APP}-refitting-worker"
       - name: DD_ENV
         value: "${TIER}"
       - name: DD_VERSION
@@ -153,9 +153,9 @@ containerDefinitions:
         Name: datadog
         tls: "on"
         tls.verify: "on"
-        dd_service: "${TIER}-${APP}-refitting-worker"
+        dd_service: "${APP}-refitting-worker"
         dd_source: "nodejs"
-        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
+        dd_tags: "env:${TIER},project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host

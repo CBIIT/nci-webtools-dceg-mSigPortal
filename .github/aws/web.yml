@@ -66,10 +66,23 @@ containerDefinitions:
 
   - name: frontend
     image: "${FRONTEND_IMAGE_LATEST}"
+    dependsOn:
+      - containerName: datadog-agent
+        condition: START
+    dockerLabels:
+      com.datadoghq.tags.service: "${APP}-frontend"
+      com.datadoghq.tags.env: "${TIER}"
+      com.datadoghq.tags.version: "${GITHUB_SHA}"
     portMappings:
       - protocol: tcp
         containerPort: ${FRONTEND_CONTAINER_PORT}
     environment:
+      - name: DD_SERVICE
+        value: "${APP}-frontend"
+      - name: DD_ENV
+        value: "${TIER}"
+      - name: DD_VERSION
+        value: "${GITHUB_SHA}"
       - name: API_BASE_URL
         value: http://localhost:${BACKEND_CONTAINER_PORT}
     secrets:
@@ -85,9 +98,9 @@ containerDefinitions:
         Name: datadog
         tls: "on"
         tls.verify: "on"
-        dd_service: "${TIER}-${APP}-frontend"
+        dd_service: "${APP}-frontend"
         dd_source: "httpd"
-        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
+        dd_tags: "env:${TIER},project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host
@@ -101,12 +114,12 @@ containerDefinitions:
       - containerName: datadog-agent
         condition: START
     dockerLabels:
-      com.datadoghq.tags.service: "${TIER}-${APP}-backend"
+      com.datadoghq.tags.service: "${APP}-backend"
       com.datadoghq.tags.env: "${TIER}"
       com.datadoghq.tags.version: "${GITHUB_SHA}"
     environment:
       - name: DD_SERVICE
-        value: "${TIER}-${APP}-backend"
+        value: "${APP}-backend"
       - name: DD_ENV
         value: "${TIER}"
       - name: DD_VERSION
@@ -200,9 +213,9 @@ containerDefinitions:
         Name: datadog
         tls: "on"
         tls.verify: "on"
-        dd_service: "${TIER}-${APP}-backend"
+        dd_service: "${APP}-backend"
         dd_source: "nodejs"
-        dd_tags: "project:${APP},tier:${TIER},team:analysis-tools"
+        dd_tags: "env:${TIER},project:${APP},tier:${TIER},team:analysis-tools"
         provider: ecs
       secretOptions:
         - name: Host
