@@ -47,40 +47,40 @@ jobs:
           path: python_r_script_repo
 
       # Free disk space
-      - name: Free Disk Space
-        run: |
-          # Remove Java (JDKs)
-          sudo rm -rf /usr/lib/jvm
+      # - name: Free Disk Space
+      #   run: |
+      #     # Remove Java (JDKs)
+      #     sudo rm -rf /usr/lib/jvm
 
-          # Remove .NET SDKs
-          sudo rm -rf /usr/share/dotnet
+      #     # Remove .NET SDKs
+      #     sudo rm -rf /usr/share/dotnet
 
-          # Remove Swift toolchain
-          sudo rm -rf /usr/share/swift
+      #     # Remove Swift toolchain
+      #     sudo rm -rf /usr/share/swift
 
-          # Remove Haskell (GHC)
-          sudo rm -rf /usr/local/.ghcup
+      #     # Remove Haskell (GHC)
+      #     sudo rm -rf /usr/local/.ghcup
 
-          # Remove Julia
-          sudo rm -rf /usr/local/julia*
+      #     # Remove Julia
+      #     sudo rm -rf /usr/local/julia*
 
-          # Remove Android SDKs
-          sudo rm -rf /usr/local/lib/android
+      #     # Remove Android SDKs
+      #     sudo rm -rf /usr/local/lib/android
 
-          # Remove Chromium (optional if not using for browser tests)
-          sudo rm -rf /usr/local/share/chromium
+      #     # Remove Chromium (optional if not using for browser tests)
+      #     sudo rm -rf /usr/local/share/chromium
 
-          # Remove Microsoft/Edge and Google Chrome builds
-          sudo rm -rf /opt/microsoft /opt/google
+      #     # Remove Microsoft/Edge and Google Chrome builds
+      #     sudo rm -rf /opt/microsoft /opt/google
 
-          # Remove Azure CLI
-          sudo rm -rf /opt/az
+      #     # Remove Azure CLI
+      #     sudo rm -rf /opt/az
 
-          # Remove PowerShell
-          sudo rm -rf /usr/local/share/powershell
+      #     # Remove PowerShell
+      #     sudo rm -rf /usr/local/share/powershell
 
-          # Remove CodeQL and other toolcaches
-          sudo rm -rf /opt/hostedtoolcache
+      #     # Remove CodeQL and other toolcaches
+      #     sudo rm -rf /opt/hostedtoolcache
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
