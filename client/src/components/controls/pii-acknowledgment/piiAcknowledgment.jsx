@@ -24,9 +24,10 @@ export default function PiiAcknowledgment({
             disabled={disabled}
             label={
               <span className="font-weight-normal">
-                I confirm that this data does not contain personally
+                I confirm that the uploaded data does not contain personally
                 identifiable information (PII) or protected health information
-                (PHI).
+                (PHI), including germline variant information that could
+                identify an individual.
               </span>
             }
           />

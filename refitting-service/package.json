@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dd-trace": "^6.26.0",
     "lodash": "^4.18.1",
     "lodash-es": "^4.18.1",
     "nodemailer": "^10.3.1",

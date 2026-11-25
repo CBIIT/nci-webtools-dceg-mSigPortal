@@ -27,6 +27,9 @@ COPY refitting-service .
 # Create ENV file if it doesn't exist https://github.com/nodejs/node/issues/50993
 RUN touch .env
 
+# Remove Python 3.9 and its dependents (including dnf/yum) after all package installs.
+RUN dnf -y --setopt=protected_packages= --setopt=clean_requirements_on_remove=False remove python3
+
 EXPOSE 8334
 
 CMD npm run start

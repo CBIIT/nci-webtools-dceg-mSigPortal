@@ -4,8 +4,35 @@ import {
   calculatePearson,
   calculateSpearman,
 } from '@/components/controls/utils/utils';
-import { groupBy } from 'lodash';
-import pcorrtest from '@stdlib/stats-pcorrtest';
+import groupBy from 'lodash/groupBy';
+
+function formatStatistic(value, decimalPlaces = 2) {
+  if (value === Infinity) return '∞';
+  if (value === -Infinity) return '−∞';
+  return Number.isFinite(value) ? round(value, decimalPlaces) : 'N/A';
+}
+
+function formatPValue(value) {
+  if (!Number.isFinite(value)) return 'N/A';
+  if (value === 0) return '&lt; 0.001';
+  return value < 0.001 ? value.toExponential(2) : round(value, 3);
+}
+
+function formatCorrelation(label, stats, approximate = false) {
+  const pairs = `n<sub>pairs</sub> = ${stats.n}`;
+  if (stats.reason) return `${label}: N/A (${stats.reason}), ${pairs}`;
+  const notes = [stats.testReason, stats.ciReason].filter(Boolean);
+  return (
+    `${label}:\tt<sub>Student</sub> = ${formatStatistic(stats.statistic)}` +
+    `, p${approximate ? ' (approx.)' : ''} = ${formatPValue(stats.pValue)}` +
+    `, r<sub>${label}</sub> = ${formatStatistic(stats.pcorr)}` +
+    `, CI<sub>95%${approximate ? ', approx.' : ''}</sub>[` +
+    `${formatStatistic(stats.ci[0])}, ${formatStatistic(
+      stats.ci[1]
+    )}], ${pairs}` +
+    (notes.length ? ` (${notes.join('; ')})` : '')
+  );
+}
 
 export default function MsAssociation(
   data,
@@ -50,9 +77,13 @@ export default function MsAssociation(
     );
   }
 
-  const minX = Math.min(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
+  const minX = xValues.length
+    ? Math.min(...xValues.map((e) => Math.log10(e['exposure'] + 1)))
+    : 0;
 
-  const maxX = Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)));
+  const maxX = xValues.length
+    ? Math.max(...xValues.map((e) => Math.log10(e['exposure'] + 1)))
+    : 0;
 
   const traceSig1 = {
     //x: signatureName1data.map((e) => Math.log10(e['exposure'] + 1)),
@@ -109,33 +140,32 @@ export default function MsAssociation(
       ': (log10)</b> %{y}<extra></extra>',
   };
 
-  const lr = linearRegression(traceMain.x, traceMain.y);
-
-  let pearsonV;
-  if (traceMain.x.length > 3) {
-    pearsonV = pcorrtest(traceMain.x, traceMain.y);
-  } else {
-    pearsonV = calculatePearson(traceMain.x, traceMain.y);
-  }
+  const pearsonV = calculatePearson(traceMain.x, traceMain.y);
   const spearman = calculateSpearman(traceMain.x, traceMain.y);
-  const traceLine = {
-    x: [minX, maxX],
-    y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
-    name: 'y=' + lr.sl + ' * x + ' + lr.off,
-    mode: 'lines',
-    marker: {
-      color: 'blue',
-    },
-    hovertemplate:
-      '<b>x: </b> %{x}<br><b>y: </b>%{y}<br>' +
-      'y=' +
-      round(lr.sl, 2) +
-      'x + ' +
-      round(lr.off, 2) +
-      '<extra></extra>',
-    showlegend: false,
-  };
-  const traces = [traceMain, traceLine, traceSig1, traceSig2];
+  const lr = pearsonV.reason
+    ? null
+    : linearRegression(traceMain.x, traceMain.y);
+  const traceLine =
+    lr && Number.isFinite(lr.sl) && Number.isFinite(lr.off)
+      ? {
+          x: [minX, maxX],
+          y: [minX * lr.sl + lr.off, maxX * lr.sl + lr.off],
+          name: 'y=' + lr.sl + ' * x + ' + lr.off,
+          mode: 'lines',
+          marker: {
+            color: 'blue',
+          },
+          hovertemplate:
+            '<b>x: </b> %{x}<br><b>y: </b>%{y}<br>' +
+            'y=' +
+            round(lr.sl, 2) +
+            'x + ' +
+            round(lr.off, 2) +
+            '<extra></extra>',
+          showlegend: false,
+        }
+      : null;
+  const traces = [traceMain, traceLine, traceSig1, traceSig2].filter(Boolean);
 
   const detailAnnotation = {
     xref: 'paper',
@@ -145,30 +175,18 @@ export default function MsAssociation(
     y: 1.01,
     yanchor: 'bottom',
     text:
-      'Pearson:\tt<sub>Student</sub> = ' +
-      round(pearsonV.statistic, 2) +
-      ', p = ' +
-      round(pearsonV.pValue, 3) +
-      ', r<sub>Pearson</sub> = ' +
-      round(pearsonV.pcorr, 2) +
-      ', CI<sub>95%</sub>[' +
-      round(pearsonV.ci[0], 2) +
-      ', ' +
-      round(pearsonV.ci[1], 2) +
-      '], n<sub>pairs</sub> = ' +
-      dataArraySample.length +
-      '<br>Spearman:\tt<sub>Student</sub> =' +
-      round(spearman.t, 2) +
-      ', p = ' +
-      round(spearman.pValue, 3) +
-      ', r<sub>Spearman</sub> = ' +
-      round(spearman.rho, 2) +
-      ', CI<sub>95%</sub>[' +
-      round(spearman.CILower, 2) +
-      ', ' +
-      round(spearman.CIUpper, 2) +
-      '], n<sub>pairs</sub> = ' +
-      spearman.n,
+      formatCorrelation('Pearson', pearsonV) +
+      '<br>' +
+      formatCorrelation(
+        'Spearman',
+        {
+          ...spearman,
+          pcorr: spearman.rho,
+          statistic: spearman.t,
+          ci: [spearman.CILower, spearman.CIUpper],
+        },
+        true
+      ),
     showarrow: false,
     font: {
       size: 16,

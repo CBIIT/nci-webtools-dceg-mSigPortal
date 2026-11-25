@@ -159,8 +159,12 @@ export function getAvg(grades) {
 }
 
 export function round(num, decimalPlaces = 0) {
-  num = Math.round(num + 'e' + decimalPlaces);
-  return Number(num + 'e' + -decimalPlaces);
+  if (!Number.isFinite(num)) return num;
+  const [coefficient, exponent = 0] = String(num).split('e');
+  const shifted = Number(`${coefficient}e${Number(exponent) + decimalPlaces}`);
+  if (!Number.isFinite(shifted)) return num;
+  const [rounded, roundedExponent = 0] = String(Math.round(shifted)).split('e');
+  return Number(`${rounded}e${Number(roundedExponent) - decimalPlaces}`);
 }
 
 export function pearson_correlation(x, y, confidence = 0.95) {
@@ -210,31 +214,58 @@ export function spearman_correlation(x, y, confidence = 0.95) {
 }
 
 export function calculateSpearman(x, y) {
-  const n = x.length;
-  const ranksX = jStat.rank(x);
-  const ranksY = jStat.rank(y);
-  let numerator = 0;
-  for (let i = 0; i < n; i++) {
-    numerator += (ranksX[i] - ranksY[i]) ** 2;
-  }
-  const rho = 1 - (6 * numerator) / (n * (n ** 2 - 1));
-  const t = rho * Math.sqrt((n - 2) / (1 - rho ** 2));
-  const pValue = jStat.ttest(t, n - 2);
-  const CILower = rho - 1.96 * Math.sqrt((1 - rho ** 2) / (n - 2));
-  const CIUpper = rho + 1.96 * Math.sqrt((1 - rho ** 2) / (n - 2));
-  const stats = {
-    n: n,
-    rho: rho,
-    t: t,
-    pValue: pValue,
-    CILower: CILower,
-    CIUpper: CIUpper,
+  validateCorrelationPairs(x, y);
+  // Pearson correlation of average ranks handles ties (including zero exposures).
+  // The t test and Fisher-z interval on ranks are asymptotic approximations.
+  const stats = calculatePearson(jStat.rank(x), jStat.rank(y));
+  return {
+    n: stats.n,
+    rho: stats.pcorr,
+    t: stats.statistic,
+    pValue: stats.pValue,
+    CILower: stats.CILower,
+    CIUpper: stats.CIUpper,
+    reason: stats.reason,
+    testReason: stats.testReason,
+    ciReason: stats.ciReason,
   };
-  return stats;
+}
+
+function validateCorrelationPairs(x, y) {
+  if (x.length !== y.length) {
+    throw new Error('Correlation requires the same number of paired values.');
+  }
+  if (!x.every(Number.isFinite) || !y.every(Number.isFinite)) {
+    throw new Error('Correlation requires finite numeric values.');
+  }
 }
 
 export function calculatePearson(x, y) {
+  validateCorrelationPairs(x, y);
   const n = x.length;
+  const stats = {
+    n,
+    pcorr: null,
+    statistic: null,
+    pValue: null,
+    CILower: null,
+    CIUpper: null,
+    ci: [null, null],
+    reason: null,
+    testReason: null,
+    ciReason: null,
+  };
+  if (n < 2) {
+    stats.reason = 'at least two paired samples are required';
+    return stats;
+  }
+  if (
+    x.every((value) => value === x[0]) ||
+    y.every((value) => value === y[0])
+  ) {
+    stats.reason = 'one or both signatures have no variation';
+    return stats;
+  }
   const xMean = jStat.mean(x);
   const yMean = jStat.mean(y);
   let numerator = 0;
@@ -245,20 +276,33 @@ export function calculatePearson(x, y) {
     xDenominator += (x[i] - xMean) ** 2;
     yDenominator += (y[i] - yMean) ** 2;
   }
-  const r = numerator / Math.sqrt(xDenominator * yDenominator);
-  const t = r * Math.sqrt((n - 2) / (1 - r ** 2));
-  const pValue = jStat.ttest(t, n - 2);
-  const CILower = r - 1.96 * Math.sqrt((1 - r ** 2) / (n - 2));
-  const CIUpper = r + 1.96 * Math.sqrt((1 - r ** 2) / (n - 2));
-  const stats = {
-    n: n,
-    pcorr: r,
-    statistic: t,
-    pValue: pValue,
-    CILower: CILower,
-    CIUpper: CIUpper,
-    ci: [CILower, CIUpper],
-  };
+  // Clamp floating-point overshoots at the correlation boundaries.
+  const r = Math.max(
+    -1,
+    Math.min(1, numerator / Math.sqrt(xDenominator * yDenominator))
+  );
+  stats.pcorr = r;
+  if (n > 2) {
+    stats.statistic = r * Math.sqrt((n - 2) / (1 - r ** 2));
+    // jStat.ttest expects a sample size and subtracts one internally. Use the
+    // distribution directly so the correlation test has exactly n - 2 df.
+    stats.pValue =
+      Math.abs(r) === 1
+        ? 0
+        : 2 * jStat.studentt.cdf(-Math.abs(stats.statistic), n - 2);
+  } else {
+    stats.testReason = 'the t test requires at least three paired samples';
+  }
+  if (n > 3) {
+    // Fisher-z 95% interval, matching the Pearson test used by the plot.
+    const z = Math.atanh(r);
+    const margin = jStat.normal.inv(0.975, 0, 1) / Math.sqrt(n - 3);
+    stats.ci = [Math.tanh(z - margin), Math.tanh(z + margin)];
+    [stats.CILower, stats.CIUpper] = stats.ci;
+  } else {
+    stats.ciReason =
+      'the confidence interval requires at least four paired samples';
+  }
   return stats;
 }
 

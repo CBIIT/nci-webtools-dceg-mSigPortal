@@ -1,0 +1,184 @@
+{
+  "_comment": "Regression cases for the Python 3.13 image upgrade. Inputs are copied into data/regression/inputs/ by run_cases.py. Tags: slow (Cluster runs), gpu (needs --gpus all), optional (skipped if input missing or run fails to start).",
+
+  "profiler": {
+    "script": "services/python/mSigPortal_Profiler_Extraction.py",
+    "inputs": [
+      "client/public/assets/exampleInput/demo_input_multi.vcf.gz",
+      "client/public/assets/exampleInput/demo_input_multi_MAF.txt",
+      "client/public/assets/exampleInput/demo_input_multi.csv",
+      "client/public/assets/exampleInput/demo_input_multi.tsv",
+      "client/public/assets/exampleInput/demo_input_catalog.tsv",
+      "client/public/assets/exampleInput/demo_input_catalog.csv",
+      "client/public/assets/exampleInput/demo_input_bed.bed",
+      "client/public/assets/exampleInput/breast_cancer_samples_example.CNV48.all",
+      "client/public/assets/exampleInput/breast_cancer_samples_example.RS32.all"
+    ],
+    "cases": {
+      "vcf_grch37_wgs": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "vcf_grch38_wgs": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh38", "Data_Type": "WGS"
+      },
+      "vcf_mm10_wgs": {
+        "package": "SigProfilerMatrixGenerator",
+        "tags": ["optional"],
+        "_note": "Human demo data against mm10 only proves the mm10 genome mounts and loads; output is expected to be near-empty on both images.",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "mm10", "Data_Type": "WGS"
+      },
+      "maf_grch37_wgs": {
+        "package": "SigProfilerMatrixGenerator",
+        "_note": "Only branch that uses pandas directly in the script (pd.read_table, to_csv).",
+        "Input_Format": "maf", "input": "demo_input_multi_MAF.txt",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "csv_grch37_collapse": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "csv", "input": "demo_input_multi.csv",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS",
+        "Collapse": "True"
+      },
+      "tsv_grch37_split_filters": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "tsv", "input": "demo_input_multi.tsv",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS",
+        "vcf_split_all_filter": "True"
+      },
+      "vcf_grch37_bed": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS",
+        "Bed": "demo_input_bed.bed"
+      },
+      "vcf_grch37_seqinfo": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS",
+        "SeqInfo": "True"
+      },
+      "vcf_grch37_wes": {
+        "package": "SigProfilerMatrixGenerator",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh37", "Data_Type": "WES"
+      },
+      "catalog_tsv_grch37": {
+        "package": "sigProfilerPlotting",
+        "Input_Format": "catalog_tsv", "input": "demo_input_catalog.tsv",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "catalog_csv_grch37": {
+        "package": "sigProfilerPlotting",
+        "Input_Format": "catalog_csv", "input": "demo_input_catalog.csv",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "catalog_cnv48": {
+        "package": "sigProfilerPlotting",
+        "tags": ["optional"],
+        "_note": "Exercises sigPlt.plotCNV via the 48-row dispatch.",
+        "Input_Format": "catalog_tsv", "input": "breast_cancer_samples_example.CNV48.all",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "catalog_rs32": {
+        "package": "sigProfilerPlotting",
+        "tags": ["optional"],
+        "_note": "Exercises sigPlt.plotSV via the 32-row dispatch.",
+        "Input_Format": "catalog_tsv", "input": "breast_cancer_samples_example.RS32.all",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS"
+      },
+      "vcf_grch37_cluster": {
+        "package": "SigProfilerClusters+SigProfilerSimulator",
+        "tags": ["slow"],
+        "_note": "100 simulations plus bcftools per-sample split. Expect tens of minutes.",
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh37", "Data_Type": "WGS",
+        "Cluster": "True"
+      },
+      "vcf_grch38_cluster": {
+        "package": "SigProfilerClusters+SigProfilerSimulator",
+        "tags": ["slow"],
+        "Input_Format": "vcf", "input": "demo_input_multi.vcf.gz",
+        "Genome_Building": "GRCh38", "Data_Type": "WGS",
+        "Cluster": "True"
+      }
+    }
+  },
+
+  "extractor": {
+    "script": "services/python/mSigPortal-SigProfilerExtractor.py",
+    "inputs": [
+      "client/public/assets/exampleInput/extraction_sample_SBS96.all",
+      "client/public/assets/exampleInput/extraction_sample_DBS78.all",
+      "data/examples/extraction/Example_ID83_SigProfileExtractor/ID83/Samples.txt"
+    ],
+    "_seed_note": "Extractor 1.1.13 reads exactly one row from a 'Seed' column; the example Seeds.txt files (header 'Seeds', 500 rows) are rejected. 5177184 is their first seed.",
+    "seed": 5177184,
+    "input_aliases": {
+      "Samples.txt": "extraction_sample_ID83.all"
+    },
+    "signature_db": {
+      "SBS96": "signature_SBS96.tsv",
+      "DBS78": "signature_DBS78.tsv",
+      "ID83": "signature_ID83.tsv"
+    },
+    "signature_db_fallback": {
+      "SBS96": "packages/SigProfilerExtractor/Reference_Signatures/GRCh37/COSMIC_v3.3_SBS_GRCh37.txt",
+      "DBS78": "packages/SigProfilerExtractor/Reference_Signatures/GRCh37/COSMIC_v3.3_DBS_GRCh37.txt",
+      "ID83": "packages/SigProfilerExtractor/Reference_Signatures/GRCh37/COSMIC_v3.3_ID_GRCh37.txt"
+    },
+    "defaults": {
+      "input_type": "matrix",
+      "opportunity_genome": "GRCh37",
+      "exome": "False",
+      "minimum_signatures": "1",
+      "maximum_signatures": "3",
+      "nmf_replicates": "5",
+      "min_nmf_iterations": "100",
+      "max_nmf_iterations": "1000",
+      "nmf_test_conv": "100",
+      "cpu": "4",
+      "gpu": "False",
+      "seeds": "Seeds.txt",
+      "make_decomposition_plots": "True",
+      "collapse_to_SBS96": "True",
+      "get_all_signature_matrices": "True",
+      "export_probabilities": "True"
+    },
+    "cases": {
+      "sbs96_cpu": {
+        "package": "SigProfilerExtractor (nmf_cpu) + SigProfilerAssignment + sigProfilerPlotting + PyPDF2/reportlab",
+        "input": "extraction_sample_SBS96.all", "context_type": "SBS96", "reference_genome": "GRCh37"
+      },
+      "sbs96_gpu": {
+        "package": "SigProfilerExtractor (nmf_gpu, torch)",
+        "tags": ["gpu"],
+        "input": "extraction_sample_SBS96.all", "context_type": "SBS96", "reference_genome": "GRCh37",
+        "gpu": "True"
+      },
+      "dbs78_cpu": {
+        "package": "SigProfilerExtractor",
+        "input": "extraction_sample_DBS78.all", "context_type": "DBS78", "reference_genome": "GRCh37"
+      },
+      "id83_cpu": {
+        "package": "SigProfilerExtractor",
+        "tags": ["optional"],
+        "input": "extraction_sample_ID83.all", "context_type": "ID83", "reference_genome": "GRCh37"
+      },
+      "sbs96_noplots_nocollapse": {
+        "package": "SigProfilerExtractor (skips plotting/PDF path)",
+        "input": "extraction_sample_SBS96.all", "context_type": "SBS96", "reference_genome": "GRCh37",
+        "make_decomposition_plots": "False", "collapse_to_SBS96": "False"
+      },
+      "sbs96_exome": {
+        "package": "SigProfilerExtractor (exome normalization)",
+        "input": "extraction_sample_SBS96.all", "context_type": "SBS96", "reference_genome": "GRCh37",
+        "exome": "True"
+      }
+    }
+  }
+}
