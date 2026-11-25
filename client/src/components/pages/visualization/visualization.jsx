@@ -156,11 +156,11 @@ export default function Visualization() {
       disabled: !completed,
     },
 
-    {
-      name: 'Download',
-      id: 'download',
-      disabled: !completed,
-    },
+    // {
+    //   name: 'Download',
+    //   id: 'download',
+    //   disabled: !completed,
+    // },
   ];
 
   return (
