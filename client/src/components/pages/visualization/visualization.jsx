@@ -94,10 +94,10 @@ export default function Visualization() {
 
   // refresh job status every minute
   useEffect(() => {
+    if (!id || isDone || refreshError) return;
     const interval = setInterval(refreshState, 1000 * 60);
-    if (isDone || refreshError) clearInterval(interval);
     return () => clearInterval(interval);
-  }, [isDone, refreshError, refreshState]);
+  }, [id, isDone, refreshError, refreshState]);
   // switch to first tab when job is complete
   useEffect(() => {
     if (status && status.status === 'COMPLETED' && displayTab == 'instructions')
@@ -156,11 +156,11 @@ export default function Visualization() {
       disabled: !completed,
     },
 
-    // {
-    //   name: 'Download',
-    //   id: 'download',
-    //   component: <Download />,
-    // },
+    {
+      name: 'Download',
+      id: 'download',
+      disabled: !completed,
+    },
   ];
 
   return (
