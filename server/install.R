@@ -1,3 +1,7 @@
+# parallelize installation using all available cores
+options(Ncpus = parallel::detectCores())
+Sys.setenv(MAKEFLAGS = paste0("-j", parallel::detectCores()))
+
 install.packages("remotes")
 # Keep installed dependencies unless an explicit version below replaces them.
 options(remotes.upgrade = "never")
